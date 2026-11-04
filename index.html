@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261104-clean-card-api-1"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261104-real-position-view-1"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -109,6 +109,29 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 .api-secondary-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}
 .api-secondary-actions button{font-size:11px;padding:10px 5px;background:#192c46}
 .api-footnote{color:#879ebc;font-size:11px;line-height:1.6;margin:12px 0 0}
+
+/* Actual Binance read-only account summary, separate from paper trading */
+.real-account-panel{border-color:#31516b;background:#132439;padding:14px!important}
+.real-account-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.real-account-head h2{font-size:16px;margin:0 0 4px}
+.real-account-head span{font-size:11px;color:#a5bbd4}
+.real-account-head .real-account-readonly{padding:4px 7px;border:1px solid #3a6966;border-radius:7px;color:#7fd9c5;font-size:10px;white-space:nowrap}
+.real-balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.real-balance-grid>div{background:#0b192c;padding:11px;border-radius:10px;min-width:0;display:flex;flex-direction:column;gap:7px}
+.real-balance-grid small{font-size:10px;color:#96aecb;line-height:1.4}
+.real-balance-grid strong{font-size:15px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.real-pnl-grid{margin-top:7px}
+.real-positions{margin-top:11px;background:#0b192c;border-radius:11px;padding:11px;color:#bed0e4;font-size:12px;line-height:1.6;white-space:pre-line;overflow-wrap:anywhere}
+.real-position-row{padding:9px 0;border-top:1px solid #263e55}
+.real-position-row:first-child{border-top:0;padding-top:0}
+.real-position-title{display:flex;justify-content:space-between;gap:6px;font-weight:700}
+.real-position-details{color:#a8bfd8;white-space:pre-line}
+.real-updated{font-size:11px;color:#91a9c5;margin-top:9px}
+.real-actions{margin-top:10px}
+.real-actions button{font-size:12px;padding:11px 5px}
+#realAccountRefresh{background:#215d91;border-color:#3377a9}
+.real-account-note{color:#91a8c1;font-size:10px;line-height:1.5;margin:10px 0 0}
+.real-pnl-positive{color:#58d3a6}.real-pnl-negative{color:#ff8396}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -122,7 +145,17 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
  <div id="entrySheet" class="card" style="display:none"><b id="sheetPrice">가상 주문</b><div class="order-types"><label><input type="radio" name="orderType" value="limit" checked> 지정가</label><label><input type="radio" name="orderType" value="market"> 시장가</label></div><label id="limitLabel" for="limitPrice">지정가 (USDT)</label><input id="limitPrice" type="number" min="0.01" step="0.1" inputmode="decimal" placeholder="원하는 진입 가격"><p id="orderHelp" class="muted" style="font-size:11px">지정가 주문은 가격 도달 시 모의 체결됩니다.</p><div class="row"><button class="buy" id="sheetLong">롱 진입</button><button class="sell" id="sheetShort">숏 진입</button><button id="sheetCancel">닫기</button></div></div>
  <div class="account-strip"><div><small>가상 잔고</small><strong id="balanceSummary">822.00 USDT</strong></div><div><small>순손익 (원화 추정)</small><strong id="pnlSummary">₩0</strong></div></div>
 </section>
-<section class="tab-page" id="page-position"><div class="card"><h2>가상 포지션</h2><div id="position" class="muted">포지션 없음</div><div class="row"><button id="close">가상 포지션 청산</button><button id="cancel">대기 주문 취소</button></div></div><div class="card"><h2>6개 시간봉 추세</h2><div class="grid" id="trends"></div></div></section>
+<section class="tab-page" id="page-position">
+<div class="card real-account-panel">
+<div class="real-account-head"><div><h2>바이낸스 실제 선물 계좌</h2><span>USDT-M · BTCUSDT · 읽기 전용</span></div><span class="real-account-readonly">실계좌 조회</span></div>
+<div class="real-balance-grid"><div><small>실제 USDT 지갑 잔고</small><strong id="realWalletBalance">—</strong></div><div><small>사용 가능 잔고</small><strong id="realAvailableBalance">—</strong></div></div>
+<div class="real-balance-grid real-pnl-grid"><div><small>실제 미실현 손익 (BTCUSDT)</small><strong id="realUnrealizedPnl">—</strong></div><div><small>포지션 수</small><strong id="realPositionCount">—</strong></div></div>
+<div id="realPositions" class="real-positions">조회 전 · 저장된 API 키는 잠금 해제가 필요해요.</div>
+<div id="realAccountUpdated" class="real-updated">실제 계좌 정보 미조회 · 자동 실시간 갱신 아님</div>
+<div class="row real-actions"><button id="realAccountRefresh" type="button">실제 잔고 · 포지션 새로고침</button><button id="realAccountManage" type="button">API 키 관리</button></div>
+<p class="real-account-note">실제 계좌 정보는 마지막 조회 시점 기준이에요. 아래 가상 포지션과 별개이며 실제 주문은 실행하지 않습니다.</p>
+</div>
+<div class="card"><h2>가상 포지션 · 모의매매</h2><div id="position" class="muted">포지션 없음</div><div class="row"><button id="close">가상 포지션 청산</button><button id="cancel">대기 주문 취소</button></div></div><div class="card"><h2>6개 시간봉 추세</h2><div class="grid" id="trends"></div></div></section>
 <section class="tab-page" id="page-history"><div class="card"><h2>모의매매 기록</h2><div id="log" class="muted">기록 없음</div><button id="clear">기록 지우기</button></div></section>
 <section class="tab-page" id="page-liquidation"><div class="card liquidation-card"><h2>BTC 청산맵</h2><p class="muted">코인글래스 청산 히트맵으로 이동해 BTC 선물 청산 밀집 구간을 확인할 수 있어요.</p><a class="liq-link" href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" rel="noopener noreferrer">코인글래스 청산맵 열기 ↗</a><p class="muted" style="font-size:12px;line-height:1.6;margin-top:14px">외부 사이트에서 열립니다. 일부 데이터는 로그인 또는 유료 이용권이 필요할 수 있어요. 청산 구간은 추정치이며 실제 청산을 보장하지 않습니다.</p></div></section>
 <section class="tab-page" id="page-settings">
@@ -318,6 +351,83 @@ $('myVaultDelete').onclick=()=>{
 };
 showVaultStatus();
 
+
+let liveAccountSnapshot=null; // memory only: never persist private account data
+let realAccountBusy=false;
+function fmtRealAmount(n,decimals=4){
+  const v=Number(n);return Number.isFinite(v)?v.toLocaleString('ko-KR',{maximumFractionDigits:decimals}):'—';
+}
+function clearRealAccount(message='조회 전 · 저장된 API 키는 잠금 해제가 필요해요.'){
+  liveAccountSnapshot=null;
+  $('realWalletBalance').textContent='—';$('realAvailableBalance').textContent='—';
+  $('realUnrealizedPnl').textContent='—';$('realPositionCount').textContent='—';
+  $('realUnrealizedPnl').className='';$('realPositions').textContent=message;
+  $('realAccountUpdated').textContent='실제 계좌 정보 미조회 · 자동 실시간 갱신 아님';
+}
+function renderRealAccount(data){
+  liveAccountSnapshot={data,at:Date.now()};
+  const usdt=(Array.isArray(data.assets)?data.assets:[]).find(x=>x.asset==='USDT');
+  const positions=(Array.isArray(data.positions)?data.positions:[]).filter(x=>x.symbol==='BTCUSDT'&&Number.isFinite(Number(x.positionAmt))&&Math.abs(Number(x.positionAmt))>0);
+  $('realWalletBalance').textContent=usdt?fmtRealAmount(usdt.walletBalance,6)+' USDT':'확인 불가';
+  $('realAvailableBalance').textContent=usdt?fmtRealAmount(usdt.availableBalance,6)+' USDT':'확인 불가';
+  const pnl=positions.reduce((sum,p)=>sum+(Number(p.unrealizedProfit)||0),0);
+  $('realUnrealizedPnl').textContent=fmtRealAmount(pnl,6)+' USDT';
+  $('realUnrealizedPnl').className=pnl>0?'real-pnl-positive':pnl<0?'real-pnl-negative':'';
+  $('realPositionCount').textContent=String(positions.length);
+  const root=$('realPositions');root.replaceChildren();
+  if(!positions.length){root.textContent='BTCUSDT 실제 보유 포지션 없음';}
+  else for(const p of positions){
+    const row=document.createElement('div');row.className='real-position-row';
+    const top=document.createElement('div');top.className='real-position-title';
+    const qty=Number(p.positionAmt);
+    const side=(p.positionSide&&p.positionSide!=='BOTH')?p.positionSide:(qty>0?'LONG':'SHORT');
+    const title=document.createElement('span');title.textContent='BTCUSDT · '+side;
+    const amount=document.createElement('span');amount.textContent=fmtRealAmount(Math.abs(qty),6)+' BTC';
+    top.append(title,amount);
+    const details=document.createElement('div');details.className='real-position-details';
+    const leverage=Number(p.leverage);
+    details.textContent=[
+      '진입가 '+fmtRealAmount(p.entryPrice,2)+' USDT · 레버리지 '+(leverage>0?leverage+'x':'—'),
+      '미실현 손익 '+fmtRealAmount(p.unrealizedProfit,6)+' USDT',
+      '예상 청산가 '+(Number(p.liquidationPrice)>0?fmtRealAmount(p.liquidationPrice,2)+' USDT':'—')
+    ].join(String.fromCharCode(10));
+    row.append(top,details);root.append(row);
+  }
+  $('realAccountUpdated').textContent='마지막 조회: '+new Date().toLocaleString('ko-KR')+' · 수동 새로고침';
+}
+async function fetchReadOnlyBinanceAccount(key,secret,out){
+  const params={apiKey:key,recvWindow:5000,timestamp:Date.now()};
+  const query=Object.keys(params).sort().map(k=>k+'='+encodeURIComponent(params[k])).join('&');
+  const hmac=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  const bytes=new Uint8Array(await crypto.subtle.sign('HMAC',hmac,new TextEncoder().encode(query)));
+  params.signature=Array.from(bytes,x=>x.toString(16).padStart(2,'0')).join('');
+  return directBinanceWS('v2/account.status',params,out);
+}
+async function refreshRealBinanceAccount(){
+  if(realAccountBusy)return;
+  const saved=getApiCredentials();
+  if(!saved?.apiKey||!saved?.apiSecret){
+    $('realPositions').textContent='API 키가 잠겨 있어요. 설정에서 잠금 해제해 주세요.';
+    return;
+  }
+  realAccountBusy=true;
+  const b=$('realAccountRefresh');b.disabled=true;
+  $('realAccountUpdated').textContent='실제 계좌 조회 중…';
+  try{
+    const data=await fetchReadOnlyBinanceAccount(saved.apiKey,saved.apiSecret,$('realAccountUpdated'));
+    renderRealAccount(data);
+  }catch(e){
+    $('realAccountUpdated').textContent='조회 실패: '+(e?.message||'연결 오류');
+    if(liveAccountSnapshot){$('realAccountUpdated').textContent+=' · 이전 조회값 표시 중';}
+    else clearRealAccount('실제 계좌 조회 실패 · 설정에서 API 키와 연결을 확인해 주세요.');
+  }finally{b.disabled=false;realAccountBusy=false}
+}
+$('realAccountRefresh').onclick=()=>{
+  if(!getApiCredentials()){switchTab('settings');$('myApiManage').open=true;$('myVaultStatus').textContent='저장된 API 키를 잠금 해제해 주세요.';return}
+  refreshRealBinanceAccount();
+};
+$('realAccountManage').onclick=()=>{switchTab('settings');$('myApiManage').open=true;};
+
 // Binance USD-M Futures WebSocket API public connectivity + optional signed account read.
 // Do NOT persist API keys, credentials, or account data. There is NO order method.
 function directBinanceWS(method,params,output,timeoutMs=9000){
@@ -343,31 +453,18 @@ $('myWsPublic').onclick=async()=>{
 $('myWsAccount').onclick=async()=>{
   const out=$('myWsAccountResult'),b=$('myWsAccount'),saved=getApiCredentials(),key=saved?.apiKey||'',secret=saved?.apiSecret||'';
   if(!key||!secret){$('myApiManage').open=true;out.hidden=false;out.textContent='API 키 관리에서 저장된 키를 잠금 해제하거나 새 키를 입력해 주세요.';return}
-  if(!window.crypto?.subtle){out.textContent='이 브라우저는 보안 서명을 지원하지 않아요.';return}
-  b.disabled=true;out.hidden=false;out.textContent='계좌 조회 중…';
+  if(!window.crypto?.subtle){out.hidden=false;out.textContent='브라우저 암호화 기능을 사용할 수 없어요.';return}
+  b.disabled=true;out.hidden=false;out.textContent='실제 계좌 조회 중…';
   try{
-    const params={apiKey:key,recvWindow:5000,timestamp:Date.now()};
-    const query=Object.keys(params).sort().map(k=>k+'='+encodeURIComponent(params[k])).join('&');
-    const hmac=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
-    const bytes=new Uint8Array(await crypto.subtle.sign('HMAC',hmac,new TextEncoder().encode(query)));
-    params.signature=Array.from(bytes,x=>x.toString(16).padStart(2,'0')).join('');
-    const account=await directBinanceWS('v2/account.status',params,out);
-    const usdt=(account.assets||[]).find(x=>x.asset==='USDT');
-    const btc=(account.positions||[]).filter(x=>x.symbol==='BTCUSDT'&&Math.abs(Number(x.positionAmt))>0);
-    const fmtV=x=>Number.isFinite(Number(x))?Number(x).toLocaleString('ko-KR',{maximumFractionDigits:6}):'--';
-    out.textContent=[
-      '✅ 잔고·포지션 조회 성공',
-      '지갑 잔고: '+fmtV(usdt?.walletBalance)+' USDT',
-      '사용 가능: '+fmtV(usdt?.availableBalance)+' USDT',
-      'BTC 포지션: '+(btc.length?btc.map(p=>p.positionSide+' '+fmtV(p.positionAmt)+' BTC / 진입가 '+fmtV(p.entryPrice)+' USDT / 미실현손익 '+fmtV(p.unrealizedProfit)+' USDT').join(' ; '):'없음')
-    ].join(String.fromCharCode(10));
-    // Query the fee while credentials are still in memory; failure must not hide successful account info.
-    try{await lookupAndSaveBinanceCommission(key,secret)}catch(e){showSavedFee('수수료 추가 조회 실패 · 확인된 저장값은 유지')}
-
-  }catch(e){out.textContent='⚠️ 직접 계좌 조회 실패: '+e.message+' · 권한 및 지역/IP 제한 확인 필요'}
+    const account=await fetchReadOnlyBinanceAccount(key,secret,out);
+    renderRealAccount(account);
+    const usdt=(Array.isArray(account.assets)?account.assets:[]).find(x=>x.asset==='USDT');
+    const btc=(Array.isArray(account.positions)?account.positions:[]).filter(x=>x.symbol==='BTCUSDT'&&Math.abs(Number(x.positionAmt))>0);
+    out.textContent='✅ 실제 선물 계좌 조회 성공 · USDT 잔고 '+fmtRealAmount(usdt?.walletBalance,6)+' · BTC 포지션 '+btc.length+'개\n자세한 내용은 포지션 탭에서 확인하세요.';
+    try{await lookupAndSaveBinanceCommission(key,secret)}catch(e){showSavedFee('수수료 재조회 실패 · 저장값 유지')}
+  }catch(e){out.textContent='⚠️ 실제 계좌 조회 실패: '+e.message}
   finally{b.disabled=false}
 };
-
 
 // Store only a verified user commission rate and its timestamp; NEVER store credentials.
 const feeStorageKey='btc_verified_usdm_btcusdt_commission_v1';
