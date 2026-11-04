@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261104-encrypted-api-vault-2"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261104-compact-api-1"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -80,7 +80,34 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
   #entrySheet .order-types{margin:4px 0}
   #entrySheet .row button{padding:7px 2px}
 }
-.daily-volume[role="button"]{cursor:pointer;touch-action:manipulation}.daily-volume-hint{font-size:10px;color:#82b7f5;margin-top:3px}.daily-volume:active{border-color:#78b5f5}.volume30-overlay[hidden]{display:none!important}.volume30-overlay{position:fixed!important;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px max(12px,env(safe-area-inset-right)) 12px max(12px,env(safe-area-inset-left));background:rgba(2,8,18,.84)}.volume30-dialog{width:min(720px,100%);max-height:calc(100dvh - 24px);overflow:auto;background:#14243b;border:1px solid #557194;border-radius:16px;padding:14px;box-shadow:0 14px 42px #0008}.volume30-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.volume30-header strong{font-size:16px}.volume30-header small{display:block;margin-top:6px;font-size:11px;color:#98b2ce;line-height:1.4}.volume30-header button{padding:5px 10px;min-width:35px;min-height:34px}.volume30-detail{font-size:14px;font-weight:700;color:#e7f2ff;margin:13px 0 5px;min-height:20px}.volume30-chart-wrap{height:clamp(140px,39dvh,290px);min-height:140px}.volume30-chart-wrap canvas{height:100%;width:100%;touch-action:manipulation;background:#0b1728}.volume30-status{font-size:11px;color:#a0b9d5;line-height:1.5;margin-top:9px}@media (orientation:landscape) and (max-height:520px){.volume30-dialog{padding:9px 12px}.volume30-chart-wrap{height:clamp(110px,40dvh,190px);min-height:110px}.volume30-header strong{font-size:14px}.volume30-detail{margin:5px 0}}.volume30-legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding-top:7px;color:#b9cce2;font-size:11px}.volume30-legend span{display:flex;align-items:center;gap:5px}.volume30-legend i{display:inline-block;width:12px;height:12px;border-radius:2px}.legend-weekend{background:#f05c75}.legend-weekday{background:#4d8fd4}.legend-selected{border:2px solid #ffd36e;background:transparent}.daily-volume{padding:6px 9px!important;margin:0 0 3px!important}.daily-volume-top{font-size:12px!important}.daily-volume-hint{margin-top:2px!important;font-size:11px!important}.daily-volume-note[hidden]{display:none!important}.grid{grid-template-columns:repeat(6,minmax(0,1fr))}</style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
+.daily-volume[role="button"]{cursor:pointer;touch-action:manipulation}.daily-volume-hint{font-size:10px;color:#82b7f5;margin-top:3px}.daily-volume:active{border-color:#78b5f5}.volume30-overlay[hidden]{display:none!important}.volume30-overlay{position:fixed!important;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px max(12px,env(safe-area-inset-right)) 12px max(12px,env(safe-area-inset-left));background:rgba(2,8,18,.84)}.volume30-dialog{width:min(720px,100%);max-height:calc(100dvh - 24px);overflow:auto;background:#14243b;border:1px solid #557194;border-radius:16px;padding:14px;box-shadow:0 14px 42px #0008}.volume30-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.volume30-header strong{font-size:16px}.volume30-header small{display:block;margin-top:6px;font-size:11px;color:#98b2ce;line-height:1.4}.volume30-header button{padding:5px 10px;min-width:35px;min-height:34px}.volume30-detail{font-size:14px;font-weight:700;color:#e7f2ff;margin:13px 0 5px;min-height:20px}.volume30-chart-wrap{height:clamp(140px,39dvh,290px);min-height:140px}.volume30-chart-wrap canvas{height:100%;width:100%;touch-action:manipulation;background:#0b1728}.volume30-status{font-size:11px;color:#a0b9d5;line-height:1.5;margin-top:9px}@media (orientation:landscape) and (max-height:520px){.volume30-dialog{padding:9px 12px}.volume30-chart-wrap{height:clamp(110px,40dvh,190px);min-height:110px}.volume30-header strong{font-size:14px}.volume30-detail{margin:5px 0}}.volume30-legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding-top:7px;color:#b9cce2;font-size:11px}.volume30-legend span{display:flex;align-items:center;gap:5px}.volume30-legend i{display:inline-block;width:12px;height:12px;border-radius:2px}.legend-weekend{background:#f05c75}.legend-weekday{background:#4d8fd4}.legend-selected{border:2px solid #ffd36e;background:transparent}.daily-volume{padding:6px 9px!important;margin:0 0 3px!important}.daily-volume-top{font-size:12px!important}.daily-volume-hint{margin-top:2px!important;font-size:11px!important}.daily-volume-note[hidden]{display:none!important}.grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+/* Compact read-only Binance connection panel */
+.api-panel{padding:14px!important}
+.api-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.api-head h2{margin:0 0 3px;font-size:16px}
+.api-caption{color:#8fa9c9;font-size:11px}
+.api-readonly{border:1px solid #365e62;border-radius:6px;padding:5px 7px;font-size:9px;font-weight:700;letter-spacing:.6px;color:#78d2be;white-space:nowrap}
+.api-vault-status{font-size:12px;color:#afc3dc;padding:10px 0 6px;line-height:1.4}
+.api-main-actions{display:grid;grid-template-columns:1.15fr 1fr;gap:7px;margin-top:5px}
+.api-main-actions button{padding:11px 5px;font-size:13px;border-radius:9px}
+.api-main-actions .api-primary{background:#235b94;border-color:#3973ad;font-weight:700}
+.api-account-result{font-size:12px;line-height:1.6;color:#bbd0e7;white-space:pre-line;overflow-wrap:anywhere;background:#0d1b30;border-radius:9px;padding:10px;margin-top:9px}
+.api-account-result[hidden]{display:none}
+.api-fee-row{display:flex;flex-direction:column;gap:5px;margin:11px 0 3px;padding:10px 11px;background:#0c1b30;border-radius:9px}
+.api-fee-row>span{font-size:11px;color:#9bb2cd}
+.api-fee-row #myFeeDisplay{font-size:12px;line-height:1.6;white-space:pre-line}
+.api-details{border-top:1px solid #2e4260;margin-top:12px}
+.api-details summary{cursor:pointer;list-style:none;color:#a8bcd5;font-size:12px;padding:12px 2px 2px;display:flex;justify-content:space-between;align-items:center}
+.api-details summary::-webkit-details-marker{display:none}
+.api-details[open] summary span{transform:rotate(180deg)}
+.api-detail-body{padding-top:4px}
+.api-detail-body label{font-size:12px;margin:11px 0 5px}
+.api-detail-body input{padding:11px;font-size:14px}
+.api-detail-body .row button{padding:10px 6px;font-size:12px}
+.api-secondary-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px}
+.api-secondary-actions button{font-size:11px;padding:8px 5px;background:#192c46}
+.api-footnote{color:#879ebc;font-size:10px;line-height:1.6;margin:12px 0 0}
+</style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
  <div class="price-panel"><div class="quote-wrap"><div class="price" id="price">-- USDT</div><div id="funding" class="funding" aria-live="polite">펀딩 조회 중</div></div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="5m">5분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="1d">일봉</option></select></div><div id="convergenceBanner" class="convergence-banner" hidden role="status"></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
@@ -97,21 +124,24 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <section class="tab-page" id="page-history"><div class="card"><h2>모의매매 기록</h2><div id="log" class="muted">기록 없음</div><button id="clear">기록 지우기</button></div></section>
 <section class="tab-page" id="page-liquidation"><div class="card liquidation-card"><h2>BTC 청산맵</h2><p class="muted">코인글래스 청산 히트맵으로 이동해 BTC 선물 청산 밀집 구간을 확인할 수 있어요.</p><a class="liq-link" href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" rel="noopener noreferrer">코인글래스 청산맵 열기 ↗</a><p class="muted" style="font-size:12px;line-height:1.6;margin-top:14px">외부 사이트에서 열립니다. 일부 데이터는 로그인 또는 유료 이용권이 필요할 수 있어요. 청산 구간은 추정치이며 실제 청산을 보장하지 않습니다.</p></div></section>
 <section class="tab-page" id="page-settings">
-<div class="card" id="binanceApiPanel"><h2>바이낸스 API 연결 · 조회 전용</h2>
-<label for="myBinanceKey">Binance API Key</label><input type="password" id="myBinanceKey" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="API Key 입력">
-<label for="myBinanceSecret">Binance Secret Key</label><input type="password" id="myBinanceSecret" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Secret Key 입력">
-<label for="myVaultPassword">저장용 잠금 비밀번호 (12자 이상)</label><input type="password" id="myVaultPassword" autocomplete="new-password" placeholder="키 암호화 저장·잠금 해제에만 사용">
-<div class="row"><button id="myVaultSave" type="button">🔒 API 키 암호화 저장</button><button id="myVaultUnlock" type="button">저장된 키 불러오기</button></div>
-<div class="row"><button id="myVaultDelete" type="button">저장된 API 키 삭제</button></div>
-<div id="myVaultStatus" class="muted" role="status" style="font-size:12px;line-height:1.5;margin-top:6px">저장된 API 키 없음</div>
-<p class="muted" style="font-size:11px;line-height:1.5;margin-top:6px">API 키와 Secret Key는 암호화해 이 기기에만 저장합니다. 재접속 시 잠금 비밀번호로 해제해야 해요. 공개 웹앱이므로 거래 권한이 없는 읽기 전용 키만 사용하세요.</p>
-<div class="row"><button id="myWsPublic" type="button">연결 확인 (키 불필요)</button></div>
-<div class="row"><button id="myWsAccount" type="button">잔고·포지션 조회</button><button id="myApiClear" type="button">입력값 지우기</button></div>
-<div class="card" style="background:#0d1b30;margin:12px 0 0;padding:12px"><strong>BTCUSDT 선물 수수료율</strong>
-<div id="myFeeDisplay" style="line-height:1.8;margin-top:7px">수수료율 미조회</div>
-<div class="row"><button type="button" id="myFeeLookup">수수료율 조회</button><button type="button" id="myFeeForget">저장값 삭제</button></div>
+<div class="card api-panel" id="binanceApiPanel">
+<div class="api-head"><div><h2>바이낸스 계좌</h2><span class="api-caption">BTCUSDT 선물 · 조회 전용</span></div><span class="api-readonly">READ ONLY</span></div>
+<div id="myVaultStatus" class="api-vault-status" role="status">저장된 키 없음</div>
+<div class="api-main-actions">
+<button id="myWsAccount" class="api-primary" type="button">잔고 · 포지션 조회</button>
+<button id="myFeeLookup" type="button">수수료 조회</button>
 </div>
-<div id="myWsAccountResult" class="muted" role="status" aria-live="polite" style="margin-top:8px;line-height:1.65"></div>
+<div id="myWsAccountResult" class="api-account-result" role="status" aria-live="polite" hidden></div>
+<div class="api-fee-row"><span>BTCUSDT 수수료</span><div id="myFeeDisplay">미조회</div></div>
+<details id="myApiManage" class="api-details"><summary>API 키 관리 <span>⌄</span></summary>
+<div class="api-detail-body">
+<label for="myVaultPassword">잠금 비밀번호</label><input type="password" id="myVaultPassword" autocomplete="off" placeholder="저장된 키 잠금 해제 / 새 저장용">
+<div class="row"><button id="myVaultUnlock" type="button">잠금 해제</button><button id="myVaultSave" type="button">암호화 저장</button></div>
+<label for="myBinanceKey">API Key</label><input type="password" id="myBinanceKey" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 API Key">
+<label for="myBinanceSecret">Secret Key</label><input type="password" id="myBinanceSecret" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 Secret Key">
+<div class="api-secondary-actions"><button id="myWsPublic" type="button">연결 확인</button><button id="myApiClear" type="button">입력 지우기</button><button id="myVaultDelete" type="button">저장 키 삭제</button><button id="myFeeForget" type="button">수수료 기록 삭제</button></div>
+<p class="api-footnote">키는 잠금 비밀번호로 이 기기에 암호화 저장됩니다. 읽기 전용 API 키만 사용하세요. 실제 주문은 실행하지 않습니다.</p>
+</div></details>
 </div><div class="card"><h2>전략 설정</h2><label>가상 계좌 USDT</label><input id="balance" type="number" value="822" min="1" step="1"><label>레버리지</label><input id="lev" type="number" value="20" min="1" max="50"><label for="sizeMode">포지션 크기 계산 방식</label><select id="sizeMode"><option value="risk">위험 기준 (기본)</option><option value="margin">증거금 기준 (직접 선택)</option></select><div id="marginControls" hidden><label for="marginPct">사용할 증거금 비율</label><select id="marginPct"><option value="10">10%</option><option value="25">25%</option><option value="50">50%</option><option value="75">75%</option><option value="100">100% (전체 잔고 · 고위험)</option></select><p class="muted" style="font-size:12px;line-height:1.5">증거금 기준은 계좌 위험 제한을 적용하지 않습니다. 100% 사용 시 수수료·손실에 대비한 여유 증거금이 없어 강제청산 위험이 큽니다.</p></div><div id="riskControls"><label>1회 계좌 위험 (%)</label><input id="risk" type="number" value="0.5" min="0.01" max="5" step="0.05"></div><label>손절 거리 (%)</label><input id="stop" type="number" value="0.3" min="0.15" max="0.6" step="0.05"><label>목표 순손익비</label><input id="rr" type="number" value="2" min="1" step="0.5"><label>최대 보유 시간</label><input id="hold" type="number" value="6" min="1" max="24"><label>USD → KRW 환율</label><input id="fx" type="number" value="1400" min="1" step="0.1"><div id="fxstatus" class="muted"></div><div id="calc" class="muted"></div></div><p class="muted footnote">모의매매 전용 · 실제 주문 없음 · 손익은 수수료·슬리피지 가정 차감 후 환산 추정치이며 펀딩비·세금 등은 제외됩니다.</p></section>
 </main>
 <div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button></div>
@@ -303,16 +333,16 @@ function directBinanceWS(method,params,output,timeoutMs=9000){
   });
 }
 $('myWsPublic').onclick=async()=>{
-  const out=$('myWsAccountResult'),b=$('myWsPublic');b.disabled=true;out.textContent='서버 없이 바이낸스 WebSocket 연결 시험 중… (API 키 미사용)';
+  const out=$('myWsAccountResult'),b=$('myWsPublic');b.disabled=true;out.hidden=false;out.textContent='서버 없이 바이낸스 WebSocket 연결 시험 중… (API 키 미사용)';
   try{const result=await directBinanceWS('time',{},out);out.textContent='✅ 직접 연결 성공! 바이낸스 서버 시간 조회됨.\\n다음은 읽기 전용 잔고·포지션 조회를 시험할 수 있어요.'.replaceAll('\\n','\n')}
   catch(err){out.textContent='⚠️ 직접 연결 실패: '+err.message+' · API 키를 입력해도 해결되지 않을 수 있어요.'}
   finally{b.disabled=false}
 };
 $('myWsAccount').onclick=async()=>{
   const out=$('myWsAccountResult'),b=$('myWsAccount'),saved=getApiCredentials(),key=saved?.apiKey||'',secret=saved?.apiSecret||'';
-  if(!key||!secret){out.textContent='API Key와 Secret Key를 입력하거나 저장된 키를 잠금 해제해 주세요.';return}
+  if(!key||!secret){$('myApiManage').open=true;out.hidden=false;out.textContent='API 키 관리에서 저장된 키를 잠금 해제하거나 새 키를 입력해 주세요.';return}
   if(!window.crypto?.subtle){out.textContent='이 브라우저는 보안 서명을 지원하지 않아요.';return}
-  b.disabled=true;out.textContent='바이낸스에 직접 읽기 전용 계좌 조회 중…';
+  b.disabled=true;out.hidden=false;out.textContent='계좌 조회 중…';
   try{
     const params={apiKey:key,recvWindow:5000,timestamp:Date.now()};
     const query=Object.keys(params).sort().map(k=>k+'='+encodeURIComponent(params[k])).join('&');
@@ -323,7 +353,7 @@ $('myWsAccount').onclick=async()=>{
     const usdt=(account.assets||[]).find(x=>x.asset==='USDT');
     const btc=(account.positions||[]).filter(x=>x.symbol==='BTCUSDT'&&Math.abs(Number(x.positionAmt))>0);
     const fmtV=x=>Number.isFinite(Number(x))?Number(x).toLocaleString('ko-KR',{maximumFractionDigits:6}):'--';
-    out.textContent='✅ 바이낸스 USDⓈ-M 계좌 직접 조회 성공\\n실제 USDT 지갑 잔고: '+fmtV(usdt?.walletBalance)+' USDT\\n실제 USDT 사용 가능 잔고: '+fmtV(usdt?.availableBalance)+' USDT\\n실제 BTCUSDT 포지션: '+(btc.length?btc.map(p=>p.positionSide+' '+fmtV(p.positionAmt)+' BTC / 진입가 '+fmtV(p.entryPrice)+' USDT / 미실현손익 '+fmtV(p.unrealizedProfit)+' USDT').join(' ; '):'없음')+'\\n실제 주문: 비활성화 / 모의매매 유지'.replaceAll('\\n','\n');
+    out.textContent='✅ 잔고·포지션 조회 성공\\n지갑 잔고: '+fmtV(usdt?.walletBalance)+' USDT\\n사용 가능: '+fmtV(usdt?.availableBalance)+' USDT\\nBTC 포지션: '+(btc.length?btc.map(p=>p.positionSide+' '+fmtV(p.positionAmt)+' BTC / 진입가 '+fmtV(p.entryPrice)+' USDT / 미실현손익 '+fmtV(p.unrealizedProfit)+' USDT').join(' ; '):'없음')+''.replaceAll('\\n','\n');
     // Query the fee while credentials are still in memory; failure must not hide successful account info.
     try{await lookupAndSaveBinanceCommission(key,secret)}catch(e){showSavedFee('수수료 추가 조회 실패 · 확인된 저장값은 유지')}
 
@@ -336,13 +366,12 @@ $('myWsAccount').onclick=async()=>{
 const feeStorageKey='btc_verified_usdm_btcusdt_commission_v1';
 function readStoredFee(){try{const d=JSON.parse(localStorage.getItem(feeStorageKey)||'null');if(d&&Number.isFinite(d.maker)&&Number.isFinite(d.taker)&&d.maker>=0&&d.taker>=0&&d.maker<=1&&d.taker<=1&&Number.isFinite(d.time))return d}catch(_){}return null}
 function showSavedFee(note=''){
-  const d=readStoredFee();
-  const out=$('myFeeDisplay');
-  if(!d){out.textContent='수수료율 미조회'+(note?' · '+note:'');return}
+  const d=readStoredFee(),out=$('myFeeDisplay');
+  if(!d){out.textContent='미조회'+(note?' · '+note:'');return}
   const fmt=x=>(x*100).toLocaleString('ko-KR',{maximumFractionDigits:6});
-  out.textContent='마지막 조회 메이커(지정가): '+fmt(d.maker)+'%\n마지막 조회 테이커(시장가): '+fmt(d.taker)+'%\n조회 시각: '+new Date(d.time).toLocaleString('ko-KR')+'\n※ 저장된 과거 조회값 · 실시간 요율 아님'+(note?'\n'+note:'');
-  out.style.whiteSpace='pre-line';
+  out.textContent='지정가 '+fmt(d.maker)+'%  ·  시장가 '+fmt(d.taker)+'%\\n마지막 조회 '+new Date(d.time).toLocaleString('ko-KR')+(note?'\\n'+note:'');
 }
+
 function saveVerifiedFees(maker,taker){
   if(!Number.isFinite(maker)||!Number.isFinite(taker)||maker<0||taker<0||maker>1||taker>1)throw Error('수수료 형식 오류');
   localStorage.setItem(feeStorageKey,JSON.stringify({maker,taker,time:Date.now()}));
@@ -365,7 +394,7 @@ async function lookupAndSaveBinanceCommission(key,secret){
 }
 $('myFeeLookup').onclick=async()=>{
   const b=$('myFeeLookup'),saved=getApiCredentials(),key=saved?.apiKey||'',secret=saved?.apiSecret||'';
-  if(!key||!secret){showSavedFee('API Key와 Secret Key를 입력하거나 저장된 키를 잠금 해제해 주세요.');return}
+  if(!key||!secret){$('myApiManage').open=true;showSavedFee('API 키 관리에서 키를 입력하거나 잠금 해제해 주세요.');return}
   b.disabled=true;showSavedFee('BTCUSDT 수수료율 직접 조회 중…');
   try{await lookupAndSaveBinanceCommission(key,secret)}
   catch(e){showSavedFee('⚠️ 이번 조회 실패 ('+(e instanceof TypeError?'브라우저 CORS 또는 네트워크 차단':e.name==='TimeoutError'?'연결 시간 초과':e.message)+'). 기존 저장된 수수료는 유지됩니다.')}
