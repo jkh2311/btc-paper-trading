@@ -34,7 +34,18 @@ async function importSnapshot(value){
   },out);
   await page.reload({waitUntil:'domcontentloaded',timeout:45000});
   const after=await getSnapshot();
-  if(after.paper!==value.paper)throw Error('Initial phone paper portfolio transfer did not persist');
+  if(!after.paper)throw Error('Initial phone paper portfolio transfer missing');
+  const source=JSON.parse(value.paper),restored=JSON.parse(after.paper);
+  // Verify all imported active paper positions survived the reload. A position
+  // may legitimately close immediately, in which case it appears in trades.
+  const ids=x=>['LONG','SHORT'].flatMap(side=>{
+    const raw=x.hedgePositions?.[side]||[];
+    return (Array.isArray(raw)?raw:[raw]).filter(Boolean).map(p=>p.id).filter(Boolean);
+  });
+  const available=new Set([...ids(restored),
+    ...(restored.closedPaperTrades||[]).map(t=>t.id).filter(Boolean)]);
+  if(ids(source).some(id=>!available.has(id)))
+    throw Error('Imported phone paper positions did not survive initialization');
   await page.locator('#autoPaperQuickToggle').waitFor({timeout:30000});
 }
 async function browser(){
