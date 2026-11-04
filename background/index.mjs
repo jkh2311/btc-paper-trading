@@ -13,6 +13,7 @@ const keys={paper:'btc-paper-trading-state-v1',settings:'btc-paper-auto-settings
 const marketModes=new Set(['classic','trend','auto','range','breakout','off']);
 const meta=path.join(DIR,'armed.json'),backup=path.join(DIR,'paper-backup.json');
 let state={armed:false,initialized:false},context=null,page=null,lock=Promise.resolve(),lastError=null,heartbeatAt=0,lastWritten='';
+let manualRequestsWaiting=0;
 const serial=fn=>{const t=lock.then(fn);lock=t.catch(()=>{});return t};
 const read=async p=>{try{return JSON.parse(await readFile(p,'utf8'))}catch{return null}};
 const save=async(p,x)=>{await writeFile(p+'.tmp',JSON.stringify(x),{mode:0o600});await rename(p+'.tmp',p)};
@@ -394,7 +395,10 @@ async function request(req,res){
       // instead of endlessly retrying the same impossible order ID.
       try{checkedManualOrder(input)}
       catch(e){return send(res,422,{error:String(e.message||e)},origin)}
-      const receipt=await serial(()=>handleManualOrder(input));
+      manualRequestsWaiting++;
+      let receipt;
+      try{receipt=await serial(()=>handleManualOrder(input))}
+      finally{manualRequestsWaiting=Math.max(0,manualRequestsWaiting-1)}
       // Order is already acknowledged and persisted; do not wait for a
       // second headless-browser status query before responding to the tap.
       return send(res,200,{receipt},origin);
@@ -421,4 +425,14 @@ await mkdir(DIR,{recursive:true,mode:0o700});
 state={...state,...await read(meta)};
 try{await browser()}catch(e){lastError=String(e.message||e).slice(0,300)}
 http.createServer((req,res)=>{void request(req,res)}).listen(Number(process.env.PORT)||3000,'0.0.0.0');
-setInterval(()=>{void serial(async()=>{heartbeatAt=Date.now();try{await synchronize();lastError=null}catch(e){lastError=String(e.message||e).slice(0,300)}})},3000);
+setInterval(()=>{
+  // Manual user actions take precedence over a scheduled status/snapshot
+  // heartbeat. The browser's paper stop/take-profit loop runs independently.
+  if(manualRequestsWaiting>0)return;
+  void serial(async()=>{
+    if(manualRequestsWaiting>0)return;
+    heartbeatAt=Date.now();
+    try{await synchronize();lastError=null}
+    catch(e){lastError=String(e.message||e).slice(0,300)}
+  });
+},3000);
