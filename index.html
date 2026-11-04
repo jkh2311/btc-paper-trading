@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-clean-rmi-shared-strategy-v12"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-fast-limit-5min-expiry-v13"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -652,7 +652,7 @@ const AUTO_PAPER_FIELDS={
   autoMaxChasePct:[0.12,0.03,0.5],autoMaxPositions:[1,1,5],
   autoDailyLossPct:[2,0.5,10],autoCooldownMin:[15,1,240]
 };
-let autoPaperEnabled=false,autoPaperArmedAt=0,autoSignalHistory=[],autoLastCheckedBar=0,autoLastEntryAt=0,autoDailyEntryCounts={};
+let autoPaperEnabled=false,autoPaperArmedAt=0,autoSignalHistory=[],autoLastCheckedBar=0,autoLastEntryAt=0,autoLastOrderAt=0,autoPendingLimit=null,autoDailyEntryCounts={};
 function readAutoSetting(id){
   const cfg=AUTO_PAPER_FIELDS[id],n=Number($(id).value);
   return Number.isFinite(n)?Math.max(cfg[1],Math.min(cfg[2],n)):cfg[0];
@@ -667,7 +667,7 @@ function saveAutoSettings(){
   }catch(e){console.warn('자동 모의 설정 저장 실패',e)}
 }
 function saveAutoSignals(){
-  try{localStorage.setItem(AUTO_PAPER_SIGNALS_KEY,JSON.stringify({history:autoSignalHistory.slice(-100),lastEntryAt:autoLastEntryAt,dailyEntryCounts:autoDailyEntryCounts}))}
+  try{localStorage.setItem(AUTO_PAPER_SIGNALS_KEY,JSON.stringify({history:autoSignalHistory.slice(-100),lastEntryAt:autoLastEntryAt,lastOrderAt:autoLastOrderAt,dailyEntryCounts:autoDailyEntryCounts}))}
   catch(e){console.warn('신호 기록 저장 실패',e)}
 }
 function restoreAutoPaperSettings(){
@@ -679,6 +679,7 @@ function restoreAutoPaperSettings(){
     const state=JSON.parse(localStorage.getItem(AUTO_PAPER_SIGNALS_KEY)||'{}');
     if(Array.isArray(state.history))autoSignalHistory=state.history.filter(x=>x&&['LONG','SHORT'].includes(x.side)&&Number.isFinite(x.barTime)&&Number.isFinite(x.price)).slice(-100);
     if(Number.isFinite(state.lastEntryAt)&&state.lastEntryAt>0)autoLastEntryAt=state.lastEntryAt;
+    if(Number.isFinite(state.lastOrderAt)&&state.lastOrderAt>0)autoLastOrderAt=state.lastOrderAt;
     if(state.dailyEntryCounts&&typeof state.dailyEntryCounts==='object'){
       autoDailyEntryCounts=Object.fromEntries(Object.entries(state.dailyEntryCounts)
         .filter(([day,n])=>/^\d{4}-\d{2}-\d{2}$/.test(day)&&Number.isInteger(n)&&n>=0&&n<=1000).slice(-40));
@@ -783,8 +784,9 @@ function autoGuardForSignal(signal,now){
   if(chasePct>readAutoSetting('autoMaxChasePct'))return '신호 이후 가격 이탈 '+chasePct.toFixed(2)+'%';
   if(paperMode()!=='hedge')return '헤지 모드에서만 자동 진입';
   if(pending)return '수동 대기 주문 있음';
+  if(autoPendingLimit)return '자동 지정가 주문 대기 중';
   if(allPaperPositions().filter(p=>p.autoStrategy).length>=readAutoSetting('autoMaxPositions'))return '자동 포지션 수 제한';
-  if(now-autoLastEntryAt<readAutoSetting('autoCooldownMin')*60000)return '재진입 대기 중';
+  if(now-Math.max(autoLastEntryAt,autoLastOrderAt)<readAutoSetting('autoCooldownMin')*60000)return '재진입 대기 중';
   const balance=Number($('balance').value);
   if(!(balance>0)||paperFreeMargin()<=1)return '가상 잔고/증거금 부족';
   const today=autoKstDay(now);
@@ -801,35 +803,82 @@ function autoGuardForSignal(signal,now){
   if(todayCount>=6)return '일일 자동 진입 6회 제한';
   return '';
 }
+
+const AUTO_LIMIT_LIFETIME_MS=300000;
+const AUTO_LIMIT_AGGRESSIVE_OFFSET=.0001;
+function autoLimitPrice(side,market){
+  if(!(market>0)||!Number.isFinite(market))return null;
+  const limit=side==='LONG'
+    ?Math.ceil(market*(1+AUTO_LIMIT_AGGRESSIVE_OFFSET)*10)/10
+    :Math.floor(market*(1-AUTO_LIMIT_AGGRESSIVE_OFFSET)*10)/10;
+  return limit>0?limit:null;
+}
+function cancelAutoPendingLimit(reason='수동 취소'){
+  const o=autoPendingLimit;if(!o)return false;
+  autoPendingLimit=null;
+  const sig=autoSignalHistory.find(x=>x.barTime===o.signalBarTime&&x.strategy===o.strategy);
+  if(sig){sig.orderStatus=Date.now()>=o.expiresAt?'expired':'cancelled';sig.blocked=reason}
+  add('자동 모의 지정가 '+(o.side==='LONG'?'롱':'숏')+' 미체결 취소 · '+reason+' · '+fmt(o.price)+' USDT');
+  savePaperState();saveAutoSignals();render();
+  return true;
+}
+function fillAutoPendingLimit(market,now=Date.now()){
+  const o=autoPendingLimit;
+  if(!o||!(market>0)||now>=o.expiresAt)return false;
+  // Never use the last trade already known when the order was submitted.
+  if(lastTickAt<=o.createdAt||now-lastTickAt>5000)return false;
+  if(!(o.side==='LONG'?market<=o.price:market>=o.price))return false;
+  if(!autoPaperEnabled||paperMode()!=='hedge'){
+    cancelAutoPendingLimit('자동 모의 OFF 또는 헤지 모드 아님');return false;
+  }
+  if(paperFreeMargin()+1e-9<o.notional/o.leverage||
+    allPaperPositions().filter(p=>p.autoStrategy).length>=readAutoSetting('autoMaxPositions')){
+    cancelAutoPendingLimit('체결 시점 증거금/포지션 한도 부족');return false;
+  }
+  const entry=o.price,side=o.side,qty=o.notional/entry,d=o.stopPct,rr=o.rr;
+  const stop=side==='LONG'?entry*(1-d):entry*(1+d);
+  const takeMove=rr*(d+2*paperTradeCost())+2*paperTradeCost();
+  const tp=side==='LONG'?entry*(1+takeMove):entry*(1-takeMove);
+  if(!(entry>0&&qty>0&&stop>0&&tp>0))return false;
+  // Aggressive LIMIT may cross the spread; conservatively charge taker on entry.
+  const p={id:paperPositionId(),side,entry,stop,tp,qty,notional:o.notional,
+    leverage:o.leverage,entryFeeRate:paperFeeRates().taker,entryType:'limit',
+    opened:now,hold:o.hold,entryPattern:o.entryPattern,
+    autoStrategy:o.strategy,autoSignalBarTime:o.signalBarTime};
+  hedgePositions[side].push(p);autoPendingLimit=null;autoLastEntryAt=now;
+  const day=autoKstDay(now);
+  autoDailyEntryCounts[day]=Math.max(Number(autoDailyEntryCounts[day])||0,
+    closedPaperTrades.filter(t=>t.autoStrategy&&autoKstDay(t.openedAt||t.closedAt)===day).length+
+    allPaperPositions().filter(x=>x.autoStrategy&&autoKstDay(x.opened)===day).length);
+  const sig=autoSignalHistory.find(x=>x.barTime===o.signalBarTime&&x.strategy===o.strategy);
+  if(sig){sig.executed=true;sig.orderStatus='filled';sig.fillPrice=entry;sig.filledAt=now}
+  add('자동 모의 '+(side==='LONG'?'롱':'숏')+' 지정가 체결 · '+fmt(entry)+' USDT · 손절 '+
+    fmt(stop)+' · 익절 '+fmt(tp)+' · 테이커 수수료 가정');
+  savePaperState();saveAutoSignals();render();return true;
+}
 function executeAutoPaperSignal(signal){
-  // Independent model: no mutation of manual order settings or manual positions.
+  if(autoPendingLimit)return '다른 자동 지정가 대기 중';
   const side=signal.side,lev=Number($('lev').value);
   const risk=Number($('risk').value)/100,stopPct=Number($('stop').value)/100;
   const rr=Number($('rr').value),hold=Number($('hold').value);
   const balance=Number($('balance').value),free=paperFreeMargin();
   if(!(balance>0&&lev>0&&Number.isFinite(lev)&&risk>0&&stopPct>=.0015&&stopPct<=.006&&rr>=1&&hold>0&&free>0))
     return '설정 탭의 전략 설정을 확인해 주세요';
-  const sourceNotional=positionNotional(balance,lev,risk,stopPct);
-  const notional=Math.min(sourceNotional*(signal.aligned?1:.35),free*lev);
+  const base=positionNotional(balance,lev,risk,stopPct);
+  const notional=Math.min(base*(signal.aligned?1:.35),free*lev);
   if(!(notional>=10)||!Number.isFinite(notional))return '가상 주문 규모 부족';
-  const entry=last*(side==='LONG'?1+slip:1-slip),qty=notional/entry;
-  const stop=side==='LONG'?entry*(1-stopPct):entry*(1+stopPct);
-  const takeMove=rr*(stopPct+2*paperTradeCost())+2*paperTradeCost();
-  const tp=side==='LONG'?entry*(1+takeMove):entry*(1-takeMove);
-  if(!(tp>0&&stop>0&&qty>0))return '가격 조건 오류';
-  const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,leverage:lev,
-    entryFeeRate:paperFeeRates().taker,entryType:'market',opened:Date.now(),
-    hold,
-    entryPattern:{...capturePaperEntryPattern('1m'),signalRmi:{daily:signal.dailyRmi,minute:signal.minuteRmi,dailyBias:signal.dailyBias,aligned:signal.aligned,trend5m:signal.trend5m,trend15m:signal.trend15m,volumeRatio:signal.volumeRatio}},autoStrategy:AUTO_PAPER_STRATEGY,
-    autoSignalBarTime:signal.barTime};
-  hedgePositions[side].push(p);
-  autoLastEntryAt=Date.now();
-  const tradeDay=autoKstDay(autoLastEntryAt);
-  autoDailyEntryCounts[tradeDay]=Math.max(Number(autoDailyEntryCounts[tradeDay])||0,closedPaperTrades.filter(t=>t.autoStrategy&&autoKstDay(t.openedAt||t.closedAt)===tradeDay).length+allPaperPositions().filter(p=>p.autoStrategy&&autoKstDay(p.opened)===tradeDay).length);
-  signal.executed=true;
-  add('자동 모의 '+(side==='LONG'?'롱':'숏')+(signal.aligned?' 순추세':' 역추세·축소')+' 진입 · '+fmt(entry)+' USDT · 손절 '+fmt(stop)+' · 익절 '+fmt(tp));
-  savePaperState();saveAutoSignals();render();
-  return '';
+  const price=autoLimitPrice(side,last);if(!(price>0))return '지정가 계산 오류';
+  const now=Date.now();
+  autoPendingLimit={id:'auto-limit-'+paperPositionId(),side,price,createdAt:now,
+    expiresAt:now+AUTO_LIMIT_LIFETIME_MS,notional,leverage:lev,
+    stopPct,rr,hold,strategy:AUTO_PAPER_STRATEGY,signalBarTime:signal.barTime,
+    entryPattern:{...capturePaperEntryPattern('1m'),signalRmi:{
+      daily:signal.dailyRmi,minute:signal.minuteRmi,dailyBias:signal.dailyBias,aligned:signal.aligned,
+      trend5m:signal.trend5m,trend15m:signal.trend15m,volumeRatio:signal.volumeRatio}}};
+  autoLastOrderAt=now;signal.orderStatus='pending';signal.limitPrice=price;
+  signal.expiresAt=autoPendingLimit.expiresAt;
+  add('자동 모의 '+(side==='LONG'?'롱':'숏')+' 빠른 지정가 대기 '+fmt(price)+' USDT · 5분 미체결 자동 취소');
+  savePaperState();saveAutoSignals();render();return '';
 }
 function maybeEvaluateAutoPaperSignals(){
   if(demo||document.visibilityState==='hidden')return;
@@ -875,6 +924,9 @@ function drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,bottom,plotW){
 }
 function initAutoPaperUi(){
   restoreAutoPaperSettings();
+  // Default OFF on reload: remove any old order rather than secretly filling it.
+  if(autoPendingLimit)cancelAutoPendingLimit(Date.now()>=autoPendingLimit.expiresAt?
+    '5분 미체결 자동 취소':'앱 재실행 · 자동 모의 OFF');
   for(const id of Object.keys(AUTO_PAPER_FIELDS)){
     $(id).addEventListener('change',()=>{
       $(id).value=String(readAutoSetting(id));saveAutoSettings();
@@ -883,6 +935,7 @@ function initAutoPaperUi(){
   const toggleAutoPaper=()=>{
     if(autoPaperEnabled){
       autoPaperEnabled=false;
+      if(autoPendingLimit)cancelAutoPendingLimit('자동 모의 OFF');
     }else{
       if(!confirm('자동 모의매매를 활성화할까요?\n실제 선물 주문은 절대 실행하지 않습니다.\n브라우저를 닫으면 동작이 중단됩니다.'))return;
       autoPaperEnabled=true;autoPaperArmedAt=Date.now();
@@ -1014,7 +1067,7 @@ function renderPaperPerformance(){
 }
 
 function savePaperState(){try{localStorage.setItem(PAPER_SAVE_KEY,JSON.stringify({
-  position,hedgePositions,selectedHedgeSide,selectedPaperPositionId,paperMode:paperMode(),pending,logs,closedPaperTrades,paperStatsBaseBalance,balance:$('balance').value,
+  position,hedgePositions,selectedHedgeSide,selectedPaperPositionId,paperMode:paperMode(),pending,autoPendingLimit,logs,closedPaperTrades,paperStatsBaseBalance,balance:$('balance').value,
   settings:Object.fromEntries(['lev','risk','stop','rr','hold','sizeMode','marginPct'].map(id=>[id,$(id).value]))
 }))}catch(e){console.warn('모의매매 저장 실패',e)}}
 function restorePaperState(){
@@ -1034,6 +1087,10 @@ function restorePaperState(){
     if(typeof state.selectedPaperPositionId==='string')selectedPaperPositionId=state.selectedPaperPositionId;
     syncSelectedPaperPosition();
     if(state.pending&&['LONG','SHORT'].includes(state.pending.side)&&Number(state.pending.price)>0)pending=state.pending;
+    if(state.autoPendingLimit&&['LONG','SHORT'].includes(state.autoPendingLimit.side)&&
+      Number(state.autoPendingLimit.price)>0&&Number.isFinite(state.autoPendingLimit.createdAt)&&
+      Number.isFinite(state.autoPendingLimit.expiresAt)&&state.autoPendingLimit.expiresAt>state.autoPendingLimit.createdAt)
+      autoPendingLimit=state.autoPendingLimit;
     if(Array.isArray(state.logs))logs=state.logs.filter(x=>typeof x==='string').slice(0,60);
     if(Array.isArray(state.closedPaperTrades))closedPaperTrades=state.closedPaperTrades.filter(x=>x&&['LONG','SHORT'].includes(x.side)&&Number.isFinite(x.net)&&Number.isFinite(x.margin)&&x.margin>0&&Number.isFinite(x.closedAt));
     if(Number(state.paperStatsBaseBalance)>0)paperStatsBaseBalance=Number(state.paperStatsBaseBalance);
@@ -1157,7 +1214,10 @@ function closeSide(side,reason){
 }
 function close(reason){if(position)closePositionById(position.id,reason)}
 function process(){
+  if(autoPendingLimit&&Date.now()>=autoPendingLimit.expiresAt)
+    cancelAutoPendingLimit('5분 미체결 자동 취소');
   if(!last)return;
+  if(autoPendingLimit)fillAutoPendingLimit(last,Date.now());
   if(pending){
     const hit=pending.side==='LONG'?last<=pending.price:last>=pending.price;
     if(hit){const p=pending;pending=null;pendingFillType='limit';try{openTrade(p.side,p.price)}finally{pendingFillType=null}}
@@ -1217,9 +1277,15 @@ function updatePosition(){
   const active=position?paperPositionDetail(position):'<p class="muted">포지션을 선택하면 상세가 표시돼요.</p>';
   const selectedNumber=position?hedgePositions[position.side].findIndex(p=>p.id===position.id)+1:0;
   const selectedTitle=position?(position.side==='LONG'?'롱 LONG':'숏 SHORT')+' #'+selectedNumber:'선택 없음';
+  const autoPendingRow=autoPendingLimit?
+    '<p class="muted">자동 모의 지정가 대기 · '+(autoPendingLimit.side==='LONG'?'롱':'숏')+
+    ' '+fmt(autoPendingLimit.price)+' USDT · '+Math.max(0,Math.ceil((autoPendingLimit.expiresAt-Date.now())/1000))+
+    '초 후 자동 취소 <button type="button" data-auto-limit-cancel>주문 취소</button></p>':'';
   el.innerHTML='<div class="hedge-margin-summary">사용 중인 증거금 <b>'+fmt(paperMarginInUse())+'</b> USDT · 추가 사용 가능 <b>'+fmt(paperFreeMargin())+'</b> USDT</div>'+
-    groups+(pending?'<p class="muted">대기 지정가: '+pending.side+' '+fmt(pending.price)+' USDT</p>':'')+
+    groups+(pending?'<p class="muted">대기 지정가: '+pending.side+' '+fmt(pending.price)+' USDT</p>':'')+autoPendingRow+
     '<div class="hedge-selected-detail"><b>선택한 포지션 상세 · '+selectedTitle+'</b>'+active+'</div>';
+  const autoCancel=el.querySelector('[data-auto-limit-cancel]');
+  if(autoCancel)autoCancel.onclick=()=>cancelAutoPendingLimit('사용자 취소');
   for(const btn of el.querySelectorAll('[data-paper-select]'))btn.onclick=()=>choosePaperPosition(btn.dataset.paperSelect);
   for(const card of el.querySelectorAll('[data-paper-card]')){
     card.onclick=e=>{if(e.target.closest('[data-paper-close],[data-paper-select]'))return;choosePaperPosition(card.dataset.paperCard)};
@@ -1524,6 +1590,11 @@ $('paperStatsReset').onclick=()=>{
 });
 $('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState()});$('marginPct').addEventListener('change',()=>{calc();savePaperState()});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
 setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();initAutoPaperUi();render();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(tick,2000);
+setInterval(()=>{
+  if(!autoPendingLimit)return;
+  if(Date.now()>=autoPendingLimit.expiresAt)cancelAutoPendingLimit('5분 미체결 자동 취소');
+  else if($('page-position').classList.contains('active'))updatePosition();
+},1000);
 setInterval(()=>{
   if(demo||document.visibilityState==='hidden')return;
   // A socket can remain nominally open even after a phone network transition.
