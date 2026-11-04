@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261104-grouped-fees-v1"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261104-grouped-fees-v2"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -135,6 +135,23 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 
 .hedge-picker{display:flex;gap:8px;margin:10px 0 12px}.hedge-picker button{flex:1;padding:9px 5px;font-size:12px}.hedge-picker button.selected{border-color:#8fbbeb;background:#214e7a;color:#fff;font-weight:700}.hedge-position-block{margin:11px 0;padding:11px;border:1px solid #30445e;border-radius:12px;background:#0b1a30}.hedge-position-block.active{border-color:#5c91c9}.hedge-position-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.hedge-position-head b{font-size:13px}.hedge-position-block .muted{font-size:11px}.hedge-close-button{padding:8px 10px;font-size:12px}.hedge-pnl{margin-top:7px;font-size:13px;font-weight:700}
 .hedge-select-button{background:transparent;border:0;text-align:left;padding:5px 0;color:#b7d7fa;font-weight:700;font-size:13px}.hedge-margin-summary{background:#0b1a30;padding:10px;border-radius:10px;font-size:12px;color:#aac4dc;line-height:1.65}.hedge-margin-summary b{color:#eef6ff}.hedge-close-button{background:#233c59}
+
+/* Clearly separated green LONG and red SHORT paper hedge groups */
+.hedge-side-group{border:1px solid #2a3f59;border-radius:15px;padding:11px;margin-top:12px;background:#0d1b30}
+.hedge-long-group{border-color:#245d55}.hedge-short-group{border-color:#754052}
+.hedge-group-header{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:5px 2px 11px;border-bottom:1px solid #294159;margin-bottom:10px}
+.hedge-group-header strong{font-size:18px;font-weight:800}
+.hedge-group-header span{font-size:12px;color:#aec1d6}
+.hedge-long-text{color:#45d4a6!important}.hedge-short-text{color:#ff778b!important}
+.hedge-side-group .hedge-position-block{margin:8px 0;background:#101f35}
+.hedge-long-card{border-left:3px solid #39bd93}.hedge-short-card{border-left:3px solid #fa7289}
+.hedge-long-card.active{border-color:#45d4a6}.hedge-short-card.active{border-color:#ff778b}
+.hedge-select-button{font-size:15px!important}
+.hedge-group-empty{padding:13px 7px;color:#94a9c1;font-size:12px}
+.hedge-fee-note,.hedge-fee-summary{font-size:11px;color:#a7bcd5;line-height:1.55;margin-top:7px}
+.hedge-fee-summary{padding:5px 2px 0}
+.hedge-selected-detail{margin-top:15px;border-top:1px solid #30465f;padding-top:12px}
+.hedge-selected-detail>b{font-size:13px;color:#a9c5e6}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -206,7 +223,7 @@ function paperPositionId(){return 'paper-'+Date.now().toString(36)+'-'+Math.rand
 const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:2});const slip=.0001;
 function paperFeeRates(){const d=readStoredFee();return d?{maker:d.maker,taker:d.taker,verified:true}:{maker:.0002,taker:.0005,verified:false}}
 function paperTradeCost(){return paperFeeRates().taker+slip}
-function paperEntryFee(p){return Number.isFinite(Number(p.entryFeeRate))?Number(p.entryFeeRate):paperFeeRates().taker}
+function paperEntryFee(p){return p.entryFeeRate!==undefined&&p.entryFeeRate!==null&&Number.isFinite(Number(p.entryFeeRate))?Number(p.entryFeeRate):paperFeeRates().taker}
 function paperNetAt(p,market){if(!p||!(market>0))return 0;const closeRate=paperFeeRates().taker,exit=market*(p.side==="LONG"?1-slip:1+slip);return (exit-p.entry)*p.qty*(p.side==="LONG"?1:-1)-p.entry*p.qty*paperEntryFee(p)-exit*p.qty*closeRate}
 const won=n=>Math.round(n*(+$("fx").value||1400)).toLocaleString("ko-KR")+"원";const percent=n=>(n>=0?"+":"")+n.toFixed(2)+"%";function netAt(p,market){return paperNetAt(p,market)}async function loadFx(){try{let r=await fetch("https://open.er-api.com/v6/latest/USD",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);let d=await r.json();let rate=Number(d?.rates?.KRW);if(!(rate>0))throw Error("환율 응답 오류");$("fx").value=rate.toFixed(2);$("fxstatus").textContent="참고 환율 자동 조회: 1 USD ≈ "+fmt(rate)+"원 · 실제 환전 환율과 차이 가능";render()}catch(e){$("fxstatus").textContent="환율 자동 조회 실패 · 입력된 수동 환율로 환산 (실시간 환율 아님)"}}
 function ema(a,p){let e=a[0],k=2/(p+1);for(let i=1;i<a.length;i++)e=a[i]*k+e*(1-k);return e}
@@ -473,24 +490,27 @@ function process(){
 function updatePosition(){
   const el=$('position');
   $('hedgeModeLabel').textContent=paperMode()==='hedge'?'· 다중 헤지 모드':'· 단방향 모드';
-  const sideLabel=side=>side==='LONG'?'롱 LONG':'숏 SHORT';
-  const buttons=['LONG','SHORT'].map(side=>'<button type="button" data-hedge-side="'+side+'" class="'+(selectedHedgeSide===side?'selected':'')+'">'+sideLabel(side)+' ('+hedgePositions[side].length+')</button>').join('');
-  const items=['LONG','SHORT'].map(side=>{
-    if(!hedgePositions[side].length)return '<div class="hedge-position-block"><div class="hedge-position-head"><b>'+sideLabel(side)+'</b><span class="muted">포지션 없음</span></div></div>';
-    return hedgePositions[side].map((p,index)=>{
+  const rates=paperFeeRates(),rateText=x=>(x*100).toLocaleString('ko-KR',{maximumFractionDigits:5})+'%';
+  const groups=['LONG','SHORT'].map(side=>{
+    const long=side==='LONG',name=long?'롱 LONG':'숏 SHORT',positions=hedgePositions[side];
+    const rows=positions.map((p,i)=>{
       const profit=last?netAt(p,last):0;
-      return '<div class="hedge-position-block '+(selectedPaperPositionId===p.id?'active':'')+'">'+
-      '<div class="hedge-position-head"><button class="hedge-select-button" type="button" data-paper-select="'+p.id+'">'+sideLabel(side)+' #'+(index+1)+(selectedPaperPositionId===p.id?' ✓':'')+'</button>'+
-      '<button class="hedge-close-button" type="button" data-paper-close="'+p.id+'">개별 청산</button></div>'+
-      '<div class="muted">진입가 '+fmt(p.entry)+' USDT · 수량 '+p.qty.toFixed(6)+' BTC · '+fmt(p.leverage)+'배 · 증거금 '+fmt(p.notional/p.leverage)+' USDT</div>'+
-      '<div class="hedge-pnl '+(profit>=0?'pnl-positive':'pnl-negative')+'">예상 순손익 '+(profit>0?'+':'')+won(profit)+'</div></div>';
+      return '<article class="hedge-position-block '+(selectedPaperPositionId===p.id?'active ':'')+(long?'hedge-long-card':'hedge-short-card')+'">'+
+        '<div class="hedge-position-head"><button class="hedge-select-button '+(long?'hedge-long-text':'hedge-short-text')+'" type="button" data-paper-select="'+p.id+'">'+name+' #'+(i+1)+(selectedPaperPositionId===p.id?' ✓':'')+'</button>'+
+        '<button class="hedge-close-button" type="button" data-paper-close="'+p.id+'">개별 청산</button></div>'+
+        '<div class="muted">진입가 '+fmt(p.entry)+' USDT · 수량 '+p.qty.toFixed(6)+' BTC · '+fmt(p.leverage)+'배 · 증거금 '+fmt(p.notional/p.leverage)+' USDT</div>'+
+        '<div class="hedge-fee-note">진입 '+(p.entryType==='limit'?'지정가':'시장가')+' 수수료 '+rateText(paperEntryFee(p))+' · 청산 예상 '+rateText(rates.taker)+'</div>'+
+        '<div class="hedge-pnl '+(profit>=0?'pnl-positive':'pnl-negative')+'">예상 순손익 '+(profit>0?'+':'')+won(profit)+'</div></article>';
     }).join('');
+    return '<section class="hedge-side-group '+(long?'hedge-long-group':'hedge-short-group')+'">'+
+      '<div class="hedge-group-header"><strong class="'+(long?'hedge-long-text':'hedge-short-text')+'">'+name+'</strong><span>'+positions.length+'개 보유</span></div>'+
+      (rows||'<div class="hedge-group-empty">보유 중인 '+(long?'롱':'숏')+' 포지션이 없어요.</div>')+'</section>';
   }).join('');
-  const active=position?paperPositionDetail(position):'<p class="muted">개별 포지션을 누르면 손절·익절 상세가 표시돼요.</p>';
+  const active=position?paperPositionDetail(position):'<p class="muted">포지션을 선택하면 손절·익절 상세가 표시돼요.</p>';
   el.innerHTML='<div class="hedge-margin-summary">사용 중인 증거금 <b>'+fmt(paperMarginInUse())+'</b> USDT · 추가 사용 가능 <b>'+fmt(paperFreeMargin())+'</b> USDT</div>'+
-    '<div class="hedge-picker">'+buttons+'</div>'+items+
-    (pending?'<p class="muted">대기 지정가: '+pending.side+' '+fmt(pending.price)+' USDT</p>':'')+active;
-  for(const btn of el.querySelectorAll('[data-hedge-side]'))btn.onclick=()=>chooseHedgeSide(btn.dataset.hedgeSide);
+    '<div class="hedge-fee-summary">모의 수수료 · 지정가 '+rateText(rates.maker)+' / 시장가 '+rateText(rates.taker)+(rates.verified?' · 조회한 계정 요율':' · 기본 요율(미조회)')+'</div>'+
+    groups+(pending?'<p class="muted">대기 지정가: '+pending.side+' '+fmt(pending.price)+' USDT</p>':'')+
+    '<div class="hedge-selected-detail"><b>선택한 포지션 상세</b>'+active+'</div>';
   for(const btn of el.querySelectorAll('[data-paper-select]'))btn.onclick=()=>choosePaperPosition(btn.dataset.paperSelect);
   for(const btn of el.querySelectorAll('[data-paper-close]'))btn.onclick=()=>{
     const id=btn.dataset.paperClose,p=allPaperPositions().find(x=>x.id===id);if(!p)return;
