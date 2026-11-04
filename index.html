@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-liq-briefing-snapshot-v1"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-remove-liq-briefing-v1"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -233,20 +233,6 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 #page-history .paper-pattern-details{margin-top:12px;padding-top:11px}
 @media(max-width:380px){#page-history .paper-closed-compact{grid-template-columns:25px 64px 1fr;column-gap:5px}#page-history .paper-closed-time{display:none}#page-history .paper-closed-amount{font-size:11px}}
 
-.liquidation-briefing-card{margin-top:13px}
-.liquidation-briefing-card h2{font-size:18px}
-.liq-briefing-warning{display:inline-flex;padding:5px 10px;border-radius:9px;background:#263344;color:#f5c7a1;font-weight:700;font-size:11px;margin:7px 0}
-.liq-briefing-context{font-size:12px;line-height:1.65;color:#a9bdd2;margin:9px 0 12px}
-.liq-briefing-context strong{color:#d8e6f5}
-.liq-briefing-levels{display:flex;flex-direction:column;gap:8px;margin:11px 0}
-.liq-briefing-level{display:flex;align-items:flex-start;gap:11px;background:#0c1b30;border:1px solid #30445e;border-radius:10px;padding:11px}
-.liq-briefing-level>div{display:flex;flex-direction:column;gap:5px;min-width:0}
-.liq-briefing-level b{font-size:13px;color:#e1edfa}
-.liq-briefing-level small{font-size:11px;color:#a4bdd4;line-height:1.5}
-.liq-briefing-dot{width:6px;border-radius:6px;align-self:stretch;flex:none}
-.liq-briefing-dot.strongest{background:#d7e927}
-.liq-briefing-dot.notable{background:#49bb8e}
-.liq-briefing-footer{padding-top:10px;border-top:1px solid #31435a;font-size:11px;line-height:1.6;color:#b9cce0}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -284,18 +270,7 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 
 </div></section>
 <section class="tab-page" id="page-liquidation"><div class="card liquidation-card"><h2>BTC 청산맵</h2><p class="muted">코인글래스 청산 히트맵으로 이동해 BTC 선물 청산 밀집 구간을 확인할 수 있어요.</p><a class="liq-link" href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" rel="noopener noreferrer">코인글래스 청산맵 열기 ↗</a><p class="muted" style="font-size:12px;line-height:1.6;margin-top:14px">외부 사이트에서 열립니다. 일부 데이터는 로그인 또는 유료 이용권이 필요할 수 있어요. 청산 구간은 추정치이며 실제 청산을 보장하지 않습니다.</p></div>
-<div class="card liquidation-briefing-card">
-<h2>청산맵 브리핑</h2>
-<div class="liq-briefing-warning">실시간 청산맵 데이터 미연동</div>
-<p class="liq-briefing-context">코인글래스 히트맵은 별도 유료 API가 필요해요. 아래 내용은 <strong>2026.11.5. 00:41(KST)에 공유된 화면</strong>을 분석한 과거 참고 기록이며, 현재 밀집 구간이 아닙니다.</p>
-<div class="liq-briefing-levels">
-<div class="liq-briefing-level"><span class="liq-briefing-dot strongest"></span><div><b>약 78,900~79,100 USDT</b><small>당시 위쪽의 강한 청산 밀집대 · 상승 시 숏 청산 가능 구간</small></div></div>
-<div class="liq-briefing-level"><span class="liq-briefing-dot notable"></span><div><b>약 79,700~80,000 USDT</b><small>당시 넓은 중상 강도 밀집 구간</small></div></div>
-<div class="liq-briefing-level"><span class="liq-briefing-dot strongest"></span><div><b>약 76,000~76,300 USDT</b><small>당시 아래쪽의 강한 청산 밀집대 · 하락 시 롱 청산 가능 구간</small></div></div>
-</div>
-<p class="liq-briefing-context">1분봉 초단타에서는 밀집 구간 접근 후 <strong>체결량·추세 지속·돌파 후 재진입 여부</strong>를 함께 확인해요. 노란 띠만 보고 진입하거나, 과거 가격대를 지금의 지지·저항으로 사용하지 마세요.</p>
-<div class="liq-briefing-footer">최신 브리핑이 필요하면 코인글래스 화면을 새로 캡처해 채팅에 보내줘. 그 화면을 기준으로 다시 분석할 수 있어.</div>
-</div></section>
+</section>
 <section class="tab-page" id="page-settings">
 <div class="card api-panel" id="binanceApiPanel">
 <div class="api-head"><div><h2>바이낸스 계좌</h2><span class="api-caption">BTCUSDT 선물 · 조회 전용</span></div><span class="api-readonly">READ ONLY</span></div>
