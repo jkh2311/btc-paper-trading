@@ -1,0 +1,12 @@
+{
+  "name": "btc-paper-background",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "playwright": "1.57.0"
+  },
+  "scripts": {
+    "start": "node index.mjs"
+  }
+}
