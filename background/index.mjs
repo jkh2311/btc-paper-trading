@@ -110,7 +110,7 @@ async function synchronize(){
 }
 
 const manualSettingsSpec={
-  lev:[1,50],risk:[0.01,5],stop:[0.15,0.6],rr:[1,20],
+  lev:[1,50],risk:[0.01,5],stop:[0.05,10],rr:[1,20],
   hold:[1,24],marginPct:[0.1,100]
 };
 
@@ -199,8 +199,9 @@ function checkedManualOrder(input){
   const settings={sizeMode:input.settings.sizeMode};
   for(const [name,[min,max]] of Object.entries(manualSettingsSpec)){
     const value=Number(input.settings[name]);
-    if(!Number.isFinite(value)||value<min||value>max)
-      throw Error('Invalid paper manual setting: '+name);
+    if(input.settings[name]===null||input.settings[name]===undefined||
+       input.settings[name]===''||!Number.isFinite(value)||value<min||value>max)
+      throw Error('Invalid paper manual setting: '+name+' (allowed '+min+'~'+max+')');
     settings[name]=value;
   }
   return {requestId,side,type,price,settings};
@@ -388,11 +389,15 @@ async function request(req,res){
     }
     if(req.method==='POST'&&url==='/api/manual-order'){
       const input=await body(req);
-      const value=await serial(async()=>{
-        const receipt=await handleManualOrder(input);
-        return {receipt,...await status()};
-      });
-      return send(res,200,value,origin);
+      // Guaranteed not sent to the paper engine if rejected here.
+      // Distinct 422 lets the phone discard this invalid draft safely,
+      // instead of endlessly retrying the same impossible order ID.
+      try{checkedManualOrder(input)}
+      catch(e){return send(res,422,{error:String(e.message||e)},origin)}
+      const receipt=await serial(()=>handleManualOrder(input));
+      // Order is already acknowledged and persisted; do not wait for a
+      // second headless-browser status query before responding to the tap.
+      return send(res,200,{receipt},origin);
     }
     if(req.method==='POST'&&url==='/api/manual-close'){
       const input=await body(req);
