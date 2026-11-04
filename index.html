@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-persistent-server-market-mode-v33"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-server-manual-sl-tp-v34"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -311,6 +311,18 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 #page-settings .api-detail-body input{height:38px}
 #page-settings .api-footnote{margin:8px 0 0;font-size:10px}
 @media(max-width:350px){#page-settings .settings-fields-grid{gap:5px 7px}#page-settings .card{padding:10px!important}}
+
+/* Remote manual paper positions are independent of this phone's paper ledger. */
+#bgServerPositionCard{padding:12px}
+.bg-portfolio-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bg-portfolio-head h2{margin:0;font-size:16px}
+.bg-portfolio-head button{font-size:11px;padding:7px 10px;white-space:nowrap}
+.bg-portfolio-status{font-size:12px;line-height:1.5;color:#a9c2dc;margin-top:9px}
+.bg-portfolio-row{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #2b405c;padding:9px 1px}
+.bg-portfolio-row strong{color:#dceafa}
+.bg-portfolio-row small{display:block;font-size:11px;color:#9aafc7;margin-top:3px;line-height:1.55}
+.bg-portfolio-row button{font-size:11px;padding:7px 9px;white-space:nowrap;flex-shrink:0}
+.bg-portfolio-green{color:#5dd9ab}.bg-portfolio-red{color:#ff8a9c}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -348,6 +360,7 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <div class="row real-actions"><button id="realAccountRefresh" type="button">실제 잔고 · 포지션 새로고침</button><button id="realAccountManage" type="button">API 키 관리</button></div>
 <p class="real-account-note">실제 계좌 정보는 마지막 조회 시점 기준이에요. 아래 가상 포지션과 별개이며 실제 주문은 실행하지 않습니다.</p>
 </div>
+<div class="card" id="bgServerPositionCard"><div class="bg-portfolio-head"><h2>Railway 서버 포지션</h2><button id="bgPositionRefresh" type="button">상태 확인</button></div><div id="bgServerPositions" class="bg-portfolio-status" aria-live="polite">서버 연결 확인 후 포지션을 표시해.</div></div>
 <div class="card"><h2>가상 포지션 · 모의매매 <span id="hedgeModeLabel" class="muted" style="font-size:11px;font-weight:400">헤지 모드</span></h2><div id="position" class="muted">포지션 없음</div><div class="row"><button id="close">선택 포지션 청산</button><button id="cancel">대기 주문 취소</button></div></div><div class="card"><h2>6개 시간봉 추세</h2><div class="grid" id="trends"></div></div></section>
 <section class="tab-page" id="page-history"><div class="card paper-history-card"><details id="paperHistoryDetails"><summary class="paper-history-toggle"><span>모의매매 기록</span><span class="paper-history-chevron" aria-hidden="true">⌄</span></summary><div class="paper-history-content"><div id="log" class="muted">기록 없음</div><button id="clear" type="button">기록 지우기</button></div></details></div>
 <div class="card paper-performance-card"><h2>청산 완료 거래 · 누적 수익률</h2>
@@ -490,7 +503,8 @@ function updateLiveTrends(){
   lastTrendPaintAt=Date.now();renderTrends();
 }
 function render(){ renderMarketRegimeBadge();$('balanceSummary').textContent=fmt(+$('balance').value||0)+' USDT';const pnlKrw=Math.round(paperPortfolioPnl()*(+$('fx').value||1400));const pnlEl=$('pnlSummary');pnlEl.textContent=(pnlKrw<0?'-':pnlKrw>0?'+':'')+'₩'+Math.abs(pnlKrw).toLocaleString('ko-KR');pnlEl.classList.toggle('pnl-positive',pnlKrw>0);pnlEl.classList.toggle('pnl-negative',pnlKrw<0); $('price').textContent=last?fmt(last)+' USDT':'-- USDT';$('mode').textContent=demo?'데모 시세':wsConnected?'실시간 연결':lastTickAt&&Date.now()-lastTickAt<10000?'REST 시세':'연결 대기';renderTrends();// Chart manual entries depend only on usable quotes, not AUTO strategy or a previous manual pending limit.
-$('long').disabled=$('short').disabled=!last||(!demo&&Date.now()-lastTickAt>10000);draw();drawRmi();updatePosition();calc()}
+$('long').disabled=$('short').disabled=bgManualOnServer()?false:
+  !last||(!demo&&Date.now()-lastTickAt>10000);draw();drawRmi();updatePosition();calc()}
 function calc(){
   const bal=Number($('balance').value)||0,r=Number($('risk').value)/100||0,d=Number($('stop').value)/100||0,lev=Number($('lev').value)||1;
   const free=paperFreeMargin(),n=positionNotional(bal,lev,r,d),margin=n/lev,loss=n*(d+2*paperTradeCost()),riskPct=bal>0?loss/bal*100:0;
@@ -1309,8 +1323,9 @@ const BG_LOCK_KEY='btc-paper-railway-auto-maybe-on-v1';
 const BG_TOKEN_SESSION='btc-paper-railway-session-token-v1';
 const BG_LOCAL_BACKUP='btc-paper-before-server-import-v1';
 const BG_PENDING_MARKET_KEY='btc-paper-railway-market-mode-pending-v1';
+const BG_MANUAL_UNCONFIRMED_KEY='btc-paper-railway-manual-uncertain-v1';
 let bgRemoteMaybeOn=localStorage.getItem(BG_LOCK_KEY)==='1';
-let bgBusy=false,bgImportReload=false;
+let bgBusy=false,bgImportReload=false,bgManualBusy=false;
 const BG_MARKET_LABELS={classic:'추세장',trend:'RMI 우선',auto:'자동 판별',range:'횡보장',breakout:'돌파주의',off:'거래 안 함'};
 let bgServerMarketMode=null,bgMarketModeRevision=0,bgMarketModePending=false;
 let bgMarketModeQueue=Promise.resolve();
@@ -1352,12 +1367,137 @@ async function bgCall(endpoint,method='GET',data){
   try{sessionStorage.setItem(BG_TOKEN_SESSION,token)}catch{}
   return out;
 }
+
+// Manual paper trades go straight into the Railway browser's portfolio so its
+// existing 2-second stop / take-profit / expiry loop continues after phone sleep.
+function bgManualOnServer(){return bgRemoteMaybeOn||!!$('bgPaperUrl')?.value.trim()}
+function bgManualSettings(){return Object.fromEntries(
+  ['lev','risk','stop','rr','hold','sizeMode','marginPct'].map(id=>[id,$(id).value])
+)}
+function bgReadUnconfirmedManual(){
+  try{
+    const raw=localStorage.getItem(BG_MANUAL_UNCONFIRMED_KEY);
+    const data=raw?JSON.parse(raw):null;
+    return data&&typeof data.requestId==='string'?data:null;
+  }catch{return null}
+}
+async function bgSendManualOrder(payload){
+  if(bgManualBusy)return;
+  bgManualBusy=true;
+  $('sheetLong').disabled=$('sheetShort').disabled=true;
+  try{
+    localStorage.setItem(BG_MANUAL_UNCONFIRMED_KEY,JSON.stringify(payload));
+    const remote=await bgCall('manual-order','POST',payload);
+    if(remote.receipt?.requestId!==payload.requestId)
+      throw Error('서버 주문 접수 확인이 일치하지 않아');
+    localStorage.removeItem(BG_MANUAL_UNCONFIRMED_KEY);
+    bgShow(remote);
+    $('entrySheet').style.display='none';
+    const receipt=remote.receipt;
+    const type=receipt.result==='pending'?'지정가 대기':'진입';
+    const levels=receipt.result==='filled'?
+      '\n손절 '+fmt(receipt.stop)+' / 익절 '+fmt(receipt.tp)+' USDT':'';
+    alert('Railway 서버 모의 '+receipt.side+' '+type+' 확인.'+levels+
+      '\n휴대폰을 꺼도 서버가 해당 가상 포지션을 감시해.');
+  }catch(e){
+    alert('서버 수동 모의주문 확인 실패: '+String(e.message||e)+
+      '\n중복 진입을 막기 위해 주문 상태를 확인하기 전에는 다른 주문을 보내지 않아. 다시 롱/숏을 누르면 같은 주문번호로 재확인할 수 있어.');
+  }finally{
+    bgManualBusy=false;
+    $('sheetLong').disabled=$('sheetShort').disabled=false;
+    render();
+  }
+}
+function bgRequestManualOrder(side){
+  if(bgManualBusy)return;
+  const unresolved=bgReadUnconfirmedManual();
+  if(unresolved){
+    if(confirm('이전 Railway 수동 주문이 서버에 접수됐는지 아직 확인되지 않았어.\n동일 주문번호로 재확인할까? (중복 생성 방지)'))
+      void bgSendManualOrder(unresolved);
+    return;
+  }
+  const type=document.querySelector('input[name="orderType"]:checked')?.value||'market';
+  let price=null;
+  if(type==='limit'){
+    price=Number($('limitPrice').value);
+    if(!Number.isFinite(price)||price<=0){alert('지정가를 입력해 줘');return}
+  }
+  const purpose=type==='market'?'서버 현재가로 시장가 진입':'지정가 '+fmt(price)+' USDT 대기';
+  if(!confirm('Railway 서버 모의 '+side+' '+purpose+'할까?\n'+
+    '휴대폰 잔고가 아닌 서버 모의 잔고를 사용하고, 서버가 손절·익절을 감시해.\n실제 바이낸스 주문은 없어.'))return;
+  const requestId=(crypto.randomUUID?crypto.randomUUID():
+    'manual_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,14));
+  void bgSendManualOrder({requestId,side,type,price,settings:bgManualSettings()});
+}
+function bgDrawServerPositions(remote){
+  const holder=$('bgServerPositions');
+  if(!holder)return;
+  holder.textContent='';
+  if(!remote.initialized){
+    holder.textContent='서버 모의계정이 아직 준비되지 않았어.';
+    return;
+  }
+  const paper=remote.paper||{},positions=Array.isArray(paper.positions)?paper.positions:[];
+  const summary=document.createElement('div');
+  summary.textContent='서버 잔고 '+fmt(Number(paper.balance)||0)+' USDT · '+
+    positions.length+'개 보유 · 손절/익절 서버 감시'+
+    (Number.isFinite(paper.marketTickAgeMs)&&paper.marketTickAgeMs>15000?' · ⚠ 시세 지연':'');
+  holder.append(summary);
+  for(const p of positions){
+    const row=document.createElement('div');row.className='bg-portfolio-row';
+    const detail=document.createElement('div');
+    const title=document.createElement('strong');
+    title.textContent=(p.manual?'수동 ':'자동 ')+p.side+' · '+fmt(p.entry)+' USDT';
+    title.className=p.side==='LONG'?'bg-portfolio-green':'bg-portfolio-red';
+    const sub=document.createElement('small');
+    sub.textContent='손절 '+fmt(p.stop)+' · 익절 '+fmt(p.tp)+
+      (p.unrealized==null?'':' · 미실현 '+fmt(p.unrealized)+' USDT');
+    detail.append(title,sub);
+    const close=document.createElement('button');
+    close.type='button';close.textContent='서버 청산';
+    close.onclick=()=>void bgCloseRemotePaper(p);
+    row.append(detail,close);holder.append(row);
+  }
+  if(paper.manualPending){
+    const row=document.createElement('div');row.className='bg-portfolio-row';
+    const label=document.createElement('span');
+    label.textContent='서버 수동 '+paper.manualPending.side+' 지정가 대기 '+fmt(paper.manualPending.price);
+    const cancel=document.createElement('button');cancel.type='button';cancel.textContent='대기 취소';
+    cancel.onclick=()=>void bgCancelRemotePaper();
+    row.append(label,cancel);holder.append(row);
+  }
+}
+async function bgCloseRemotePaper(p){
+  if(bgManualBusy)return;
+  if(!confirm('Railway 서버의 '+p.side+' 가상 포지션을 지금 수동 청산할까?\n이 작업은 서버 모의계정에만 적용돼.'))return;
+  bgManualBusy=true;
+  try{
+    const r=await bgCall('manual-close','POST',{positionId:p.id});
+    if(r.receipt?.result!=='closed'||r.receipt.positionId!==p.id)
+      throw Error('서버 청산 결과 확인 실패');
+    bgShow(r);
+  }catch(e){alert('서버 수동 청산 실패: '+String(e.message||e))}
+  finally{bgManualBusy=false}
+}
+async function bgCancelRemotePaper(){
+  if(bgManualBusy||!confirm('Railway 서버 수동 지정가 대기 주문을 취소할까?'))return;
+  bgManualBusy=true;
+  try{const r=await bgCall('manual-cancel','POST',{});bgShow(r)}
+  catch(e){alert('서버 대기 주문 취소 실패: '+String(e.message||e))}
+  finally{bgManualBusy=false}
+}
+
 function bgShow(remote){
   bgLock(!!remote.armed);
   if(!remote.initialized){
     bgMessage('서버 연결 성공 · 아직 서버 모의계정 없음 · AUTO OFF\n서버 AUTO 시작을 누르면 휴대폰의 모의 기록을 처음 한 번 복사해.');return;
   }
   const p=remote.paper||{},age=p.marketTickAgeMs;
+  bgDrawServerPositions(remote);
+  const uncertain=bgReadUnconfirmedManual();
+  if(uncertain&&Array.isArray(remote.recentManualIds)&&
+     remote.recentManualIds.includes(uncertain.requestId))
+    localStorage.removeItem(BG_MANUAL_UNCONFIRMED_KEY);
   // Remote status is read-only. NEVER overwrite the user's selected mode:
   // doing so erased a newer choice when an old /api/status reply arrived.
   const modeVerified=Object.hasOwn(BG_MARKET_LABELS,p.marketMode);
@@ -1508,6 +1648,7 @@ function initBgPaperUi(){
   $('bgPaperStart').addEventListener('click',()=>void bgStart());
   $('bgPaperStop').addEventListener('click',()=>void bgStop());
   $('bgPaperImport').addEventListener('click',()=>void bgImport());
+  $('bgPositionRefresh').addEventListener('click',()=>void bgCheck());
   $('bgPaperUrl').addEventListener('change',()=>{
     try{localStorage.setItem(BG_URL_KEY,bgUrl())}catch(e){bgMessage(String(e.message||e),'warning')}
   });
@@ -1749,7 +1890,7 @@ function capturePaperEntryPattern(timeframeOverride){
   }catch(e){console.warn('진입 패턴 기록 실패',e);return null}
 }
 let pendingFillType=null;
-function openTrade(side,entry){
+function openTrade(side,entry,manualRequestId=null){
   let bal=Number($('balance').value),r=Number($('risk').value)/100,d=Number($('stop').value)/100;
   const lev=Number($('lev').value),rr=Number($('rr').value),hold=Number($('hold').value);
   if(!(bal>0&&r>0&&d>=.0015&&d<=.006&&lev>0&&rr>=1&&hold>0&&entry>0))return alert('전략 설정을 확인하세요');
@@ -1768,13 +1909,15 @@ function openTrade(side,entry){
   const tp=side==='LONG'?entry*(1+(rr*(d+2*paperTradeCost())+2*paperTradeCost())):entry*(1-(rr*(d+2*paperTradeCost())+2*paperTradeCost()));
   const entryType=pendingFillType||document.querySelector('input[name="orderType"]:checked')?.value||'market';
   const entryFeeRate=entryType==='limit'?paperFeeRates().maker:paperFeeRates().taker;
-  const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,entryFeeRate,entryType,leverage:lev,opened:Date.now(),hold,entryPattern:capturePaperEntryPattern()};
+  const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,entryFeeRate,entryType,leverage:lev,opened:Date.now(),hold,
+    manualRequestId:manualRequestId||null,entryPattern:capturePaperEntryPattern()};
   hedgePositions[side].push(p);
   selectedPaperPositionId=p.id;selectedHedgeSide=side;position=p;selected=null;
   add('가상 '+side+' 개별 포지션 진입 '+fmt(entry)+' USDT · 총 규모 '+won(notional)+' · 남은 가상 증거금 '+fmt(paperFreeMargin())+' USDT');
   savePaperState();render();
 }
 function request(side){
+  if(bgManualOnServer()){bgRequestManualOrder(side);return}
   // Chart LONG/SHORT are manually requested paper entries, not AUTO signals.
   if(!last||(!demo&&Date.now()-lastTickAt>10000)){
     alert('최신 시세 연결이 필요합니다.');return;
@@ -1802,15 +1945,15 @@ function request(side){
   $('entrySheet').style.display='none';
 }
 function showOrderSheet(side){
-  if(!last||(!demo&&Date.now()-lastTickAt>10000)){
+  if(!bgManualOnServer()&&(!last||(!demo&&Date.now()-lastTickAt>10000))){
     alert('최신 시세 연결이 필요합니다.');return;
   }
   // Default to market order for manual entries. Limit remains optional.
   document.querySelector('input[name="orderType"][value="market"]').checked=true;
-  $('limitPrice').value=last.toFixed(1);
+  $('limitPrice').value=last>0?last.toFixed(1):'';
   $('entrySheet').style.display='block';
   const reverse=side==='LONG'?'SHORT':'LONG';
-  $('sheetPrice').textContent='수동 모의 '+(side==='LONG'?'롱':'숏')+' '+
+  $('sheetPrice').textContent=(bgManualOnServer()?'Railway 서버 수동 모의 ':'수동 모의 ')+(side==='LONG'?'롱':'숏')+' '+
     (paperMode()==='oneway'&&hedgePositions[reverse].length?'방향 전환':'신규 진입')+
     ' · 가용 '+fmt(paperFreeMargin())+' USDT';
   $('sheetLong').style.display=side==='LONG'?'':'none';
@@ -1823,7 +1966,7 @@ function updateOrderType(){
   $('limitPrice').style.display=limit?'':'none';
   const note=limit?'지정가는 가격 도달 시 모의 체결':'시장가는 현재가로 즉시 모의 체결';
   $('orderHelp').textContent=note+
-    (bgRemoteMaybeOn?' · 휴대폰 계정 전용 (Railway 서버와 별도)':'')+
+    (bgManualOnServer()?' · 서버 계정 / 화면 꺼짐 손절·익절':' · 휴대폰 계정')+
     ' · 자동매매 전략 무관';
 }
 function renderLogs(){$('log').innerHTML=logs.length?logs.map(v=>'<div class="trade-log-item">'+v.replace(/(-?[0-9,]+원)(?= \()/g,(m)=>'<span class="'+(m.startsWith('-')?'pnl-negative':'pnl-positive')+'">'+m+'</span>')+'</div>').join(''):'기록 없음'}function add(s){logs.unshift(new Date().toLocaleTimeString('ko-KR')+' · '+s);logs=logs.slice(0,60);renderLogs()}
@@ -1834,7 +1977,8 @@ function closePositionById(id,reason='수동 청산',shouldRender=true){
   if(paperStatsBaseBalance===null)paperStatsBaseBalance=bal>0?bal:null;
   closedPaperTrades.push({
     id:p.id,side:p.side,entry:p.entry,exitPrice:last,margin:p.notional/(p.leverage||1),
-    net,reason,closedAt:Date.now(),openedAt:p.opened,entryPattern:p.entryPattern||null,autoStrategy:p.autoStrategy||null,autoSignalBarTime:p.autoSignalBarTime||null
+    net,reason,closedAt:Date.now(),openedAt:p.opened,entryPattern:p.entryPattern||null,autoStrategy:p.autoStrategy||null,
+    manualRequestId:p.manualRequestId||null,autoSignalBarTime:p.autoSignalBarTime||null
   });
   $('balance').value=(bal+net).toFixed(2);
   add(reason+' · 가상 '+p.side+' 개별 포지션 · 비용 차감 순손익 '+won(net)+' ('+(bal>0?percent(net/bal*100):'—')+', 계좌 기준)');
@@ -1857,7 +2001,7 @@ function process(){
   if(autoPendingLimit)fillAutoPendingLimit(last,Date.now());
   if(pending){
     const hit=pending.side==='LONG'?last<=pending.price:last>=pending.price;
-    if(hit){const p=pending;pending=null;pendingFillType='limit';try{openTrade(p.side,p.price)}finally{pendingFillType=null}}
+    if(hit){const p=pending;pending=null;pendingFillType='limit';try{openTrade(p.side,p.price,p.manualRequestId||null)}finally{pendingFillType=null}}
   }
   for(const p of [...allPaperPositions()]){
     if(!allPaperPositions().some(x=>x.id===p.id))continue;
