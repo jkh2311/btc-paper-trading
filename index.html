@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-manual-limit-fast-stop-v41"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-phone-only-restored-v42"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -266,69 +266,6 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 .auto-settings-grid label{margin:0;min-width:0;font-size:10px;color:#abc0d7}
 .auto-settings-grid input{display:block;width:100%;min-width:0;height:30px;padding:4px 5px;margin-top:3px;font-size:14px!important;border-radius:6px}
 @media (orientation:landscape) and (max-height:520px) and (max-width:1100px){#page-chart .auto-panel{grid-column:1/-1;grid-row:4;align-self:start;justify-self:end;margin:2px 6px;padding:2px 5px;z-index:3;max-width:53%;background:#101e31ed}#page-chart .auto-panel details{display:none}}
-
-/* Screen-off paper only: dedicated Railway controls. */
-#bgPaperPanel{border:1px solid #365475}
-#bgPaperPanel input{width:100%;box-sizing:border-box;margin:5px 0 9px}
-.bg-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
-.bg-actions button{font-size:12px;min-height:42px;padding:8px 4px}
-#bgPaperStatus{background:#18263a;padding:10px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.6}
-#bgPaperStatus[data-kind="on"]{color:#75efb7}
-#bgPaperStatus[data-kind="error"]{color:#ff99ab}
-#bgPaperStatus[data-kind="warning"]{color:#ffd78c}
-
-/* Compact settings only: do not resize chart, trading or position controls. */
-#page-settings{font-size:13px}
-#page-settings .card{padding:12px!important;border-radius:13px;margin-bottom:10px}
-#page-settings h2{font-size:16px;margin:0 0 9px;letter-spacing:-.2px}
-#page-settings h3{font-size:14px;margin:11px 0 8px}
-#page-settings label{font-size:11px;margin:8px 0 4px;line-height:1.35}
-#page-settings input,#page-settings select{height:38px;min-height:38px;padding:7px 10px;font-size:14px!important;border-radius:8px;max-width:100%;min-width:0}
-#page-settings select{width:100%;text-overflow:ellipsis}
-#page-settings button{padding:8px 7px;min-height:38px;border-radius:8px;font-size:12px}
-#page-settings .row{gap:7px;margin-top:8px}
-#page-settings .row>*{min-width:0}
-#page-settings .settings-fields-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 10px;align-items:end}
-#page-settings .setting-field{min-width:0}
-#page-settings .setting-field label{margin:6px 0 4px}
-#page-settings .setting-field input,#page-settings .setting-field select{width:100%;margin:0}
-#page-settings .settings-computed{font-size:11px;line-height:1.45;margin-top:7px}
-#page-settings .settings-computed:empty{display:none}
-#page-settings .auto-settings-grid{gap:7px 10px}
-#page-settings .auto-settings-grid label{font-size:11px}
-#page-settings .auto-settings-grid input{height:36px;min-height:36px;font-size:13px!important;margin-top:4px}
-#page-settings #bgPaperPanel input{margin:0 0 4px}
-#page-settings .bg-actions{gap:7px;margin:8px 0}
-#page-settings .bg-actions button{min-height:38px;padding:7px 4px;font-size:11px}
-#page-settings #bgPaperStatus{padding:9px;font-size:11px;line-height:1.45}
-#page-settings .settings-safety-note{color:#91a8c1;font-size:10px;line-height:1.45;margin:8px 0 0}
-#page-settings #binanceApiPanel.api-panel{padding:12px!important;border-radius:13px}
-#page-settings .api-vault-status{padding:7px 0;font-size:11px}
-#page-settings .api-fee-row{padding:9px;margin-top:8px}
-#page-settings .api-details{margin-top:9px}
-#page-settings .api-details summary{padding:9px 2px 0}
-#page-settings .api-detail-body{padding-top:7px}
-#page-settings .api-detail-body input{height:38px}
-#page-settings .api-footnote{margin:8px 0 0;font-size:10px}
-@media(max-width:350px){#page-settings .settings-fields-grid{gap:5px 7px}#page-settings .card{padding:10px!important}}
-
-/* Remote manual paper positions are independent of this phone's paper ledger. */
-#bgServerPositionCard{padding:12px}
-.bg-portfolio-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.bg-portfolio-head h2{margin:0;font-size:16px}
-.bg-portfolio-head button{font-size:11px;padding:7px 10px;white-space:nowrap}
-.bg-portfolio-status{font-size:12px;line-height:1.5;color:#a9c2dc;margin-top:9px}
-.bg-portfolio-row{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #2b405c;padding:9px 1px}
-.bg-portfolio-row strong{color:#dceafa}
-.bg-portfolio-row small{display:block;font-size:11px;color:#9aafc7;margin-top:3px;line-height:1.55}
-.bg-portfolio-row button{font-size:11px;padding:7px 9px;white-space:nowrap;flex-shrink:0}
-.bg-portfolio-green{color:#5dd9ab}.bg-portfolio-red{color:#ff8a9c}
-#paperOrderToast{position:fixed;z-index:99999;left:50%;bottom:110px;transform:translateX(-50%);
-  max-width:min(94vw,450px);width:max-content;box-sizing:border-box;
-  padding:12px 15px;border-radius:10px;border:1px solid #367d73;
-  background:#0a302d;color:#a9ffe1;box-shadow:0 8px 26px #0008;font-size:13px;line-height:1.45;text-align:center}
-#paperOrderToast[data-kind="error"]{background:#361923;color:#ffd0d8;border-color:#b7526a}
-#paperOrderToast[hidden]{display:none}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -366,7 +303,6 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <div class="row real-actions"><button id="realAccountRefresh" type="button">실제 잔고 · 포지션 새로고침</button><button id="realAccountManage" type="button">API 키 관리</button></div>
 <p class="real-account-note">실제 계좌 정보는 마지막 조회 시점 기준이에요. 아래 가상 포지션과 별개이며 실제 주문은 실행하지 않습니다.</p>
 </div>
-<div class="card" id="bgServerPositionCard"><div class="bg-portfolio-head"><h2>Railway 서버 포지션</h2><button id="bgPositionRefresh" type="button">상태 확인</button></div><div id="bgServerPositions" class="bg-portfolio-status" aria-live="polite">서버 연결 확인 후 포지션을 표시해.</div></div>
 <div class="card"><h2>가상 포지션 · 모의매매 <span id="hedgeModeLabel" class="muted" style="font-size:11px;font-weight:400">헤지 모드</span></h2><div id="position" class="muted">포지션 없음</div><div class="row"><button id="close">선택 포지션 청산</button><button id="cancel">대기 주문 취소</button></div></div><div class="card"><h2>6개 시간봉 추세</h2><div class="grid" id="trends"></div></div></section>
 <section class="tab-page" id="page-history"><div class="card paper-history-card"><details id="paperHistoryDetails"><summary class="paper-history-toggle"><span>모의매매 기록</span><span class="paper-history-chevron" aria-hidden="true">⌄</span></summary><div class="paper-history-content"><div id="log" class="muted">기록 없음</div><button id="clear" type="button">기록 지우기</button></div></details></div>
 <div class="card paper-performance-card"><h2>청산 완료 거래 · 누적 수익률</h2>
@@ -383,22 +319,6 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <section class="tab-page" id="page-liquidation"><div class="card liquidation-card"><h2>BTC 청산맵</h2><p class="muted">코인글래스 청산 히트맵으로 이동해 BTC 선물 청산 밀집 구간을 확인할 수 있어요.</p><a class="liq-link" href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" rel="noopener noreferrer">코인글래스 청산맵 열기 ↗</a><p class="muted" style="font-size:12px;line-height:1.6;margin-top:14px">외부 사이트에서 열립니다. 일부 데이터는 로그인 또는 유료 이용권이 필요할 수 있어요. 청산 구간은 추정치이며 실제 청산을 보장하지 않습니다.</p></div>
 </section>
 <section class="tab-page" id="page-settings">
-<div class="card" id="bgPaperPanel">
-<h2>Railway 서버 AUTO</h2>
-
-<label for="bgPaperUrl">Railway 서버 주소</label>
-<input id="bgPaperUrl" type="url" inputmode="url" autocapitalize="none" spellcheck="false" placeholder="https://서버이름.up.railway.app">
-<label for="bgPaperToken">서버 비밀번호</label>
-<input id="bgPaperToken" type="password" autocapitalize="none" spellcheck="false" autocomplete="off" placeholder="Railway Variables에서 설정한 32자 이상 비밀번호">
-<div class="bg-actions">
-<button id="bgPaperCheck" type="button">서버 연결 확인</button>
-<button id="bgPaperStart" type="button">서버 AUTO 시작</button>
-<button id="bgPaperStop" type="button">서버 AUTO 중지</button>
-<button id="bgPaperImport" type="button">서버 기록 가져오기</button>
-</div>
-<div id="bgPaperStatus" role="status" aria-live="polite" data-kind="unknown">서버 주소와 비밀번호를 넣고 연결 확인을 눌러 줘.</div>
-<p class="settings-safety-note">서버·휴대폰 기록은 별도 · 서버 실행 중 휴대폰 중복 거래 주의</p>
-</div>
 <div class="card api-panel" id="binanceApiPanel">
 <div class="api-head"><div><h2>바이낸스 계좌</h2><span class="api-caption">BTCUSDT 선물 · 조회 전용</span></div><span class="api-readonly">READ ONLY</span></div>
 <div id="myVaultStatus" class="api-vault-status" role="status">🔒 암호화 저장 상태 확인 중</div>
@@ -415,10 +335,10 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <label for="myBinanceKey">API Key</label><input type="password" id="myBinanceKey" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 API Key">
 <label for="myBinanceSecret">Secret Key</label><input type="password" id="myBinanceSecret" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 Secret Key">
 <div class="api-secondary-actions"><button id="myWsPublic" type="button">연결 확인</button><button id="myApiClear" type="button">입력 지우기</button><button id="myVaultDelete" type="button">저장 키 삭제</button><button id="myFeeForget" type="button">수수료 기록 삭제</button></div>
-<p class="api-footnote">읽기 전용 API 키만 사용 · 실제 주문 없음</p>
+<p class="api-footnote">키는 잠금 비밀번호로 이 기기에 암호화 저장됩니다. 읽기 전용 API 키만 사용하세요. 실제 주문은 실행하지 않습니다.</p>
 </div></details>
-</div><div class="card"><h2>모의매매 모드</h2><label for="paperPositionMode">포지션 방식</label><select id="paperPositionMode"><option value="hedge">헤지 모드 · 롱/숏 동시 보유</option><option value="oneway">단방향 모드 · 한쪽만 보유</option></select>
-<label for="autoMarketMode">자동매매 전략</label>
+</div><div class="card"><h2>모의매매 포지션 모드</h2><label for="paperPositionMode">포지션 방식</label><select id="paperPositionMode"><option value="hedge">헤지 모드 · 롱/숏 동시 보유</option><option value="oneway">단방향 모드 · 한쪽만 보유</option></select>
+<label for="autoMarketMode">자동 모의매매 시장 모드</label>
 <select id="autoMarketMode">
 <option value="classic">추세장 · RMI + 5·15분 추세 + 거래량 1.2배 (기본)</option>
 <option value="trend">RMI 우선 · 시간봉/거래량 필터 없음</option>
@@ -427,16 +347,16 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <option value="breakout">돌파주의 · 신규 진입 차단</option>
 <option value="off">거래 안 함 · 신규 진입 차단</option>
 </select>
-
-</div><div class="card"><h2>전략 설정</h2><div class="settings-fields-grid"><div class="setting-field"><label for="balance">가상 계좌 USDT</label><input id="balance" type="number" value="822" min="1" step="1"></div><div class="setting-field"><label for="lev">레버리지</label><input id="lev" type="number" value="20" min="1" max="50"></div><div class="setting-field"><label for="sizeMode">포지션 크기 계산</label><select id="sizeMode"><option value="risk">위험 기준 (기본)</option><option value="margin">증거금 기준 (직접 선택)</option></select></div><div id="marginControls" class="setting-field" hidden><label for="marginPct">증거금 사용 비율 (%)</label><input id="marginPct" type="number" value="25" min="0.1" max="100" step="0.5" inputmode="decimal" aria-label="이번 주문에 사용할 남은 증거금 비율 (%)"></div><div id="riskControls" class="setting-field"><label for="risk">1회 계좌 위험 (%)</label><input id="risk" type="number" value="0.5" min="0.01" max="5" step="0.05"></div><div class="setting-field"><label for="stop">손절 거리 (%)</label><input id="stop" type="number" value="0.3" min="0.05" max="10" step="0.05"></div><div class="setting-field"><label for="rr">목표 순손익비</label><input id="rr" type="number" value="2" min="1" step="0.5"></div><div class="setting-field"><label for="hold">최대 보유 시간</label><input id="hold" type="number" value="6" min="1" max="24"></div><div class="setting-field"><label for="fx">USD → KRW 환율</label><input id="fx" type="number" value="1400" min="1" step="0.1"></div></div><div id="fxstatus" class="muted settings-computed"></div><div id="calc" class="muted settings-computed"></div><div class="auto-strategy-guards" aria-label="자동 모의 보호 설정">
+<p class="muted" style="font-size:11px;line-height:1.45">차트의 시장 상태는 실제 5·15분봉 데이터로 따로 판단해 표시합니다. 기본 추세장은 1분봉 RMI 타점에 5·15분 EMA9/21 방향 일치와 1분 거래량 1.2배를 확인합니다. RMI 우선은 시간봉·거래량을 필터로 사용하지 않습니다. 자동 판별은 횡보장/예전 추세장으로 전환하고, 돌파주의·불확실 구간에서는 신규 진입을 멈춥니다.</p>
+<p class="muted" style="font-size:11px;line-height:1.5">모의매매에만 적용돼요. 바이낸스 실제 선물 계좌 설정은 변경하지 않습니다.</p></div><div class="card"><h2>전략 설정</h2><label>가상 계좌 USDT</label><input id="balance" type="number" value="822" min="1" step="1"><label>레버리지</label><input id="lev" type="number" value="20" min="1" max="50"><label for="sizeMode">포지션 크기 계산 방식</label><select id="sizeMode"><option value="risk">위험 기준 (기본)</option><option value="margin">증거금 기준 (직접 선택)</option></select><div id="marginControls" hidden><label for="marginPct">이번 주문에 사용할 남은 증거금 비율</label><input id="marginPct" type="number" value="25" min="0.1" max="100" step="0.5" inputmode="decimal" aria-label="이번 주문에 사용할 남은 증거금 비율 (%)"><p class="muted" style="font-size:12px;line-height:1.5">남은 사용 가능 증거금에서 직접 지정한 비율만 사용합니다. 25를 입력하면 남은 증거금의 25%를 사용해요. 위험 기준 모드에도 임의의 20% 제한은 없습니다.</p></div><div id="riskControls"><label>1회 계좌 위험 (%)</label><input id="risk" type="number" value="0.5" min="0.01" max="5" step="0.05"></div><label>손절 거리 (%)</label><input id="stop" type="number" value="0.3" min="0.15" max="0.6" step="0.05"><label>목표 순손익비</label><input id="rr" type="number" value="2" min="1" step="0.5"><label>최대 보유 시간</label><input id="hold" type="number" value="6" min="1" max="24"><label>USD → KRW 환율</label><input id="fx" type="number" value="1400" min="1" step="0.1"><div id="fxstatus" class="muted"></div><div id="calc" class="muted"></div><div class="auto-strategy-guards" aria-label="자동 모의 보호 설정">
 <h3>자동 모의 보호 설정</h3>
-
+<p class="muted" style="font-size:11px;line-height:1.45">자동 모의매매도 위 전략 설정의 레버리지·포지션 크기·손절·목표 손익비·최대 보유 시간을 그대로 사용합니다.</p>
 <div class="auto-settings-grid">
  <label>신호 가격 이탈 제한 (%)<input id="autoMaxChasePct" type="number" inputmode="decimal" min="0.03" max="0.5" step="0.01" value="0.12"></label>
  <label>동시 자동 포지션 수<input id="autoMaxPositions" type="number" inputmode="numeric" min="1" max="5" step="1" value="1"></label>
  <label>일일 최대 손실 (%)<input id="autoDailyLossPct" type="number" inputmode="decimal" min="0.5" max="10" step="0.5" value="2"></label>
  <label>재진입 대기 (분)<input id="autoCooldownMin" type="number" inputmode="numeric" min="1" max="240" step="1" value="15"></label>
-</div></div></div></section>
+</div></div></div><p class="muted footnote">모의매매 전용 · 실제 주문 없음 · 손익은 수수료·슬리피지 가정 차감 후 환산 추정치이며 펀딩비·세금 등은 제외됩니다.</p></section>
 </main>
 <div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button></div>
 <nav class="bottom-nav" aria-label="메뉴"><button class="nav-btn active" data-tab="chart"><span>▥</span>차트</button><button class="nav-btn" data-tab="position"><span>▣</span>포지션</button><button class="nav-btn" data-tab="history"><span>◷</span>거래내역</button><button class="nav-btn" data-tab="liquidation"><span>▤</span>청산맵</button><button class="nav-btn" data-tab="settings"><span>⚙</span>설정</button></nav>
@@ -508,9 +428,7 @@ function updateLiveTrends(){
   if(document.visibilityState==='hidden'||Date.now()-lastTrendPaintAt<700)return;
   lastTrendPaintAt=Date.now();renderTrends();
 }
-function render(){ renderMarketRegimeBadge();$('balanceSummary').textContent=fmt(+$('balance').value||0)+' USDT';const pnlKrw=Math.round(paperPortfolioPnl()*(+$('fx').value||1400));const pnlEl=$('pnlSummary');pnlEl.textContent=(pnlKrw<0?'-':pnlKrw>0?'+':'')+'₩'+Math.abs(pnlKrw).toLocaleString('ko-KR');pnlEl.classList.toggle('pnl-positive',pnlKrw>0);pnlEl.classList.toggle('pnl-negative',pnlKrw<0); $('price').textContent=last?fmt(last)+' USDT':'-- USDT';$('mode').textContent=demo?'데모 시세':wsConnected?'실시간 연결':lastTickAt&&Date.now()-lastTickAt<10000?'REST 시세':'연결 대기';renderTrends();// Chart manual entries depend only on usable quotes, not AUTO strategy or a previous manual pending limit.
-$('long').disabled=$('short').disabled=bgManualOnServer()?false:
-  !last||(!demo&&Date.now()-lastTickAt>10000);draw();drawRmi();updatePosition();calc()}
+function render(){ renderMarketRegimeBadge();$('balanceSummary').textContent=fmt(+$('balance').value||0)+' USDT';const pnlKrw=Math.round(paperPortfolioPnl()*(+$('fx').value||1400));const pnlEl=$('pnlSummary');pnlEl.textContent=(pnlKrw<0?'-':pnlKrw>0?'+':'')+'₩'+Math.abs(pnlKrw).toLocaleString('ko-KR');pnlEl.classList.toggle('pnl-positive',pnlKrw>0);pnlEl.classList.toggle('pnl-negative',pnlKrw<0); $('price').textContent=last?fmt(last)+' USDT':'-- USDT';$('mode').textContent=demo?'데모 시세':wsConnected?'실시간 연결':lastTickAt&&Date.now()-lastTickAt<10000?'REST 시세':'연결 대기';renderTrends();$('long').disabled=$('short').disabled=!last||!!pending||(!demo&&Date.now()-lastTickAt>10000);draw();drawRmi();updatePosition();calc()}
 function calc(){
   const bal=Number($('balance').value)||0,r=Number($('risk').value)/100||0,d=Number($('stop').value)/100||0,lev=Number($('lev').value)||1;
   const free=paperFreeMargin(),n=positionNotional(bal,lev,r,d),margin=n/lev,loss=n*(d+2*paperTradeCost()),riskPct=bal>0?loss/bal*100:0;
@@ -791,14 +709,13 @@ function restoreAutoPaperSettings(){
 function renderAutoPaperStatus(){
   const button=$('autoPaperToggle'),quick=$('autoPaperQuickToggle');
   if(!button||!quick)return;
-  const serverActive=typeof bgRemoteMaybeOn==='boolean'&&bgRemoteMaybeOn&&!autoPaperEnabled;
-  button.textContent=serverActive?'서버 AUTO ON':autoPaperEnabled?'자동 모의 ON':'자동 모의 OFF';
-  quick.textContent=serverActive?'SERVER ON':autoPaperEnabled?'AUTO ON':'AUTO OFF';
+  button.textContent=autoPaperEnabled?'자동 모의 ON':'자동 모의 OFF';
+  quick.textContent=autoPaperEnabled?'AUTO ON':'AUTO OFF';
   for(const item of [button,quick]){
-    item.setAttribute('aria-pressed',String(autoPaperEnabled||serverActive));
-    item.classList.toggle('is-on',autoPaperEnabled||serverActive);
+    item.setAttribute('aria-pressed',String(autoPaperEnabled));
+    item.classList.toggle('is-on',autoPaperEnabled);
   }
-  quick.setAttribute('aria-label',serverActive?'Railway 서버 자동 모의매매 상태는 설정에서 관리':autoPaperEnabled?'자동 모의매매 끄기':'자동 모의매매 켜기');
+  quick.setAttribute('aria-label',autoPaperEnabled?'자동 모의매매 끄기':'자동 모의매매 켜기');
   // Update the visible Positions tab synchronously with the AUTO toggle.
   if($('page-position').classList.contains('active'))updatePosition();
 }
@@ -1322,538 +1239,6 @@ async function pollAutoPaperMinute(){
   }catch(e){console.warn('자동 모의 1분봉 신호 확인 실패',e)}
   finally{autoMinutePolling=false}
 }
-
-/* Opt-in Railway paper-only server, no Binance trading endpoint. */
-const BG_URL_KEY='btc-paper-railway-url-v1';
-const BG_LOCK_KEY='btc-paper-railway-auto-maybe-on-v1';
-const BG_TOKEN_SESSION='btc-paper-railway-session-token-v1';
-const BG_LOCAL_BACKUP='btc-paper-before-server-import-v1';
-const BG_PENDING_MARKET_KEY='btc-paper-railway-market-mode-pending-v1';
-const BG_PENDING_CONFIG_KEY='btc-paper-railway-config-pending-v1';
-const BG_MANUAL_UNCONFIRMED_KEY='btc-paper-railway-manual-uncertain-v1';
-let bgRemoteMaybeOn=localStorage.getItem(BG_LOCK_KEY)==='1';
-let bgBusy=false,bgImportReload=false,bgManualBusy=false;
-const BG_MARKET_LABELS={classic:'추세장',trend:'RMI 우선',auto:'자동 판별',range:'횡보장',breakout:'돌파주의',off:'거래 안 함'};
-let bgServerMarketMode=null,bgMarketModeRevision=0,bgMarketModePending=false;
-let bgConfigTimer=null,bgConfigSending=false,bgConfigError=null,bgLatestConfigRevision=-1;
-let bgModeTimer=null,bgModeSending=false,bgModeError=null;
-const BG_RISK_IDS=['lev','risk','stop','rr','hold','sizeMode','marginPct'];
-const BG_GUARD_IDS=['autoDailyHigh','autoDailyLow','autoMinuteHighFrom','autoMinuteHighTo',
-  'autoMinuteLowFrom','autoMinuteLowTo','autoMaxChasePct','autoMaxPositions',
-  'autoDailyLossPct','autoCooldownMin'];
-const BG_RISK_LIMITS={lev:[1,50],risk:[.01,5],stop:[.05,10],rr:[1,20],hold:[1,24],marginPct:[.1,100]};
-function bgLock(value){
-  bgRemoteMaybeOn=!!value;
-  if(value)localStorage.setItem(BG_LOCK_KEY,'1');
-  else localStorage.removeItem(BG_LOCK_KEY);
-  renderAutoPaperStatus();
-}
-function bgMessage(message,kind='unknown'){
-  $('bgPaperStatus').textContent=message;
-  $('bgPaperStatus').dataset.kind=kind;
-}
-function bgUrl(){
-  let url;try{url=new URL($('bgPaperUrl').value.trim())}
-  catch{throw Error('Railway에서 생성한 https://...up.railway.app 주소를 입력해 줘')}
-  if(url.protocol!=='https:'||!url.hostname.endsWith('.up.railway.app')||
-    url.port||url.username||url.password||url.search||url.hash||
-    !['/','/health',''].includes(url.pathname))
-    throw Error('Railway https://...up.railway.app 주소를 붙여 넣어 줘. /health 주소도 가능해.');
-  return url.origin;
-}
-function bgToken(){
-  const t=$('bgPaperToken').value.trim();
-  if(t.length<32)throw Error('Railway에 등록한 BACKGROUND_TOKEN 32자 이상을 입력해 줘');
-  return t;
-}
-async function bgCall(endpoint,method='GET',data){
-  const url=bgUrl(),token=bgToken();
-  const res=await fetch(url+'/api/'+endpoint,{
-    method,mode:'cors',credentials:'omit',cache:'no-store',
-    headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
-    ...(data===undefined?{}:{body:JSON.stringify(data)}),
-    signal:AbortSignal.timeout(15000)
-  });
-  const out=await res.json().catch(()=>({error:'서버 응답 해석 실패'}));
-  if(!res.ok){
-    const error=Error(out?.error||'Railway HTTP '+res.status);
-    error.httpStatus=res.status;
-    throw error;
-  }
-  localStorage.setItem(BG_URL_KEY,url);
-  try{sessionStorage.setItem(BG_TOKEN_SESSION,token)}catch{}
-  return out;
-}
-
-// Manual paper trades go straight into the Railway browser's portfolio so its
-// existing 2-second stop / take-profit / expiry loop continues after phone sleep.
-function bgManualOnServer(){return bgRemoteMaybeOn||!!$('bgPaperUrl')?.value.trim()}
-function bgManualSettings(){
-  const settings={sizeMode:$('sizeMode').value};
-  if(!['risk','margin'].includes(settings.sizeMode))throw Error('포지션 크기 계산 방식을 확인해 줘');
-  for(const [id,[min,max]] of Object.entries(BG_RISK_LIMITS)){
-    const raw=$(id).value,n=Number(raw);
-    if(raw===''||!Number.isFinite(n)||n<min||n>max)
-      throw Error(({stop:'손절 거리',lev:'레버리지',risk:'계좌 위험',rr:'손익비',
-        hold:'최대 보유 시간',marginPct:'증거금 사용 비율'}[id]||id)+
-        ' 설정값을 확인해 줘 ('+min+'~'+max+').');
-    settings[id]=n;
-  }
-  return settings;
-}
-function bgReadUnconfirmedManual(){
-  try{
-    const raw=localStorage.getItem(BG_MANUAL_UNCONFIRMED_KEY);
-    const data=raw?JSON.parse(raw):null;
-    return data&&typeof data.requestId==='string'?data:null;
-  }catch{return null}
-}
-let bgOrderToastTimer=null;
-function bgOrderToast(message,error=false){
-  let el=$('paperOrderToast');
-  if(!el){
-    el=document.createElement('div');el.id='paperOrderToast';
-    el.setAttribute('role','status');el.setAttribute('aria-live','polite');
-    document.body.appendChild(el);
-  }
-  el.textContent=message;el.dataset.kind=error?'error':'ok';
-  el.hidden=false;
-  if(bgOrderToastTimer!==null)clearTimeout(bgOrderToastTimer);
-  bgOrderToastTimer=setTimeout(()=>{el.hidden=true;bgOrderToastTimer=null},3800);
-}
-async function bgSendManualOrder(payload){
-  if(bgManualBusy)return;
-  bgManualBusy=true;
-  $('sheetLong').disabled=$('sheetShort').disabled=true;
-  try{
-    localStorage.setItem(BG_MANUAL_UNCONFIRMED_KEY,JSON.stringify(payload));
-    $('entrySheet').style.display='none';
-    bgOrderToast('수동 '+payload.side+' 전송 중 · 서버 접수 확인 전 (진입 미확정)');
-    const remote=await bgCall('manual-order','POST',payload);
-    if(remote.receipt?.requestId!==payload.requestId)
-      throw Error('서버에서 주문번호 확인에 실패했어');
-    localStorage.removeItem(BG_MANUAL_UNCONFIRMED_KEY);
-    $('entrySheet').style.display='none';
-    const receipt=remote.receipt;
-    const description=receipt.result==='pending'?'지정가 접수':'진입 완료';
-    bgOrderToast('서버 수동 '+receipt.side+' '+description+' · 손절/익절 서버 감시');
-    // The fast acknowledgment may contain only a receipt. Fetch the portfolio
-    // separately so the trade response is not delayed by another status read.
-    if(remote.paper)bgShow(remote);
-    else void bgCheck();
-  }catch(e){
-    const message=String(e.message||e);
-    // Only clear the uncertainty lock when the server conclusively rejected
-    // the order before it could reach the matching engine.
-    const rejectedBeforeExecution=e.httpStatus===422||
-      /^(Invalid paper manual setting:|Invalid manual position sizing mode|Invalid paper order side or type|Invalid paper limit price|Invalid manual request identifier|Existing server paper limit order: cancel it first|Server BTC market price is stale|No free server paper margin|Server paper hedge mode is required)/.test(message);
-    if(rejectedBeforeExecution){
-      localStorage.removeItem(BG_MANUAL_UNCONFIRMED_KEY);
-      const hint=message.startsWith('Existing server paper limit order')?
-        '서버에 지정가 대기 주문이 있어. 포지션 → Railway 서버 포지션에서 대기 취소를 눌러 줘.':
-        message.startsWith('Server BTC market price is stale')?
-        '서버 시세가 지연 중이야. 서버 상태를 확인한 뒤 다시 눌러 줘.':
-        '수동 주문을 접수하지 못했어: '+message;
-      bgOrderToast(hint,true);
-      return;
-    }
-    bgOrderToast('주문 접수 미확인 · 다시 누르면 같은 주문번호로 조회',true);
-  }finally{
-    bgManualBusy=false;
-    $('sheetLong').disabled=$('sheetShort').disabled=false;
-    render();
-  }
-}
-function bgRequestManualOrder(side){
-  if(bgManualBusy)return;
-  const unresolved=bgReadUnconfirmedManual();
-  if(unresolved){
-    if(confirm('이전 수동 주문이 서버에 접수됐는지 아직 확인되지 않았어.\n같은 주문번호로 재확인할까? (중복 진입 방지)'))
-      void bgSendManualOrder(unresolved);
-    return;
-  }
-  // Do not queue a request whose authentication can be rejected locally.
-  try{bgUrl();bgToken()}catch(e){
-    alert('설정 → Railway 서버에서 주소·비밀번호를 확인해 줘.\n'+String(e.message||e));return;
-  }
-  let settings;
-  try{settings=bgManualSettings()}catch(e){
-    bgOrderToast(String(e.message||e),true);return;
-  }
-  const type=document.querySelector('input[name="orderType"]:checked')?.value||'limit';
-  let price=null;
-  if(type==='limit'){
-    price=Number($('limitPrice').value);
-    if(!Number.isFinite(price)||price<=0){alert('지정가를 입력해 줘');return}
-  }
-  const purpose=type==='market'?'서버 현재가로 시장가 진입':'지정가 '+fmt(price)+' USDT 대기';
-  // Entry-sheet tap already confirms the paper order; no second modal.
-  const requestId=(crypto.randomUUID?crypto.randomUUID():
-    'manual_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,14));
-  void bgSendManualOrder({requestId,side,type,price,settings});
-}
-function bgDrawServerPositions(remote){
-  const holder=$('bgServerPositions');
-  if(!holder)return;
-  holder.textContent='';
-  if(!remote.initialized){
-    holder.textContent='서버 모의계정이 아직 준비되지 않았어.';
-    return;
-  }
-  const paper=remote.paper||{};
-  if(!Array.isArray(paper.positions)){
-    holder.textContent='Railway 서버의 수동 포지션 기능 배포를 확인해 줘. 최신 서버가 필요해.';
-    return;
-  }
-  const positions=paper.positions;
-  const summary=document.createElement('div');
-  summary.textContent='서버 잔고 '+fmt(Number(paper.balance)||0)+' USDT · '+
-    positions.length+'개 보유 · 손절/익절 서버 감시'+
-    (Number.isFinite(paper.marketTickAgeMs)&&paper.marketTickAgeMs>15000?' · ⚠ 시세 지연':'');
-  holder.append(summary);
-  for(const p of positions){
-    const row=document.createElement('div');row.className='bg-portfolio-row';
-    const detail=document.createElement('div');
-    const title=document.createElement('strong');
-    title.textContent=(p.manual?'수동 ':'자동 ')+p.side+' · '+fmt(p.entry)+' USDT';
-    title.className=p.side==='LONG'?'bg-portfolio-green':'bg-portfolio-red';
-    const sub=document.createElement('small');
-    sub.textContent='손절 '+fmt(p.stop)+' · 익절 '+fmt(p.tp)+
-      (p.unrealized==null?'':' · 미실현 '+fmt(p.unrealized)+' USDT');
-    detail.append(title,sub);
-    const close=document.createElement('button');
-    close.type='button';close.textContent='서버 청산';
-    close.onclick=()=>void bgCloseRemotePaper(p);
-    row.append(detail,close);holder.append(row);
-  }
-  if(paper.manualPending){
-    const row=document.createElement('div');row.className='bg-portfolio-row';
-    const label=document.createElement('span');
-    label.textContent='서버 수동 '+paper.manualPending.side+' 지정가 대기 '+fmt(paper.manualPending.price);
-    const cancel=document.createElement('button');cancel.type='button';cancel.textContent='대기 취소';
-    cancel.onclick=()=>void bgCancelRemotePaper();
-    row.append(label,cancel);holder.append(row);
-  }
-}
-async function bgCloseRemotePaper(p){
-  if(bgManualBusy)return;
-  if(!confirm('Railway 서버의 '+p.side+' 가상 포지션을 지금 수동 청산할까?\n이 작업은 서버 모의계정에만 적용돼.'))return;
-  bgManualBusy=true;
-  try{
-    const r=await bgCall('manual-close','POST',{positionId:p.id});
-    if(r.receipt?.result!=='closed'||r.receipt.positionId!==p.id)
-      throw Error('서버 청산 결과 확인 실패');
-    bgShow(r);
-  }catch(e){alert('서버 수동 청산 실패: '+String(e.message||e))}
-  finally{bgManualBusy=false}
-}
-async function bgCancelRemotePaper(){
-  if(bgManualBusy||!confirm('Railway 서버 수동 지정가 대기 주문을 취소할까?'))return;
-  bgManualBusy=true;
-  try{const r=await bgCall('manual-cancel','POST',{});bgShow(r)}
-  catch(e){alert('서버 대기 주문 취소 실패: '+String(e.message||e))}
-  finally{bgManualBusy=false}
-}
-
-
-function bgTradingConfigFromUi(){
-  const strategy={},guards={};
-  for(const id of BG_RISK_IDS){
-    if(id==='sizeMode'){
-      if(!['risk','margin'].includes($(id).value))return null;
-      strategy[id]=$(id).value;continue;
-    }
-    const raw=$(id).value,n=Number(raw),[min,max]=BG_RISK_LIMITS[id];
-    if(raw===''||!Number.isFinite(n)||n<min||n>max)return null;
-    strategy[id]=n;
-  }
-  for(const id of BG_GUARD_IDS){
-    const raw=$(id).value,n=Number(raw),cfg=AUTO_PAPER_FIELDS[id];
-    if(raw===''||!Number.isFinite(n)||n<cfg[1]||n>cfg[2])return null;
-    guards[id]=n;
-  }
-  return {marketMode:$('autoMarketMode').value,strategy,guards};
-}
-function bgConfigSignature(config){
-  if(!config||!Object.hasOwn(BG_MARKET_LABELS,config.marketMode))return null;
-  return JSON.stringify({marketMode:config.marketMode,
-    strategy:Object.fromEntries(BG_RISK_IDS.map(id=>
-      [id,id==='sizeMode'?config.strategy?.[id]:Number(config.strategy?.[id])])),
-    guards:Object.fromEntries(BG_GUARD_IDS.map(id=>[id,Number(config.guards?.[id])]))});
-}
-function bgUnsentConfig(){
-  try{
-    const raw=localStorage.getItem(BG_PENDING_CONFIG_KEY);
-    return raw?JSON.parse(raw):null;
-  }catch{return null}
-}
-function bgScheduleSync(ms=100){
-  if(bgConfigTimer!==null)clearTimeout(bgConfigTimer);
-  bgConfigTimer=setTimeout(()=>{bgConfigTimer=null;void bgFlushConfig()},ms);
-}
-function bgStageConfig(ms=100){
-  // The Railway headless browser has no server URL; never loop back to itself.
-  if(!bgRemoteMaybeOn&&!String($('bgPaperUrl')?.value||'').trim())return;
-  const config=bgTradingConfigFromUi();
-  if(!config){
-    bgMessage('입력한 설정값을 확인해 줘. 올바른 값으로 고치면 서버에 자동 반영돼.','warning');
-    return;
-  }
-  localStorage.setItem(BG_PENDING_CONFIG_KEY,JSON.stringify(config));
-  localStorage.setItem(BG_PENDING_MARKET_KEY,config.marketMode);
-  bgConfigError=null;
-  bgMessage('서버 설정 자동 반영 중 · '+BG_MARKET_LABELS[config.marketMode],'warning');
-  if($('page-position').classList.contains('active'))updatePosition();
-  if(!String($('bgPaperToken').value||'').trim()){
-    bgMessage('설정은 저장됐어. Railway 비밀번호를 다시 입력하면 자동 반영돼.','warning');
-    return;
-  }
-  bgScheduleSync(ms);
-}
-async function bgFlushConfig(){
-  if(bgConfigSending)return;
-  const config=bgUnsentConfig();
-  if(!config||!String($('bgPaperToken').value||'').trim())return;
-  if(localStorage.getItem(BG_PENDING_MARKET_KEY))return void bgFlushMarketMode();
-  config.marketMode=$('autoMarketMode').value;
-  const sent=bgConfigSignature(config);
-  if(!sent)return;
-  bgConfigSending=true;
-  let error=null;
-  try{
-    const response=await bgCall('trading-config','POST',config);
-    if(bgConfigSignature(response.paper?.tradingConfig)!==sent)
-      throw Error('서버에서 변경된 설정을 확인하지 못했어');
-    if(bgConfigSignature(bgUnsentConfig())===sent){
-      localStorage.removeItem(BG_PENDING_CONFIG_KEY);
-      localStorage.removeItem(BG_PENDING_MARKET_KEY);
-    }
-    bgConfigError=null;
-    bgShow(response);
-  }catch(e){
-    error=String(e.message||e);bgConfigError=error;
-    const reason=/HTTP 404|Not found/i.test(error)?
-      'Railway 서버 최신 배포가 필요해.':
-      '서버 응답 지연 · 자동 재시도 중';
-    bgMessage('서버 설정 반영 실패 · '+reason+'\n'+error,'error');
-    if($('page-position').classList.contains('active'))updatePosition();
-  }finally{
-    bgConfigSending=false;
-    const newer=bgUnsentConfig();
-    if(newer&&String($('bgPaperToken').value||'').trim()&&
-       document.visibilityState==='visible')
-      bgScheduleSync(bgConfigSignature(newer)!==sent?30:error?4500:1000);
-  }
-}
-
-function bgShow(remote){
-  // Ignore a late reply from an older request after newer settings were
-  // already accepted by Railway. Its outdated mode must not flash as an error.
-  const version=Number(remote.paper?.configRevision);
-  if(Number.isFinite(version)&&version>=0){
-    if(version<bgLatestConfigRevision)return;
-    bgLatestConfigRevision=Math.max(bgLatestConfigRevision,version);
-  }
-  bgLock(!!remote.armed);
-  if(!remote.initialized){
-    bgMessage('서버 연결 성공 · 아직 서버 모의계정 없음 · AUTO OFF\n서버 AUTO 시작을 누르면 휴대폰의 모의 기록을 처음 한 번 복사해.');return;
-  }
-  const p=remote.paper||{},age=p.marketTickAgeMs;
-  bgDrawServerPositions(remote);
-  const uncertain=bgReadUnconfirmedManual();
-  if(uncertain&&Array.isArray(remote.recentManualIds)&&
-     remote.recentManualIds.includes(uncertain.requestId))
-    localStorage.removeItem(BG_MANUAL_UNCONFIRMED_KEY);
-  // Remote status is read-only. NEVER overwrite the user's selected mode:
-  // doing so erased a newer choice when an old /api/status reply arrived.
-  const modeVerified=Object.hasOwn(BG_MARKET_LABELS,p.marketMode);
-  if(modeVerified)bgServerMarketMode=p.marketMode;
-  const selected=$('autoMarketMode').value;
-  const pending=bgUnsentConfig();
-  const confirmed=p.tradingConfig&&bgConfigSignature(p.tradingConfig)===bgConfigSignature(pending);
-  if(pending&&confirmed){
-    localStorage.removeItem(BG_PENDING_CONFIG_KEY);
-    localStorage.removeItem(BG_PENDING_MARKET_KEY);
-    bgConfigError=null;
-  }
-  const waiting=!!bgUnsentConfig()||!!localStorage.getItem(BG_PENDING_MARKET_KEY);
-  const running=!!remote.armed&&p.autoEnabled===true;
-  const line=running?'서버 AUTO ON · 모의 신호 감시 중':
-    remote.armed?'서버 시작 요청됨 · 실제 AUTO ON 확인 필요':'서버 AUTO OFF';
-  const strategy=waiting?
-    '\n설정 자동 반영 중 · 선택 '+(BG_MARKET_LABELS[selected]||selected)+
-      (modeVerified?' · 서버 현재 '+BG_MARKET_LABELS[p.marketMode]:''):
-    modeVerified?
-      '\n서버 전략 '+BG_MARKET_LABELS[p.marketMode]+
-        (p.marketMode===selected?' · 적용 확인':' · 휴대폰 선택과 다름'):
-      '\n서버 전략 정보 없음 · Railway 최신 서버 배포를 확인해 줘';
-  const mismatch=waiting||!modeVerified||p.marketMode!==selected;
-  const feed=Number.isFinite(age)?age<=15000?' · 시세 최근 갱신':' · 시세 지연 '+Math.round(age/1000)+'초':' · 시세 상태 미확인';
-  bgMessage(line+strategy+'\n가상 잔고 '+(p.balance??'—')+' USDT · LONG '+(p.long??'—')+
-    '개 · SHORT '+(p.short??'—')+'개 · 청산 '+(p.closed??'—')+'건'+feed+
-    (remote.lastError?'\n서버 오류: '+remote.lastError:''),
-    remote.lastError||mismatch||remote.armed&&!running||Number.isFinite(age)&&age>15000?'warning':running?'on':'unknown');
-  if($('page-position').classList.contains('active'))updatePosition();
-}
-async function bgRun(work){
-  if(bgBusy)return;bgBusy=true;
-  const buttons=['bgPaperCheck','bgPaperStart','bgPaperStop','bgPaperImport'];
-  for(const id of buttons)$(id).disabled=true;
-  try{await work()}catch(e){bgMessage('오류: '+String(e.message||e),'error')}
-  finally{bgBusy=false;for(const id of buttons)$(id).disabled=false}
-}
-async function bgCheck(){
-  await bgRun(async()=>{
-    bgMessage('서버 상태 확인 중…');
-    const remote=await bgCall('status');
-    bgShow(remote);
-    if(bgUnsentConfig())bgScheduleSync(20);
-    else{
-      const previous=localStorage.getItem(BG_PENDING_MARKET_KEY);
-      if(previous&&previous===$('autoMarketMode').value&&
-         Object.hasOwn(BG_MARKET_LABELS,previous)&&remote.paper?.marketMode!==previous)
-        bgStageConfig(20);
-      else if(previous&&remote.paper?.marketMode===previous)
-        localStorage.removeItem(BG_PENDING_MARKET_KEY);
-    }
-  });
-}
-function bgPushMarketMode(mode){
-  if(!Object.hasOwn(BG_MARKET_LABELS,mode))return;
-  localStorage.setItem(BG_PENDING_MARKET_KEY,mode);
-  bgModeError=null;
-  if(bgModeTimer!==null)clearTimeout(bgModeTimer);
-  bgModeTimer=setTimeout(()=>{bgModeTimer=null;void bgFlushMarketMode()},20);
-  if($('page-position').classList.contains('active'))updatePosition();
-}
-async function bgFlushMarketMode(){
-  if(bgModeSending)return;
-  const mode=localStorage.getItem(BG_PENDING_MARKET_KEY);
-  if(!Object.hasOwn(BG_MARKET_LABELS,mode)||!String($('bgPaperToken').value||'').trim())return;
-  bgModeSending=true;
-  let failed=false;
-  try{
-    const remote=await bgCall('market-mode','POST',{mode});
-    if(remote.paper?.marketMode!==mode)throw Error('서버 전략 확인 실패');
-    bgServerMarketMode=mode;
-    if(localStorage.getItem(BG_PENDING_MARKET_KEY)===mode)localStorage.removeItem(BG_PENDING_MARKET_KEY);
-    bgModeError=null;
-    bgShow(remote);
-  }catch(e){
-    failed=true;bgModeError=String(e.message||e);
-    bgMessage('전략 서버 반영 재시도 중 · '+BG_MARKET_LABELS[mode]+' · '+bgModeError,'warning');
-  }finally{
-    bgModeSending=false;
-    const newer=localStorage.getItem(BG_PENDING_MARKET_KEY);
-    if(Object.hasOwn(BG_MARKET_LABELS,newer)&&document.visibilityState==='visible'){
-      if(bgModeTimer!==null)clearTimeout(bgModeTimer);
-      bgModeTimer=setTimeout(()=>{bgModeTimer=null;void bgFlushMarketMode()},failed?2500:20);
-    }
-    if($('page-position').classList.contains('active'))updatePosition();
-  }
-}
-function bgStopPhoneAuto(){
-  if(autoPaperEnabled){autoPaperEnabled=false;renderAutoPaperStatus()}
-  if(autoPendingLimit)cancelAutoPendingLimit('Railway 서버 모의매매 전환');
-  savePaperState();saveAutoSettings();saveAutoSignals();
-}
-async function bgStart(){
-  await bgRun(async()=>{
-    const remote=await bgCall('status');
-    if(remote.armed){bgShow(remote);return}
-    if(!remote.ready)throw Error('Railway 서버 브라우저가 아직 준비되지 않았어');
-    if(!remote.initialized&&paperMode()!=='hedge')throw Error('최초 연결 전에 포지션 방식을 헤지 모드로 선택해 줘');
-    const first=!remote.initialized;
-    const msg=first?
-      '휴대폰의 현재 모의 잔고·포지션·기록·설정을 서버에 최초 1회 복사하고 서버 AUTO를 시작할까?\n서버와 휴대폰은 이후 별도 모의계정이야.':
-      '서버에 저장된 모의계정으로 AUTO를 다시 시작할까?\n휴대폰 기록으로 서버를 덮어쓰지 않아.';
-    if(!confirm(msg))return;
-    bgStopPhoneAuto();
-    let data={};
-    if(first){
-      const paper=localStorage.getItem(PAPER_SAVE_KEY);
-      if(!paper)throw Error('휴대폰 모의계정 저장 실패');
-      data={snapshot:{paper,settings:localStorage.getItem(AUTO_PAPER_SETTINGS_KEY),
-        signals:localStorage.getItem(AUTO_PAPER_SIGNALS_KEY)}};
-    }
-    // If network fails after arming, keep phone AUTO locked until verified.
-    bgLock(true);bgMessage('서버 AUTO 시작 요청 중…','warning');
-    bgShow(await bgCall('start','POST',data));
-  });
-}
-async function bgStop(){
-  await bgRun(async()=>{
-    if(!confirm('Railway 서버 AUTO 신규 진입을 중지할까?\n기존 서버 가상 포지션의 손절·익절 감시는 계속해.'))return;
-    bgMessage('서버 AUTO 중지 중…','warning');
-    bgShow(await bgCall('stop','POST',{}));
-  });
-}
-async function bgImport(){
-  await bgRun(async()=>{
-    const remote=await bgCall('status');
-    if(!remote.initialized)throw Error('서버 모의계정이 아직 없어.');
-    const question=remote.armed?
-      '서버 AUTO를 중지하고 서버의 모의 포지션·잔고·기록을 휴대폰으로 가져올까?\n휴대폰 기록은 별도 백업하고 표시되는 기록은 서버 기록으로 교체돼.':
-      '서버 모의 포지션·잔고·기록을 휴대폰으로 가져올까?\n현재 휴대폰 기록은 별도 백업돼.';
-    if(!confirm(question))return;
-    if(remote.armed){
-      const stopped=await bgCall('stop','POST',{});
-      if(stopped.armed)throw Error('서버 AUTO 중지 실패');
-      bgLock(false);
-    }
-    bgStopPhoneAuto();
-    const old={paper:localStorage.getItem(PAPER_SAVE_KEY),settings:localStorage.getItem(AUTO_PAPER_SETTINGS_KEY),
-      signals:localStorage.getItem(AUTO_PAPER_SIGNALS_KEY)};
-    const result=await bgCall('snapshot');
-    if(typeof result.paper!=='string')throw Error('서버 모의계정 스냅샷이 없어');
-    for(const key of ['paper','settings','signals']){
-      if(result[key]==null)continue;
-      if(typeof result[key]!=='string')throw Error('서버 '+key+' 형식 오류');
-      const obj=JSON.parse(result[key]);
-      if(!obj||typeof obj!=='object'||Array.isArray(obj))throw Error('서버 '+key+' 손상');
-    }
-    localStorage.setItem(BG_LOCAL_BACKUP,JSON.stringify(old));
-    bgImportReload=true;
-    localStorage.setItem(PAPER_SAVE_KEY,result.paper);
-    if(result.settings)localStorage.setItem(AUTO_PAPER_SETTINGS_KEY,result.settings);
-    if(result.signals)localStorage.setItem(AUTO_PAPER_SIGNALS_KEY,result.signals);
-    bgLock(false);window.location.reload();
-  });
-}
-function initBgPaperUi(){
-  $('bgPaperUrl').value=localStorage.getItem(BG_URL_KEY)||'';
-  try{$('bgPaperToken').value=sessionStorage.getItem(BG_TOKEN_SESSION)||''}catch{}
-  $('bgPaperCheck').addEventListener('click',()=>void bgCheck());
-  $('bgPaperStart').addEventListener('click',()=>void bgStart());
-  $('bgPaperStop').addEventListener('click',()=>void bgStop());
-  $('bgPaperImport').addEventListener('click',()=>void bgImport());
-  $('bgPositionRefresh').addEventListener('click',()=>void bgCheck());
-  $('bgPaperToken').addEventListener('change',()=>{
-    if(bgUnsentConfig())bgScheduleSync(20);
-  });
-  $('bgPaperUrl').addEventListener('change',()=>{
-    try{localStorage.setItem(BG_URL_KEY,bgUrl())}catch(e){bgMessage(String(e.message||e),'warning')}
-  });
-  if(bgRemoteMaybeOn){
-    bgMessage('서버 AUTO가 켜져 있을 수 있어. 연결 확인 후 서버 AUTO를 중지하기 전까지 휴대폰 AUTO는 중복 방지로 잠겨 있어.','warning');
-    renderAutoPaperStatus();
-  }
-  if($('bgPaperUrl').value&&$('bgPaperToken').value)void bgCheck();
-  else if(bgUnsentConfig())bgMessage('Railway 서버 설정 변경을 저장했어. 비밀번호를 입력하면 자동으로 적용해.','warning');
-  const retryOnReturn=()=>{
-    if(document.visibilityState==='visible'&&bgUnsentConfig()&&
-       String($('bgPaperToken').value||'').trim())bgScheduleSync(20);
-  };
-  document.addEventListener('visibilitychange',retryOnReturn);
-  window.addEventListener('focus',retryOnReturn);
-  // iOS can suspend timers in the background. Retry when awake without
-  // requiring the user to press a server button.
-  setInterval(()=>{
-    if(document.visibilityState==='visible'&&bgUnsentConfig()&&
-       String($('bgPaperToken').value||'').trim()&&
-       !bgConfigSending&&bgConfigTimer===null)bgScheduleSync(20);
-  },8000);
-}
 function initAutoPaperUi(){
   restoreAutoPaperSettings();
   // Default OFF on reload: remove any old order rather than secretly filling it.
@@ -1861,7 +1246,7 @@ function initAutoPaperUi(){
     '5분 미체결 자동 취소':'앱 재실행 · 자동 모의 OFF');
   for(const id of Object.keys(AUTO_PAPER_FIELDS)){
     $(id).addEventListener('change',()=>{
-      $(id).value=String(readAutoSetting(id));saveAutoSettings();bgStageConfig(150);
+      $(id).value=String(readAutoSetting(id));saveAutoSettings();
     });
   }
   const toggleAutoPaper=()=>{
@@ -1869,7 +1254,6 @@ function initAutoPaperUi(){
       autoPaperEnabled=false;
       if(autoPendingLimit)cancelAutoPendingLimit('자동 모의 OFF');
     }else{
-      if(bgRemoteMaybeOn){alert('Railway 서버 AUTO가 작동 중일 수 있어. 설정 → Railway 연결에서 서버 상태를 확인하고 서버 AUTO를 먼저 중지해 줘. 중복 모의거래를 방지하기 위해 휴대폰 AUTO를 켤 수 없어.');return}
       if(!confirm('자동 모의매매를 활성화할까요?\n실제 선물 주문은 절대 실행하지 않습니다.\n브라우저를 닫으면 동작이 중단됩니다.'))return;
       autoPaperEnabled=true;autoPaperArmedAt=Date.now();
       void pollAutoPaperMinute();
@@ -2086,10 +1470,10 @@ function capturePaperEntryPattern(timeframeOverride){
   }catch(e){console.warn('진입 패턴 기록 실패',e);return null}
 }
 let pendingFillType=null;
-function openTrade(side,entry,manualRequestId=null){
+function openTrade(side,entry){
   let bal=Number($('balance').value),r=Number($('risk').value)/100,d=Number($('stop').value)/100;
   const lev=Number($('lev').value),rr=Number($('rr').value),hold=Number($('hold').value);
-  if(!(bal>0&&r>0&&d>=.0005&&d<=.1&&lev>0&&rr>=1&&hold>0&&entry>0))return alert('전략 설정을 확인하세요 (손절 거리 0.05~10%)');
+  if(!(bal>0&&r>0&&d>=.0015&&d<=.006&&lev>0&&rr>=1&&hold>0&&entry>0))return alert('전략 설정을 확인하세요');
   if(paperMode()==='oneway'){
     const reverse=side==='LONG'?'SHORT':'LONG';
     for(const p of [...hedgePositions[reverse]])closePositionById(p.id,'방향 전환 청산',false);
@@ -2105,66 +1489,38 @@ function openTrade(side,entry,manualRequestId=null){
   const tp=side==='LONG'?entry*(1+(rr*(d+2*paperTradeCost())+2*paperTradeCost())):entry*(1-(rr*(d+2*paperTradeCost())+2*paperTradeCost()));
   const entryType=pendingFillType||document.querySelector('input[name="orderType"]:checked')?.value||'market';
   const entryFeeRate=entryType==='limit'?paperFeeRates().maker:paperFeeRates().taker;
-  const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,entryFeeRate,entryType,leverage:lev,opened:Date.now(),hold,
-    manualRequestId:manualRequestId||null,entryPattern:capturePaperEntryPattern()};
+  const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,entryFeeRate,entryType,leverage:lev,opened:Date.now(),hold,entryPattern:capturePaperEntryPattern()};
   hedgePositions[side].push(p);
   selectedPaperPositionId=p.id;selectedHedgeSide=side;position=p;selected=null;
   add('가상 '+side+' 개별 포지션 진입 '+fmt(entry)+' USDT · 총 규모 '+won(notional)+' · 남은 가상 증거금 '+fmt(paperFreeMargin())+' USDT');
   savePaperState();render();
 }
 function request(side){
-  if(bgManualOnServer()){bgRequestManualOrder(side);return}
-  // Chart LONG/SHORT are manually requested paper entries, not AUTO signals.
-  if(!last||(!demo&&Date.now()-lastTickAt>10000)){
-    alert('최신 시세 연결이 필요합니다.');return;
-  }
+  if(!last||pending||(!demo&&Date.now()-lastTickAt>10000)){alert(pending?'대기 주문을 먼저 취소해 주세요.':'최신 시세 연결이 필요합니다.');return}
   if(paperFreeMargin()<=.001){alert('가상 잔고의 사용 가능한 증거금이 부족해요.');return}
   const reverse=side==='LONG'?'SHORT':'LONG';
   const action=paperMode()==='oneway'&&hedgePositions[reverse].length?'반대 방향 전환':'독립 포지션 신규 진입';
   const type=document.querySelector('input[name="orderType"]:checked').value;
   if(type==='market'){
-    if(!confirm('가상 '+side+' '+action+' 시장가 · 현재가 '+fmt(last)+' USDT\n'+
-      (paperMode()==='oneway'&&hedgePositions[reverse].length?'기존 반대 방향 포지션은 청산됩니다.\n':'')+
-      '모의 주문입니다.'))return;
+    if(!confirm('가상 '+side+' '+action+' 시장가 · 현재가 '+fmt(last)+' USDT\n'+(paperMode()==='oneway'&&hedgePositions[reverse].length?'기존 반대 방향 포지션은 청산됩니다.\n':'')+'모의 주문입니다.'))return;
     openTrade(side,last*(side==='LONG'?1+slip:1-slip));
   }else{
     const price=Number($('limitPrice').value);
     if(!(price>0)||!Number.isFinite(price)){alert('유효한 지정가를 입력해 주세요.');return}
-    const replacePending=pending!==null;
-    if(!confirm('가상 '+side+' '+(replacePending?'기존 수동 대기 주문을 취소하고 새 ':'신규 ')+
-      '지정가 '+fmt(price)+' USDT\n체결 시 잔여 증거금 기준으로 크기가 제한됩니다.'))return;
-    if(replacePending)add('이전 수동 지정가 주문 취소 · 새 주문으로 교체');
-    pending={side,price};
-    add('가상 '+side+' 신규 지정가 대기 '+fmt(price)+' USDT');
-    savePaperState();render();
+    if(!confirm('가상 '+side+' 신규 지정가 '+fmt(price)+' USDT\n체결 시 잔여 증거금 기준으로 크기가 제한됩니다.'))return;
+    pending={side,price};add('가상 '+side+' 신규 지정가 대기 '+fmt(price)+' USDT');savePaperState();render();
   }
   $('entrySheet').style.display='none';
 }
 function showOrderSheet(side){
-  if(!bgManualOnServer()&&(!last||(!demo&&Date.now()-lastTickAt>10000))){
-    alert('최신 시세 연결이 필요합니다.');return;
-  }
-  // Manual chart entries start as LIMIT orders; market is an explicit choice.
+  if(!last||pending||(!demo&&Date.now()-lastTickAt>10000)){alert(pending?'대기 주문을 먼저 취소해 주세요.':'최신 시세 연결이 필요합니다.');return}
   document.querySelector('input[name="orderType"][value="limit"]').checked=true;
-  $('limitPrice').value=last>0?last.toFixed(1):'';
-  $('entrySheet').style.display='block';
+  $('limitPrice').value=last.toFixed(1);$('entrySheet').style.display='block';
   const reverse=side==='LONG'?'SHORT':'LONG';
-  $('sheetPrice').textContent=(bgManualOnServer()?'Railway 서버 수동 모의 ':'수동 모의 ')+(side==='LONG'?'롱':'숏')+' '+
-    (paperMode()==='oneway'&&hedgePositions[reverse].length?'방향 전환':'신규 진입')+
-    ' · 가용 '+fmt(paperFreeMargin())+' USDT';
-  $('sheetLong').style.display=side==='LONG'?'':'none';
-  $('sheetShort').style.display=side==='SHORT'?'':'none';
-  updateOrderType();
+  $('sheetPrice').textContent='가상 '+(side==='LONG'?'롱':'숏')+' '+(paperMode()==='oneway'&&hedgePositions[reverse].length?'방향 전환':'독립 신규 포지션')+' · 남은 증거금 '+fmt(paperFreeMargin())+' USDT';
+  $('sheetLong').style.display=side==='LONG'?'':'none';$('sheetShort').style.display=side==='SHORT'?'':'none';updateOrderType();
 }
-function updateOrderType(){
-  const limit=document.querySelector('input[name="orderType"]:checked').value==='limit';
-  $('limitLabel').style.display=limit?'':'none';
-  $('limitPrice').style.display=limit?'':'none';
-  const note=limit?'지정가는 가격 도달 시 모의 체결':'시장가는 현재가로 즉시 모의 체결';
-  $('orderHelp').textContent=note+
-    (bgManualOnServer()?' · 서버 계정 / 화면 꺼짐 손절·익절':' · 휴대폰 계정')+
-    ' · 자동매매 전략 무관';
-}
+function updateOrderType(){const limit=document.querySelector('input[name="orderType"]:checked').value==='limit';$('limitLabel').style.display=limit?'':'none';$('limitPrice').style.display=limit?'':'none';$('orderHelp').textContent=limit?'지정가 주문은 가격 도달 시 모의 체결됩니다.':'시장가는 현재가 기준으로 즉시 모의 체결됩니다.'}
 function renderLogs(){$('log').innerHTML=logs.length?logs.map(v=>'<div class="trade-log-item">'+v.replace(/(-?[0-9,]+원)(?= \()/g,(m)=>'<span class="'+(m.startsWith('-')?'pnl-negative':'pnl-positive')+'">'+m+'</span>')+'</div>').join(''):'기록 없음'}function add(s){logs.unshift(new Date().toLocaleTimeString('ko-KR')+' · '+s);logs=logs.slice(0,60);renderLogs()}
 function closePositionById(id,reason='수동 청산',shouldRender=true){
   const p=allPaperPositions().find(x=>x.id===id);
@@ -2173,8 +1529,7 @@ function closePositionById(id,reason='수동 청산',shouldRender=true){
   if(paperStatsBaseBalance===null)paperStatsBaseBalance=bal>0?bal:null;
   closedPaperTrades.push({
     id:p.id,side:p.side,entry:p.entry,exitPrice:last,margin:p.notional/(p.leverage||1),
-    net,reason,closedAt:Date.now(),openedAt:p.opened,entryPattern:p.entryPattern||null,autoStrategy:p.autoStrategy||null,
-    manualRequestId:p.manualRequestId||null,autoSignalBarTime:p.autoSignalBarTime||null
+    net,reason,closedAt:Date.now(),openedAt:p.opened,entryPattern:p.entryPattern||null,autoStrategy:p.autoStrategy||null,autoSignalBarTime:p.autoSignalBarTime||null
   });
   $('balance').value=(bal+net).toFixed(2);
   add(reason+' · 가상 '+p.side+' 개별 포지션 · 비용 차감 순손익 '+won(net)+' ('+(bal>0?percent(net/bal*100):'—')+', 계좌 기준)');
@@ -2197,26 +1552,7 @@ function process(){
   if(autoPendingLimit)fillAutoPendingLimit(last,Date.now());
   if(pending){
     const hit=pending.side==='LONG'?last<=pending.price:last>=pending.price;
-    if(hit){
-      const p=pending;pending=null;pendingFillType='limit';
-      // Preserve the exact manual risk/SL/TP settings captured at limit placement.
-      const fields=['lev','risk','stop','rr','hold','sizeMode','marginPct'];
-      const old=p.manualSettings?
-        Object.fromEntries(fields.map(id=>[id,$(id).value])):null;
-      try{
-        if(old){
-          for(const id of fields)$(id).value=String(p.manualSettings[id]);
-          syncSizeMode();
-        }
-        openTrade(p.side,p.price,p.manualRequestId||null);
-      }finally{
-        pendingFillType=null;
-        if(old){
-          for(const id of fields)$(id).value=old[id];
-          syncSizeMode();savePaperState();
-        }
-      }
-    }
+    if(hit){const p=pending;pending=null;pendingFillType='limit';try{openTrade(p.side,p.price)}finally{pendingFillType=null}}
   }
   for(const p of [...allPaperPositions()]){
     if(!allPaperPositions().some(x=>x.id===p.id))continue;
@@ -2297,21 +1633,11 @@ function updatePosition(){
     const plan=selectedMarketPlan();
     const name=plan.selected==='auto'?'자동 판별 ('+plan.snapshot.label+')':
       plan.selected==='range'?'횡보장':plan.selected==='trend'?'RMI 우선':
-      plan.selected==='classic'?'추세장':
+      plan.selected==='classic'?'추세장 (기존)':
       plan.selected==='breakout'?'돌파주의':'거래 안 함';
-    const remoteMaybeOn=typeof bgRemoteMaybeOn==='boolean'&&bgRemoteMaybeOn;
-    // Unified user-facing AUTO state: server AUTO counts as automatic
-    // paper trading ON even while the phone engine is deliberately OFF.
-    // Avoid claiming live verification; server flag is the last checked state.
-    const strategy=name;
-    const waiting=bgUnsentConfig()||localStorage.getItem(BG_PENDING_MARKET_KEY);
-    const serverConfirmed=bgServerMarketMode===$('autoMarketMode').value&&!waiting;
-    autoMode.textContent=remoteMaybeOn?
-      '자동 모의 ON · '+strategy+' · 서버'+
-        (waiting?' · '+(bgModeError||bgConfigError?'연결 재시도 중':'서버 적용 중'):serverConfirmed?' · 서버 적용 확인':' · 서버 확인 필요'):
-      autoPaperEnabled?'자동 모의 ON · '+strategy:
-        '자동 모의 OFF · '+strategy;
-    autoMode.style.color=remoteMaybeOn||autoPaperEnabled?'#52e6b1':'#a4b8d0';
+    autoMode.textContent='자동 모의 '+(autoPaperEnabled?'ON · '+name+' · '+
+      (plan.mode==='pause'?'신규 진입 중지':'신호 감시 중'):'OFF · '+name);
+    autoMode.style.color=autoPaperEnabled?'#52e6b1':'#a4b8d0';
   }
   const autoDiagnostic=el.querySelector('[data-auto-diagnostic]');
   if(autoDiagnostic)autoDiagnostic.textContent=signalStateText;
@@ -2612,12 +1938,7 @@ $('tf').onchange=()=>{viewOffset=0;resetStableChartScale();crosshairIndex=null;f
 $('paperStatsReset').onclick=()=>{
   if(!confirm('청산 완료 모의거래 통계와 개별 수익률 기록만 초기화할까요? 가상 포지션·잔고·일반 거래내역은 유지됩니다.'))return;
   closedPaperTrades=[];paperStatsBaseBalance=null;renderPaperPerformance();savePaperState();
-};for(let id of ['balance','lev','risk','stop','rr','hold','fx','sizeMode','marginPct'])$(id).oninput=()=>{
-  syncSizeMode();calc();
-  if(id==='fx'){renderDailyVolume();renderVolume30()}
-  savePaperState();
-  if(BG_RISK_IDS.includes(id))bgStageConfig(350);
-};$('paperPositionMode').addEventListener('change',()=>{
+};for(let id of ['balance','lev','risk','stop','rr','hold','fx','sizeMode','marginPct'])$(id).oninput=()=>{syncSizeMode();calc();if(id==='fx'){renderDailyVolume();renderVolume30()}savePaperState()};$('paperPositionMode').addEventListener('change',()=>{
   if(paperMode()==='oneway'&&hedgePositions.LONG.length&&hedgePositions.SHORT.length){
     alert('롱과 숏을 모두 보유 중이에요. 한쪽을 청산한 뒤 단방향 모드로 변경할 수 있어요.');
     $('paperPositionMode').value='hedge';return;
@@ -2625,17 +1946,12 @@ $('paperStatsReset').onclick=()=>{
   savePaperState();render();
 });
 $('autoMarketMode').addEventListener('change',()=>{
-  // Cancel an unfilled phone AUTO order when its strategy changes.
+  // Cancel an unfilled automatic order created for the previous market strategy.
   if(autoPendingLimit)cancelAutoPendingLimit('사용자가 시장 모드 변경');
   savePaperState();render();
-  // When the Railway account is connected, apply this selection to the
-  // server's own browser. The phone and server paper portfolios stay separate.
-  if(bgRemoteMaybeOn||($('bgPaperUrl').value.trim()&&$('bgPaperToken').value.trim()))
-    bgPushMarketMode($('autoMarketMode').value);
 });
-$('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState();bgStageConfig(40)});
-$('marginPct').addEventListener('change',()=>{calc();savePaperState();bgStageConfig(40)});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{if(!bgImportReload){savePaperState();saveAutoSignals()}});restorePaperState();initAutoPaperUi();initBgPaperUi();render();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(tick,2000);
+$('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState()});$('marginPct').addEventListener('change',()=>{calc();savePaperState()});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();initAutoPaperUi();render();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(tick,2000);
 setInterval(pollAutoPaperMinute,5000);
 setInterval(()=>{
   if(!autoPendingLimit)return;
