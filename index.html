@@ -680,7 +680,7 @@ function saveAutoSettings(){
     const old=JSON.parse(localStorage.getItem(AUTO_PAPER_SETTINGS_KEY)||'{}');
     const previous=old&&typeof old==='object'&&!Array.isArray(old)?old:{};
     localStorage.setItem(AUTO_PAPER_SETTINGS_KEY,JSON.stringify({
-      ...previous,...Object.fromEntries(Object.keys(AUTO_PAPER_FIELDS).map(id=>[id,readAutoSetting(id)]))
+      ...previous,...Object.fromEntries(Object.keys(AUTO_PAPER_FIELDS).map(id=>[id,readAutoSetting(id)])),autoPaperEnabled
     }));
   }catch(e){console.warn('자동 모의 설정 저장 실패',e)}
 }
@@ -703,8 +703,10 @@ function restoreAutoPaperSettings(){
         .filter(([day,n])=>/^\d{4}-\d{2}-\d{2}$/.test(day)&&Number.isInteger(n)&&n>=0&&n<=1000).slice(-40));
     }
   }catch(e){console.warn('자동 모의 설정 복구 실패',e)}
-  // Deliberately never auto-arm on reload. Requires fresh explicit consent each time.
-  autoPaperEnabled=false;
+  // Restore the user's last explicit AUTO ON/OFF choice on app restart.
+  try{autoPaperEnabled=JSON.parse(localStorage.getItem(AUTO_PAPER_SETTINGS_KEY)||'{}').autoPaperEnabled===true}
+  catch(e){autoPaperEnabled=false;console.warn('자동 모의 ON 상태 복구 실패',e)}
+  if(autoPaperEnabled)autoPaperArmedAt=Date.now();
   renderAutoPaperStatus();
 }
 function renderAutoPaperStatus(){
@@ -1242,9 +1244,9 @@ async function pollAutoPaperMinute(){
 }
 function initAutoPaperUi(){
   restoreAutoPaperSettings();
-  // Default OFF on reload: remove any old order rather than secretly filling it.
+  // Do not silently fill an obsolete pending order after a restart.
   if(autoPendingLimit)cancelAutoPendingLimit(Date.now()>=autoPendingLimit.expiresAt?
-    '5분 미체결 자동 취소':'앱 재실행 · 자동 모의 OFF');
+    '5분 미체결 자동 취소':'앱 재실행 · 기존 미체결 주문 취소');
   for(const id of Object.keys(AUTO_PAPER_FIELDS)){
     $(id).addEventListener('change',()=>{
       $(id).value=String(readAutoSetting(id));saveAutoSettings();
@@ -1255,10 +1257,11 @@ function initAutoPaperUi(){
       autoPaperEnabled=false;
       if(autoPendingLimit)cancelAutoPendingLimit('자동 모의 OFF');
     }else{
-      if(!confirm('자동 모의매매를 활성화할까요?\n실제 선물 주문은 절대 실행하지 않습니다.\n브라우저를 닫으면 동작이 중단됩니다.'))return;
+      if(!confirm('자동 모의매매를 활성화할까요?\n실제 선물 주문은 절대 실행하지 않습니다.\nON 설정은 유지되지만 화면 잠금 중 거래 실행은 보장되지 않습니다.'))return;
       autoPaperEnabled=true;autoPaperArmedAt=Date.now();
       void pollAutoPaperMinute();
     }
+    saveAutoSettings();
     renderAutoPaperStatus();
   };
   $('autoPaperToggle').addEventListener('click',toggleAutoPaper);
