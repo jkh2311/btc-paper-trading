@@ -463,7 +463,7 @@ async function request(req,res){
         state.marketMode=request.mode;
         state.configRevision=(Number(state.configRevision)||0)+1;
         await save(meta,state);
-        return status();
+        return {mode:state.marketMode,configRevision:state.configRevision,applied:true};
       });
       return send(res,200,value,origin);
     }
