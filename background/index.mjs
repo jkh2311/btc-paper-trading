@@ -316,7 +316,6 @@ async function status(){
           'autoMinuteLowFrom','autoMinuteLowTo','autoMaxChasePct','autoMaxPositions',
           'autoDailyLossPct','autoCooldownMin'].map(id=>[id,Number(document.getElementById(id)?.value)]))
       },
-      configRevision:Number(state.configRevision)||0,
       marketTickAgeMs:typeof lastTickAt==='number'&&lastTickAt>0?Date.now()-lastTickAt:null,
       marketPrice:typeof last==='number'&&last>0?last:null,
       positions:allPaperPositions().slice(0,40).map(p=>({
@@ -326,6 +325,8 @@ async function status(){
       })),
       manualPending:pending?{side:pending.side,price:pending.price}:null
     };},keys.paper);
+    // Node process metadata is not available inside page.evaluate's browser realm.
+    v.paper.configRevision=Number(state.configRevision)||0;
   }catch(e){v.lastError=String(e.message||e).slice(0,200)}
   return v;
 }
