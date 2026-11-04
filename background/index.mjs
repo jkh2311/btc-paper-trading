@@ -104,8 +104,129 @@ async function synchronize(){
   const val=await getSnapshot(),hash=JSON.stringify(val);
   if(hash!==lastWritten){await save(backup,val);lastWritten=hash}
 }
+
+const manualSettingsSpec={
+  lev:[1,50],risk:[0.01,5],stop:[0.15,0.6],rr:[1,20],
+  hold:[1,24],marginPct:[0.1,100]
+};
+function checkedManualOrder(input){
+  if(!input||typeof input!=='object')throw Error('Manual order data required');
+  const {requestId,side,type}=input;
+  if(typeof requestId!=='string'||!/^[a-zA-Z0-9_-]{12,96}$/.test(requestId))
+    throw Error('Invalid manual request identifier');
+  if(!['LONG','SHORT'].includes(side)||!['market','limit'].includes(type))
+    throw Error('Invalid paper order side or type');
+  const price=type==='limit'?Number(input.price):null;
+  if(type==='limit'&&(!Number.isFinite(price)||price<1||price>10000000))
+    throw Error('Invalid paper limit price');
+  if(!input.settings||typeof input.settings!=='object'||
+     !['risk','margin'].includes(input.settings.sizeMode))
+    throw Error('Invalid manual position sizing mode');
+  const settings={sizeMode:input.settings.sizeMode};
+  for(const [name,[min,max]] of Object.entries(manualSettingsSpec)){
+    const value=Number(input.settings[name]);
+    if(!Number.isFinite(value)||value<min||value>max)
+      throw Error('Invalid paper manual setting: '+name);
+    settings[name]=value;
+  }
+  return {requestId,side,type,price,settings};
+}
+async function persistPaperBackup(){
+  const val=await getSnapshot();
+  await save(backup,val);
+  lastWritten=JSON.stringify(val);
+}
+async function handleManualOrder(input){
+  const order=checkedManualOrder(input);
+  if(!state.initialized)throw Error('Start and initialize Railway paper account first');
+  if(!page||page.isClosed())await browser();
+  if(!Array.isArray(state.manualReceipts))state.manualReceipts=[];
+  const existing=state.manualReceipts.find(item=>item.requestId===order.requestId);
+  if(existing)return existing;
+  // Check the browser portfolio too: it can survive a crash between a trade
+  // being saved in the browser and the receipt reaching the persistent volume.
+  const prior=await page.evaluate(id=>{
+    const active=allPaperPositions().find(p=>p.manualRequestId===id);
+    if(active)return {requestId:id,side:active.side,type:active.entryType,
+      positionId:active.id,entry:active.entry,stop:active.stop,tp:active.tp,
+      result:'filled'};
+    const completed=closedPaperTrades.find(t=>t.manualRequestId===id);
+    if(completed)return {requestId:id,side:completed.side,type:'market',
+      positionId:completed.id,entry:completed.entry,stop:null,tp:null,result:'closed'};
+    if(pending?.manualRequestId===id)
+      return {requestId:id,side:pending.side,type:'limit',price:pending.price,result:'pending'};
+    return null;
+  },order.requestId);
+  if(prior){state.manualReceipts.push(prior);state.manualReceipts=state.manualReceipts.slice(-100);await save(meta,state);return prior}
+  const receipt=await page.evaluate(order=>{
+    if(demo||!(last>0)||!Number.isFinite(last)||Date.now()-lastTickAt>10000)
+      throw Error('Server BTC market price is stale: manual paper order not submitted');
+    if(paperMode()!=='hedge')throw Error('Server paper hedge mode is required for independent long/short');
+    if(typeof openTrade!=='function'||typeof savePaperState!=='function')
+      throw Error('Server paper trading engine unavailable');
+    const ids=['lev','risk','stop','rr','hold','sizeMode','marginPct'];
+    const old=Object.fromEntries(ids.map(id=>[id,document.getElementById(id).value]));
+    try{
+      for(const id of ids)document.getElementById(id).value=String(order.settings[id]);
+      syncSizeMode();
+      if(order.type==='market'){
+        const before=new Set(allPaperPositions().map(p=>p.id));
+        if(!(paperFreeMargin()>0.001))throw Error('No free server paper margin');
+        pendingFillType='market';
+        try{openTrade(order.side,last*(order.side==='LONG'?1+slip:1-slip),order.requestId)}
+        finally{pendingFillType=null}
+        const p=allPaperPositions().find(p=>p.side===order.side&&!before.has(p.id));
+        if(!p)throw Error('Manual server entry was not executed');
+        p.manualRequestId=order.requestId;
+        savePaperState();
+        return {requestId:order.requestId,side:order.side,type:'market',
+          positionId:p.id,entry:p.entry,stop:p.stop,tp:p.tp,result:'filled'};
+      }
+      if(pending)throw Error('Existing server paper limit order: cancel it first');
+      pending={side:order.side,price:order.price,manualRequestId:order.requestId};
+      add('서버 수동 가상 '+order.side+' 지정가 대기 '+fmt(order.price)+' USDT');
+      savePaperState();render();
+      return {requestId:order.requestId,side:order.side,type:'limit',price:order.price,result:'pending'};
+    }finally{
+      for(const [id,value] of Object.entries(old))document.getElementById(id).value=value;
+      syncSizeMode();savePaperState();
+    }
+  },order);
+  state.manualReceipts.push(receipt);
+  state.manualReceipts=state.manualReceipts.slice(-100);
+  await save(meta,state);
+  await persistPaperBackup();
+  return receipt;
+}
+async function closeServerPaperPosition(id){
+  if(!state.initialized)throw Error('Server paper account not initialized');
+  if(typeof id!=='string'||!/^paper-[a-z0-9-]+$/.test(id))throw Error('Invalid paper position ID');
+  const result=await page.evaluate(id=>{
+    if(demo||!(last>0)||Date.now()-lastTickAt>10000)
+      throw Error('Server market price stale: cannot close paper position');
+    const p=allPaperPositions().find(p=>p.id===id);
+    if(!p)throw Error('Paper position is no longer open');
+    const side=p.side;
+    closePositionById(id,'서버 수동 청산');
+    if(allPaperPositions().some(p=>p.id===id))throw Error('Paper position not closed');
+    return {positionId:id,side,result:'closed'};
+  },id);
+  await persistPaperBackup();
+  return result;
+}
+async function cancelServerPaperLimit(){
+  if(!state.initialized)throw Error('Server paper account not initialized');
+  const result=await page.evaluate(()=>{
+    if(!pending)return {result:'none'};
+    const old={side:pending.side,price:pending.price};
+    pending=null;add('서버 수동 지정가 주문 취소');savePaperState();render();
+    return {result:'cancelled',...old};
+  });
+  await persistPaperBackup();
+  return result;
+}
 async function status(){
-  const v={armed:state.armed,initialized:state.initialized,ready:!!page&&!page.isClosed(),lastError,heartbeatAt};
+  const v={armed:state.armed,initialized:state.initialized,ready:!!page&&!page.isClosed(),lastError,heartbeatAt,recentManualIds:(state.manualReceipts||[]).slice(-40).map(r=>r.requestId)};
   if(v.ready&&v.initialized)try{
     v.paper=await page.evaluate(key=>{const p=JSON.parse(localStorage.getItem(key)||'{}');return {
       balance:Number(p.balance)||0,long:Array.isArray(p.hedgePositions?.LONG)?p.hedgePositions.LONG.length:0,
@@ -113,7 +234,15 @@ async function status(){
       closed:Array.isArray(p.closedPaperTrades)?p.closedPaperTrades.length:0,
       autoEnabled:typeof autoPaperEnabled==='boolean'&&autoPaperEnabled,
       marketMode:document.getElementById('autoMarketMode')?.value||null,
-      marketTickAgeMs:typeof lastTickAt==='number'&&lastTickAt>0?Date.now()-lastTickAt:null};},keys.paper);
+      marketTickAgeMs:typeof lastTickAt==='number'&&lastTickAt>0?Date.now()-lastTickAt:null,
+      marketPrice:typeof last==='number'&&last>0?last:null,
+      positions:allPaperPositions().slice(0,40).map(p=>({
+        id:p.id,side:p.side,entry:p.entry,stop:p.stop,tp:p.tp,opened:p.opened,
+        leverage:p.leverage,margin:p.notional/(p.leverage||1),
+        manual:!!p.manualRequestId,unrealized:last>0?Number(netAt(p,last).toFixed(2)):null
+      })),
+      manualPending:pending?{side:pending.side,price:pending.price}:null
+    };},keys.paper);
   }catch(e){v.lastError=String(e.message||e).slice(0,200)}
   return v;
 }
@@ -150,6 +279,29 @@ async function request(req,res){
         state.marketMode=request.mode;
         await save(meta,state);
         return status();
+      });
+      return send(res,200,value,origin);
+    }
+    if(req.method==='POST'&&url==='/api/manual-order'){
+      const input=await body(req);
+      const value=await serial(async()=>{
+        const receipt=await handleManualOrder(input);
+        return {receipt,...await status()};
+      });
+      return send(res,200,value,origin);
+    }
+    if(req.method==='POST'&&url==='/api/manual-close'){
+      const input=await body(req);
+      const value=await serial(async()=>{
+        const receipt=await closeServerPaperPosition(input?.positionId);
+        return {receipt,...await status()};
+      });
+      return send(res,200,value,origin);
+    }
+    if(req.method==='POST'&&url==='/api/manual-cancel'){
+      const value=await serial(async()=>{
+        const receipt=await cancelServerPaperLimit();
+        return {receipt,...await status()};
       });
       return send(res,200,value,origin);
     }
