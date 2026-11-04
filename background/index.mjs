@@ -10,6 +10,7 @@ const TOKEN=process.env.BACKGROUND_TOKEN||'';
 const DIR=process.env.RAILWAY_VOLUME_MOUNT_PATH||process.env.PAPER_DATA_DIR;
 if(!DIR||TOKEN.length<32)throw Error('Persistent volume and 32+ character BACKGROUND_TOKEN required');
 const keys={paper:'btc-paper-trading-state-v1',settings:'btc-paper-auto-settings-v1',signals:'btc-paper-signals-v1'};
+const marketModes=new Set(['classic','trend','auto','range','breakout','off']);
 const meta=path.join(DIR,'armed.json'),backup=path.join(DIR,'paper-backup.json');
 let state={armed:false,initialized:false},context=null,page=null,lock=Promise.resolve(),lastError=null,heartbeatAt=0,lastWritten='';
 const serial=fn=>{const t=lock.then(fn);lock=t.catch(()=>{});return t};
@@ -68,9 +69,31 @@ async function browser(){
     if(!val.paper){const old=await read(backup);if(old?.paper)await importSnapshot(old)}
   }
 }
+async function setPageMarketMode(mode){
+  if(!marketModes.has(mode))throw Error('Invalid market mode');
+  if(!page||page.isClosed())await browser();
+  await page.locator('#autoMarketMode').waitFor({timeout:10000});
+  const applied=await page.evaluate(value=>{
+    const select=document.getElementById('autoMarketMode');
+    if(!select||![...select.options].some(option=>option.value===value))throw Error('Server app market selector missing');
+    if(select.value!==value){
+      select.value=value;
+      // Run the app's existing handler so its unfilled AUTO order is cancelled
+      // when changing strategy, while keeping opened paper positions intact.
+      select.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+    if(typeof savePaperState==='function')savePaperState();
+    return select.value;
+  },mode);
+  if(applied!==mode)throw Error('Server market mode confirmation failed');
+}
 async function synchronize(){
   if(!page||page.isClosed())await browser();
   if(!state.initialized)return;
+  if(marketModes.has(state.marketMode)){
+    const selected=await page.locator('#autoMarketMode').inputValue();
+    if(selected!==state.marketMode)await setPageMarketMode(state.marketMode);
+  }
   const status=await page.evaluate(()=>({on:typeof autoPaperEnabled==='boolean'&&autoPaperEnabled,visible:document.visibilityState}));
   if(status.visible!=='visible')throw Error('Headless app hidden');
   if(status.on!==state.armed){
@@ -89,6 +112,7 @@ async function status(){
       short:Array.isArray(p.hedgePositions?.SHORT)?p.hedgePositions.SHORT.length:0,
       closed:Array.isArray(p.closedPaperTrades)?p.closedPaperTrades.length:0,
       autoEnabled:typeof autoPaperEnabled==='boolean'&&autoPaperEnabled,
+      marketMode:document.getElementById('autoMarketMode')?.value||null,
       marketTickAgeMs:typeof lastTickAt==='number'&&lastTickAt>0?Date.now()-lastTickAt:null};},keys.paper);
   }catch(e){v.lastError=String(e.message||e).slice(0,200)}
   return v;
@@ -115,6 +139,18 @@ async function request(req,res){
     }
     if(req.method==='POST'&&url==='/api/stop'){
       const value=await serial(async()=>{state.armed=false;await save(meta,state);await synchronize();return status()});
+      return send(res,200,value,origin);
+    }
+    if(req.method==='POST'&&url==='/api/market-mode'){
+      const request=await body(req);
+      if(!marketModes.has(request?.mode))throw Error('Invalid market mode');
+      const value=await serial(async()=>{
+        if(!state.initialized)throw Error('Server paper account not initialized');
+        await setPageMarketMode(request.mode);
+        state.marketMode=request.mode;
+        await save(meta,state);
+        return status();
+      });
       return send(res,200,value,origin);
     }
     return send(res,404,{error:'Not found'},origin);
