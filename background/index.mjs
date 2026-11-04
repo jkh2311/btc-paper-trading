@@ -183,7 +183,7 @@ async function handleManualOrder(input){
           positionId:p.id,entry:p.entry,stop:p.stop,tp:p.tp,result:'filled'};
       }
       if(pending)throw Error('Existing server paper limit order: cancel it first');
-      pending={side:order.side,price:order.price,manualRequestId:order.requestId};
+      pending={side:order.side,price:order.price,manualRequestId:order.requestId,manualSettings:{...order.settings}};
       add('서버 수동 가상 '+order.side+' 지정가 대기 '+fmt(order.price)+' USDT');
       savePaperState();render();
       return {requestId:order.requestId,side:order.side,type:'limit',price:order.price,result:'pending'};
