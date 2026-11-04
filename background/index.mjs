@@ -11,6 +11,8 @@ const DIR=process.env.RAILWAY_VOLUME_MOUNT_PATH||process.env.PAPER_DATA_DIR;
 if(!DIR||TOKEN.length<32)throw Error('Persistent volume and 32+ character BACKGROUND_TOKEN required');
 const keys={paper:'btc-paper-trading-state-v1',settings:'btc-paper-auto-settings-v1',signals:'btc-paper-signals-v1'};
 const marketModes=new Set(['classic','trend','auto','range','breakout','off']);
+// Retired at user request: no browser or automated paper trades on Railway.
+const RAILWAY_PAPER_DISABLED=true;
 const meta=path.join(DIR,'armed.json'),backup=path.join(DIR,'paper-backup.json');
 let state={armed:false,initialized:false},context=null,page=null,lock=Promise.resolve(),lastError=null,heartbeatAt=0,lastWritten='';
 let manualRequestsWaiting=0;
@@ -434,6 +436,7 @@ async function request(req,res){
   const url=new URL(req.url,'http://localhost').pathname;
   if(url==='/health')return send(res,200,{ok:!!page&&!page.isClosed()},origin);
   if(!auth(req))return send(res,401,{error:'Unauthorized'},origin);
+  if(RAILWAY_PAPER_DISABLED)return send(res,410,{error:'Railway paper trading disconnected; phone-only app restored'},origin);
   try{
     if(req.method==='GET'&&url==='/api/status')return send(res,200,await serial(status),origin);
     if(req.method==='GET'&&url==='/api/snapshot')return send(res,200,await serial(getSnapshot),origin);
@@ -535,9 +538,16 @@ async function request(req,res){
 }
 await mkdir(DIR,{recursive:true,mode:0o700});
 state={...state,...await read(meta)};
-try{await browser()}catch(e){lastError=String(e.message||e).slice(0,300)}
+if(RAILWAY_PAPER_DISABLED){
+  // Retain on-disk balance/history/backups; disarm engine across restarts.
+  state.armed=false;
+  await save(meta,state);
+}else{
+  try{await browser()}catch(e){lastError=String(e.message||e).slice(0,300)}
+}
 http.createServer((req,res)=>{void request(req,res)}).listen(Number(process.env.PORT)||3000,'0.0.0.0');
 setInterval(()=>{
+  if(RAILWAY_PAPER_DISABLED)return;
   // Manual user actions take precedence over a scheduled status/snapshot
   // heartbeat. The browser's paper stop/take-profit loop runs independently.
   if(manualRequestsWaiting>0)return;
