@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-4h-pattern-journal-v2"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-dense-trade-cards-v1"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -212,6 +212,26 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 .paper-pattern-chart{width:100%;max-height:80px;display:block;background:#0b182a;border-radius:6px;margin:7px 0}
 .paper-pattern-tags{display:flex;flex-wrap:wrap;gap:5px}
 .paper-pattern-tags span{font-size:10px;color:#c6d8e8;border:1px solid #314963;border-radius:6px;padding:5px 6px}
+
+/* Compact iPhone trade journal: one concise row per closed paper trade */
+#page-history .paper-performance-card{padding:13px 14px 16px}
+#page-history .paper-performance-card>h2{font-size:18px;line-height:1.25;margin:0 0 9px}
+#page-history .paper-performance-minimal{gap:7px;margin:8px 0 4px}
+#page-history .paper-performance-minimal>div{padding:10px 11px;min-height:0;gap:5px;border-radius:9px}
+#page-history .paper-performance-minimal small{font-size:10px;line-height:1.3}
+#page-history .paper-performance-minimal strong{font-size:18px;line-height:1.15}
+#page-history .paper-performance-count{padding:5px 1px 6px;font-size:11px}
+#page-history .paper-performance-head{margin-top:8px;margin-bottom:7px}
+#page-history .paper-performance-head h3{font-size:13px}
+#page-history #paperStatsReset{padding:6px 9px;font-size:11px}
+#page-history .paper-closed-trade-list{gap:5px}
+#page-history .paper-closed-compact{display:grid;grid-template-columns:30px minmax(64px,.8fr) minmax(78px,1.1fr) auto;align-items:center;column-gap:7px;row-gap:0;padding:10px 9px;margin:0;min-height:0;border-radius:9px;line-height:1.15}
+#page-history .paper-closed-side{font-size:13px}
+#page-history .paper-closed-rate{font-size:14px;white-space:nowrap}
+#page-history .paper-closed-amount{font-size:12px;font-weight:700;white-space:nowrap;text-align:right}
+#page-history .paper-closed-time{font-size:10px;line-height:1.2;color:#8da8c6;white-space:nowrap;text-align:right}
+#page-history .paper-pattern-details{margin-top:12px;padding-top:11px}
+@media(max-width:380px){#page-history .paper-closed-compact{grid-template-columns:25px 64px 1fr;column-gap:5px}#page-history .paper-closed-time{display:none}#page-history .paper-closed-amount{font-size:11px}}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -595,16 +615,15 @@ function renderPaperPerformance(){
   list.replaceChildren();
   for(const trade of [...trades].reverse()){
     const row=document.createElement('div');row.className='paper-closed-item paper-closed-compact';
-    const top=document.createElement('div');top.className='paper-closed-head';
-    const side=document.createElement('b');side.className=trade.side==='LONG'?'hedge-long-text':'hedge-short-text';side.textContent=trade.side==='LONG'?'롱':'숏';
-    const time=document.createElement('span');
+    const side=document.createElement('b');side.className='paper-closed-side '+(trade.side==='LONG'?'hedge-long-text':'hedge-short-text');
+    side.textContent=trade.side==='LONG'?'롱':'숏';
+    const pnl=document.createElement('b');pnl.className='paper-closed-rate '+(trade.net>=0?'paper-stat-profit':'paper-stat-loss');
+    pnl.textContent=rate(trade.net/trade.margin*100);
+    const amount=document.createElement('span');amount.className='paper-closed-amount '+(trade.net>=0?'paper-stat-profit':'paper-stat-loss');
+    amount.textContent=(trade.net>0?'+':'')+won(trade.net);
+    const time=document.createElement('small');time.className='paper-closed-time';
     time.textContent=new Date(trade.closedAt).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
-    top.append(side,time);
-    const result=document.createElement('div');result.className='paper-closed-result '+(trade.net>=0?'paper-stat-profit':'paper-stat-loss');
-    const pnl=document.createElement('b');pnl.textContent=rate(trade.net/trade.margin*100);
-    const amount=document.createElement('span');amount.textContent=(trade.net>0?'+':'')+won(trade.net);
-    result.append(pnl,amount);
-    row.append(top,result);list.append(row);
+    row.append(side,pnl,amount,time);list.append(row);
   }
 }
 
