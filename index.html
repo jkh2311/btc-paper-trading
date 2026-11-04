@@ -738,7 +738,7 @@ function autoGuardForSignal(signal,now){
   const balanceAtDayStart=Math.max(1,balance-dailyNet);
   if(dailyNet+Math.min(0,paperPortfolioPnl())<=-balanceAtDayStart*readAutoSetting('autoDailyLossPct')/100)
     return '일일 손실 한도';
-  const autoClosed=closedPaperTrades.filter(t=>t.autoStrategy===AUTO_PAPER_STRATEGY).slice(-3);
+  const autoClosed=closedPaperTrades.filter(t=>t.autoStrategy===AUTO_PAPER_STRATEGY&&autoKstDay(t.closedAt)===today).slice(-3);
   if(autoClosed.length===3&&autoClosed.every(t=>t.net<0))return '자동 3연속 손실';
   const todayCount=autoSignalHistory.filter(x=>x.executed&&autoKstDay(x.detectedAt)===today).length;
   if(todayCount>=6)return '일일 자동 진입 6회 제한';
@@ -752,7 +752,7 @@ function executeAutoPaperSignal(signal){
   const balance=Number($('balance').value),free=paperFreeMargin();
   const maxByRisk=balance*risk/(stopPct+2*paperTradeCost()),maxByMargin=free*lev*cap;
   const notional=Math.min(maxByRisk,maxByMargin,free*lev);
-  if(!(notional>=10)&&!(notional>1))return '가상 주문 규모 부족';
+  if(!(notional>=10)||!Number.isFinite(notional))return '가상 주문 규모 부족';
   const entry=last*(side==='LONG'?1+slip:1-slip),qty=notional/entry;
   const stop=side==='LONG'?entry*(1-stopPct):entry*(1+stopPct);
   const takeMove=rr*(stopPct+2*paperTradeCost())+2*paperTradeCost();
@@ -761,7 +761,7 @@ function executeAutoPaperSignal(signal){
   const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,leverage:lev,
     entryFeeRate:paperFeeRates().taker,entryType:'market',opened:Date.now(),
     hold:readAutoSetting('autoHoldMin')/60,
-    entryPattern:capturePaperEntryPattern(),autoStrategy:AUTO_PAPER_STRATEGY,
+    entryPattern:capturePaperEntryPattern('1m'),autoStrategy:AUTO_PAPER_STRATEGY,
     autoSignalBarTime:signal.barTime};
   hedgePositions[side].push(p);
   autoLastEntryAt=Date.now();
@@ -995,9 +995,9 @@ function positionNotional(bal,lev,r,d){
   return Math.max(0,Math.min(riskNotional,free*lev));
 }
 function syncSizeMode(){$('marginControls').hidden=$('sizeMode').value!=='margin';$('riskControls').hidden=$('sizeMode').value==='margin'}
-function capturePaperEntryPattern(){
+function capturePaperEntryPattern(timeframeOverride){
   try{
-    const timeframe=$('tf').value;
+    const timeframe=timeframeOverride||$('tf').value;
     const main=candles[timeframe]||[];
     const lastBars=main.slice(-30).map(v=>[v.t,Number(v.o.toFixed(2)),Number(v.h.toFixed(2)),Number(v.l.toFixed(2)),Number(v.c.toFixed(2))]);
     const timeframes={};
