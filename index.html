@@ -8,11 +8,13 @@ body{background:#09111f;font-size:14px}header.app-header{display:flex;align-item
 
 /* Compact controls and crisp text at all chart heights */
 @media(max-width:800px){.tf-tabs{display:flex;justify-content:flex-start}.tf-tabs select{width:112px;max-width:42%;height:31px;padding:4px 8px;border-radius:9px}.price-panel .price{font-variant-numeric:tabular-nums;letter-spacing:-.6px;font-size:clamp(22px,6vw,29px);white-space:nowrap}.chart-panel{min-height:0}.chart-tools{touch-action:manipulation}#chart{touch-action:none}}
+
+/* One-line quote + timeframe; smaller RMI and fixed entry controls */
+@media(max-width:800px){.price-panel{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:3px 2px 6px}.price-panel .price{min-width:0;flex:1;font-size:clamp(18px,5vw,27px);letter-spacing:-.5px;overflow:hidden;text-overflow:clip}.price-panel .tf-tabs{margin:0;flex:0 0 auto}.price-panel .tf-tabs select{width:79px;max-width:none;height:31px;padding:3px 6px;font-size:12px}.indicator-label{font-size:9px;padding:1px 8px 0}#rmiChart{height:clamp(42px,8dvh,66px)!important;flex:0 0 clamp(42px,8dvh,66px)}.trade-bar{height:55px;bottom:calc(62px + env(safe-area-inset-bottom));padding:5px 10px;gap:8px}.trade-bar button{padding:6px 8px;font-size:14px;border-radius:10px}main{height:calc(100dvh - 52px - 55px - 62px - env(safe-area-inset-bottom))}}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="retry" class="icon-btn" aria-label="시세 재연결" title="시세 재연결">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
- <div class="price-panel"><div class="price" id="price">-- USDT</div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
- <div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="5m">5분</option><option value="15m">15분</option><option value="1h">1시간</option><option value="1d">일봉</option></select></div>
+ <div class="price-panel"><div class="price" id="price">-- USDT</div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="5m">5분</option><option value="15m">15분</option><option value="1h">1시간</option><option value="1d">일봉</option></select></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
  <div class="chart-panel"><div id="combinedChart"><canvas id="chart"></canvas><div class="indicator-label">RMI (5, 14)</div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
  <div id="candleTime" class="muted candle-info"></div>
  <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button></div>
