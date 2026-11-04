@@ -274,6 +274,69 @@ async function handleManualOrder(input){
   await persistPaperBackup();
   return receipt;
 }
+
+// Import a paper position already created instantly on the phone.
+// Protect against retries using a stable phone-generated request ID.
+function checkedLocalMirror(data){
+  if(!data||typeof data!=='object'||typeof data.requestId!=='string'||
+     !/^[a-zA-Z0-9_-]{12,96}$/.test(data.requestId))throw Error('Invalid mirror request ID');
+  const p=data.position;
+  if(!p||typeof p!=='object'||!['LONG','SHORT'].includes(p.side))
+    throw Error('Invalid mirror position side');
+  const fields={};
+  for(const id of ['entry','stop','tp','qty','notional','entryFeeRate','leverage','opened','hold']){
+    const raw=p[id],v=Number(raw);
+    if(raw===null||raw===undefined||raw===''||!Number.isFinite(v)||v<=0)throw Error('Invalid mirror position '+id);
+    fields[id]=v;
+  }
+  if(fields.entry<1||fields.entry>10000000||fields.notional<0.01||
+     fields.notional>1e9||fields.leverage>125||fields.hold>72||
+     fields.entryFeeRate>0.02||fields.qty>10000||
+     Math.abs(fields.qty*fields.entry-fields.notional)/fields.notional>0.005)
+    throw Error('Invalid mirror risk parameters');
+  const d=p.side==='LONG'?(fields.entry-fields.stop)/fields.entry:
+    (fields.stop-fields.entry)/fields.entry;
+  if(!(d>0&&d<=0.2)||(p.side==='LONG'?fields.tp<=fields.entry:fields.tp>=fields.entry))
+    throw Error('Invalid mirror stop or take-profit levels');
+  if(p.id!==undefined&&(typeof p.id!=='string'||p.id.length>120))throw Error('Invalid mirror position ID');
+  const entryType=['market','limit'].includes(p.entryType)?p.entryType:'market';
+  return {requestId:data.requestId,position:{...fields,
+    id:typeof p.id==='string'?p.id:null,side:p.side,entryType,manualRequestId:data.requestId}};
+}
+async function importLocalMirror(input){
+  const request=checkedLocalMirror(input);
+  if(!state.initialized)throw Error('Server paper account not initialized');
+  if(!page||page.isClosed())await browser();
+  if(!Array.isArray(state.mirrorReceipts))state.mirrorReceipts=[];
+  const previous=state.mirrorReceipts.find(x=>x.requestId===request.requestId);
+  if(previous)return previous;
+  const receipt=await page.evaluate(({requestId,position:p})=>{
+    const existing=allPaperPositions().find(v=>v.manualRequestId===requestId);
+    if(existing)return {requestId,result:'protected',positionId:existing.id,stop:existing.stop,tp:existing.tp};
+    if(closedPaperTrades.some(x=>x.manualRequestId===requestId))
+      return {requestId,result:'already-closed'};
+    if(typeof paperFreeMargin!=='function'||typeof savePaperState!=='function')
+      throw Error('Server paper engine unavailable');
+    if(paperMode()!=='hedge')throw Error('Server hedge mode required');
+    if(!last||Date.now()-lastTickAt>15000)throw Error('Server price feed not fresh');
+    const needed=p.notional/p.leverage;
+    if(!(needed>0&&paperFreeMargin()>=needed))
+      throw Error('Insufficient server paper free margin');
+    // Preserve phone entry price, quantity, stop, take profit, and entry time.
+    // The server adds a separately accounted paper position; no real orders.
+    const copy={...p,id:paperPositionId(),manualRequestId:requestId,
+      entryPattern:null,source:'phone-mirror'};
+    hedgePositions[copy.side].push(copy);
+    add('휴대폰 수동 모의 '+copy.side+' 포지션 서버 보호 연결 '+fmt(copy.entry)+' USDT');
+    savePaperState();
+    return {requestId,result:'protected',positionId:copy.id,stop:copy.stop,tp:copy.tp};
+  },request);
+  state.mirrorReceipts.push(receipt);
+  state.mirrorReceipts=state.mirrorReceipts.slice(-120);
+  await save(meta,state);
+  await persistPaperBackup();
+  return receipt;
+}
 async function closeServerPaperPosition(id){
   if(!state.initialized)throw Error('Server paper account not initialized');
   if(typeof id!=='string'||!/^paper-[a-z0-9-]+$/.test(id))throw Error('Invalid paper position ID');
@@ -361,11 +424,10 @@ async function request(req,res){
       if(!marketModes.has(request?.mode))throw Error('Invalid market mode');
       const value=await serial(async()=>{
         if(!state.initialized)throw Error('Server paper account not initialized');
-        if(state.tradingConfig){
-          const next={...state.tradingConfig,marketMode:request.mode};
-          await setServerTradingConfig(next);
-          state.tradingConfig=next;
-        }else await setPageMarketMode(request.mode);
+        // Updating strategy must not fail because an unrelated numeric setting
+        // in the saved full-config snapshot is out of bounds.
+        await setPageMarketMode(request.mode);
+        if(state.tradingConfig)state.tradingConfig={...state.tradingConfig,marketMode:request.mode};
         state.marketMode=request.mode;
         state.configRevision=(Number(state.configRevision)||0)+1;
         await save(meta,state);
@@ -401,6 +463,17 @@ async function request(req,res){
       finally{manualRequestsWaiting=Math.max(0,manualRequestsWaiting-1)}
       // Order is already acknowledged and persisted; do not wait for a
       // second headless-browser status query before responding to the tap.
+      return send(res,200,{receipt},origin);
+    }
+    if(req.method==='POST'&&url==='/api/mirror-position'){
+      const input=await body(req);
+      let checked;
+      try{checked=checkedLocalMirror(input)}
+      catch(e){return send(res,422,{error:String(e.message||e)},origin)}
+      manualRequestsWaiting++;
+      let receipt;
+      try{receipt=await serial(()=>importLocalMirror(checked))}
+      finally{manualRequestsWaiting=Math.max(0,manualRequestsWaiting-1)}
       return send(res,200,{receipt},origin);
     }
     if(req.method==='POST'&&url==='/api/manual-close'){
