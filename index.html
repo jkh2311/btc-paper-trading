@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-autofib-swing-v1"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-live-fasttrend-autofib-v2"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -238,6 +238,9 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 .autofib-toolbar button{font-size:12px;font-weight:700;padding:7px 12px;border-radius:9px;background:#203e55;border-color:#3b7894}
 .autofib-toolbar button[aria-pressed="false"]{opacity:.65}
 .autofib-toolbar span{font-size:11px}
+.trend-confirmed{display:block;font-size:9px;line-height:1.25;color:#94abc7;margin-top:3px;white-space:nowrap}
+#trends .tf{min-width:0;padding:9px 2px;line-height:1.25}
+#trends .tf>div{font-size:11px;font-weight:700;margin-top:4px}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -334,8 +337,40 @@ function paperEntryFee(p){return p.entryFeeRate!==undefined&&p.entryFeeRate!==nu
 function paperNetAt(p,market){if(!p||!(market>0))return 0;const closeRate=paperFeeRates().taker,exit=market*(p.side==="LONG"?1-slip:1+slip);return (exit-p.entry)*p.qty*(p.side==="LONG"?1:-1)-p.entry*p.qty*paperEntryFee(p)-exit*p.qty*closeRate}
 const won=n=>Math.round(n*(+$("fx").value||1400)).toLocaleString("ko-KR")+"원";const percent=n=>(n>=0?"+":"")+n.toFixed(2)+"%";function netAt(p,market){return paperNetAt(p,market)}async function loadFx(){try{let r=await fetch("https://open.er-api.com/v6/latest/USD",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);let d=await r.json();let rate=Number(d?.rates?.KRW);if(!(rate>0))throw Error("환율 응답 오류");$("fx").value=rate.toFixed(2);$("fxstatus").textContent="참고 환율 자동 조회: 1 USD ≈ "+fmt(rate)+"원 · 실제 환전 환율과 차이 가능";render()}catch(e){$("fxstatus").textContent="환율 자동 조회 실패 · 입력된 수동 환율로 환산 (실시간 환율 아님)"}}
 function ema(a,p){let e=a[0],k=2/(p+1);for(let i=1;i<a.length;i++)e=a[i]*k+e*(1-k);return e}
-function trend(a){if(!a||a.length<55)return '대기';let x=a.slice(0,-1).map(v=>v.c);let e=ema(x.slice(-60),20),f=ema(x.slice(-60),50);return e>f*1.0003?'상승':e<f*.9997?'하락':'횡보'}
-function render(){ $('balanceSummary').textContent=fmt(+$('balance').value||0)+' USDT';const pnlKrw=Math.round(paperPortfolioPnl()*(+$('fx').value||1400));const pnlEl=$('pnlSummary');pnlEl.textContent=(pnlKrw<0?'-':pnlKrw>0?'+':'')+'₩'+Math.abs(pnlKrw).toLocaleString('ko-KR');pnlEl.classList.toggle('pnl-positive',pnlKrw>0);pnlEl.classList.toggle('pnl-negative',pnlKrw<0); $('price').textContent=last?fmt(last)+' USDT':'-- USDT';$('mode').textContent=demo?'데모 시세':wsConnected?'실시간 연결':lastTickAt&&Date.now()-lastTickAt<10000?'REST 시세':'연결 대기';$('trends').innerHTML=tfs.map(tf=>{let s=trend(candles[tf]);return '<div class="tf"><b>'+tf+'</b><div class="'+(s==='상승'?'up':s==='하락'?'down':'flat')+'">'+s+'</div></div>'}).join('');$('long').disabled=$('short').disabled=!last||!!pending||(!demo&&Date.now()-lastTickAt>10000);draw();drawRmi();updatePosition();calc()}
+function trend(a){
+  if(!a||a.length<55)return '대기';
+  const closed=a.slice(0,-1).map(v=>v.c),e=ema(closed.slice(-60),20),f=ema(closed.slice(-60),50);
+  return e>f*1.0003?'상승':e<f*.9997?'하락':'횡보';
+}
+const FAST_TREND_FRAMES=new Set(['1m','5m','15m']);
+function fastTrend(a){
+  if(!a||a.length<24)return '대기';
+  const closes=a.slice(-22).map(v=>v.c),fast=ema(closes,5),slow=ema(closes,10);
+  const previous=ema(closes.slice(0,-3),5),lastClose=closes.at(-1);
+  const difference=(fast-slow)/Math.max(1,slow),slope=(fast-previous)/Math.max(1,previous);
+  if(difference>0.000045&&slope>0.000015&&lastClose>=slow)return '상승';
+  if(difference<-.000045&&slope<-.000015&&lastClose<=slow)return '하락';
+  return '횡보';
+}
+function renderTrends(){
+  const el=$('trends');if(!el)return;
+  const html=tfs.map(tf=>{
+    const confirmed=trend(candles[tf]),fast=FAST_TREND_FRAMES.has(tf)?fastTrend(candles[tf]):null;
+    const current=fast||confirmed;
+    const state=current==='상승'?'up':current==='하락'?'down':'flat';
+    const trying=fast&&confirmed!=='대기'&&fast!==confirmed&&fast!=='횡보';
+    const label=trying?(current==='상승'?'↑ 전환':'↓ 전환'):current;
+    return '<div class="tf"><b>'+tf+'</b><div class="'+state+'">'+label+'</div>'+
+      (fast?'<small class="trend-confirmed">확정 '+confirmed+'</small>':'')+'</div>';
+  }).join('');
+  if(el.innerHTML!==html)el.innerHTML=html;
+}
+let lastTrendPaintAt=0;
+function updateLiveTrends(){
+  if(document.visibilityState==='hidden'||Date.now()-lastTrendPaintAt<700)return;
+  lastTrendPaintAt=Date.now();renderTrends();
+}
+function render(){ $('balanceSummary').textContent=fmt(+$('balance').value||0)+' USDT';const pnlKrw=Math.round(paperPortfolioPnl()*(+$('fx').value||1400));const pnlEl=$('pnlSummary');pnlEl.textContent=(pnlKrw<0?'-':pnlKrw>0?'+':'')+'₩'+Math.abs(pnlKrw).toLocaleString('ko-KR');pnlEl.classList.toggle('pnl-positive',pnlKrw>0);pnlEl.classList.toggle('pnl-negative',pnlKrw<0); $('price').textContent=last?fmt(last)+' USDT':'-- USDT';$('mode').textContent=demo?'데모 시세':wsConnected?'실시간 연결':lastTickAt&&Date.now()-lastTickAt<10000?'REST 시세':'연결 대기';renderTrends();$('long').disabled=$('short').disabled=!last||!!pending||(!demo&&Date.now()-lastTickAt>10000);draw();drawRmi();updatePosition();calc()}
 function calc(){
   const bal=Number($('balance').value)||0,r=Number($('risk').value)/100||0,d=Number($('stop').value)/100||0,lev=Number($('lev').value)||1;
   const free=paperFreeMargin(),n=positionNotional(bal,lev,r,d),margin=n/lev,loss=n*(d+2*paperTradeCost()),riskPct=bal>0?loss/bal*100:0;
@@ -370,6 +405,7 @@ function paintLivePrice(){
   $('price').textContent=last?fmt(last)+' USDT':'-- USDT';
   $('mode').textContent=wsConnected?'실시간 체결가':lastTickAt&&Date.now()-lastTickAt<5000?'REST 시세':'연결 대기';
   refreshLivePaperReturns();
+  updateLiveTrends();
   if(allPaperPositions().length&&$('page-chart').classList.contains('active')){
     const pnl=paperPortfolioPnl()*(+$('fx').value||1400);
     const el=$('pnlSummary');el.textContent=(pnl<0?'-':pnl>0?'+':'')+'₩'+Math.abs(Math.round(pnl)).toLocaleString('ko-KR');
