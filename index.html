@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-remove-position-explanation-v28"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-compact-settings-v29"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -276,6 +276,41 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 #bgPaperStatus[data-kind="on"]{color:#75efb7}
 #bgPaperStatus[data-kind="error"]{color:#ff99ab}
 #bgPaperStatus[data-kind="warning"]{color:#ffd78c}
+
+/* Compact settings only: do not resize chart, trading or position controls. */
+#page-settings{font-size:13px}
+#page-settings .card{padding:12px!important;border-radius:13px;margin-bottom:10px}
+#page-settings h2{font-size:16px;margin:0 0 9px;letter-spacing:-.2px}
+#page-settings h3{font-size:14px;margin:11px 0 8px}
+#page-settings label{font-size:11px;margin:8px 0 4px;line-height:1.35}
+#page-settings input,#page-settings select{height:38px;min-height:38px;padding:7px 10px;font-size:14px!important;border-radius:8px;max-width:100%;min-width:0}
+#page-settings select{width:100%;text-overflow:ellipsis}
+#page-settings button{padding:8px 7px;min-height:38px;border-radius:8px;font-size:12px}
+#page-settings .row{gap:7px;margin-top:8px}
+#page-settings .row>*{min-width:0}
+#page-settings .settings-fields-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 10px;align-items:end}
+#page-settings .setting-field{min-width:0}
+#page-settings .setting-field label{margin:6px 0 4px}
+#page-settings .setting-field input,#page-settings .setting-field select{width:100%;margin:0}
+#page-settings .settings-computed{font-size:11px;line-height:1.45;margin-top:7px}
+#page-settings .settings-computed:empty{display:none}
+#page-settings .auto-settings-grid{gap:7px 10px}
+#page-settings .auto-settings-grid label{font-size:11px}
+#page-settings .auto-settings-grid input{height:36px;min-height:36px;font-size:13px!important;margin-top:4px}
+#page-settings #bgPaperPanel input{margin:0 0 4px}
+#page-settings .bg-actions{gap:7px;margin:8px 0}
+#page-settings .bg-actions button{min-height:38px;padding:7px 4px;font-size:11px}
+#page-settings #bgPaperStatus{padding:9px;font-size:11px;line-height:1.45}
+#page-settings .settings-safety-note{color:#91a8c1;font-size:10px;line-height:1.45;margin:8px 0 0}
+#page-settings #binanceApiPanel.api-panel{padding:12px!important;border-radius:13px}
+#page-settings .api-vault-status{padding:7px 0;font-size:11px}
+#page-settings .api-fee-row{padding:9px;margin-top:8px}
+#page-settings .api-details{margin-top:9px}
+#page-settings .api-details summary{padding:9px 2px 0}
+#page-settings .api-detail-body{padding-top:7px}
+#page-settings .api-detail-body input{height:38px}
+#page-settings .api-footnote{margin:8px 0 0;font-size:10px}
+@media(max-width:350px){#page-settings .settings-fields-grid{gap:5px 7px}#page-settings .card{padding:10px!important}}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -330,11 +365,11 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 </section>
 <section class="tab-page" id="page-settings">
 <div class="card" id="bgPaperPanel">
-<h2>화면 꺼짐 · Railway 자동 모의매매</h2>
-<p class="muted" style="font-size:12px;line-height:1.5">휴대폰 대신 Railway 서버가 기존 BTCUSDT 모의 신호와 손절·익절을 감시해. 실제 바이낸스 주문은 하지 않아.</p>
+<h2>Railway 서버 AUTO</h2>
+
 <label for="bgPaperUrl">Railway 서버 주소</label>
 <input id="bgPaperUrl" type="url" inputmode="url" autocapitalize="none" spellcheck="false" placeholder="https://서버이름.up.railway.app">
-<label for="bgPaperToken">Railway BACKGROUND_TOKEN</label>
+<label for="bgPaperToken">서버 비밀번호</label>
 <input id="bgPaperToken" type="password" autocapitalize="none" spellcheck="false" autocomplete="off" placeholder="Railway Variables에서 설정한 32자 이상 비밀번호">
 <div class="bg-actions">
 <button id="bgPaperCheck" type="button">서버 연결 확인</button>
@@ -343,7 +378,7 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <button id="bgPaperImport" type="button">서버 기록 가져오기</button>
 </div>
 <div id="bgPaperStatus" role="status" aria-live="polite" data-kind="unknown">서버 주소와 비밀번호를 넣고 연결 확인을 눌러 줘.</div>
-<p class="muted" style="font-size:11px;line-height:1.5">서버 최초 시작 시 휴대폰 모의 계정·설정·신호 기록만 복사해. 이후 서버와 휴대폰 계정은 자동 동기화되지 않아. 서버 실행 중 휴대폰 AUTO·수동 모의거래는 하지 마. 결과 확인은 서버 기록 가져오기를 사용해. 서버 비밀번호는 탭 세션에만 저장해.</p>
+<p class="settings-safety-note">서버·휴대폰 기록은 별도 · 서버 실행 중 휴대폰 중복 거래 주의</p>
 </div>
 <div class="card api-panel" id="binanceApiPanel">
 <div class="api-head"><div><h2>바이낸스 계좌</h2><span class="api-caption">BTCUSDT 선물 · 조회 전용</span></div><span class="api-readonly">READ ONLY</span></div>
@@ -361,10 +396,10 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <label for="myBinanceKey">API Key</label><input type="password" id="myBinanceKey" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 API Key">
 <label for="myBinanceSecret">Secret Key</label><input type="password" id="myBinanceSecret" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 Secret Key">
 <div class="api-secondary-actions"><button id="myWsPublic" type="button">연결 확인</button><button id="myApiClear" type="button">입력 지우기</button><button id="myVaultDelete" type="button">저장 키 삭제</button><button id="myFeeForget" type="button">수수료 기록 삭제</button></div>
-<p class="api-footnote">키는 잠금 비밀번호로 이 기기에 암호화 저장됩니다. 읽기 전용 API 키만 사용하세요. 실제 주문은 실행하지 않습니다.</p>
+<p class="api-footnote">읽기 전용 API 키만 사용 · 실제 주문 없음</p>
 </div></details>
-</div><div class="card"><h2>모의매매 포지션 모드</h2><label for="paperPositionMode">포지션 방식</label><select id="paperPositionMode"><option value="hedge">헤지 모드 · 롱/숏 동시 보유</option><option value="oneway">단방향 모드 · 한쪽만 보유</option></select>
-<label for="autoMarketMode">자동 모의매매 시장 모드</label>
+</div><div class="card"><h2>모의매매 모드</h2><label for="paperPositionMode">포지션 방식</label><select id="paperPositionMode"><option value="hedge">헤지 모드 · 롱/숏 동시 보유</option><option value="oneway">단방향 모드 · 한쪽만 보유</option></select>
+<label for="autoMarketMode">자동매매 전략</label>
 <select id="autoMarketMode">
 <option value="classic">추세장 · RMI + 5·15분 추세 + 거래량 1.2배 (기본)</option>
 <option value="trend">RMI 우선 · 시간봉/거래량 필터 없음</option>
@@ -373,16 +408,16 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <option value="breakout">돌파주의 · 신규 진입 차단</option>
 <option value="off">거래 안 함 · 신규 진입 차단</option>
 </select>
-<p class="muted" style="font-size:11px;line-height:1.45">차트의 시장 상태는 실제 5·15분봉 데이터로 따로 판단해 표시합니다. 기본 추세장은 1분봉 RMI 타점에 5·15분 EMA9/21 방향 일치와 1분 거래량 1.2배를 확인합니다. RMI 우선은 시간봉·거래량을 필터로 사용하지 않습니다. 자동 판별은 횡보장/예전 추세장으로 전환하고, 돌파주의·불확실 구간에서는 신규 진입을 멈춥니다.</p>
-<p class="muted" style="font-size:11px;line-height:1.5">모의매매에만 적용돼요. 바이낸스 실제 선물 계좌 설정은 변경하지 않습니다.</p></div><div class="card"><h2>전략 설정</h2><label>가상 계좌 USDT</label><input id="balance" type="number" value="822" min="1" step="1"><label>레버리지</label><input id="lev" type="number" value="20" min="1" max="50"><label for="sizeMode">포지션 크기 계산 방식</label><select id="sizeMode"><option value="risk">위험 기준 (기본)</option><option value="margin">증거금 기준 (직접 선택)</option></select><div id="marginControls" hidden><label for="marginPct">이번 주문에 사용할 남은 증거금 비율</label><input id="marginPct" type="number" value="25" min="0.1" max="100" step="0.5" inputmode="decimal" aria-label="이번 주문에 사용할 남은 증거금 비율 (%)"><p class="muted" style="font-size:12px;line-height:1.5">남은 사용 가능 증거금에서 직접 지정한 비율만 사용합니다. 25를 입력하면 남은 증거금의 25%를 사용해요. 위험 기준 모드에도 임의의 20% 제한은 없습니다.</p></div><div id="riskControls"><label>1회 계좌 위험 (%)</label><input id="risk" type="number" value="0.5" min="0.01" max="5" step="0.05"></div><label>손절 거리 (%)</label><input id="stop" type="number" value="0.3" min="0.15" max="0.6" step="0.05"><label>목표 순손익비</label><input id="rr" type="number" value="2" min="1" step="0.5"><label>최대 보유 시간</label><input id="hold" type="number" value="6" min="1" max="24"><label>USD → KRW 환율</label><input id="fx" type="number" value="1400" min="1" step="0.1"><div id="fxstatus" class="muted"></div><div id="calc" class="muted"></div><div class="auto-strategy-guards" aria-label="자동 모의 보호 설정">
+
+</div><div class="card"><h2>전략 설정</h2><div class="settings-fields-grid"><div class="setting-field"><label for="balance">가상 계좌 USDT</label><input id="balance" type="number" value="822" min="1" step="1"></div><div class="setting-field"><label for="lev">레버리지</label><input id="lev" type="number" value="20" min="1" max="50"></div><div class="setting-field"><label for="sizeMode">포지션 크기 계산</label><select id="sizeMode"><option value="risk">위험 기준 (기본)</option><option value="margin">증거금 기준 (직접 선택)</option></select></div><div id="marginControls" class="setting-field" hidden><label for="marginPct">증거금 사용 비율 (%)</label><input id="marginPct" type="number" value="25" min="0.1" max="100" step="0.5" inputmode="decimal" aria-label="이번 주문에 사용할 남은 증거금 비율 (%)"></div><div id="riskControls" class="setting-field"><label for="risk">1회 계좌 위험 (%)</label><input id="risk" type="number" value="0.5" min="0.01" max="5" step="0.05"></div><div class="setting-field"><label for="stop">손절 거리 (%)</label><input id="stop" type="number" value="0.3" min="0.15" max="0.6" step="0.05"></div><div class="setting-field"><label for="rr">목표 순손익비</label><input id="rr" type="number" value="2" min="1" step="0.5"></div><div class="setting-field"><label for="hold">최대 보유 시간</label><input id="hold" type="number" value="6" min="1" max="24"></div><div class="setting-field"><label for="fx">USD → KRW 환율</label><input id="fx" type="number" value="1400" min="1" step="0.1"></div></div><div id="fxstatus" class="muted settings-computed"></div><div id="calc" class="muted settings-computed"></div><div class="auto-strategy-guards" aria-label="자동 모의 보호 설정">
 <h3>자동 모의 보호 설정</h3>
-<p class="muted" style="font-size:11px;line-height:1.45">자동 모의매매도 위 전략 설정의 레버리지·포지션 크기·손절·목표 손익비·최대 보유 시간을 그대로 사용합니다.</p>
+
 <div class="auto-settings-grid">
  <label>신호 가격 이탈 제한 (%)<input id="autoMaxChasePct" type="number" inputmode="decimal" min="0.03" max="0.5" step="0.01" value="0.12"></label>
  <label>동시 자동 포지션 수<input id="autoMaxPositions" type="number" inputmode="numeric" min="1" max="5" step="1" value="1"></label>
  <label>일일 최대 손실 (%)<input id="autoDailyLossPct" type="number" inputmode="decimal" min="0.5" max="10" step="0.5" value="2"></label>
  <label>재진입 대기 (분)<input id="autoCooldownMin" type="number" inputmode="numeric" min="1" max="240" step="1" value="15"></label>
-</div></div></div><p class="muted footnote">모의매매 전용 · 실제 주문 없음 · 손익은 수수료·슬리피지 가정 차감 후 환산 추정치이며 펀딩비·세금 등은 제외됩니다.</p></section>
+</div></div></div></section>
 </main>
 <div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button></div>
 <nav class="bottom-nav" aria-label="메뉴"><button class="nav-btn active" data-tab="chart"><span>▥</span>차트</button><button class="nav-btn" data-tab="position"><span>▣</span>포지션</button><button class="nav-btn" data-tab="history"><span>◷</span>거래내역</button><button class="nav-btn" data-tab="liquidation"><span>▤</span>청산맵</button><button class="nav-btn" data-tab="settings"><span>⚙</span>설정</button></nav>
