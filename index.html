@@ -656,7 +656,7 @@ const AUTO_PAPER_FIELDS={
   autoMaxMarginPct:[25,1,100],autoMaxPositions:[1,1,5],
   autoDailyLossPct:[2,0.5,10],autoCooldownMin:[15,1,240],autoHoldMin:[20,1,120]
 };
-let autoPaperEnabled=false,autoPaperArmedAt=0,autoSignalHistory=[],autoLastCheckedBar=0,autoLastEntryAt=0,autoStatusText='일봉 추세·1분 RMI 구간 확인 중 · 자동 모의 OFF';
+let autoPaperEnabled=false,autoPaperArmedAt=0,autoSignalHistory=[],autoLastCheckedBar=0,autoLastEntryAt=0,autoDailyEntryCounts={},autoStatusText='일봉 추세·1분 RMI 구간 확인 중 · 자동 모의 OFF';
 function readAutoSetting(id){
   const cfg=AUTO_PAPER_FIELDS[id],n=Number($(id).value);
   return Number.isFinite(n)?Math.max(cfg[1],Math.min(cfg[2],n)):cfg[0];
@@ -666,7 +666,7 @@ function saveAutoSettings(){
   catch(e){console.warn('자동 모의 설정 저장 실패',e)}
 }
 function saveAutoSignals(){
-  try{localStorage.setItem(AUTO_PAPER_SIGNALS_KEY,JSON.stringify({history:autoSignalHistory.slice(-100),lastEntryAt:autoLastEntryAt}))}
+  try{localStorage.setItem(AUTO_PAPER_SIGNALS_KEY,JSON.stringify({history:autoSignalHistory.slice(-100),lastEntryAt:autoLastEntryAt,dailyEntryCounts:autoDailyEntryCounts}))}
   catch(e){console.warn('신호 기록 저장 실패',e)}
 }
 function restoreAutoPaperSettings(){
@@ -678,6 +678,10 @@ function restoreAutoPaperSettings(){
     const state=JSON.parse(localStorage.getItem(AUTO_PAPER_SIGNALS_KEY)||'{}');
     if(Array.isArray(state.history))autoSignalHistory=state.history.filter(x=>x&&['LONG','SHORT'].includes(x.side)&&Number.isFinite(x.barTime)&&Number.isFinite(x.price)).slice(-100);
     if(Number.isFinite(state.lastEntryAt)&&state.lastEntryAt>0)autoLastEntryAt=state.lastEntryAt;
+    if(state.dailyEntryCounts&&typeof state.dailyEntryCounts==='object'){
+      autoDailyEntryCounts=Object.fromEntries(Object.entries(state.dailyEntryCounts)
+        .filter(([day,n])=>/^\d{4}-\d{2}-\d{2}$/.test(day)&&Number.isInteger(n)&&n>=0&&n<=1000).slice(-40));
+    }
   }catch(e){console.warn('자동 모의 설정 복구 실패',e)}
   // Deliberately never auto-arm on reload. Requires fresh explicit consent each time.
   autoPaperEnabled=false;
@@ -779,7 +783,9 @@ function autoGuardForSignal(signal,now){
     return '일일 손실 한도';
   const autoClosed=closedPaperTrades.filter(t=>t.autoStrategy&&autoKstDay(t.closedAt)===today).slice(-3);
   if(autoClosed.length===3&&autoClosed.every(t=>t.net<0))return '자동 3연속 손실';
-  const todayCount=autoSignalHistory.filter(x=>x.executed&&autoKstDay(x.detectedAt)===today).length;
+  const priorClosed=closedPaperTrades.filter(t=>t.autoStrategy&&autoKstDay(t.openedAt||t.closedAt)===today).length;
+  const priorOpen=allPaperPositions().filter(p=>p.autoStrategy&&autoKstDay(p.opened)===today).length;
+  const todayCount=Math.max(Number(autoDailyEntryCounts[today])||0,priorClosed+priorOpen);
   if(todayCount>=6)return '일일 자동 진입 6회 제한';
   return '';
 }
@@ -804,6 +810,8 @@ function executeAutoPaperSignal(signal){
     autoSignalBarTime:signal.barTime};
   hedgePositions[side].push(p);
   autoLastEntryAt=Date.now();
+  const tradeDay=autoKstDay(autoLastEntryAt);
+  autoDailyEntryCounts[tradeDay]=Math.max(Number(autoDailyEntryCounts[tradeDay])||0,closedPaperTrades.filter(t=>t.autoStrategy&&autoKstDay(t.openedAt||t.closedAt)===tradeDay).length+allPaperPositions().filter(p=>p.autoStrategy&&autoKstDay(p.opened)===tradeDay).length);
   signal.executed=true;
   add('자동 모의 '+(side==='LONG'?'롱':'숏')+(signal.aligned?' 순추세':' 역추세·축소')+' 진입 · '+fmt(entry)+' USDT · 손절 '+fmt(stop)+' · 익절 '+fmt(tp));
   savePaperState();saveAutoSignals();render();
@@ -1124,7 +1132,7 @@ function closePositionById(id,reason='수동 청산',shouldRender=true){
   if(paperStatsBaseBalance===null)paperStatsBaseBalance=bal>0?bal:null;
   closedPaperTrades.push({
     id:p.id,side:p.side,entry:p.entry,exitPrice:last,margin:p.notional/(p.leverage||1),
-    net,reason,closedAt:Date.now(),entryPattern:p.entryPattern||null,autoStrategy:p.autoStrategy||null,autoSignalBarTime:p.autoSignalBarTime||null
+    net,reason,closedAt:Date.now(),openedAt:p.opened,entryPattern:p.entryPattern||null,autoStrategy:p.autoStrategy||null,autoSignalBarTime:p.autoSignalBarTime||null
   });
   $('balance').value=(bal+net).toFixed(2);
   add(reason+' · 가상 '+p.side+' 개별 포지션 · 비용 차감 순손익 '+won(net)+' ('+(bal>0?percent(net/bal*100):'—')+', 계좌 기준)');
