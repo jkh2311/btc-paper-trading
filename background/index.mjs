@@ -90,7 +90,11 @@ async function setPageMarketMode(mode){
 async function synchronize(){
   if(!page||page.isClosed())await browser();
   if(!state.initialized)return;
-  if(marketModes.has(state.marketMode)){
+  if(state.tradingConfig){
+    const current=await getServerTradingConfig();
+    if(JSON.stringify(current)!==JSON.stringify(state.tradingConfig))
+      await setServerTradingConfig(state.tradingConfig);
+  }else if(marketModes.has(state.marketMode)){
     const selected=await page.locator('#autoMarketMode').inputValue();
     if(selected!==state.marketMode)await setPageMarketMode(state.marketMode);
   }
@@ -109,6 +113,76 @@ const manualSettingsSpec={
   lev:[1,50],risk:[0.01,5],stop:[0.15,0.6],rr:[1,20],
   hold:[1,24],marginPct:[0.1,100]
 };
+
+const autoSettingsSpec={
+  autoDailyHigh:[55,95],autoDailyLow:[5,45],
+  autoMinuteHighFrom:[70,95],autoMinuteHighTo:[75,99],
+  autoMinuteLowFrom:[1,25],autoMinuteLowTo:[5,30],
+  autoMaxChasePct:[0.03,0.5],autoMaxPositions:[1,5],
+  autoDailyLossPct:[0.5,10],autoCooldownMin:[1,240]
+};
+const serverTradeFields=['lev','risk','stop','rr','hold','sizeMode','marginPct'];
+const serverGuardFields=Object.keys(autoSettingsSpec);
+function checkedTradingConfig(data){
+  if(!data||typeof data!=='object'||!marketModes.has(data.marketMode))throw Error('Invalid paper market strategy');
+  if(!data.strategy||typeof data.strategy!=='object'||!['risk','margin'].includes(data.strategy.sizeMode))
+    throw Error('Invalid paper size mode');
+  if(!data.guards||typeof data.guards!=='object')throw Error('Invalid paper guard configuration');
+  const strategy={},guards={};
+  for(const id of serverTradeFields){
+    if(id==='sizeMode'){strategy[id]=data.strategy[id];continue}
+    const [min,max]=manualSettingsSpec[id],raw=data.strategy[id],value=Number(raw);
+    if(raw===null||raw===undefined||raw===''||!Number.isFinite(value)||value<min||value>max)
+      throw Error('Invalid paper strategy field: '+id);
+    strategy[id]=value;
+  }
+  for(const id of serverGuardFields){
+    const [min,max]=autoSettingsSpec[id],raw=data.guards[id],value=Number(raw);
+    if(raw===null||raw===undefined||raw===''||!Number.isFinite(value)||value<min||value>max)
+      throw Error('Invalid paper AUTO field: '+id);
+    guards[id]=value;
+  }
+  return {marketMode:data.marketMode,strategy,guards};
+}
+async function getServerTradingConfig(){
+  if(!page||page.isClosed())throw Error('Paper engine browser offline');
+  return page.evaluate(({strategy,guards})=>{
+    const value=id=>document.getElementById(id)?.value;
+    return {marketMode:value('autoMarketMode'),
+      strategy:Object.fromEntries(strategy.map(id=>[id,id==='sizeMode'?value(id):Number(value(id))])),
+      guards:Object.fromEntries(guards.map(id=>[id,Number(value(id))]))};
+  },{strategy:serverTradeFields,guards:serverGuardFields});
+}
+async function setServerTradingConfig(config){
+  const normalized=checkedTradingConfig(config);
+  if(!page||page.isClosed())await browser();
+  await page.locator('#autoMarketMode').waitFor({timeout:10000});
+  const applied=await page.evaluate(({config,strategyIds,guardIds})=>{
+    const el=id=>document.getElementById(id);
+    const mode=el('autoMarketMode');
+    if(!mode||![...mode.options].some(option=>option.value===config.marketMode))
+      throw Error('Paper market strategy selector unavailable');
+    for(const id of [...strategyIds,...guardIds])if(!el(id))
+      throw Error('Paper engine missing setting '+id);
+    // Only affect future paper entries; do not touch balance, positions,
+    // orders, trading history or Binance private API credentials.
+    for(const id of strategyIds)el(id).value=String(config.strategy[id]);
+    for(const id of guardIds)el(id).value=String(config.guards[id]);
+    if(mode.value!==config.marketMode){
+      mode.value=config.marketMode;
+      mode.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+    syncSizeMode();
+    saveAutoSettings();savePaperState();
+    return {marketMode:mode.value,
+      strategy:Object.fromEntries(strategyIds.map(id=>[id,id==='sizeMode'?el(id).value:Number(el(id).value)])),
+      guards:Object.fromEntries(guardIds.map(id=>[id,Number(el(id).value)]))};
+  },{config:normalized,strategyIds:serverTradeFields,guardIds:serverGuardFields});
+  if(JSON.stringify(applied)!==JSON.stringify(normalized))
+    throw Error('Paper strategy verification mismatch');
+  return applied;
+}
+
 function checkedManualOrder(input){
   if(!input||typeof input!=='object')throw Error('Manual order data required');
   const {requestId,side,type}=input;
@@ -234,6 +308,15 @@ async function status(){
       closed:Array.isArray(p.closedPaperTrades)?p.closedPaperTrades.length:0,
       autoEnabled:typeof autoPaperEnabled==='boolean'&&autoPaperEnabled,
       marketMode:document.getElementById('autoMarketMode')?.value||null,
+      tradingConfig:{
+        marketMode:document.getElementById('autoMarketMode')?.value||null,
+        strategy:Object.fromEntries(['lev','risk','stop','rr','hold','sizeMode','marginPct'].map(id=>
+          [id,id==='sizeMode'?document.getElementById(id)?.value:Number(document.getElementById(id)?.value)])),
+        guards:Object.fromEntries(['autoDailyHigh','autoDailyLow','autoMinuteHighFrom','autoMinuteHighTo',
+          'autoMinuteLowFrom','autoMinuteLowTo','autoMaxChasePct','autoMaxPositions',
+          'autoDailyLossPct','autoCooldownMin'].map(id=>[id,Number(document.getElementById(id)?.value)]))
+      },
+      configRevision:Number(state.configRevision)||0,
       marketTickAgeMs:typeof lastTickAt==='number'&&lastTickAt>0?Date.now()-lastTickAt:null,
       marketPrice:typeof last==='number'&&last>0?last:null,
       positions:allPaperPositions().slice(0,40).map(p=>({
@@ -275,8 +358,28 @@ async function request(req,res){
       if(!marketModes.has(request?.mode))throw Error('Invalid market mode');
       const value=await serial(async()=>{
         if(!state.initialized)throw Error('Server paper account not initialized');
-        await setPageMarketMode(request.mode);
+        if(state.tradingConfig){
+          const next={...state.tradingConfig,marketMode:request.mode};
+          await setServerTradingConfig(next);
+          state.tradingConfig=next;
+        }else await setPageMarketMode(request.mode);
         state.marketMode=request.mode;
+        state.configRevision=(Number(state.configRevision)||0)+1;
+        await save(meta,state);
+        return status();
+      });
+      return send(res,200,value,origin);
+    }
+    if(req.method==='POST'&&url==='/api/trading-config'){
+      const config=checkedTradingConfig(await body(req));
+      const value=await serial(async()=>{
+        if(!state.initialized)throw Error('Server paper account not initialized');
+        const actual=await getServerTradingConfig();
+        const changed=JSON.stringify(actual)!==JSON.stringify(config);
+        if(changed)await setServerTradingConfig(config);
+        state.tradingConfig=config;
+        state.marketMode=config.marketMode;
+        if(changed)state.configRevision=(Number(state.configRevision)||0)+1;
         await save(meta,state);
         return status();
       });
