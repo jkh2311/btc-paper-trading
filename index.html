@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261104-paper-hedge-v2"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261104-multihedge-v1"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -186,10 +186,22 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
  <div id="volume30Overlay" class="volume30-overlay" hidden role="dialog" aria-modal="true" aria-label="최근 30일 BTC 선물 일별 거래량"><div class="volume30-dialog"><div class="volume30-header"><div><strong>최근 30일 BTC 선물 거래대금</strong><small>바이낸스 BTCUSDT 무기한 선물 · UTC 일별 · 현재 환율로 원화 환산</small></div><button id="volume30Close" type="button" aria-label="닫기">✕</button></div><div class="volume30-detail" id="volume30Detail">일별 거래대금 조회 중…</div><div class="volume30-chart-wrap"><canvas id="volume30Chart" aria-label="최근 30일 일별 거래대금 막대그래프"></canvas></div><div class="volume30-legend"><span><i class="legend-weekend"></i> 토·일요일</span><span><i class="legend-weekday"></i> 평일</span><span><i class="legend-selected"></i> 선택한 날짜</span></div><div id="volume30Status" class="volume30-status">막대를 누르면 날짜와 거래대금을 볼 수 있어요. 오늘은 진행 중인 거래대금입니다.</div></div></div>
 <script>
 "use strict";
-document.addEventListener('contextmenu',e=>{if(!e.target.closest('input,textarea,[contenteditable="true"]'))e.preventDefault()});const $=id=>document.getElementById(id),tfs=['1d','1h','30m','15m','5m','1m'];const futureSlots=20;let verticalZoom=1;let viewCount=65,viewOffset=0,gesture=null,suppressTapUntil=0,crosshairIndex=null,futureCrosshairSlot=null,crosshairPrice=null,chartPriceScale=null;let candles={},last=0,selected=null,position=null,hedgePositions={LONG:null,SHORT:null},selectedHedgeSide="LONG",pending=null,logs=[],demo=false,timer=null,axis=null,working=false,lastTickAt=0,priceBusy=false,ws=null,wsRetry=null,wsConnected=false;function paperMode(){return $('paperPositionMode')?.value||'hedge'}
-function chooseHedgeSide(side){if(!['LONG','SHORT'].includes(side))return;selectedHedgeSide=side;position=hedgePositions[side]||null;render()}
-function paperPortfolioPnl(){return ['LONG','SHORT'].reduce((sum,side)=>sum+(hedgePositions[side]&&last?netAt(hedgePositions[side],last):0),0)}
-function paperMarginInUse(){return ['LONG','SHORT'].reduce((sum,side)=>{const p=hedgePositions[side];return sum+(p?p.notional/(p.leverage||1):0)},0)}
+document.addEventListener('contextmenu',e=>{if(!e.target.closest('input,textarea,[contenteditable="true"]'))e.preventDefault()});const $=id=>document.getElementById(id),tfs=['1d','1h','30m','15m','5m','1m'];const futureSlots=20;let verticalZoom=1;let viewCount=65,viewOffset=0,gesture=null,suppressTapUntil=0,crosshairIndex=null,futureCrosshairSlot=null,crosshairPrice=null,chartPriceScale=null;let candles={},last=0,selected=null,position=null,hedgePositions={LONG:[],SHORT:[]},selectedHedgeSide="LONG",selectedPaperPositionId=null,pending=null,logs=[],demo=false,timer=null,axis=null,working=false,lastTickAt=0,priceBusy=false,ws=null,wsRetry=null,wsConnected=false;function paperMode(){return $('paperPositionMode')?.value||'hedge'}
+function allPaperPositions(){return [...hedgePositions.LONG,...hedgePositions.SHORT]}
+function syncSelectedPaperPosition(){
+  const selected=allPaperPositions().find(p=>p.id===selectedPaperPositionId);
+  if(selected){position=selected;selectedHedgeSide=selected.side;return}
+  const fallback=hedgePositions[selectedHedgeSide][0]||allPaperPositions()[0]||null;
+  position=fallback;selectedPaperPositionId=fallback?.id||null;
+  if(fallback)selectedHedgeSide=fallback.side;
+}
+function chooseHedgeSide(side){if(!['LONG','SHORT'].includes(side))return;selectedHedgeSide=side;selectedPaperPositionId=hedgePositions[side][0]?.id||null;syncSelectedPaperPosition();render()}
+function choosePaperPosition(id){const selected=allPaperPositions().find(p=>p.id===id);if(!selected)return;selectedPaperPositionId=id;selectedHedgeSide=selected.side;syncSelectedPaperPosition();render()}
+function paperPortfolioPnl(){return allPaperPositions().reduce((sum,p)=>sum+(last?netAt(p,last):0),0)}
+function paperMarginInUse(){return allPaperPositions().reduce((sum,p)=>sum+p.notional/(p.leverage||1),0)}
+function paperFreeMargin(){return Math.max(0,(Number($('balance').value)||0)*.95-paperMarginInUse())}
+function paperPositionId(){return 'paper-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10)}
+
 const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:2});const fee=.0005,slip=.0001,cost=fee+slip;const won=n=>Math.round(n*(+$("fx").value||1400)).toLocaleString("ko-KR")+"원";const percent=n=>(n>=0?"+":"")+n.toFixed(2)+"%";function netAt(p,market){if(!p)return 0;let exit=market*(p.side==="LONG"?1-slip:1+slip);return (exit-p.entry)*p.qty*(p.side==="LONG"?1:-1)-(p.entry+exit)*p.qty*fee}async function loadFx(){try{let r=await fetch("https://open.er-api.com/v6/latest/USD",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);let d=await r.json();let rate=Number(d?.rates?.KRW);if(!(rate>0))throw Error("환율 응답 오류");$("fx").value=rate.toFixed(2);$("fxstatus").textContent="참고 환율 자동 조회: 1 USD ≈ "+fmt(rate)+"원 · 실제 환전 환율과 차이 가능";render()}catch(e){$("fxstatus").textContent="환율 자동 조회 실패 · 입력된 수동 환율로 환산 (실시간 환율 아님)"}}
 function ema(a,p){let e=a[0],k=2/(p+1);for(let i=1;i<a.length;i++)e=a[i]*k+e*(1-k);return e}
 function trend(a){if(!a||a.length<55)return '대기';let x=a.slice(0,-1).map(v=>v.c);let e=ema(x.slice(-60),20),f=ema(x.slice(-60),50);return e>f*1.0003?'상승':e<f*.9997?'하락':'횡보'}
@@ -222,7 +234,7 @@ function paintLivePrice(){
   lastPricePaintAt=Date.now();
   $('price').textContent=last?fmt(last)+' USDT':'-- USDT';
   $('mode').textContent=wsConnected?'실시간 체결가':lastTickAt&&Date.now()-lastTickAt<5000?'REST 시세':'연결 대기';
-  if((hedgePositions.LONG||hedgePositions.SHORT)&&$('page-chart').classList.contains('active')){
+  if(allPaperPositions().length&&$('page-chart').classList.contains('active')){
     const pnl=paperPortfolioPnl()*(+$('fx').value||1400);
     const el=$('pnlSummary');el.textContent=(pnl<0?'-':pnl>0?'+':'')+'₩'+Math.abs(Math.round(pnl)).toLocaleString('ko-KR');
     el.classList.toggle('pnl-positive',pnl>0);el.classList.toggle('pnl-negative',pnl<0);
@@ -326,7 +338,7 @@ chart.addEventListener('click',e=>{if(Date.now()<suppressTapUntil)return;if(cros
 $('zoomIn').onclick=()=>{viewCount=Math.max(20,Math.round(viewCount*.75));render()};$('zoomOut').onclick=()=>{viewCount=Math.min(400,Math.round(viewCount*1.35));render()};$('latest').onclick=()=>{viewOffset=0;verticalPan=0;render()};
 const PAPER_SAVE_KEY='btc-paper-trading-state-v1';
 function savePaperState(){try{localStorage.setItem(PAPER_SAVE_KEY,JSON.stringify({
-  position,hedgePositions,selectedHedgeSide,paperMode:paperMode(),pending,logs,balance:$('balance').value,
+  position,hedgePositions,selectedHedgeSide,selectedPaperPositionId,paperMode:paperMode(),pending,logs,balance:$('balance').value,
   settings:Object.fromEntries(['lev','risk','stop','rr','hold','sizeMode','marginPct'].map(id=>[id,$(id).value]))
 }))}catch(e){console.warn('모의매매 저장 실패',e)}}
 function restorePaperState(){
@@ -334,14 +346,17 @@ function restorePaperState(){
     const raw=localStorage.getItem(PAPER_SAVE_KEY);if(!raw)return;
     const state=JSON.parse(raw);
     const validPosition=p=>p&&['LONG','SHORT'].includes(p.side)&&['entry','stop','tp','qty','notional','opened','hold'].every(k=>Number.isFinite(Number(p[k]))&&Number(p[k])>0);
-    if(state.hedgePositions&&typeof state.hedgePositions==='object'){
-      for(const side of ['LONG','SHORT'])if(validPosition(state.hedgePositions[side])&&state.hedgePositions[side].side===side)hedgePositions[side]=state.hedgePositions[side];
-    }else if(validPosition(state.position)){hedgePositions[state.position.side]=state.position}
+    // Compatible with the original single-position save and the previous one-per-side hedge save.
+    for(const side of ['LONG','SHORT']){
+      const previous=state.hedgePositions?.[side];
+      const items=Array.isArray(previous)?previous:previous?[previous]:[];
+      hedgePositions[side]=items.filter(p=>validPosition(p)&&p.side===side).slice(0,100).map(p=>({...p,id:typeof p.id==='string'&&p.id?p.id:paperPositionId()}));
+    }
+    if(!allPaperPositions().length&&validPosition(state.position))hedgePositions[state.position.side].push({...state.position,id:paperPositionId()});
     if(['LONG','SHORT'].includes(state.selectedHedgeSide))selectedHedgeSide=state.selectedHedgeSide;
     if(state.paperMode==='oneway'||state.paperMode==='hedge')$('paperPositionMode').value=state.paperMode;
-    // Older one-position saves are migrated without altering the old account balance.
-    if(!hedgePositions[selectedHedgeSide])selectedHedgeSide=hedgePositions.LONG?'LONG':hedgePositions.SHORT?'SHORT':'LONG';
-    position=hedgePositions[selectedHedgeSide]||null;
+    if(typeof state.selectedPaperPositionId==='string')selectedPaperPositionId=state.selectedPaperPositionId;
+    syncSelectedPaperPosition();
     if(state.pending&&['LONG','SHORT'].includes(state.pending.side)&&Number(state.pending.price)>0)pending=state.pending;
     if(Array.isArray(state.logs))logs=state.logs.filter(x=>typeof x==='string').slice(0,60);
     if(Number(state.balance)>0)$('balance').value=state.balance;
