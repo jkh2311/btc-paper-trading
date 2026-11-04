@@ -367,36 +367,42 @@ function restorePaperState(){
 function positionNotional(bal,lev,r,d){if($('sizeMode').value==='margin'){const pct=Number($('marginPct').value);return bal*lev*pct/100}return Math.min(bal*r/(d+2*cost),bal*lev*.95)}
 function syncSizeMode(){$('marginControls').hidden=$('sizeMode').value!=='margin';$('riskControls').hidden=$('sizeMode').value==='margin'}
 function openTrade(side,entry){
-  let bal=+$('balance').value,r=+$('risk').value/100,d=+$('stop').value/100,lev=+$('lev').value,rr=+$('rr').value,hold=+$('hold').value;
+  let bal=Number($('balance').value),r=Number($('risk').value)/100,d=Number($('stop').value)/100;
+  const lev=Number($('lev').value),rr=Number($('rr').value),hold=Number($('hold').value);
   if(!(bal>0&&r>0&&d>=.0015&&d<=.006&&lev>0&&rr>=1&&hold>0&&entry>0))return alert('전략 설정을 확인하세요');
-  if(paperMode()==='oneway'&&hedgePositions[side==='LONG'?'SHORT':'LONG']){
-    closeSide(side==='LONG'?'SHORT':'LONG','방향 전환 청산');bal=+$('balance').value;
+  if(paperMode()==='oneway'){
+    const reverse=side==='LONG'?'SHORT':'LONG';
+    for(const p of [...hedgePositions[reverse]])closePositionById(p.id,'방향 전환 청산',false);
+    bal=Number($('balance').value);
   }
-  let notional=positionNotional(bal,lev,r,d),old=hedgePositions[side];
-  const freeMargin=Math.max(0,bal*.95-paperMarginInUse());
-  notional=Math.min(notional,freeMargin*lev);
-  if(!(notional>0))return alert('사용 가능한 가상 증거금이 부족합니다. 롱과 숏은 증거금을 공유합니다.');
-  let qty=notional/entry,added=!!old;
-  if(added){entry=(old.entry*old.qty+entry*qty)/(old.qty+qty);qty+=old.qty;notional+=old.notional}
+  const free=paperFreeMargin();
+  const intendedNotional=positionNotional(bal,lev,r,d);
+  // Reserve 5% of the paper balance as a safety buffer, shared across both sides.
+  const notional=Math.min(intendedNotional,free*lev);
+  if(!(notional>0.01)||!Number.isFinite(notional))return alert('잔고 내 사용 가능한 가상 증거금이 부족해요. 기존 포지션을 청산하거나 크기를 줄여 주세요.');
+  const qty=notional/entry;
   const stop=side==='LONG'?entry*(1-d):entry*(1+d);
   const tp=side==='LONG'?entry*(1+(rr*(d+2*cost)+2*cost)):entry*(1-(rr*(d+2*cost)+2*cost));
-  hedgePositions[side]={side,entry,stop,tp,qty,notional,leverage:added?(old.leverage||lev):lev,opened:Date.now(),hold};
-  selectedHedgeSide=side;position=hedgePositions[side];selected=null;
-  add('가상 '+side+(added?' 추가 진입 ':' 진입 ')+fmt(entry)+' USDT · 총 포지션 규모 '+won(notional));
+  const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,leverage:lev,opened:Date.now(),hold};
+  hedgePositions[side].push(p);
+  selectedPaperPositionId=p.id;selectedHedgeSide=side;position=p;selected=null;
+  add('가상 '+side+' 개별 포지션 진입 '+fmt(entry)+' USDT · 총 규모 '+won(notional)+' · 남은 가상 증거금 '+fmt(paperFreeMargin())+' USDT');
   savePaperState();render();
 }
 function request(side){
   if(!last||pending||(!demo&&Date.now()-lastTickAt>10000)){alert(pending?'대기 주문을 먼저 취소해 주세요.':'최신 시세 연결이 필요합니다.');return}
-  const action=hedgePositions[side]?'추가 진입':paperMode()==='oneway'&&hedgePositions[side==='LONG'?'SHORT':'LONG']?'반대 방향 전환':'신규 진입';
+  if(paperFreeMargin()<=.001){alert('가상 잔고의 사용 가능한 증거금이 부족해요.');return}
+  const reverse=side==='LONG'?'SHORT':'LONG';
+  const action=paperMode()==='oneway'&&hedgePositions[reverse].length?'반대 방향 전환':'독립 포지션 신규 진입';
   const type=document.querySelector('input[name="orderType"]:checked').value;
   if(type==='market'){
-    if(!confirm('가상 '+side+' '+action+' 시장가 · 현재가 '+fmt(last)+' USDT\n'+(paperMode()==='oneway'&&hedgePositions[side==='LONG'?'SHORT':'LONG']?'기존 반대 포지션이 청산됩니다.\n':'')+'모의 주문입니다.'))return;
+    if(!confirm('가상 '+side+' '+action+' 시장가 · 현재가 '+fmt(last)+' USDT\n'+(paperMode()==='oneway'&&hedgePositions[reverse].length?'기존 반대 방향 포지션은 청산됩니다.\n':'')+'모의 주문입니다.'))return;
     openTrade(side,last*(side==='LONG'?1+slip:1-slip));
   }else{
     const price=Number($('limitPrice').value);
     if(!(price>0)||!Number.isFinite(price)){alert('유효한 지정가를 입력해 주세요.');return}
-    if(!confirm('가상 '+side+' '+action+' 지정가 '+fmt(price)+' USDT\n가격 도달 시 모의 체결됩니다.'))return;
-    pending={side,price};add('가상 '+side+' '+action+' 지정가 대기 '+fmt(price)+' USDT');savePaperState();render();
+    if(!confirm('가상 '+side+' 신규 지정가 '+fmt(price)+' USDT\n체결 시 잔여 증거금 기준으로 크기가 제한됩니다.'))return;
+    pending={side,price};add('가상 '+side+' 신규 지정가 대기 '+fmt(price)+' USDT');savePaperState();render();
   }
   $('entrySheet').style.display='none';
 }
@@ -404,30 +410,39 @@ function showOrderSheet(side){
   if(!last||pending||(!demo&&Date.now()-lastTickAt>10000)){alert(pending?'대기 주문을 먼저 취소해 주세요.':'최신 시세 연결이 필요합니다.');return}
   document.querySelector('input[name="orderType"][value="limit"]').checked=true;
   $('limitPrice').value=last.toFixed(1);$('entrySheet').style.display='block';
-  $('sheetPrice').textContent='가상 '+(side==='LONG'?'롱':'숏')+' '+(hedgePositions[side]?'추가 진입':paperMode()==='oneway'&&hedgePositions[side==='LONG'?'SHORT':'LONG']?'방향 전환':'신규 진입')+' · 현재가 '+fmt(last);
+  const reverse=side==='LONG'?'SHORT':'LONG';
+  $('sheetPrice').textContent='가상 '+(side==='LONG'?'롱':'숏')+' '+(paperMode()==='oneway'&&hedgePositions[reverse].length?'방향 전환':'독립 신규 포지션')+' · 남은 증거금 '+fmt(paperFreeMargin())+' USDT';
   $('sheetLong').style.display=side==='LONG'?'':'none';$('sheetShort').style.display=side==='SHORT'?'':'none';updateOrderType();
 }
 function updateOrderType(){const limit=document.querySelector('input[name="orderType"]:checked').value==='limit';$('limitLabel').style.display=limit?'':'none';$('limitPrice').style.display=limit?'':'none';$('orderHelp').textContent=limit?'지정가 주문은 가격 도달 시 모의 체결됩니다.':'시장가는 현재가 기준으로 즉시 모의 체결됩니다.'}
 function renderLogs(){$('log').innerHTML=logs.length?logs.map(v=>'<div class="trade-log-item">'+v.replace(/(-?[0-9,]+원)(?= \()/g,(m)=>'<span class="'+(m.startsWith('-')?'pnl-negative':'pnl-positive')+'">'+m+'</span>')+'</div>').join(''):'기록 없음'}function add(s){logs.unshift(new Date().toLocaleTimeString('ko-KR')+' · '+s);logs=logs.slice(0,60);renderLogs()}
-function closeSide(side,reason){
-  const p=hedgePositions[side];if(!p)return;
-  const net=netAt(p,last),bal=+$('balance').value;
+function closePositionById(id,reason='수동 청산',shouldRender=true){
+  const p=allPaperPositions().find(x=>x.id===id);
+  if(!p)return;
+  const net=netAt(p,last),bal=Number($('balance').value)||0;
   $('balance').value=(bal+net).toFixed(2);
-  add(reason+' · '+p.side+' 비용 차감 순손익 '+won(net)+' ('+(bal>0?percent(net/bal*100):'—')+', 계좌 기준)');
-  hedgePositions[side]=null;
-  if(selectedHedgeSide===side)selectedHedgeSide=hedgePositions[side==='LONG'?'SHORT':'LONG']?(side==='LONG'?'SHORT':'LONG'):side;
-  position=hedgePositions[selectedHedgeSide]||null;
+  add(reason+' · 가상 '+p.side+' 개별 포지션 · 비용 차감 순손익 '+won(net)+' ('+(bal>0?percent(net/bal*100):'—')+', 계좌 기준)');
+  hedgePositions[p.side]=hedgePositions[p.side].filter(x=>x.id!==id);
+  syncSelectedPaperPosition();
+  savePaperState();if(shouldRender)render();
+}
+function closeSide(side,reason){
+  for(const p of [...hedgePositions[side]])closePositionById(p.id,reason,false);
   savePaperState();render();
 }
-function close(reason){closeSide(selectedHedgeSide,reason)}
+function close(reason){if(position)closePositionById(position.id,reason)}
 function process(){
   if(!last)return;
-  if(pending){const hit=pending.side==='LONG'?last<=pending.price:last>=pending.price;if(hit){const p=pending;pending=null;openTrade(p.side,p.price)}}
-  for(const side of ['LONG','SHORT']){
-    const p=hedgePositions[side];if(!p)continue;
+  if(pending){
+    const hit=pending.side==='LONG'?last<=pending.price:last>=pending.price;
+    if(hit){const p=pending;pending=null;openTrade(p.side,p.price)}
+  }
+  for(const p of [...allPaperPositions()]){
+    if(!allPaperPositions().some(x=>x.id===p.id))continue;
     const stopHit=p.side==='LONG'?last<=p.stop:last>=p.stop;
     const tpHit=p.side==='LONG'?last>=p.tp:last<=p.tp;
-    if(stopHit||tpHit||Date.now()-p.opened>=p.hold*3600000)closeSide(side,stopHit?'손절':tpHit?'익절':'시간 만료');
+    if(stopHit||tpHit||Date.now()-p.opened>=p.hold*3600000)
+      closePositionById(p.id,stopHit?'손절':tpHit?'익절':'시간 만료');
   }
 }
 function updatePosition(){
