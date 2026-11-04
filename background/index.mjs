@@ -23,8 +23,18 @@ async function getSnapshot(){if(!page||page.isClosed())throw Error('Browser unav
 async function importSnapshot(value){
   if(!value||typeof value!=='object'||typeof value.paper!=='string')throw Error('Paper-only initial snapshot required');
   const out={};for(const [k,id] of Object.entries(keys)){const v=value[k];if(v==null)continue;if(typeof v!=='string'||v.length>600000||!JSON.parse(v)||Array.isArray(JSON.parse(v)))throw Error('Invalid '+k);out[id]=v}
-  await page.evaluate(data=>{for(const [k,v] of Object.entries(data))localStorage.setItem(k,v)},out);
+  await page.evaluate(data=>{
+    for(const [k,v] of Object.entries(data))localStorage.setItem(k,v);
+    // The currently running phone app writes its old in-memory portfolio on
+    // pagehide. Restore the imported values AFTER that legacy handler runs.
+    // Otherwise the first server reload silently erases existing positions.
+    window.addEventListener('pagehide',()=>{
+      for(const [k,v] of Object.entries(data))localStorage.setItem(k,v);
+    },{once:true});
+  },out);
   await page.reload({waitUntil:'domcontentloaded',timeout:45000});
+  const after=await getSnapshot();
+  if(after.paper!==value.paper)throw Error('Initial phone paper portfolio transfer did not persist');
   await page.locator('#autoPaperQuickToggle').waitFor({timeout:30000});
 }
 async function browser(){
