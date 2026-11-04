@@ -308,6 +308,8 @@ async function importLocalMirror(input){
   if(!state.initialized)throw Error('Server paper account not initialized');
   if(!page||page.isClosed())await browser();
   if(!Array.isArray(state.mirrorReceipts))state.mirrorReceipts=[];
+  const cancelled=(state.mirrorRevocations||[]).find(x=>x.requestId===request.requestId);
+  if(cancelled)return {requestId:request.requestId,result:'already-revoked'};
   const previous=state.mirrorReceipts.find(x=>x.requestId===request.requestId);
   if(previous)return previous;
   const receipt=await page.evaluate(({requestId,position:p})=>{
@@ -333,6 +335,36 @@ async function importLocalMirror(input){
   },request);
   state.mirrorReceipts.push(receipt);
   state.mirrorReceipts=state.mirrorReceipts.slice(-120);
+  await save(meta,state);
+  await persistPaperBackup();
+  return receipt;
+}
+function checkedMirrorRequestId(input){
+  if(!input||typeof input.requestId!=='string'||
+     !/^[a-zA-Z0-9_-]{12,96}$/.test(input.requestId))
+    throw Error('Invalid local mirror cancellation ID');
+  return input.requestId;
+}
+async function revokeLocalMirror(input){
+  const id=checkedMirrorRequestId(input);
+  if(!state.initialized)throw Error('Server paper account not initialized');
+  if(!Array.isArray(state.mirrorRevocations))state.mirrorRevocations=[];
+  const previous=state.mirrorRevocations.find(r=>r.requestId===id);
+  if(previous)return previous;
+  if(!page||page.isClosed())await browser();
+  const receipt=await page.evaluate(requestId=>{
+    const p=allPaperPositions().find(p=>p.manualRequestId===requestId&&p.source==='phone-mirror');
+    if(!p)return {requestId,result:'not-open'};
+    // Never leave an orphan remote paper position after its phone position
+    // has been closed. The simulated close is subject to a fresh price quote.
+    if(!(last>0)||Date.now()-lastTickAt>15000)
+      throw Error('Server quote stale; mirror cancellation needs retry');
+    closePositionById(p.id,'휴대폰 포지션 청산 동기화');
+    if(allPaperPositions().some(x=>x.id===p.id))throw Error('Mirror still open');
+    return {requestId,result:'closed',positionId:p.id};
+  },id);
+  state.mirrorRevocations.push(receipt);
+  state.mirrorRevocations=state.mirrorRevocations.slice(-120);
   await save(meta,state);
   await persistPaperBackup();
   return receipt;
@@ -474,6 +506,13 @@ async function request(req,res){
       let receipt;
       try{receipt=await serial(()=>importLocalMirror(checked))}
       finally{manualRequestsWaiting=Math.max(0,manualRequestsWaiting-1)}
+      return send(res,200,{receipt},origin);
+    }
+    if(req.method==='POST'&&url==='/api/mirror-revoke'){
+      const input=await body(req);
+      try{checkedMirrorRequestId(input)}
+      catch(e){return send(res,422,{error:String(e.message||e)},origin)}
+      const receipt=await serial(()=>revokeLocalMirror(input));
       return send(res,200,{receipt},origin);
     }
     if(req.method==='POST'&&url==='/api/manual-close'){
