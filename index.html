@@ -566,7 +566,7 @@ function stableChartPriceRange(a,tf){
     chartRangeAnchor={tf,lo:low-padding,hi:high+padding};
   }
   // Only follow a live price approaching the edge; never auto-fit to position lines or zoom.
-  if(viewOffset===0&&last>0&&a.length){
+  if(last>0&&a.length&&visibleWindow(a).end===a.length){
     const span=chartRangeAnchor.hi-chartRangeAnchor.lo,edge=span*.08;
     let shift=0;
     if(last>chartRangeAnchor.hi-edge)shift=last-(chartRangeAnchor.hi-edge);
@@ -586,7 +586,7 @@ function zoomChartKeepingAnchor(nextCount){
   const a=candles[$('tf').value]||[],previous=visibleWindow(a);
   const next=Math.max(20,Math.min(400,Math.round(nextCount)));
   if(a.length){
-    const ratio=viewOffset===0
+    const ratio=previous.end===a.length
       ?Math.max(.1,Math.min(.9,(a.length-.5-previous.left)/previous.count))
       :.5;
     const anchor=previous.left+ratio*previous.count;
