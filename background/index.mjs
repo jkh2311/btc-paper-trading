@@ -31,6 +31,15 @@ async function browser(){
   if(context)try{await context.close()}catch{}
   context=await chromium.launchPersistentContext(path.join(DIR,'profile'),{headless:true,viewport:{width:390,height:844},args:['--no-sandbox','--disable-dev-shm-usage']});
   page=context.pages()[0]||await context.newPage();
+  // Playwright dismisses unhandled confirms. Only accept the phone app's
+  // AUTO consent prompt following an authenticated explicit server /api/start.
+  page.on('dialog',async dialog=>{
+    try{
+      if(dialog.type()==='confirm'&&state.armed&&
+         dialog.message().includes('자동 모의매매를 활성화'))await dialog.accept();
+      else await dialog.dismiss();
+    }catch(e){console.warn('Background dialog failed',e)}
+  });
   await page.goto(APP,{waitUntil:'domcontentloaded',timeout:45000});
   await page.locator('#autoPaperQuickToggle').waitFor({timeout:30000});
   if(state.initialized){
@@ -43,7 +52,11 @@ async function synchronize(){
   if(!state.initialized)return;
   const status=await page.evaluate(()=>({on:typeof autoPaperEnabled==='boolean'&&autoPaperEnabled,visible:document.visibilityState}));
   if(status.visible!=='visible')throw Error('Headless app hidden');
-  if(status.on!==state.armed)await page.locator('#autoPaperQuickToggle').click({timeout:9000});
+  if(status.on!==state.armed){
+    await page.locator('#autoPaperQuickToggle').click({timeout:9000});
+    const actual=await page.evaluate(()=>typeof autoPaperEnabled==='boolean'&&autoPaperEnabled);
+    if(actual!==state.armed)throw Error('Server AUTO activation did not take effect');
+  }
   const val=await getSnapshot(),hash=JSON.stringify(val);
   if(hash!==lastWritten){await save(backup,val);lastWritten=hash}
 }
@@ -54,7 +67,8 @@ async function status(){
       balance:Number(p.balance)||0,long:Array.isArray(p.hedgePositions?.LONG)?p.hedgePositions.LONG.length:0,
       short:Array.isArray(p.hedgePositions?.SHORT)?p.hedgePositions.SHORT.length:0,
       closed:Array.isArray(p.closedPaperTrades)?p.closedPaperTrades.length:0,
-      autoEnabled:typeof autoPaperEnabled==='boolean'&&autoPaperEnabled};},keys.paper);
+      autoEnabled:typeof autoPaperEnabled==='boolean'&&autoPaperEnabled,
+      marketTickAgeMs:typeof lastTickAt==='number'&&lastTickAt>0?Date.now()-lastTickAt:null};},keys.paper);
   }catch(e){v.lastError=String(e.message||e).slice(0,200)}
   return v;
 }
