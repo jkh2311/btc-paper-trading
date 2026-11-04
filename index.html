@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-rmi-first-entry-v18"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-restore-classic-trend-v19"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -340,12 +340,13 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <label for="autoMarketMode">자동 모의매매 시장 모드</label>
 <select id="autoMarketMode">
 <option value="trend">RMI 우선 · 시간봉/거래량 필터 없음 (기본)</option>
+<option value="classic">추세장 · 이전 5·15분 추세 + 거래량 1.2배</option>
 <option value="auto">자동 판별 · 시장에 따라 전환</option>
 <option value="range">횡보장 · 박스 하단 롱 / 상단 숏</option>
 <option value="breakout">돌파주의 · 신규 진입 차단</option>
 <option value="off">거래 안 함 · 신규 진입 차단</option>
 </select>
-<p class="muted" style="font-size:11px;line-height:1.45">차트의 시장 상태는 실제 5·15분봉 데이터로 따로 판단해 표시합니다. RMI 우선 모드는 1분봉 RMI 타점만 확인하고 시간봉 추세·거래량으로 진입을 막지 않습니다. 자동 판별/횡보장은 선택한 장세 제한을 유지하며, 돌파주의는 신규 진입을 멈춥니다.</p>
+<p class="muted" style="font-size:11px;line-height:1.45">차트의 시장 상태는 실제 5·15분봉 데이터로 따로 판단해 표시합니다. RMI 우선은 1분봉 RMI로만 진입하고, 추세장은 예전처럼 5·15분 EMA9/21 방향 일치·1분 거래량 1.2배를 확인합니다. 자동 판별은 횡보장/예전 추세장으로 전환하고, 돌파주의에서는 신규 진입을 멈춥니다.</p>
 <p class="muted" style="font-size:11px;line-height:1.5">모의매매에만 적용돼요. 바이낸스 실제 선물 계좌 설정은 변경하지 않습니다.</p></div><div class="card"><h2>전략 설정</h2><label>가상 계좌 USDT</label><input id="balance" type="number" value="822" min="1" step="1"><label>레버리지</label><input id="lev" type="number" value="20" min="1" max="50"><label for="sizeMode">포지션 크기 계산 방식</label><select id="sizeMode"><option value="risk">위험 기준 (기본)</option><option value="margin">증거금 기준 (직접 선택)</option></select><div id="marginControls" hidden><label for="marginPct">이번 주문에 사용할 남은 증거금 비율</label><input id="marginPct" type="number" value="25" min="0.1" max="100" step="0.5" inputmode="decimal" aria-label="이번 주문에 사용할 남은 증거금 비율 (%)"><p class="muted" style="font-size:12px;line-height:1.5">남은 사용 가능 증거금에서 직접 지정한 비율만 사용합니다. 25를 입력하면 남은 증거금의 25%를 사용해요. 위험 기준 모드에도 임의의 20% 제한은 없습니다.</p></div><div id="riskControls"><label>1회 계좌 위험 (%)</label><input id="risk" type="number" value="0.5" min="0.01" max="5" step="0.05"></div><label>손절 거리 (%)</label><input id="stop" type="number" value="0.3" min="0.15" max="0.6" step="0.05"><label>목표 순손익비</label><input id="rr" type="number" value="2" min="1" step="0.5"><label>최대 보유 시간</label><input id="hold" type="number" value="6" min="1" max="24"><label>USD → KRW 환율</label><input id="fx" type="number" value="1400" min="1" step="0.1"><div id="fxstatus" class="muted"></div><div id="calc" class="muted"></div><div class="auto-strategy-guards" aria-label="자동 모의 보호 설정">
 <h3>자동 모의 보호 설정</h3>
 <p class="muted" style="font-size:11px;line-height:1.45">자동 모의매매도 위 전략 설정의 레버리지·포지션 크기·손절·목표 손익비·최대 보유 시간을 그대로 사용합니다.</p>
@@ -771,7 +772,7 @@ function auto1mVolumeRatio(minutes){
 
 // Market regime classifier (closed 5m/15m candles only). All thresholds are
 // initial paper-trading heuristics, NOT a validated trading edge.
-const MARKET_MODE_OPTIONS=['auto','range','trend','breakout','off'];
+const MARKET_MODE_OPTIONS=['auto','range','trend','classic','breakout','off'];
 function adxWilder(bars,period=14){
   if(!Array.isArray(bars)||bars.length<period*2+2)return null;
   const tr=[],plus=[],minus=[];
@@ -863,11 +864,11 @@ function selectedMarketPlan(asOf=Date.now()-1800){
   if(selected==='off')return {mode:'pause',reason:'거래 안 함 모드',snapshot,selected};
   if(selected==='breakout')return {mode:'pause',reason:'돌파주의 모드 · 신규 진입 차단',snapshot,selected};
   if(selected==='auto'){
-    return {mode:snapshot.kind==='range'?'range':snapshot.kind==='trend'?'trend':'pause',
+    return {mode:snapshot.kind==='range'?'range':snapshot.kind==='trend'?'classic':'pause',
       reason:snapshot.kind==='unknown'?'시장 상태 판별 대기':'자동 판별: '+snapshot.label+' · 신규 진입 차단',
       snapshot,selected};
   }
-  return {mode:selected==='range'?'range':'trend',reason:'',snapshot,selected};
+  return {mode:selected==='range'?'range':selected==='classic'?'classic':'trend',reason:'',snapshot,selected};
 }
 function renderMarketRegimeBadge(){
   const badge=$('marketRegimeBadge');if(!badge)return;
@@ -882,43 +883,53 @@ function calculateAutoPaperSignal(now){
   if(minutes.length<36)return null;
   const candle=minutes.at(-1),asOf=candle.t+60000;
   if(now-asOf>110000)return null;
-  // 1-minute RMI is the entry trigger. Other timeframes and volume do NOT
-  // block a LONG/SHORT entry; daily RMI is context for conservative sizing.
   const minute=minuteRmiTrend(minutes);
   if(!minute?.side)return null;
   const side=minute.side,day=dailyRmiTrend(asOf);
   const aligned=!!day?.side&&side===day.side;
   const plan=selectedMarketPlan(asOf);
   if(plan.mode==='pause')return null;
-  // Trade on an RMI direction switch or a renewed move in its active direction.
-  // Flat or opposing RMI movements are not new entry points.
-  const rmiTurning=minute.changed||
-    (side==='LONG'?minute.value>minute.previous:minute.value<minute.previous);
-  if(!rmiTurning)return null;
-  const volumeRatio=auto1mVolumeRatio(minutes); // annotation only, never an entry gate
-  let rangeLow=null,rangeHigh=null,rangeReason='';
-  if(plan.mode==='range'){
-    // The explicitly selected range strategy still buys near its box bottom
-    // and sells near its top. No 5m/15m EMA or volume confirmation is required.
-    const snap=plan.snapshot,box=snap.box;
-    if(!box||snap.confirmedBreakout||
-       box.width<.0035||box.width>.025||
-       box.lowerTouches<2||box.upperTouches<2)return null;
-    const location=(candle.c-box.low)/(box.high-box.low);
-    const nearEdge=side==='LONG'
-      ?location>=0&&location<=.22&&minute.value<=readAutoSetting('autoMinuteLowTo')+12
-      :location<=1&&location>=.78&&minute.value>=readAutoSetting('autoMinuteHighFrom')-12;
-    if(!nearEdge)return null;
-    rangeLow=box.low;rangeHigh=box.high;
-    rangeReason=side==='LONG'?'횡보 박스 하단 롱':'횡보 박스 상단 숏';
+  const volumeRatio=auto1mVolumeRatio(minutes);
+  let rangeLow=null,rangeHigh=null,rangeReason='',trend5m=null,trend15m=null;
+  if(plan.mode==='classic'){
+    // Restore the original trend strategy from v17:
+    // Daily RMI context, agreeing EMA9/21 on closed 5m+15m bars,
+    // 1m volume >= 1.2x previous 20 bars, and <0.5% candle body.
+    if(!day?.side)return null;
+    trend5m=autoTimeframeTrend('5m',asOf);
+    trend15m=autoTimeframeTrend('15m',asOf);
+    if(!trend5m||trend5m!==trend15m||(side==='LONG'?trend5m!==1:trend5m!==-1))return null;
+    if(volumeRatio<1.2||Math.abs(candle.c/candle.o-1)>.005)return null;
+    const lastPlaced=autoSignalHistory.filter(x=>x.strategy===AUTO_PAPER_STRATEGY&&
+      (x.orderStatus==='pending'||x.orderStatus==='filled'||x.executed)).at(-1);
+    if(!minute.changed&&lastPlaced&&asOf-(lastPlaced.barTime+60000)<300000)return null;
+  }else{
+    // Retain RMI-first and range behavior: no trend/volume entry confirmation.
+    const rmiTurning=minute.changed||
+      (side==='LONG'?minute.value>minute.previous:minute.value<minute.previous);
+    if(!rmiTurning)return null;
+    if(plan.mode==='range'){
+      const snap=plan.snapshot,box=snap.box;
+      if(!box||snap.confirmedBreakout||
+         box.width<.0035||box.width>.025||
+         box.lowerTouches<2||box.upperTouches<2)return null;
+      const location=(candle.c-box.low)/(box.high-box.low);
+      const nearEdge=side==='LONG'
+        ?location>=0&&location<=.22&&minute.value<=readAutoSetting('autoMinuteLowTo')+12
+        :location<=1&&location>=.78&&minute.value>=readAutoSetting('autoMinuteHighFrom')-12;
+      if(!nearEdge)return null;
+      rangeLow=box.low;rangeHigh=box.high;
+      rangeReason=side==='LONG'?'횡보 박스 하단 롱':'횡보 박스 상단 숏';
+    }
   }
   return {barTime:candle.t,side,price:candle.c,detectedAt:now,strategy:AUTO_PAPER_STRATEGY,
     marketMode:plan.mode,rangeLow,rangeHigh,
     dailyBias:day?.side||null,aligned,dailyDeveloping:!!day?.developing,
-    trend5m:null,trend15m:null,volumeRatio:Number(volumeRatio.toFixed(2)),
+    trend5m,trend15m,volumeRatio:Number(volumeRatio.toFixed(2)),
     dailyRmi:day&&Number.isFinite(day.value)?Number(day.value.toFixed(1)):null,
     minuteRmi:Number(minute.value.toFixed(1)),
-    reason:(rangeReason||'1분 RMI 타점 · 시간봉/거래량 필터 없음')+
+    reason:(plan.mode==='classic'?'추세장 · 5·15분 정렬 + 거래량 1.2배':
+       rangeReason||'1분 RMI 타점 · 시간봉/거래량 필터 없음')+
       ' · 일봉 '+(day?.side||'판별 대기')+
       (aligned?' · 순추세':' · 축소 진입')+
       ' · 1분 RMI '+minute.value.toFixed(1),executed:false};
@@ -1546,6 +1557,7 @@ function updatePosition(){
     const plan=selectedMarketPlan();
     const name=plan.selected==='auto'?'자동 판별 ('+plan.snapshot.label+')':
       plan.selected==='range'?'횡보장':plan.selected==='trend'?'RMI 우선':
+      plan.selected==='classic'?'추세장 (기존)':
       plan.selected==='breakout'?'돌파주의':'거래 안 함';
     autoMode.textContent='자동 모의 '+(autoPaperEnabled?'ON · '+name+' · '+
       (plan.mode==='pause'?'신규 진입 중지':'신호 감시 중'):'OFF · '+name);
