@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-independent-1m-long-short-v20"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-restore-classic-short85-v21"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -339,14 +339,14 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 </div><div class="card"><h2>모의매매 포지션 모드</h2><label for="paperPositionMode">포지션 방식</label><select id="paperPositionMode"><option value="hedge">헤지 모드 · 롱/숏 동시 보유</option><option value="oneway">단방향 모드 · 한쪽만 보유</option></select>
 <label for="autoMarketMode">자동 모의매매 시장 모드</label>
 <select id="autoMarketMode">
-<option value="trend">RMI 우선 · 시간봉/거래량 필터 없음 (기본)</option>
-<option value="classic">추세장 · 이전 5·15분 추세 + 거래량 1.2배</option>
+<option value="classic">추세장 · RMI + 5·15분 추세 + 거래량 1.2배 (기본)</option>
+<option value="trend">RMI 우선 · 시간봉/거래량 필터 없음</option>
 <option value="auto">자동 판별 · 시장에 따라 전환</option>
 <option value="range">횡보장 · 박스 하단 롱 / 상단 숏</option>
 <option value="breakout">돌파주의 · 신규 진입 차단</option>
 <option value="off">거래 안 함 · 신규 진입 차단</option>
 </select>
-<p class="muted" style="font-size:11px;line-height:1.45">차트의 시장 상태는 실제 5·15분봉 데이터로 따로 판단해 표시합니다. RMI 우선은 1분봉 RMI로만 진입하고, 추세장은 예전처럼 5·15분 EMA9/21 방향 일치·1분 거래량 1.2배를 확인합니다. 자동 판별은 횡보장/예전 추세장으로 전환하고, 돌파주의에서는 신규 진입을 멈춥니다.</p>
+<p class="muted" style="font-size:11px;line-height:1.45">차트의 시장 상태는 실제 5·15분봉 데이터로 따로 판단해 표시합니다. 기본 추세장은 1분봉 RMI 타점에 5·15분 EMA9/21 방향 일치와 1분 거래량 1.2배를 확인합니다. RMI 우선은 시간봉·거래량을 필터로 사용하지 않습니다. 자동 판별은 횡보장/예전 추세장으로 전환하고, 돌파주의에서는 신규 진입을 멈춥니다.</p>
 <p class="muted" style="font-size:11px;line-height:1.5">모의매매에만 적용돼요. 바이낸스 실제 선물 계좌 설정은 변경하지 않습니다.</p></div><div class="card"><h2>전략 설정</h2><label>가상 계좌 USDT</label><input id="balance" type="number" value="822" min="1" step="1"><label>레버리지</label><input id="lev" type="number" value="20" min="1" max="50"><label for="sizeMode">포지션 크기 계산 방식</label><select id="sizeMode"><option value="risk">위험 기준 (기본)</option><option value="margin">증거금 기준 (직접 선택)</option></select><div id="marginControls" hidden><label for="marginPct">이번 주문에 사용할 남은 증거금 비율</label><input id="marginPct" type="number" value="25" min="0.1" max="100" step="0.5" inputmode="decimal" aria-label="이번 주문에 사용할 남은 증거금 비율 (%)"><p class="muted" style="font-size:12px;line-height:1.5">남은 사용 가능 증거금에서 직접 지정한 비율만 사용합니다. 25를 입력하면 남은 증거금의 25%를 사용해요. 위험 기준 모드에도 임의의 20% 제한은 없습니다.</p></div><div id="riskControls"><label>1회 계좌 위험 (%)</label><input id="risk" type="number" value="0.5" min="0.01" max="5" step="0.05"></div><label>손절 거리 (%)</label><input id="stop" type="number" value="0.3" min="0.15" max="0.6" step="0.05"><label>목표 순손익비</label><input id="rr" type="number" value="2" min="1" step="0.5"><label>최대 보유 시간</label><input id="hold" type="number" value="6" min="1" max="24"><label>USD → KRW 환율</label><input id="fx" type="number" value="1400" min="1" step="0.1"><div id="fxstatus" class="muted"></div><div id="calc" class="muted"></div><div class="auto-strategy-guards" aria-label="자동 모의 보호 설정">
 <h3>자동 모의 보호 설정</h3>
 <p class="muted" style="font-size:11px;line-height:1.45">자동 모의매매도 위 전략 설정의 레버리지·포지션 크기·손절·목표 손익비·최대 보유 시간을 그대로 사용합니다.</p>
@@ -784,6 +784,29 @@ function minuteRmiTrend(a){
   return {side,previousSide,changed:side!==previousSide&&side!==null,
     value,previous:prior,enteredAt,turnKind};
 }
+// Independent 1m RMI zone crossing. Works even when the RMI direction
+// switched to SHORT around 83 before reaching the configured 85 threshold.
+function minuteRmiZoneEntry(previous,current){
+  if(!Number.isFinite(previous)||!Number.isFinite(current))return null;
+  if(previous<readAutoSetting('autoMinuteHighFrom')&&
+     current>=readAutoSetting('autoMinuteHighFrom'))return 'SHORT';
+  if(previous>readAutoSetting('autoMinuteLowTo')&&
+     current<=readAutoSetting('autoMinuteLowTo'))return 'LONG';
+  return null;
+}
+// Chart-only crosses on confirmed exchange candles; never create retroactive orders.
+function chartRmiZoneMarkers(bars,start,end,asOf=Date.now()-1800){
+  if(!Array.isArray(bars)||bars.length<23)return [];
+  const closed=bars.filter(b=>b&&Number.isFinite(b.t)&&b.t+60000<=asOf&&b.v>0&&b.c>0);
+  if(closed.length<23)return [];
+  const scores=rmiSeries(closed),markers=[];
+  for(let i=1;i<closed.length;i++){
+    if(closed[i].t<bars[start]?.t||closed[i].t>bars[end-1]?.t)continue;
+    const side=minuteRmiZoneEntry(scores[i-1],scores[i]);
+    if(side)markers.push({barTime:closed[i].t,side,chartOnly:true});
+  }
+  return markers;
+}
 function autoTimeframeTrend(tf,asOf){
   const arr=confirmedSignalBars(tf,asOf),duration=candleDuration[tf];
   if(arr.length<35||!duration)return 0;
@@ -889,7 +912,7 @@ function marketRegimeSnapshot(asOf=Date.now()-1800){
     reason:'횡보·추세 조건 미확인 (불확실)',confirmedBreakout:false};
 }
 function selectedMarketPlan(asOf=Date.now()-1800){
-  const selected=$('autoMarketMode')?.value||'trend';
+  const selected=$('autoMarketMode')?.value||'classic';
   const snapshot=marketRegimeSnapshot(asOf);
   if(selected==='off')return {mode:'pause',reason:'거래 안 함 모드',snapshot,selected};
   if(selected==='breakout')return {mode:'pause',reason:'돌파주의 모드 · 신규 진입 차단',snapshot,selected};
@@ -931,10 +954,12 @@ function calculateAutoPaperSignal(now){
     if(volumeRatio<1.2||Math.abs(candle.c/candle.o-1)>.005)return null;
     const lastPlaced=autoSignalHistory.filter(x=>x.strategy===AUTO_PAPER_STRATEGY&&
       (x.orderStatus==='pending'||x.orderStatus==='filled'||x.executed)).at(-1);
-    if(!minute.changed&&lastPlaced&&asOf-(lastPlaced.barTime+60000)<300000)return null;
+    if(!minute.changed&&minuteRmiZoneEntry(minute.previous,minute.value)!==side&&
+       lastPlaced&&asOf-(lastPlaced.barTime+60000)<300000)return null;
   }else{
     // Retain RMI-first and range behavior: no trend/volume entry confirmation.
-    const rmiTurning=minute.changed||
+    const zoneEntry=minuteRmiZoneEntry(minute.previous,minute.value);
+    const rmiTurning=minute.changed||zoneEntry===side||
       (side==='LONG'?minute.value>minute.previous:minute.value<minute.previous);
     if(!rmiTurning)return null;
     if(plan.mode==='range'){
@@ -1153,13 +1178,25 @@ function maybeEvaluateAutoPaperSignals(){
   if($('page-chart').classList.contains('active'))draw();
 }
 function drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,bottom,plotW){
-  if($('tf').value!=='1m'||!autoSignalHistory.length)return;
-  const near=autoSignalHistory.filter(x=>x.strategy===AUTO_PAPER_STRATEGY&&x.barTime>=a[start]?.t&&x.barTime<=a[end-1]?.t);
-  if(!near.length)return;
+  if($('tf').value!=='1m'||!Array.isArray(a)||!a.length)return;
+  const markers=new Map();
+  for(const sig of autoSignalHistory){
+    if(sig.strategy===AUTO_PAPER_STRATEGY&&sig.barTime>=a[start]?.t&&
+       sig.barTime<=a[end-1]?.t)markers.set(sig.barTime,sig);
+  }
+  // Independently display confirmed 1m RMI 85 SHORT / 20 LONG crosses,
+  // regardless of day bias or trading mode. These markers are NOT fills.
+  for(const sig of chartRmiZoneMarkers(a,start,end))
+    markers.set(sig.barTime,sig);
+  if(!markers.size)return;
+  const near=[...markers.values()].sort((x,z)=>x.barTime-z.barTime);
   const byTime=new Map();for(let i=start;i<end;i++)byTime.set(a[i].t,i);
+  const lastArrow={LONG:-100,SHORT:-100};
   ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,bottom-top);ctx.clip();
   for(const sign of near){
     const i=byTime.get(sign.barTime);if(i===undefined)continue;
+    if(i-lastArrow[sign.side]<3)continue; // de-clutter same-side labels only
+    lastArrow[sign.side]=i;
     const x=(i-left+.5)*bw;
     if(x<0||x>plotW)continue;
     const candle=a[i],isLong=sign.side==='LONG',color=isLong?'#56e9a4':'#ff829a';
@@ -1377,7 +1414,13 @@ function restorePaperState(){
     if(state.settings){
       for(const id of ['lev','risk','stop','rr','hold','marginPct'])if(Number(state.settings[id])>0)$(id).value=state.settings[id];
       if(['risk','margin'].includes(state.settings.sizeMode))$('sizeMode').value=state.settings.sizeMode;
-      if(MARKET_MODE_OPTIONS.includes(state.settings.autoMarketMode))$('autoMarketMode').value=state.settings.autoMarketMode;
+      // One-time strategy preference migration: legacy 'trend' was RMI-only.
+      // Restore classic trend as requested while preserving explicit other modes.
+      if(state.settings.autoMarketMode==='trend'){
+        $('autoMarketMode').value='classic';
+      }else if(MARKET_MODE_OPTIONS.includes(state.settings.autoMarketMode)){
+        $('autoMarketMode').value=state.settings.autoMarketMode;
+      }
     }
     syncSizeMode();renderLogs();renderPaperPerformance();updatePosition();
   }catch(e){console.warn('모의매매 복원 실패',e)}
