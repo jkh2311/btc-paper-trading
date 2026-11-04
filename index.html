@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261104-restore-missing-helpers-v3"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-compact-performance-v1"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -184,6 +184,14 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 .hedge-position-block .hedge-pnl{margin-top:7px;font-size:14px}
 .paper-detail-compact .position-grid{margin-top:10px}
 .paper-detail-compact .paper-tp-result{margin-bottom:0}
+
+.paper-performance-minimal{margin-bottom:8px}
+.paper-performance-minimal>div{gap:9px;padding:15px 12px}
+.paper-performance-minimal strong{font-size:19px;line-height:1.25}
+.paper-performance-count{font-size:12px;color:#9fb5cf;padding:4px 1px 9px}
+.paper-closed-compact{gap:7px;padding:11px 13px;margin-top:7px}
+.paper-closed-result{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
+.paper-closed-result span{font-size:13px;font-weight:650;text-align:right}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -209,11 +217,11 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 </div>
 <div class="card"><h2>가상 포지션 · 모의매매 <span id="hedgeModeLabel" class="muted" style="font-size:11px;font-weight:400">헤지 모드</span></h2><div id="position" class="muted">포지션 없음</div><div class="row"><button id="close">선택 포지션 청산</button><button id="cancel">대기 주문 취소</button></div></div><div class="card"><h2>6개 시간봉 추세</h2><div class="grid" id="trends"></div></div></section>
 <section class="tab-page" id="page-history"><div class="card"><h2>모의매매 기록</h2><div id="log" class="muted">기록 없음</div><button id="clear">기록 지우기</button></div>
-<div class="card paper-performance-card"><h2>청산 완료 거래 · 누적 수익률</h2><p class="muted paper-performance-info">모의매매 청산이 완료된 거래만 집계해요. 수익률은 수수료와 슬리피지 차감 후 기준이에요.</p>
+<div class="card paper-performance-card"><h2>청산 완료 거래 · 누적 수익률</h2>
 <div id="paperPerformanceSummary" class="paper-performance-summary">집계할 청산 완료 거래가 없습니다.</div>
-<div class="paper-performance-head"><h3>거래별 수익 · 손실률</h3><button id="paperStatsReset" type="button">통계 초기화</button></div>
+<div class="paper-performance-head"><h3>완료 거래</h3><button id="paperStatsReset" type="button">통계 초기화</button></div>
 <div id="paperClosedTradeList" class="paper-closed-trade-list">청산 완료 거래 없음</div>
-<p class="muted paper-performance-info">이 업데이트 이전의 텍스트 거래 기록은 정확한 포지션 규모·손익을 복원할 수 없어 통계에 포함되지 않습니다. 앞으로 청산한 거래부터 누적됩니다.</p>
+
 </div></section>
 <section class="tab-page" id="page-liquidation"><div class="card liquidation-card"><h2>BTC 청산맵</h2><p class="muted">코인글래스 청산 히트맵으로 이동해 BTC 선물 청산 밀집 구간을 확인할 수 있어요.</p><a class="liq-link" href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" rel="noopener noreferrer">코인글래스 청산맵 열기 ↗</a><p class="muted" style="font-size:12px;line-height:1.6;margin-top:14px">외부 사이트에서 열립니다. 일부 데이터는 로그인 또는 유료 이용권이 필요할 수 있어요. 청산 구간은 추정치이며 실제 청산을 보장하지 않습니다.</p></div></section>
 <section class="tab-page" id="page-settings">
@@ -507,35 +515,29 @@ let closedPaperTrades=[],paperStatsBaseBalance=null;
 function renderPaperPerformance(){
   const summary=$('paperPerformanceSummary'),list=$('paperClosedTradeList');
   if(!summary||!list)return;
-  if(!closedPaperTrades.length){
-    summary.textContent='청산 완료 거래 없음 · 새로 청산하는 모의 포지션부터 집계해요.';
-    list.textContent='기록된 청산 거래가 없어요.';return;
-  }
-  const trades=closedPaperTrades.filter(x=>Number.isFinite(x.net)&&Number.isFinite(x.margin)&&x.margin>0);
-  const net=trades.reduce((sum,x)=>sum+x.net,0),wins=trades.filter(x=>x.net>0),losses=trades.filter(x=>x.net<0);
-  const profit=wins.reduce((sum,x)=>sum+x.net,0),loss=losses.reduce((sum,x)=>sum+x.net,0);
-  const base=Number(paperStatsBaseBalance),totalRate=base>0?net/base*100:null;
-  const rate=x=>(x>=0?'+':'')+x.toFixed(2)+'%';
-  const money=x=>(x>=0?'+':'')+fmtFeeUsdt(x)+' USDT';
-  summary.innerHTML='<div class="paper-performance-grid">'+
-    '<div><small>누적 실현손익</small><strong class="'+(net>=0?'paper-stat-profit':'paper-stat-loss')+'">'+money(net)+'</strong><span>'+won(net)+'</span></div>'+
-    '<div><small>총 수익률 · 시작 잔고 대비</small><strong class="'+(net>=0?'paper-stat-profit':'paper-stat-loss')+'">'+(totalRate!==null?rate(totalRate):'—')+'</strong><span>기준 잔고 '+(base>0?fmtFeeUsdt(base)+' USDT':'확인 불가')+'</span></div>'+
-    '<div><small>이익 거래 / 승률</small><strong class="paper-stat-profit">'+wins.length+'건 · '+(trades.length?wins.length/trades.length*100:0).toFixed(1)+'%</strong><span>누적 이익 '+money(profit)+'</span></div>'+
-    '<div><small>손실 거래 / 손실 거래율</small><strong class="paper-stat-loss">'+losses.length+'건 · '+(trades.length?losses.length/trades.length*100:0).toFixed(1)+'%</strong><span>누적 손실 '+money(loss)+'</span></div>'+
-    '</div>';
+  const trades=closedPaperTrades.filter(x=>x&&Number.isFinite(x.net)&&Number.isFinite(x.margin)&&x.margin>0);
+  if(!trades.length){summary.textContent='청산 완료 거래 없음';list.textContent='아직 완료된 거래가 없어요.';return}
+  const net=trades.reduce((sum,x)=>sum+x.net,0);
+  const wins=trades.filter(x=>x.net>0).length,losses=trades.filter(x=>x.net<0).length;
+  const base=Number(paperStatsBaseBalance);
+  const rate=x=>(x>0?'+':'')+x.toFixed(2)+'%';
+  summary.innerHTML='<div class="paper-performance-grid paper-performance-minimal">'+
+    '<div><small>총 수익률</small><strong class="'+(net>=0?'paper-stat-profit':'paper-stat-loss')+'">'+(base>0?rate(net/base*100):'—')+'</strong></div>'+
+    '<div><small>누적 실현손익</small><strong class="'+(net>=0?'paper-stat-profit':'paper-stat-loss')+'">'+(net>0?'+':'')+won(net)+'</strong></div>'+
+    '</div><div class="paper-performance-count">청산 '+trades.length+'건 · <span class="paper-stat-profit">수익 '+wins+'건</span> · <span class="paper-stat-loss">손실 '+losses+'건</span></div>';
   list.replaceChildren();
-  for(const trade of trades.slice().reverse()){
-    const row=document.createElement('div');row.className='paper-closed-item';
-    const head=document.createElement('div');head.className='paper-closed-head';
-    const title=document.createElement('b');title.className=trade.side==='LONG'?'hedge-long-text':'hedge-short-text';
-    title.textContent=(trade.side==='LONG'?'롱':'숏')+' · '+(trade.net>0?'수익':trade.net<0?'손실':'본전');
-    const date=document.createElement('span');date.textContent=new Date(trade.closedAt).toLocaleString('ko-KR');
-    head.append(title,date);
-    const detail=document.createElement('div');detail.className='paper-closed-detail';
-    detail.textContent='사유 '+trade.reason+' · 진입 '+fmt(trade.entry)+' / 청산 '+fmt(trade.exitPrice)+' USDT · 증거금 '+fmtFeeUsdt(trade.margin)+' USDT';
-    const result=document.createElement('strong');result.className=trade.net>=0?'paper-stat-profit':'paper-stat-loss';
-    result.textContent='증거금 대비 '+rate(trade.net/trade.margin*100)+' · '+money(trade.net)+' · '+won(trade.net);
-    row.append(head,detail,result);list.append(row);
+  for(const trade of [...trades].reverse()){
+    const row=document.createElement('div');row.className='paper-closed-item paper-closed-compact';
+    const top=document.createElement('div');top.className='paper-closed-head';
+    const side=document.createElement('b');side.className=trade.side==='LONG'?'hedge-long-text':'hedge-short-text';side.textContent=trade.side==='LONG'?'롱':'숏';
+    const time=document.createElement('span');
+    time.textContent=new Date(trade.closedAt).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    top.append(side,time);
+    const result=document.createElement('div');result.className='paper-closed-result '+(trade.net>=0?'paper-stat-profit':'paper-stat-loss');
+    const pnl=document.createElement('b');pnl.textContent=rate(trade.net/trade.margin*100);
+    const amount=document.createElement('span');amount.textContent=(trade.net>0?'+':'')+won(trade.net);
+    result.append(pnl,amount);
+    row.append(top,result);list.append(row);
   }
 }
 
