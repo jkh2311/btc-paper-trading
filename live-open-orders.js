@@ -100,6 +100,11 @@ async function sync(){
   if(ok)document.dispatchEvent(new CustomEvent('btc:open-order-snapshot',{
     detail:{orders:plain.value.filter(order=>order?.symbol==='BTCUSDT').map(order=>({
       symbol:'BTCUSDT',orderId:order.orderId
+    })),algoOrders:algo.value.filter(order=>order?.symbol==='BTCUSDT').map(order=>({
+      symbol:'BTCUSDT',algoId:order.algoId,side:order.side,positionSide:order.positionSide,
+      type:order.orderType||order.type,algoStatus:order.algoStatus,
+      triggerPrice:order.triggerPrice,quantity:order.quantity,
+      closePosition:order.closePosition,reduceOnly:order.reduceOnly
     })),receivedAt:lastResultAt}
   }));
   state.className=ok?'success':'order-warn';
