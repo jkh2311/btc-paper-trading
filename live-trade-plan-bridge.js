@@ -112,7 +112,11 @@ document.addEventListener('btc:position-action-planned',async e=>{
      Math.abs(d.quantity/r.step-Math.round(d.quantity/r.step))>1e-7||
      Math.abs(d.price/r.tick-Math.round(d.price/r.tick))>1e-7)
      throw Error('거래소 최소·최대 수량 또는 가격 단위 오류');
-  if(d.kind==='REDUCE'&&d.quantity>Math.abs(p.amount)+1e-8)throw Error('보유 수량 초과 청산 금지');
+  const expectedSide=d.kind==='REDUCE'?(d.side==='LONG'?'SELL':'BUY'):(d.side==='LONG'?'BUY':'SELL');
+  if(d.orderSide!==expectedSide)throw Error('진입/청산 방향이 거래소 포지션과 불일치');
+  if(d.kind==='ADD'&&Number.isFinite(r.notional)&&r.notional>0&&d.quantity*d.price+1e-8<r.notional)
+   throw Error('거래소 최소 명목가 미달');
+    if(d.kind==='REDUCE'&&d.quantity>Math.abs(p.amount)+1e-8)throw Error('보유 수량 초과 청산 금지');
   const ratio=number(rrInput.value),stop=number(stopInput.value);
   if(!(ratio>=.5&&ratio<=3&&stop>=.1&&stop<=5))throw Error('손절 거리/익절 손익비 범위 오류');
   const protect=d.kind==='ADD'?protection(p,d.side,d.price,stop,ratio,r.tick):null;
@@ -136,7 +140,7 @@ document.addEventListener('btc:live-auto-plan-request',async e=>{
   const r=await exchangeRules();
   if(mine!==request||!fresh(account)||document.hidden)return;
   const price=tickRound(d.signalPrice,r.tick),margin=b*weight[i]/sum,quantity=safeQty(margin*p.lev/price,r.step);
-  if(!(quantity>=r.min)&&!(quantity>0))throw Error('AUTO 선택 단계 BTC 수량 미달');
+  if(!(quantity>0))throw Error('AUTO 수량이 0입니다');
   if(!(quantity>=r.min)||Number.isFinite(r.max)&&quantity>r.max||
    Number.isFinite(r.notional)&&r.notional>0&&quantity*price+1e-8<r.notional)
    throw Error('AUTO 선택 단계가 거래소 주문 수량/최소 명목가 조건 미달');
