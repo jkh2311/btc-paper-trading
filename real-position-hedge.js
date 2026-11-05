@@ -21,7 +21,7 @@ let snapshot=null,selection=null;
 const controls=make('div',undefined,'real-hedge-controls');
 const refresh=make('button','실제 계좌 새로고침');
 const manage=make('button','API 키 관리');
-const message=make('div','실제 바이낸스 계좌 조회 전 · 가상 포지션은 표시하지 않습니다.','muted');
+const message=make('div','실계좌 조회 전','muted');
 refresh.type=manage.type='button';
 refresh.onclick=()=>document.getElementById('realAccountRefresh')?.click();
 manage.onclick=()=>document.getElementById('realAccountManage')?.click();
@@ -107,7 +107,7 @@ function render(){
  const detail=make('div',undefined,'hedge-selected-detail');
  const p=snapshot?.positions.find(p=>cleanSide(p)===selection);
  detail.append(make('b','선택한 포지션 상세 · '+(p?(selection==='LONG'?'롱 LONG':'숏 SHORT'):'선택 없음')));
- if(!p)detail.append(make('p','포지션을 선택하면 상세가 표시돼요.','muted'));
+ if(!p)detail.append(make('p','포지션 선택','muted'));
  else detail.append(make('div',[
   '보유 수량 '+fmt(Math.abs(p.amount),8)+' BTC',
   '평균 진입가 '+fmt(p.entry,2)+' USDT',
@@ -117,9 +117,8 @@ function render(){
   '추정 청산가 '+(p.liquidation>0?fmt(p.liquidation,2)+' USDT':'—')
  ].join('\n'),'real-position-detail'));
  root.append(detail);
- message.textContent=snapshot?'실제 Binance BTCUSDT 계좌 · 마지막 조회 '+new Date(snapshot.at).toLocaleTimeString('ko-KR')+
-  ' · 수동 새로고침 · 주문/청산 미연결':
-  '실제 바이낸스 계좌 조회 전 · 가상 포지션을 표시하지 않습니다.';
+ message.textContent=snapshot?'실계좌 조회 '+new Date(snapshot.at).toLocaleTimeString('ko-KR'):
+  '실계좌 조회 전';
 }
 document.addEventListener('btc:real-account-updated',e=>{
  const next=normalize(e.detail);
@@ -132,7 +131,7 @@ document.addEventListener('btc:real-account-cleared',e=>{
  snapshot=null;selection=null;render();
  document.dispatchEvent(new CustomEvent('btc:real-position-selected',{detail:null}));
  const note=e.detail?.message;
- if(note)message.textContent=String(note).slice(0,160)+' · 가상 포지션은 표시하지 않습니다.';
+ if(note)message.textContent=String(note).slice(0,160)+'';
 });
 // Keep last verified snapshot while iOS temporarily suspends this PWA; timestamps remain visible.
 // A genuine page reload naturally discards in-memory account details.
