@@ -100,9 +100,9 @@ function showRows(rows){
  const grid=create('div',undefined,'paper-performance-grid paper-performance-minimal');
  const totalReturn=create('div');totalReturn.append(create('small','총 수익률'),
   create('strong','— (기준 계좌자산 미확인)'));
- const totalGain=create('div');totalGain.append(create('small','조회 범위 실현손익 (USDT)'),
-  create('strong',signed(net)+' USDT'+(otherFee?'*':'')));
- totalGain.querySelector('strong').className=net>=0?'paper-stat-profit':'paper-stat-loss';
+ const totalGain=create('div'),netValue=create('strong',signed(net)+' USDT'+(otherFee?'*':''));
+ netValue.className=net>=0?'paper-stat-profit':'paper-stat-loss';
+ totalGain.append(create('small','조회 범위 실현손익 (USDT)'),netValue);
  grid.append(totalReturn,totalGain);summary.append(grid);
  summary.append(create('div','실현손익이 확인된 청산 체결 그룹 '+groups.length+'건 · 수익 '+success+
   '건 · 손실 '+failure+'건','paper-performance-count'));
