@@ -147,14 +147,32 @@ function render(){
  const p=snapshot?.positions.find(p=>cleanSide(p)===selection);
  detail.append(make('b','선택한 포지션 상세 · '+(p?(selection==='LONG'?'롱 LONG':'숏 SHORT'):'선택 없음')));
  if(!p)detail.append(make('p','포지션 선택','muted'));
- else detail.append(make('div',[
-  '보유 수량 '+fmt(Math.abs(p.amount),8)+' BTC',
-  '평균 진입가 '+fmt(p.entry,2)+' USDT',
-  '마크 가격 '+fmt(p.mark,2)+' USDT',
-  '레버리지 '+(Number.isFinite(p.leverage)&&p.leverage>0?fmt(p.leverage,0):'조회 실패')+'배',
-  roiLabel(p)+won(p.unrealized),
-  '추정 청산가 '+(p.liquidation>0?fmt(p.liquidation,2)+' USDT':'—')
- ].join('\n'),'real-position-detail'));
+ else{
+  // Reuse the original v61 paper-position compact grid and result panel.
+  const summary=make('div',undefined,'position-summary paper-detail-compact');
+  const grid=make('div',undefined,'position-grid');
+  const value=(label,display)=>{
+   const cell=make('div',undefined,'position-stat');
+   cell.append(make('small',label),make('strong',display));
+   return cell;
+  };
+  const size=Math.abs(p.amount);
+  const margin=Number.isFinite(p.margin)&&p.margin>0?p.margin:
+   p.entry>0&&p.leverage>0?size*p.entry/p.leverage:NaN;
+  grid.append(
+   value('보유 수량',fmt(size,8)+' BTC'),
+   value('평균 진입가',fmt(p.entry,2)+' USDT'),
+   value('마크 가격',fmt(p.mark,2)+' USDT'),
+   value('레버리지',p.leverage>0?fmt(p.leverage,0)+'배':'조회 실패'),
+   value('증거금',Number.isFinite(margin)?fmt(margin,3)+' USDT':'—'),
+   value('추정 청산가',p.liquidation>0?fmt(p.liquidation,2)+' USDT':'—')
+  );
+  const result=make('div',undefined,'paper-tp-result');
+  result.append(make('strong','현재 미실현 손익'));
+  const total=make('b',roiLabel(p)+won(p.unrealized),p.unrealized>=0?'paper-stat-profit':'paper-stat-loss');
+  result.append(total);
+  summary.append(grid,result);detail.append(summary);
+ }
  root.append(detail);
  message.textContent=snapshot?'실계좌 조회 '+new Date(snapshot.at).toLocaleTimeString('ko-KR'):
   '실계좌 조회 전';
