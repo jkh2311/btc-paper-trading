@@ -22,8 +22,18 @@ const fx=()=>{const rate=Number(document.getElementById('fx')?.value);return rat
 const won=amount=>{
  if(!Number.isFinite(amount)||!Number.isFinite(fx()))return '원화 환산 불가';
  const krw=Math.round(amount*fx());
- return (krw>0?'+':krw<0?'-':'')+'₩'+Math.abs(krw).toLocaleString('ko-KR');
+ return (krw>0?'+':krw<0?'-':'')+Math.abs(krw).toLocaleString('ko-KR')+'원';
 };
+function roi(p){
+ const lev=Number.isFinite(p.leverage)&&p.leverage>0?p.leverage:NaN;
+ const notional=Number.isFinite(p.entry)&&p.entry>0?Math.abs(p.amount)*p.entry:NaN;
+ const margin=Number.isFinite(p.margin)&&p.margin>0?p.margin:notional/lev;
+ return margin>0&&Number.isFinite(p.unrealized)?p.unrealized/margin*100:NaN;
+}
+function roiLabel(p){
+ const n=roi(p);
+ return Number.isFinite(n)?'수익률 '+(n>=0?'+':'')+n.toFixed(2)+'% · ':'수익률 확인 중 · ';
+}
 function renderActualBalanceStrip(){
  const balance=document.getElementById('balanceSummary'),pnl=document.getElementById('pnlSummary');
  if(!balance||!pnl)return;
@@ -57,7 +67,10 @@ style.textContent=[
 'body.real-position-ready #paperPositionCard .real-position-meta{font-size:12px;color:#b4c5dc;line-height:1.8}',
 'body.real-position-ready #paperPositionCard .hedge-selected-detail{border-top:1px solid #324965;padding-top:12px;margin-top:12px}',
 'body.real-position-ready #paperPositionCard .real-position-row{cursor:pointer}',
-'body.real-position-ready #paperPositionCard .real-position-row:focus-visible{outline:2px solid #7ca9d3}'
+'body.real-position-ready #paperPositionCard .real-position-row:focus-visible{outline:2px solid #7ca9d3}',
+'body.real-position-ready #paperPositionCard .real-position-row .hedge-position-head{display:flex;align-items:center;gap:8px}',
+'body.real-position-ready #paperPositionCard .real-position-row .real-close-single{margin-left:auto;padding:8px 10px;min-height:34px;font-size:12px;white-space:nowrap}',
+'body.real-position-ready #paperPositionCard .real-position-row .hedge-pnl{font-weight:700}'
 ].join('\n');
 document.head.append(style);
 function normalize(details){
@@ -101,12 +114,20 @@ function render(){
    row.setAttribute('aria-label',(isLong?'롱':'숏')+' 포지션 선택');
    row.setAttribute('aria-pressed',String(selection===side));
    const head=make('div',undefined,'hedge-position-head');
-   head.append(make('b',(isLong?'롱 LONG':'숏 SHORT')+' #'+(i+1),colour+'-text'),
-    make('small',fmt(Math.abs(p.amount),8)+' BTC'));
+   const name=make('b',(isLong?'롱 LONG':'숏 SHORT')+' #'+(i+1),colour+'-text');
+   const closeOne=make('button','개별 청산','real-close-single');
+   closeOne.type='button';
+   closeOne.onclick=e=>{
+    e.preventDefault();e.stopPropagation();
+    const payload={side,positionSide:p.side,amount:p.amount,entry:p.entry,mark:p.mark,
+      leverage:p.leverage,unrealized:p.unrealized,selectedAt:Date.now(),accountAt:snapshot?.at||0};
+    selection=side;document.dispatchEvent(new CustomEvent('btc:real-position-selected',{detail:payload}));
+    document.dispatchEvent(new CustomEvent('btc:real-close-requested',{detail:payload}));
+   };
+   head.append(name,make('small',fmt(Math.abs(p.amount),8)+' BTC'),closeOne);
    const est=Number.isFinite(p.margin)?fmt(p.margin,3)+' USDT':'—';
    const entry=make('div','진입가 '+fmt(p.entry,2)+' USDT · 증거금 '+est,'real-position-meta');
-   const pnl=make('div','미실현 손익 '+won(p.unrealized)+
-    (Number.isFinite(p.leverage)?' · '+fmt(p.leverage,0)+'배':''),'hedge-pnl');
+   const pnl=make('div',roiLabel(p)+won(p.unrealized),'hedge-pnl');
    pnl.classList.add(p.unrealized>=0?'pnl-positive':'pnl-negative');
    row.append(head,entry,pnl);
    row.onclick=()=>{
@@ -130,8 +151,8 @@ function render(){
   '보유 수량 '+fmt(Math.abs(p.amount),8)+' BTC',
   '평균 진입가 '+fmt(p.entry,2)+' USDT',
   '마크 가격 '+fmt(p.mark,2)+' USDT',
-  '레버리지 '+fmt(p.leverage,0)+'배',
-  '미실현 손익 '+won(p.unrealized),
+  '레버리지 '+(Number.isFinite(p.leverage)&&p.leverage>0?fmt(p.leverage,0):'조회 실패')+'배',
+  roiLabel(p)+won(p.unrealized),
   '추정 청산가 '+(p.liquidation>0?fmt(p.liquidation,2)+' USDT':'—')
  ].join('\n'),'real-position-detail'));
  root.append(detail);
