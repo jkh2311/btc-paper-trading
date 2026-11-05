@@ -12,7 +12,7 @@ const autoPanel=document.getElementById('autoPaperToggle')?.closest('.auto-panel
 if(autoPanel){
  const observer=document.createElement('p');observer.className='muted';
  observer.style.cssText='font-size:11px;margin:8px 0;line-height:1.5';
- observer.textContent='RMI AUTO: 확정봉 신호 관찰 · 실제 주문 전송은 아직 연결되지 않았습니다.';
+ observer.textContent='AUTO · 신호 관찰만 (실주문 OFF)';
  autoPanel.querySelector('.auto-panel-header')?.insertAdjacentElement('afterend',observer);
  document.addEventListener('btc:live-rmi-observed',e=>{
   const d=e.detail;if(d?.symbol!=='BTCUSDT'||!['LONG','SHORT'].includes(d.side))return;
@@ -42,9 +42,9 @@ const signed=v=>v>0?'+'+fmt(v):fmt(v);
 const showError=message=>{status.textContent=message;status.style.color='#ff9aaa'};
 function empty(heading){
  log.replaceChildren();log.textContent=heading||'실제 체결 내역 조회 전';
- pending.replaceChildren();pending.textContent='실제 거래소 체결 조회 전';
- summary.replaceChildren();summary.textContent='실제 계좌 수익 정보 조회 전';
- closed.replaceChildren();closed.textContent='실제 청산 체결 조회 전';
+ pending.replaceChildren();pending.textContent='체결 조회 전';
+ summary.replaceChildren();summary.textContent='손익 조회 전';
+ closed.replaceChildren();closed.textContent='청산 조회 전';
 }
 function validateTrade(t){
  if(t?.symbol!=='BTCUSDT')return null;
@@ -71,7 +71,7 @@ async function trades(account,signal){
 function showRows(rows){
  empty();
  const tradesDesc=create('div',undefined,'live-real-history-note');
- tradesDesc.textContent='실제 BTCUSDT 최근 최대 100건 체결 · 거래소 조회 시점 '+new Date().toLocaleTimeString('ko-KR')+
+ tradesDesc.textContent='실제 체결 최대 100건 · '+new Date().toLocaleTimeString('ko-KR')+
   ' · 전체 거래 기간을 포함하지 않을 수 있습니다.';
  pending.replaceChildren(tradesDesc);
  log.replaceChildren();
