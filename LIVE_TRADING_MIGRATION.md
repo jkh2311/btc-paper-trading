@@ -155,3 +155,12 @@
 - `live-rmi-auto.js` 신규: 사용자가 명시적으로 ON한 상태에서만 확정된 1분봉 신호 후보 표시. 동일 봉 신호 키를 localStorage에 저장해 앱 재실행 후 중복 표시 방지. 신호는 기존 RMI 및 추세/거래량 필터 그대로 사용. 앱 비활성화/API 잠금 시 관찰 OFF. **실전 AUTO 주문 전송은 미구현·잠금**.
 - 개발 환경 동작 시험: 6단계별 계산 예시, 추가 LONG 진입 수량, 25% LONG 청산 수량, 수동 주문칸 자동 입력, 같은 RMI 확정봉 중복 표시 차단 확인. 실제 Binance 연결/아이폰 실기기/RMI 주문 테스트가 아님.
 - `main` 모의매매 v61과 실전 송신 안전 잠금은 변경하지 않음. Cloudflare Worker를 사용하지 않는 PWA 개발 구조 유지.
+
+## v17: 수동 추가 진입/부분 청산 + RMI AUTO 주문 계획을 실행 엔진 미리보기에 연결
+
+- `live-position-actions.js`: 기존 실제 계좌 기반 ADD/REDUCE 수량 계산 성공 시 `btc:position-action-planned` 이벤트 발행. 방향·positionSide·현재 포지션 수량·수량/가격·레버리지·검사 시각 전달.
+- `live-rmi-auto.js`: 사용자가 ON한 확정봉 후보와 최근 60초 이내 실제 계좌 정보가 있을 때 `btc:live-auto-plan-request` 발행. 기존 RMI 신호 계산과 중복봉 차단 로직 유지.
+- 신규 `live-trade-plan-bridge.js`: 실제 BTCUSDT 계좌의 포지션 방향·레버리지, 거래소 LOT_SIZE/PRICE_FILTER/MIN_NOTIONAL, 사용자가 선택한 6단계 예산·단계·손절 폭·목표 손익비로 FOK LIMIT 주문과 방향별 STOP_MARKET/TAKE_PROFIT_MARKET 후보 계획 생성. 원웨이 부분 청산은 reduceOnly=true로 표시, 헷지 포지션은 맞는 positionSide로 표시. 실제 계좌·계획 신선도 45초 제한.
+- `live-venue-execution.js`: 위 두 경로에서 생성된 공통 `btc:live-execution-preview` 계획을 읽어 보여줌. **TX_ENABLED=false** 유지, 실제 Binance 서명 주문 요청은 절대 보내지 않음.
+- 개발 환경 모의 이벤트 시험에서 롱 부분 청산 SELL, 숏 RMI AUTO 1단계 SELL/FOK 및 손절 BUY/익절 BUY 후보가 생성되는 것과 실행 버튼 disabled 상태를 확인.
+- 기존 모의매매 `main` v61 변경 없음. 실기기·테스트넷 주문/보호 주문 연계 검증 후 별도 실전앱 배포가 필요. 현재 단계는 실전 거래 가능한 완제품이 아님.
