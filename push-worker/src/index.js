@@ -219,7 +219,6 @@ function selectedMarketPlan(asOf=Date.now()-1800){
   }
   return {mode:selected==='range'?'range':selected==='classic'?'classic':'trend',reason:'',snapshot,selected};
 }
-}
 
 function calculateAutoPaperSignal(now){
   const minutes=confirmedSignalBars('1m',now-1800);
@@ -275,6 +274,10 @@ function calculateAutoPaperSignal(now){
     reason:(plan.mode==='classic'?'추세장 · 5·15분 정렬 + 거래량 1.2배':
        rangeReason||'1분 RMI 타점 · 시간봉/거래량 필터 없음')+
       ' · '+(minute.turnKind||'1분 방향 유지')+
+      ' · 일봉 '+(day?.side||'판별 대기')+
+      (aligned?' · 순추세':' · 축소 진입')+
+      ' · 1분 RMI '+minute.value.toFixed(1),executed:false};
+}
 function validConfig(raw){
   const mode=['classic','trend','auto','range','breakout','off'].includes(raw?.mode)?raw.mode:'classic';
   const config={mode};
