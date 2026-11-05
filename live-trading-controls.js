@@ -44,8 +44,12 @@ document.addEventListener('btc:real-account-updated',e=>{
  const d=e.detail;
  if(!d||!Number.isFinite(d.at)||!Array.isArray(d.positions))return;
  account={at:d.at,wallet:value(d.wallet),available:value(d.available),positions:d.positions};
- selected=null;if(close)close.disabled=true;
- result.textContent='실제 계좌 '+new Date(d.at).toLocaleTimeString('ko-KR')+' 조회 · 포지션을 선택하거나 대기 주문을 확인해 주세요.';
+ if(selected){
+  const match=account.positions.find(p=>p.side===selected.positionSide&&Math.abs(value(p.amount)-value(selected.amount))<1e-8);
+  if(match)selected={...selected,accountAt:d.at};else selected=null;
+ }
+ if(close)close.disabled=!selected;
+ if(!selected)result.textContent='실제 계좌 '+new Date(d.at).toLocaleTimeString('ko-KR')+' 조회 · 포지션을 선택하거나 대기 주문을 확인해 주세요.';
  updateBalance();
 });
 document.addEventListener('btc:real-account-cleared',reset);
