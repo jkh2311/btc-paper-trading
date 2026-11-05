@@ -268,9 +268,12 @@ async function closeSelected(orderKind='LIMIT'){
    const defaultPrice=proposed>0?(Math.round(proposed/tick)*tick).toFixed(digits):'';
    const typed=prompt('BTCUSDT '+selection.side+' 전량 지정가 청산 가격(USDT)을 입력하세요.\n미체결 시 주문이 대기하며, 시장가로 청산되지 않습니다.',defaultPrice);
    if(typed===null)return;
-   if(!/^\\d+(?:\\.\\d+)?$/.test(typed.trim()))
-    throw Error('지정가에 올바른 USDT 가격을 입력하세요');
-   const n=Number(typed.trim()),steps=Math.round(n/tick);
+   // iOS prompts can include grouping commas and surrounding whitespace.
+   // Validate a numeric USDT price, never silently interpret extra text or currency units.
+   const cleanPrice=typed.trim().replace(/,/g,'').replace(/\s+/g,'');
+   if(!/^\d+(?:\.\d+)?$/.test(cleanPrice))
+    throw Error('지정가는 숫자로 입력하세요. 예: 79650.5 USDT');
+   const n=Number(cleanPrice),steps=Math.round(n/tick);
    if(!Number.isFinite(n)||n<=0||steps<1||Math.abs(n-steps*tick)>Math.max(1e-8,tick*1e-6))
     throw Error('바이낸스 지정가 호가 단위 '+f.price.tickSize+' USDT에 맞게 입력하세요');
    price=(steps*tick).toFixed(digits);
