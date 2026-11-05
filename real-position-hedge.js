@@ -90,7 +90,14 @@ function render(){
     (Number.isFinite(p.leverage)?' · '+fmt(p.leverage,0)+'배':''),'hedge-pnl');
    pnl.classList.add(p.unrealized>=0?'pnl-positive':'pnl-negative');
    row.append(head,entry,pnl);
-   row.onclick=()=>{selection=side;render()};
+   row.onclick=()=>{
+    selection=side;render();
+    document.dispatchEvent(new CustomEvent('btc:real-position-selected',{detail:{
+      side,positionSide:p.side,amount:p.amount,entry:p.entry,mark:p.mark,
+      leverage:p.leverage,unrealized:p.unrealized,selectedAt:Date.now(),
+      accountAt:snapshot?.at||0
+    }}));
+   };
    row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();row.click()}};
    section.append(row);
   });
@@ -122,6 +129,7 @@ document.addEventListener('btc:real-account-updated',e=>{
 });
 document.addEventListener('btc:real-account-cleared',e=>{
  snapshot=null;selection=null;render();
+ document.dispatchEvent(new CustomEvent('btc:real-position-selected',{detail:null}));
  const note=e.detail?.message;
  if(note)message.textContent=String(note).slice(0,160)+' · 가상 포지션은 표시하지 않습니다.';
 });
