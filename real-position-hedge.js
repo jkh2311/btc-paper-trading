@@ -73,9 +73,9 @@ function render(){
   const section=make('section',undefined,'hedge-side-group '+colour+'-group');
   const header=make('div',undefined,'hedge-group-header');
   header.append(make('strong',(isLong?'롱 LONG':'숏 SHORT'),colour+'-text'),
-   make('span',members.length+'개 보유'));
+   make('span',snapshot?members.length+'개 보유':'조회 전'));
   section.append(header);
-  if(!members.length)section.append(make('div','보유 중인 '+(isLong?'롱':'숏')+' 포지션이 없어요.','hedge-group-empty'));
+  if(!members.length)section.append(make('div',snapshot?'보유 중인 '+(isLong?'롱':'숏')+' 포지션이 없어요.':'실제 계좌 조회 후 표시돼요.','hedge-group-empty'));
   else members.forEach((p,i)=>{
    const row=make('article',undefined,'hedge-position-block '+colour+'-card real-position-row'+(selection===side?' active':''));
    row.tabIndex=0;row.setAttribute('role','button');
