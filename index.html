@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-chart-divider-drag-v61"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-live-preparation-v1"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 실전매매 준비 · 주문 잠금</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -289,6 +289,17 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 #expandedChartOverlay #tradeBar button{height:48px!important;font-size:17px!important;padding:10px 8px!important;border-radius:11px!important;flex:1!important}
 body.chart-focus-mode #entrySheet{z-index:11010!important;bottom:calc(64px + env(safe-area-inset-bottom))!important}
 body.chart-focus-mode #signalAlertToast{z-index:11020!important}
+
+/* Live migration preview: no paper balance or simulator controls. */
+body.live-prep header.app-header .brand b::after{content:' · 실전 준비';font-size:11px;color:#ffd291}
+body.live-prep #autoPaperQuickToggle{display:none!important}
+body.live-prep #tradeBar button{background:#33445b!important;border-color:#536983!important;color:#e5ecf5!important;opacity:.65}
+body.live-prep #page-position .paper-history-card{display:none}
+body.live-prep #page-settings .card:not(.live-readiness-card){opacity:.42;pointer-events:none}
+body.live-prep #page-position .card:has(#position) .row{display:none}
+.live-readiness-card{background:#14263c;border:1px solid #ad8743;border-radius:15px;padding:15px;margin:8px 0 14px;color:#eaf1ff;line-height:1.65}
+.live-readiness-card strong{color:#ffd291}
+.live-readiness-card small{display:block;color:#afc5dc;font-size:12px}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -414,6 +425,7 @@ function paperPortfolioPnl(){return allPaperPositions().reduce((sum,p)=>sum+(las
 function paperReservedMargin(){return pendingOrders.reduce((sum,o)=>sum+Number(o.margin||0),0)+(autoPendingLimit?Number(autoPendingLimit.notional)/Number(autoPendingLimit.leverage||1):0)}
 function paperMarginInUse(){return allPaperPositions().reduce((sum,p)=>sum+p.notional/(p.leverage||1),0)+paperReservedMargin()}
 function cancelManualPendingOrder(id,reason='사용자 취소'){
+ if(LIVE_PREP_MODE)return false;
  const i=pendingOrders.findIndex(o=>o.id===id);if(i<0)return false;
  const [o]=pendingOrders.splice(i,1);
  add('가상 '+o.side+' 지정가 미체결 취소 · '+fmt(o.price)+' USDT · 예약 증거금 반환 '+fmt(o.margin)+' USDT');
@@ -1574,6 +1586,7 @@ chart.addEventListener('touchend',function(e){e.preventDefault();clearHold();if(
 chart.addEventListener('touchcancel',()=>{clearHold();levelDragPreview=null;gesture=null;touchStart=null;suppressTapUntil=Date.now()+1200;draw()});
 chart.addEventListener('click',e=>{if(Date.now()<suppressTapUntil)return;if(crosshairIndex!==null||futureCrosshairSlot!==null)hideCrosshair()});
 $('zoomIn').onclick=()=>zoomChartKeepingAnchor(viewCount*.75);$('zoomOut').onclick=()=>zoomChartKeepingAnchor(viewCount*1.35);$('latest').onclick=()=>{viewOffset=0;resetStableChartScale();draw();drawRmi()};
+const LIVE_PREP_MODE=true;
 const PAPER_SAVE_KEY='btc-paper-trading-state-v1';
 let closedPaperTrades=[],paperStatsBaseBalance=null;
 function paperPatternMiniChart(bars){
@@ -1618,6 +1631,7 @@ function renderSavedPaperPatterns(){
   }
 }
 function renderPaperPerformance(){
+  if(LIVE_PREP_MODE){$('paperPerformanceSummary').textContent='실제 거래내역 연동 대기';$('paperClosedTradeList').textContent='실제 체결 기록 연결 전';return;}
   const summary=$('paperPerformanceSummary'),list=$('paperClosedTradeList');
   if(!summary||!list)return;
   const trades=closedPaperTrades.filter(x=>x&&Number.isFinite(x.net)&&Number.isFinite(x.margin)&&x.margin>0);
@@ -1646,7 +1660,7 @@ function renderPaperPerformance(){
   }
 }
 
-function savePaperState(){try{localStorage.setItem(PAPER_SAVE_KEY,JSON.stringify({
+function savePaperState(){if(LIVE_PREP_MODE)return;try{localStorage.setItem(PAPER_SAVE_KEY,JSON.stringify({
   position,hedgePositions,selectedHedgeSide,selectedPaperPositionId,paperMode:paperMode(),pendingOrders,autoPendingLimit,logs,closedPaperTrades,paperStatsBaseBalance,balance:$('balance').value,
   settings:{...Object.fromEntries(['lev','risk','stop','rr','hold','sizeMode','marginPct','pyramidEntryCount','autoMarketMode'].map(id=>[id,$(id).value])),autoMarketModeRevision:22}
 }))}catch(e){console.warn('모의매매 저장 실패',e)}}
@@ -1779,6 +1793,7 @@ function capturePaperEntryPattern(timeframeOverride){
 }
 let pendingFillType=null;
 function openTrade(side,entry,reserved=null){
+  if(LIVE_PREP_MODE)return false;
   let bal=Number($('balance').value);
   const r=reserved?1:Number($('risk').value)/100;
   const d=reserved?Number(reserved.stopPct):Number($('stop').value)/100;
@@ -1817,6 +1832,7 @@ function openTrade(side,entry,reserved=null){
   savePaperState();render();return true;
 }
 function request(side){
+  if(LIVE_PREP_MODE)return;
   // Explicit manual entries ignore AUTO market mode, timeframe trends,
   // RMI bias, volume confirmation, and pause states.
   if(!last||(!demo&&Date.now()-lastTickAt>10000)){
@@ -1846,6 +1862,7 @@ function request(side){
   $('entrySheet').style.display='none';
 }
 function showOrderSheet(side){
+  if(LIVE_PREP_MODE){alert('실전 주문은 보안 검증 전까지 잠금 상태입니다.');return;}
   if(!last||(!demo&&Date.now()-lastTickAt>10000)){
     alert('최신 시세 연결이 필요합니다.');return;
   }
@@ -1871,8 +1888,9 @@ function renderPendingHistory(){
     row.append(info,cancel);list.append(row);
   }
 }
-function renderLogs(){renderPendingHistory();$('log').innerHTML=logs.length?logs.map(v=>'<div class="trade-log-item">'+v.replace(/(-?[0-9,]+원)(?= \()/g,(m)=>'<span class="'+(m.startsWith('-')?'pnl-negative':'pnl-positive')+'">'+m+'</span>')+'</div>').join(''):'기록 없음'}function add(s){logs.unshift(new Date().toLocaleTimeString('ko-KR')+' · '+s);logs=logs.slice(0,60);renderLogs()}
+function renderLogs(){if(LIVE_PREP_MODE){$('log').textContent='실제 거래 기록은 계좌 연결 이후 표시됩니다.';return;}renderPendingHistory();$('log').innerHTML=logs.length?logs.map(v=>'<div class="trade-log-item">'+v.replace(/(-?[0-9,]+원)(?= \()/g,(m)=>'<span class="'+(m.startsWith('-')?'pnl-negative':'pnl-positive')+'">'+m+'</span>')+'</div>').join(''):'기록 없음'}function add(s){logs.unshift(new Date().toLocaleTimeString('ko-KR')+' · '+s);logs=logs.slice(0,60);renderLogs()}
 function closePositionById(id,reason='수동 청산',shouldRender=true){
+  if(LIVE_PREP_MODE)return;
   const p=allPaperPositions().find(x=>x.id===id);
   if(!p)return;
   const net=netAt(p,last),bal=Number($('balance').value)||0;
@@ -1893,6 +1911,7 @@ function closeSide(side,reason){
 }
 function close(reason){if(position)closePositionById(position.id,reason)}
 function process(){
+  if(LIVE_PREP_MODE)return; // No simulated order fill/stop/profit in live prep.
   if(autoPendingLimit&&Date.now()>=autoPendingLimit.expiresAt)
     cancelAutoPendingLimit('5분 미체결 자동 취소');
   if(autoPendingLimit?.marketMode==='range'&&last>0&&
@@ -1950,6 +1969,7 @@ function refreshLivePaperReturns(){
   }
 }
 function updatePosition(){
+  if(LIVE_PREP_MODE){$('position').textContent='실제 바이낸스 포지션은 보안 연결 후 표시됩니다.';return;}
   const el=$('position');
   $('hedgeModeLabel').textContent=paperMode()==='hedge'?'· 다중 헤지 모드':'· 단방향 모드';
   const groups=['LONG','SHORT'].map(side=>{
@@ -2478,8 +2498,34 @@ function initSignalAlerts(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden){event.preventDefault();close()}});
 })();
 
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();initAutoPaperUi();initSignalAlerts();render();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&candles[$('tf').value]?.length>=22)draw()},1000);setInterval(tick,2000);
-setInterval(pollAutoPaperMinute,5000);
+
+/* Live preparation mode; no actual trade or simulated fills. */
+(function initLivePreparationUi(){
+ if(!LIVE_PREP_MODE)return;
+ document.body.classList.add('live-prep');
+ const addCard=(parent,heading,details)=>{
+   if(!parent)return;
+   const card=document.createElement('section');card.className='live-readiness-card';
+   const title=document.createElement('strong');title.textContent=heading;
+   const note=document.createElement('small');note.textContent=details;
+   card.append(title,note);parent.prepend(card);
+ };
+ addCard($('page-chart'),'🔒 실전매매 연결 준비 · 주문 비활성화','차트·RMI·LONG/SHORT 신호는 유지됩니다. 실제 주문과 자동매매는 인증, 계좌 동기화, 보호 주문 검증 전까지 잠겨 있습니다.');
+ addCard($('page-position'),'실제 BTCUSDT 포지션 · 연결 대기','바이낸스 실제 잔고·증거금·헤지 포지션·미체결 주문을 조회하는 서버 API 연결이 필요합니다. 가상 포지션을 불러오지 않습니다.');
+ addCard($('page-history'),'실전 거래내역 · 연결 대기','모의 거래 기록이 아닌 거래소 실제 체결 기록을 불러오는 기능을 준비 중입니다.');
+ addCard($('page-settings'),'실전 설정 · 아직 수정 불가','헤지/단방향, 레버리지, 손절·익절, 주문 수량은 서버 및 거래소 검증 후 활성화합니다. 기존 모의매매 설정은 실전 주문에 적용하지 않습니다.');
+ for(const id of ['long','short','sheetLong','sheetShort','autoPaperToggle','autoPaperQuickToggle','cancel','close']){
+   const button=$(id);if(button){button.disabled=true;button.title='실전 거래 기능 검증 전까지 잠금'}
+ }
+ const label=$('hedgeModeLabel');if(label)label.textContent='· 실전 계좌 연결 대기';
+ const historyTitle=document.querySelector('#paperHistoryDetails summary span');if(historyTitle)historyTitle.textContent='실전 거래내역 · 연결 대기';
+ document.querySelectorAll('input,select').forEach(el=>{
+   if(el.closest('#page-settings')){el.disabled=true;el.title='실전 거래 설정 연결 전'}
+ });
+})();
+
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});if(!LIVE_PREP_MODE){restorePaperState();initAutoPaperUi()}initSignalAlerts();render();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&candles[$('tf').value]?.length>=22)draw()},1000);setInterval(tick,2000);
+if(!LIVE_PREP_MODE)setInterval(pollAutoPaperMinute,5000);
 setInterval(()=>{
   if(!autoPendingLimit)return;
   if(Date.now()>=autoPendingLimit.expiresAt)cancelAutoPendingLimit('5분 미체결 자동 취소');
