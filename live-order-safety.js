@@ -145,6 +145,7 @@ recovery.onclick=async()=>{
     order=x.status+' / 체결 '+String(x.executedQty);
    }catch(_){order='미확인 (미접수 확정 아님)'}
    for(const [name,clientId] of [['stop',rec.stopId],['take',rec.takeId]]){
+    if(current!==epoch||document.hidden)break;
     try{
      const controller=new AbortController();
      const timer=setTimeout(()=>controller.abort(),9000);
@@ -161,6 +162,7 @@ recovery.onclick=async()=>{
   }
  }finally{
   busy=false;render();
+  if(current!==epoch||document.hidden)return;
   status.textContent='조회 결과는 진입/손절/익절 주문 유무를 보장하지 않습니다. 미확인이나 조회 실패 시 바이낸스 앱에서 실제 포지션 및 모든 보호 주문 확인이 필요합니다. 자동 재주문 없음.';
  }
 };
@@ -170,5 +172,13 @@ function lock(){
 document.addEventListener('btc:live-lock',lock);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)lock()});
 window.addEventListener('pagehide',lock);
+window.addEventListener('storage',event=>{
+ if(event.key!==KEY)return;
+ // Multi-tab updates are not an atomic lock. Fail closed until re-open/review.
+ corrupted=true;draft=null;account=null;epoch++;
+ status.className='safety-alert';
+ render();
+ status.textContent='다른 탭/창에서 안전 기록 변경 감지 · 이 화면의 신규 진입 잠금. 모든 앱 창을 종료하고 다시 열어 거래소 상태를 확인하세요.';
+});
 render();
 })();
