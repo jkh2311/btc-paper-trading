@@ -8,7 +8,11 @@ let account=null,selected=null,busy=false,lastRequest=null,lastOrderIssue=false,
 const cred=()=>typeof getApiCredentials==='function'?getApiCredentials():null;
 const val=id=>Number($(id)?.value),fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:8});
 const status=$('realAccountUpdated'),result=document.querySelector('.real-trade-action-result');
-function message(text){if(result)result.textContent=text;else if(status)status.textContent=text;}
+function message(text){
+ const sheet=$('entrySheet'),help=$('orderHelp');
+ if(sheet&&sheet.style.display!=='none'&&help){help.textContent=text;help.style.whiteSpace='pre-line';help.style.color=text.includes('실패')||text.includes('오류')||text.includes('필요')?'#ff9aaa':'#bbd5f1';}
+ if(result)result.textContent=text;else if(status)status.textContent=text;
+}
 function credentials(){const a=cred();if(!a?.apiKey||!a?.apiSecret)throw Error('API 키를 먼저 잠금 해제하세요.');return a;}
 function visible(){return document.visibilityState==='visible';}
 async function signed(method,path,fields={}){
@@ -43,6 +47,7 @@ function roundDown(n,step){const s=String(step),digits=s.includes('.')?s.split('
 async function run(fn){
  if(busy)return;
  busy=true;
+ if($('entrySheet')?.style.display!=='none')message('실제 계좌 및 주문 조건 확인 중…');
  for(const id of ['sheetLong','sheetShort','close','cancel'])if($(id))$(id).disabled=true;
  try{await fn();}catch(e){message('실제 거래 요청 실패/확인 필요: '+String(e?.message||e)+'\n주문이 불확실하면 바이낸스에서 확인하기 전 같은 주문을 반복하지 마세요.');}
  finally{busy=false;for(const id of ['sheetLong','sheetShort','cancel'])if($(id))$(id).disabled=false; if($('close'))$('close').disabled=!selected;}
@@ -55,6 +60,8 @@ function showSheet(side){
  if(!credentialsSafe())return;
  const sh=$('entrySheet');if(!sh)return;
  sh.style.display='block';
+ $('sheetLong').style.display=side==='LONG'?'':'none';
+ $('sheetShort').style.display=side==='SHORT'?'':'none';
  $('sheetPrice').textContent='BTCUSDT 실제 '+(side==='LONG'?'롱':'숏')+' 주문';
  $('orderHelp').textContent='실제 바이낸스 선물 주문입니다. 지정가 또는 시장가를 선택하세요.';
  sh.dataset.realSide=side;
@@ -88,11 +95,6 @@ async function enter(side){
   if(Number(qty)*price<f.minNotional)throw Error('최소 주문금액 미달: '+fmt(Number(qty)*price)+' USDT');
   const existing=account.positions.find(p=>p.side===(dual?side:'BOTH')&&Math.abs(Number(p.amount))>0);
   if(existing&&Number(existing.leverage)!==lev)throw Error('실제 기존 포지션 레버리지와 설정값 불일치. 바이낸스 레버리지를 확인하세요.');
-  // Always apply the chosen leverage before opening. Never change position mode automatically.
-  if(!existing){
-   const leverageResult=await signed('POST','/fapi/v1/leverage',{symbol,leverage:String(lev)});
-   if(Number(leverageResult?.leverage)!==lev)throw Error('레버리지 재확인 실패');
-  }
   const order={symbol,side:side==='LONG'?'BUY':'SELL',positionSide:dual?side:'BOTH',type,quantity:qty,newOrderRespType:'RESULT',
     newClientOrderId:'btcPwa'+Date.now()+Math.floor(Math.random()*10000)};
   if(type==='LIMIT'){
@@ -102,6 +104,12 @@ async function enter(side){
   }
   const summary=side+' '+type+' · '+qty+' BTC'+(order.price?' @ '+order.price:'')+' · '+lev+'배 · 예상 증거금 '+fmt(margin)+' USDT\n실제 계좌에 주문하며 손절/익절 보호 주문은 자동 등록되지 않습니다.';
   if(!confirm('바이낸스 실제 주문을 전송할까요?\n'+summary))return;
+  // No exchange-side mutation takes place before the user confirms the order.
+  if(!existing){
+   message('바이낸스 레버리지 확인 및 주문 요청 중…');
+   const leverageResult=await signed('POST','/fapi/v1/leverage',{symbol,leverage:String(lev)});
+   if(Number(leverageResult?.leverage)!==lev)throw Error('레버리지 재확인 실패');
+  }
   lastOrderIssue=true;lastRequest=order.newClientOrderId;
   let response;
   try{response=await signed('POST','/fapi/v1/order',order);}
@@ -111,7 +119,6 @@ async function enter(side){
    response=known;
   }
   lastOrderIssue=false;
-  $('entrySheet').style.display='none';
   message('실제 주문 확인 · #'+response.orderId+' · '+response.status+' · 체결 '+(response.executedQty||'0')+' BTC\n보호 주문은 자동 등록되지 않습니다.');
   if($('realAccountRefresh'))$('realAccountRefresh').click();
   if($('paperStatsReset')){/* no paper statistics mutation */}
