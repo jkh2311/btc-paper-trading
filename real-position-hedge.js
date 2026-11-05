@@ -65,7 +65,8 @@ function render(){
     snapshot.positions.reduce((sum,p)=>sum+p.margin,0):NaN;
   root.append(make('div','사용 중인 증거금 '+fmt(used,3)+' USDT · 추가 사용 가능 '+fmt(snapshot.available,3)+' USDT','hedge-margin-summary'));
   const hedge=snapshot.positions.some(p=>p.side==='LONG'||p.side==='SHORT');
-  if(label)label.textContent=hedge?'· 다중 헤지 모드':'· 단방향 모드';
+  if(label)label.textContent=!snapshot.positions.length?'· 포지션 모드는 설정에서 확인':
+   hedge?'· 다중 헤지 모드':'· 단방향 모드';
  }
  for(const side of ['LONG','SHORT']){
   const isLong=side==='LONG',colour=isLong?'hedge-long':'hedge-short';
