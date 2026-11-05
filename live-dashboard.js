@@ -55,7 +55,7 @@ let orderBusy=false;
 lookupButton.addEventListener('click',async()=>{
  if(orderBusy)return;
  const entered=orderIdInput.value.trim();
- if(!/^[1-9][0-9]{0,18}$/.test(entered)){orderOutput.textContent='올바른 BTCUSDT 주문 번호를 입력해 주세요.';return}
+ if(!/^[1-9][0-9]{0,15}$/.test(entered)||!Number.isSafeInteger(Number(entered))){orderOutput.textContent='정확한 BTCUSDT 주문 번호를 입력해 주세요.';return}
  const creds=typeof getApiCredentials==='function'?getApiCredentials():null;
  if(!creds?.apiKey||!creds?.apiSecret){orderOutput.textContent='설정에서 API 잠금을 먼저 해제해 주세요.';return}
  orderBusy=true;lookupButton.disabled=true;orderOutput.textContent='바이낸스 주문 상태 조회 중…';
