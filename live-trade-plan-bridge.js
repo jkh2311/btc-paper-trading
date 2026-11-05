@@ -67,6 +67,22 @@ function protection(p,side,price,stopPct,ratio,step){
  return {stop:sl,take:tp,closeSide:long?'SELL':'BUY',positionSide:p.side};
 }
 function renderPlan(origin,data,protect){
+ const order={
+  symbol:'BTCUSDT',side:data.orderSide,positionSide:data.positionSide,
+  type:'LIMIT',timeInForce:'FOK',quantity:String(Number(data.quantity.toFixed(8))),
+  price:String(data.price),
+  ...(data.reduce&&data.positionSide==='BOTH'?{reduceOnly:'true'}:{})
+ };
+ if(!['BUY','SELL'].includes(order.side)||!(Number(order.quantity)>0)||
+    !(Number(order.price)>0))throw Error('실행 대기 주문 파라미터 확인 실패');
+ document.dispatchEvent(new CustomEvent('btc:live-execution-preview',{detail:{
+  source:origin.startsWith('RMI AUTO')?'RMI':'MANUAL',order,
+  stopCandidate:protect?{side:protect.closeSide,positionSide:protect.positionSide,
+   triggerPrice:protect.stop,type:'STOP_MARKET',closePosition:true}:null,
+  takeCandidate:protect?{side:protect.closeSide,positionSide:protect.positionSide,
+   triggerPrice:protect.take,type:'TAKE_PROFIT_MARKET',closePosition:true}:null,
+  inspectedAt:Date.now(),tradeEnabled:false
+ }}));
  const lines=[origin+' · 실제 주문 전송 없음',
   '포지션 '+data.direction+' / Binance positionSide '+data.positionSide,
   '주문: '+data.orderSide+' '+display(data.quantity)+' BTC · 지정가 '+display(data.price,2)+' USDT',
@@ -93,6 +109,7 @@ document.addEventListener('btc:position-action-planned',async e=>{
   if(p.side!==d.positionSide||Math.abs(Math.abs(p.amount)-d.heldQty)>1e-8||
      p.lev!==d.leverage)throw Error('현재 계좌 포지션이 수량 계산 시점과 다름');
   if(d.quantity+1e-9<r.min||Number.isFinite(r.max)&&d.quantity>r.max||
+     Math.abs(d.quantity/r.step-Math.round(d.quantity/r.step))>1e-7||
      Math.abs(d.price/r.tick-Math.round(d.price/r.tick))>1e-7)
      throw Error('거래소 최소·최대 수량 또는 가격 단위 오류');
   if(d.kind==='REDUCE'&&d.quantity>Math.abs(p.amount)+1e-8)throw Error('보유 수량 초과 청산 금지');
