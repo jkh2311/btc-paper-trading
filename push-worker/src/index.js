@@ -24,7 +24,10 @@ function confirmedSignalBars(tf,asOf){
   const list=candles[tf],duration=candleDuration[tf];
   if(!Array.isArray(list)||!duration)return [];
   // Use exchange-confirmed REST klines. Synthetic WS-advanced bars have volume 0.
-const AUTO_RMI_NEAR_POINTS=2;
+  return list.filter(b=>b&&Number.isFinite(b.t)&&b.t+duration<=asOf&&b.v>0&&b.c>0);
+}
+
+
 function dailyRmiBars(asOf){
   return (candles['1d']||[]).filter(b=>b&&Number.isFinite(b.t)&&b.t<=asOf&&b.c>0&&b.v>0);
 }
