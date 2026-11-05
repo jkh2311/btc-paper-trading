@@ -83,7 +83,7 @@ function buildPlan(account,v,rr){
  // The quantity cannot be used with closePosition=true. For hedge mode
  // positionSide must equal the side to be *closed*.
  const entry={symbol:'BTCUSDT',side:entrySide,positionSide:ps,type:'LIMIT',
-  timeInForce:'GTC',quantity:fmt(v.quantity),price:fmt(v.price,4)};
+  timeInForce:'FOK',quantity:fmt(v.quantity),price:fmt(v.price,4)};
  const common={algoType:'CONDITIONAL',symbol:'BTCUSDT',side:exitSide,
   positionSide:ps,workingType:'MARK_PRICE',closePosition:'true'};
  const stop={...common,type:'STOP_MARKET',triggerPrice:fmt(v.stopPrice,4)};
