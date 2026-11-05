@@ -1,13 +1,14 @@
 /* Manual BTCUSDT LIMIT order sizing preview only. NO order submission. */
 (()=>{
 'use strict';
-const host=document.getElementById('page-chart');
+const host=document.getElementById('page-position');
 if(!host)return;
 const css=document.createElement('style');css.textContent='.live-draft{background:#11243a;border:1px solid #4a6382;border-radius:12px;padding:12px;margin:8px 0;color:#eaf2ff}.live-draft h3{margin:0 0 8px;font-size:15px}.live-draft small{font-size:11px;color:#b5c9df;line-height:1.5}.live-draft label{font-size:12px}.live-draft select,.live-draft input{min-width:0;width:100%;padding:9px}.live-draft .fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}.live-draft button{width:100%;margin:10px 0 2px;padding:10px}.live-draft pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.6;background:#081828;padding:10px;border-radius:8px}.live-draft .warn{color:#ffcca1}';document.head.append(css);
 const c=document.createElement('section');c.className='live-draft';
 c.innerHTML='<h3>실전 수동 지정가 주문 · 미리보기</h3><small>실제 계좌 조회 후 주문 금액을 검증합니다. 현재 실제 주문 전송은 잠겨 있어요.</small><div class="fields"><label>방향<select id="draftSide"><option value="LONG">롱 LONG</option><option value="SHORT">숏 SHORT</option></select></label><label>예약 가격 (USDT)<input id="draftPrice" type="number" inputmode="decimal" min="1" step="0.1" placeholder="BTC 지정가"></label><label>예상 증거금 (USDT)<input id="draftMargin" type="number" inputmode="decimal" min="1" max="20" step="0.1" value="10"></label><label>손절 거리 (%)<input id="draftStop" type="number" min="0.1" max="10" step="0.1" value="0.8"></label></div><button id="draftCalculate" type="button">수량 · 손절 미리보기</button><pre id="draftResult" aria-live="polite">실제 계좌를 조회한 뒤 미리보기를 실행해 주세요.</pre><small class="warn">주문 전송 / 자동 진입 / 청산은 작동하지 않습니다. 보호 주문이 실제로 설치됐다는 뜻이 아닙니다.</small>';
-const panel=document.getElementById('page-chart').querySelector('.price-panel');
-panel?.parentNode.insertBefore(c,panel?.nextSibling||null);
+const panel=host.querySelector('.direct-live');
+if(panel?.parentNode)panel.parentNode.insertBefore(c,panel.nextSibling);
+else host.prepend(c);
 const e=id=>document.getElementById(id),result=e('draftResult');
 let snapshot=null,filters=null;
 document.addEventListener('btc:live-account-read',event=>{snapshot=event.detail;result.textContent='계좌 조회 완료 · 지정가와 증거금을 입력해 검증할 수 있어요.'});
