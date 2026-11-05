@@ -94,7 +94,7 @@ function render(acc,positionList){
   item(positions,side+' · '+amount(Math.abs(Number(p.positionAmt)),6)+' BTC',
    '진입 '+amount(p.entryPrice)+' / 레버리지 '+amount(p.leverage,0)+'배 / 미실현 '+amount(p.unRealizedProfit)+' USDT / 청산 '+amount(p.liquidationPrice));
  }
- orders.append(make('p','미체결 주문 자동 조회는 아직 미구현입니다. 앱이 실제 주문 목록을 확인하기 전에는 취소·정정할 수 없습니다. 바이낸스 앱에서 확인하세요.'));
+ orders.append(make('p','일반·조건부 미체결 목록은 아래 별도 조회 화면에서 확인하세요. 조회 실패 또는 오래된 결과만으로 주문이 없다고 판단하면 안 됩니다. 취소·정정은 아직 불가합니다.'));
  status.className='success';status.textContent='바이낸스 직접 조회 성공 · '+new Date().toLocaleTimeString('ko-KR')+' · 거래 권한 '+(acc.canTrade?'있음':'없음')+' · 앱 주문 전송 잠금';
 }
 refresh.addEventListener('click',async()=>{
