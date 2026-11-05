@@ -1288,6 +1288,22 @@ function maybeEvaluateAutoPaperSignals(){
   if(!a.length)return;
   const bar=a.at(-1);
   maybeAlertChartSignal(bar,a);
+  if(LIVE_PREP_MODE){
+    // Reuse the existing confirmed-candle RMI + market-mode signal logic.
+    // Live preview never touches paper execution paths or sends an order.
+    const liveCandidate=calculateAutoPaperSignal(Date.now());
+    if(liveCandidate&&liveCandidate.barTime===bar.t&&bar.t+60000<=Date.now()-1800){
+      document.dispatchEvent(new CustomEvent('btc:live-rmi-candidate',{detail:{
+        symbol:'BTCUSDT',barTime:liveCandidate.barTime,side:liveCandidate.side,
+        price:liveCandidate.price,marketMode:liveCandidate.marketMode,
+        minuteRmi:liveCandidate.minuteRmi,dailyRmi:liveCandidate.dailyRmi,
+        volumeRatio:liveCandidate.volumeRatio,trend5m:liveCandidate.trend5m,
+        trend15m:liveCandidate.trend15m,reason:liveCandidate.reason,
+        detectedAt:Date.now()
+      }}));
+    }
+    return;
+  }
   const previous=autoSignalHistory.find(x=>x.barTime===bar.t&&x.strategy===AUTO_PAPER_STRATEGY);
   if(previous){
     if(autoPaperEnabled&&previous.blocked&&!previous.orderStatus&&
