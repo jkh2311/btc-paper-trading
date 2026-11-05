@@ -69,8 +69,17 @@ function buildPlan(account,v,rr){
   throw Error('손절 거리 범위 0.1~5% 밖');
  if(!(rr>=.5&&rr<=3))throw Error('손익비 0.5~3 밖');
  const entrySide=isLong?'BUY':'SELL',exitSide=isLong?'SELL':'BUY';
- const take=isLong?v.price+dist*rr:v.price-dist*rr;
- if(!(take>0))throw Error('익절 가격 불일치');
+ const tick=Number(v.tickSize),step=Number(v.quantityStep);
+ if(!(tick>0&&step>0&&Number.isFinite(tick)&&Number.isFinite(step)))
+  throw Error('거래소 호가 단위와 수량 단위를 다시 검증해야 합니다');
+ const nearTick=x=>Math.abs(x/tick-Math.round(x/tick))<1e-7;
+ const nearStep=x=>Math.abs(x/step-Math.round(x/step))<1e-7;
+ if(!nearTick(v.price)||!nearTick(v.stopPrice)||!nearStep(v.quantity))
+  throw Error('진입가·손절가·수량이 거래소 필터와 불일치');
+ const rawTake=isLong?v.price+dist*rr:v.price-dist*rr;
+ const take=Math.round(rawTake/tick)*tick;
+ if(!(take>0)||!nearTick(take)||isLong&&take<=v.price||!isLong&&take>=v.price)
+  throw Error('익절 가격이 호가 단위와 맞지 않음');
  // The quantity cannot be used with closePosition=true. For hedge mode
  // positionSide must equal the side to be *closed*.
  const entry={symbol:'BTCUSDT',side:entrySide,positionSide:ps,type:'LIMIT',
