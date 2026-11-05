@@ -151,11 +151,11 @@ function showRows(rows){
  const rateLabel=Number.isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(2)+'%':'—';
  const rateValue=create('strong',rateLabel);
  rateValue.className=Number.isFinite(roi)?(roi>=0?'paper-stat-profit':'paper-stat-loss'):'';
- totalReturn.append(create('small','조회 손익률'),rateValue);
+ totalReturn.append(create('small','총 수익률'),rateValue);
  totalReturn.title='최근 최대 100체결 손익 ÷ 현재 지갑 잔고 · 전체 누적 수익률 아님';
  const totalGain=create('div'),netValue=create('strong',won(net)+(otherFee?'*':''));
  netValue.className=net>=0?'paper-stat-profit':'paper-stat-loss';
- totalGain.append(create('small','조회 순실현손익'),netValue);
+ totalGain.append(create('small','누적 순실현손익'),netValue);
  grid.append(totalReturn,totalGain);summary.append(grid);
  const count=create('div',undefined,'paper-performance-count');
  count.append(create('span','청산 체결 '+groups.length+'건 · '));
