@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-candle-countdown-v51"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261105-reserved-limits-timer-v53"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -304,7 +304,7 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
 <p class="real-account-note">실제 계좌 정보는 마지막 조회 시점 기준이에요. 아래 가상 포지션과 별개이며 실제 주문은 실행하지 않습니다.</p>
 </div>
 <div class="card"><h2>가상 포지션 · 모의매매 <span id="hedgeModeLabel" class="muted" style="font-size:11px;font-weight:400">헤지 모드</span></h2><div id="position" class="muted">포지션 없음</div><div class="row"><button id="close">선택 포지션 청산</button><button id="cancel">대기 주문 취소</button></div></div><div class="card"><h2>6개 시간봉 추세</h2><div class="grid" id="trends"></div></div></section>
-<section class="tab-page" id="page-history"><div class="card paper-history-card"><details id="paperHistoryDetails"><summary class="paper-history-toggle"><span>모의매매 기록</span><span class="paper-history-chevron" aria-hidden="true">⌄</span></summary><div class="paper-history-content"><div id="log" class="muted">기록 없음</div><button id="clear" type="button">기록 지우기</button></div></details></div>
+<section class="tab-page" id="page-history"><div class="card paper-history-card"><details id="paperHistoryDetails"><summary class="paper-history-toggle"><span>모의매매 기록</span><span class="paper-history-chevron" aria-hidden="true">⌄</span></summary><div class="paper-history-content"><div id="manualPendingHistory" aria-live="polite"></div><div id="log" class="muted">기록 없음</div><button id="clear" type="button">기록 지우기</button></div></details></div>
 <div class="card paper-performance-card"><h2>청산 완료 거래 · 누적 수익률</h2>
 <div id="paperPerformanceSummary" class="paper-performance-summary">집계할 청산 완료 거래가 없습니다.</div>
 <div class="paper-performance-head"><h3>완료 거래</h3><button id="paperStatsReset" type="button">통계 초기화</button></div>
@@ -373,7 +373,7 @@ window.addEventListener('error',event=>{
   console.error('앱 실행 오류:',event.message);
 });
 
-document.addEventListener('contextmenu',e=>{if(!e.target.closest('input,textarea,[contenteditable="true"]'))e.preventDefault()});const $=id=>document.getElementById(id),tfs=['1d','4h','1h','30m','15m','5m','1m'];const futureSlots=20;let verticalZoom=1;let viewCount=65,viewOffset=0,gesture=null,suppressTapUntil=0,crosshairIndex=null,futureCrosshairSlot=null,crosshairPrice=null,chartPriceScale=null;let candles={},last=0,selected=null,position=null,hedgePositions={LONG:[],SHORT:[]},selectedHedgeSide="LONG",selectedPaperPositionId=null,pending=null,logs=[],demo=false,timer=null,axis=null,working=false,lastTickAt=0,priceBusy=false,ws=null,wsRetry=null,wsConnected=false;function paperMode(){return $('paperPositionMode')?.value||'hedge'}
+document.addEventListener('contextmenu',e=>{if(!e.target.closest('input,textarea,[contenteditable="true"]'))e.preventDefault()});const $=id=>document.getElementById(id),tfs=['1d','4h','1h','30m','15m','5m','1m'];const futureSlots=20;let verticalZoom=1;let viewCount=65,viewOffset=0,gesture=null,suppressTapUntil=0,crosshairIndex=null,futureCrosshairSlot=null,crosshairPrice=null,chartPriceScale=null;let candles={},last=0,selected=null,position=null,hedgePositions={LONG:[],SHORT:[]},selectedHedgeSide="LONG",selectedPaperPositionId=null,pendingOrders=[],logs=[],demo=false,timer=null,axis=null,working=false,lastTickAt=0,priceBusy=false,ws=null,wsRetry=null,wsConnected=false;function paperMode(){return $('paperPositionMode')?.value||'hedge'}
 function allPaperPositions(){return [...hedgePositions.LONG,...hedgePositions.SHORT]}
 function syncSelectedPaperPosition(){
   const selected=allPaperPositions().find(p=>p.id===selectedPaperPositionId);
@@ -385,7 +385,28 @@ function syncSelectedPaperPosition(){
 function chooseHedgeSide(side){if(!['LONG','SHORT'].includes(side))return;selectedHedgeSide=side;selectedPaperPositionId=hedgePositions[side][0]?.id||null;syncSelectedPaperPosition();render()}
 function choosePaperPosition(id){const selected=allPaperPositions().find(p=>p.id===id);if(!selected)return;selectedPaperPositionId=id;selectedHedgeSide=selected.side;syncSelectedPaperPosition();render()}
 function paperPortfolioPnl(){return allPaperPositions().reduce((sum,p)=>sum+(last?netAt(p,last):0),0)}
-function paperMarginInUse(){return allPaperPositions().reduce((sum,p)=>sum+p.notional/(p.leverage||1),0)}
+function paperReservedMargin(){return pendingOrders.reduce((sum,o)=>sum+Number(o.margin||0),0)+(autoPendingLimit?Number(autoPendingLimit.notional)/Number(autoPendingLimit.leverage||1):0)}
+function paperMarginInUse(){return allPaperPositions().reduce((sum,p)=>sum+p.notional/(p.leverage||1),0)+paperReservedMargin()}
+function cancelManualPendingOrder(id,reason='사용자 취소'){
+ const i=pendingOrders.findIndex(o=>o.id===id);if(i<0)return false;
+ const [o]=pendingOrders.splice(i,1);
+ add('가상 '+o.side+' 지정가 미체결 취소 · '+fmt(o.price)+' USDT · 예약 증거금 반환 '+fmt(o.margin)+' USDT');
+ savePaperState();render();return true;
+}
+function pendingOrderSnapshot(side,price,createdAt=Date.now()){
+ const bal=Number($('balance').value),lev=Number($('lev').value),
+       risk=Number($('risk').value)/100,stopPct=Number($('stop').value)/100;
+ if(!(bal>0&&lev>0&&stopPct>=.0005&&stopPct<=.1&&risk>0&&price>0))return null;
+ const plan=paperMode()==='hedge'?manualHedgePyramidPlan(side,lev):null;
+ if(plan?.full)return null;
+ const notional=paperMode()==='hedge'?plan.notional:positionNotional(bal,lev,risk,stopPct);
+ const margin=notional/lev;
+ if(!(notional>.01&&margin>0&&margin<=paperFreeMargin()+1e-7))return null;
+ return {id:'manual-limit-'+paperPositionId(),side,price,createdAt,notional,margin,qty:notional/price,
+   leverage:lev,stopPct,rr:Number($('rr').value),hold:Number($('hold').value),
+   entryPattern:capturePaperEntryPattern()};
+}
+
 function paperFreeMargin(){return Math.max(0,(Number($('balance').value)||0)*.95-paperMarginInUse())}
 function paperPositionId(){return 'paper-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10)}
 
@@ -561,6 +582,34 @@ function drawRmi(){
 let convergence=null;
 function detectDailyConvergence(){const all=candles['1d'];convergence=null;if(all&&all.length>=45&&!demo){const a=all.slice(-61,-1),highs=[],lows=[];for(let i=2;i<a.length-2;i++){if(a[i].h>=Math.max(a[i-2].h,a[i-1].h,a[i+1].h,a[i+2].h))highs.push([i,a[i].h]);if(a[i].l<=Math.min(a[i-2].l,a[i-1].l,a[i+1].l,a[i+2].l))lows.push([i,a[i].l])}const fit=arr=>{if(arr.length<3)return null;const mx=arr.reduce((s,v)=>s+v[0],0)/arr.length,my=arr.reduce((s,v)=>s+v[1],0)/arr.length,den=arr.reduce((s,v)=>s+(v[0]-mx)**2,0);if(!den)return null;const slope=arr.reduce((s,v)=>s+(v[0]-mx)*(v[1]-my),0)/den;return {slope,base:my-slope*mx}};const hi=fit(highs),lo=fit(lows);if(hi&&lo&&hi.slope<0&&lo.slope>0){const apex=(lo.base-hi.base)/(hi.slope-lo.slope),now=a.length-1,width=hi.base+hi.slope*now-lo.base-lo.slope*now,days=apex-now;if(days>=1&&days<=35&&width>0&&width/(a.at(-1).c)<.18&&highs.some(v=>v[0]>now-24)&&lows.some(v=>v[0]>now-24)){convergence={hi,lo,apex,days,date:new Date(a[0].t+apex*86400000),origin:a[0].t}}}}const banner=$('convergenceBanner');banner.hidden=!convergence;if(convergence){banner.textContent='⚠ 일봉상 수렴 발생 예상 · 거래 자제 | 예상: '+convergence.date.toLocaleDateString('ko-KR')+' 전후 · 추정치, 방향 미확정';const key='btc-convergence-alert-'+new Date().toISOString().slice(0,10);try{if(document.visibilityState==='visible'&&localStorage.getItem(key)!=='shown'){localStorage.setItem(key,'shown');alert('일봉상 수렴 발생 예상 · 거래 자제\\n예상 수렴일: '+convergence.date.toLocaleDateString('ko-KR')+' 전후\\n실제 돌파 시점과 방향은 예측할 수 없습니다.')}}catch(e){}}}
 // Stable per-side numbering matches the cards in the paper position tab.
+function drawPendingOrderLines(ctx,y,top,bottom,plotW){
+  const visible=pendingOrders.map((o,i)=>({...o,at:y(o.price),i})).filter(o=>o.at>=top&&o.at<=bottom);
+  visible.forEach((o,i)=>{
+    const color=o.side==='LONG'?'#48d9ac':'#ff819b',label=(o.side==='LONG'?'예약롱':'예약숏')+' '+fmt(o.price)+' USDT · 탭 취소';
+    ctx.save();ctx.strokeStyle=color;ctx.lineWidth=1.6;ctx.setLineDash([8,4]);
+    ctx.beginPath();ctx.moveTo(0,o.at);ctx.lineTo(plotW,o.at);ctx.stroke();ctx.setLineDash([]);
+    ctx.font='bold 10px -apple-system,sans-serif';
+    const tagW=Math.min(plotW-8,ctx.measureText(label).width+12);
+    const tagY=Math.max(top,Math.min(bottom-17,o.at-18));
+    ctx.fillStyle='#0a192c';ctx.fillRect(3,tagY,tagW,17);
+    ctx.strokeStyle=color;ctx.strokeRect(3.5,tagY+.5,tagW-1,16);
+    ctx.fillStyle=color;ctx.save();ctx.beginPath();ctx.rect(5,tagY+1,tagW-4,15);ctx.clip();
+    ctx.fillText(label,8,tagY+12);ctx.restore();ctx.restore();
+  });
+}
+function pendingOrderAtChart(clientX,clientY){
+  const scale=chartPriceScale;if(!scale||!pendingOrders.length)return null;
+  const rect=chart.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top;
+  if(x<0||x>scale.plotW||y<scale.top-13||y>scale.priceBottom+13)return null;
+  const hits=pendingOrders.map(o=>({o,dist:Math.abs(y-(scale.top+(scale.hi-o.price)/(scale.hi-scale.lo)*(scale.priceBottom-scale.top)))}))
+    .filter(x=>x.dist<=14).sort((a,b)=>a.dist-b.dist);
+  return hits[0]?.o||null;
+}
+function cancelPendingFromChart(order){
+  if(!order||!pendingOrders.some(o=>o.id===order.id))return;
+  if(confirm('차트 예약 '+(order.side==='LONG'?'롱':'숏')+' '+fmt(order.price)+' USDT · 미체결 '+Number(order.qty).toFixed(6)+' BTC 주문을 취소할까요?'))
+    cancelManualPendingOrder(order.id);
+}
 function paperChartLevels(){
   const levels=[];
   for(const side of ['LONG','SHORT']){
@@ -1008,7 +1057,7 @@ function autoGuardForSignal(signal,now){
   const chasePct=Math.abs(last/signal.price-1)*100;
   if(chasePct>readAutoSetting('autoMaxChasePct'))return '신호 이후 가격 이탈 '+chasePct.toFixed(2)+'%';
   if(paperMode()!=='hedge')return '헤지 모드에서만 자동 진입';
-  if(pending)return '수동 대기 주문 있음';
+  if(pendingOrders.length)return '수동 대기 주문 있음';
   if(autoPendingLimit)return '자동 지정가 주문 대기 중';
   if(allPaperPositions().filter(p=>p.autoStrategy).length>=readAutoSetting('autoMaxPositions'))return '자동 포지션 수 제한';
   if(now-Math.max(autoLastEntryAt,autoLastOrderAt)<readAutoSetting('autoCooldownMin')*60000)return '재진입 대기 중';
@@ -1066,7 +1115,7 @@ function fillAutoPendingLimit(market,now=Date.now(),fromFreshOrderBook=false){
   if(o.marketMode==='range'&&(market<o.rangeLow*.99975||market>o.rangeHigh*1.00025)){
     cancelAutoPendingLimit('횡보 박스 돌파 · 자동 주문 취소');return false;
   }
-  if(paperFreeMargin()+1e-9<o.notional/o.leverage||
+  if(paperFreeMargin()+o.notional/o.leverage+1e-9<o.notional/o.leverage||
     allPaperPositions().filter(p=>p.autoStrategy).length>=readAutoSetting('autoMaxPositions')){
     cancelAutoPendingLimit('체결 시점 증거금/포지션 한도 부족');return false;
   }
@@ -1279,7 +1328,7 @@ function selectedCandleCountdown(now=Date.now()){
   return (hours?String(hours).padStart(2,'0')+':':'')+
     String(minutes).padStart(2,'0')+':'+String(seconds).padStart(2,'0');
 }
-function draw(){let a=candles[$('tf').value],cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h*.76),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const base=stableChartPriceRange(a,$('tf').value);let center=(base.hi+base.lo)/2+verticalPan,half=(base.hi-base.lo)/2/verticalZoom,lo=center-half,hi=center+half;let y=p=>top+(hi-p)/(hi-lo)*(priceBottom-top),bw=plotW/count;chartPriceScale={lo,hi,top,priceBottom,plotW};ctx.font='11px -apple-system,sans-serif';ctx.strokeStyle='#26384e';ctx.fillStyle='#a4b4c8';for(let i=0;i<5;i++){let p=lo+(hi-lo)*i,yy=y(p);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.fillText(fmt(p),plotW+6,yy+4)}ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();let mx=stableChartVolumeMax(a,$('tf').value);data.forEach((v,i)=>{let x=(start+i-left+.5)*bw,green=v.c>=v.o;ctx.fillStyle=ctx.strokeStyle=green?'#27c996':'#f05c75';ctx.beginPath();ctx.moveTo(x,y(v.h));ctx.lineTo(x,y(v.l));ctx.stroke();ctx.fillRect(x-bw*.31,Math.min(y(v.o),y(v.c)),Math.max(1,bw*.62),Math.max(1,Math.abs(y(v.o)-y(v.c))));});for(let [period,color] of [[5,'#ffd65e'],[10,'#ffffff']]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=0.9;let started=false;data.forEach((v,i)=>{let ma=sma(a,start+i,period);if(ma===null)return;let x=(start+i-left+.5)*bw;if(!started){ctx.moveTo(x,y(ma));started=true}else ctx.lineTo(x,y(ma))});ctx.stroke()}for(let [key,color] of [['upper','#369cff'],['lower','#369cff'],['mid','#086c3b']]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=key==='mid'?1.2:0.8;let started=false;bb.forEach((v,i)=>{if(!v)return;let x=(start+i-left+.5)*bw;if(!started){ctx.moveTo(x,y(v[key]));started=true}else ctx.lineTo(x,y(v[key]))});ctx.stroke()}ctx.restore();drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)});ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'1d':86400000}[$('tf').value],stamp=new Date(a[a.length-1].t+(futureCrosshairSlot+1)*ms),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);const remaining=selectedCandleCountdown();if(remaining){const countdownY=liveLabelY-19;ctx.fillStyle='#164b46';ctx.fillRect(plotW,countdownY,right,19);ctx.fillStyle='#d9fff3';ctx.font='bold 11px -apple-system,sans-serif';ctx.fillText('⏱ '+remaining,plotW+4,countdownY+13)}}$('range').textContent='표시 '+data.length+'개 / 전체 '+a.length+'개 캔들'+(viewOffset===0?' · 오른쪽 미래 빈 공간 '+slots+'칸':'')+' · '+(viewOffset?'과거 탐색 중 ('+viewOffset+'개 전)':'최신 구간')+' · 핀치 확대/축소 · 차트 상하·좌우·대각선 이동 · 오른쪽 가격축 확대/축소'}
+function draw(){let a=candles[$('tf').value],cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h*.76),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const base=stableChartPriceRange(a,$('tf').value);let center=(base.hi+base.lo)/2+verticalPan,half=(base.hi-base.lo)/2/verticalZoom,lo=center-half,hi=center+half;let y=p=>top+(hi-p)/(hi-lo)*(priceBottom-top),bw=plotW/count;chartPriceScale={lo,hi,top,priceBottom,plotW};ctx.font='11px -apple-system,sans-serif';ctx.strokeStyle='#26384e';ctx.fillStyle='#a4b4c8';for(let i=0;i<5;i++){let p=lo+(hi-lo)*i,yy=y(p);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.fillText(fmt(p),plotW+6,yy+4)}ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();let mx=stableChartVolumeMax(a,$('tf').value);data.forEach((v,i)=>{let x=(start+i-left+.5)*bw,green=v.c>=v.o;ctx.fillStyle=ctx.strokeStyle=green?'#27c996':'#f05c75';ctx.beginPath();ctx.moveTo(x,y(v.h));ctx.lineTo(x,y(v.l));ctx.stroke();ctx.fillRect(x-bw*.31,Math.min(y(v.o),y(v.c)),Math.max(1,bw*.62),Math.max(1,Math.abs(y(v.o)-y(v.c))));});for(let [period,color] of [[5,'#ffd65e'],[10,'#ffffff']]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=0.9;let started=false;data.forEach((v,i)=>{let ma=sma(a,start+i,period);if(ma===null)return;let x=(start+i-left+.5)*bw;if(!started){ctx.moveTo(x,y(ma));started=true}else ctx.lineTo(x,y(ma))});ctx.stroke()}for(let [key,color] of [['upper','#369cff'],['lower','#369cff'],['mid','#086c3b']]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=key==='mid'?1.2:0.8;let started=false;bb.forEach((v,i)=>{if(!v)return;let x=(start+i-left+.5)*bw;if(!started){ctx.moveTo(x,y(v[key]));started=true}else ctx.lineTo(x,y(v[key]))});ctx.stroke()}ctx.restore();drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)});ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'1d':86400000}[$('tf').value],stamp=new Date(a[a.length-1].t+(futureCrosshairSlot+1)*ms),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);drawPendingOrderLines(ctx,y,top,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);}$('range').textContent='표시 '+data.length+'개 / 전체 '+a.length+'개 캔들'+(viewOffset===0?' · 오른쪽 미래 빈 공간 '+slots+'칸':'')+' · '+(viewOffset?'과거 탐색 중 ('+viewOffset+'개 전)':'최신 구간')+' · 핀치 확대/축소 · 차트 상하·좌우·대각선 이동 · 오른쪽 가격축 확대/축소'}
 let verticalPan=0,levelDragPreview=null;const chart=$('chart');let touchStart=null,holdTimer=null;
 function priceAtChartY(clientY){const scale=chartPriceScale;if(!scale)return null;const rect=chart.getBoundingClientRect(),yy=Math.max(scale.top,Math.min(scale.priceBottom,clientY-rect.top));return scale.hi-(yy-scale.top)/(scale.priceBottom-scale.top)*(scale.hi-scale.lo)}
 function levelHitAt(clientY,clientX){
@@ -1296,6 +1345,31 @@ function makePinch(e){let a=candles[$('tf').value]||[],rect=chart.getBoundingCli
 function clearHold(){if(holdTimer!==null){clearTimeout(holdTimer);holdTimer=null}}
 function inspectAt(clientX,clientY){let a=candles[$('tf').value];if(!a?.length)return;let rect=chart.getBoundingClientRect(),plotW=Math.max(1,rect.width-80),{left,count}=visibleWindow(a),index=Math.floor(left+Math.max(0,Math.min(plotW-1,clientX-rect.left))/plotW*count);if(index>=a.length){crosshairIndex=null;futureCrosshairSlot=index-a.length}else{futureCrosshairSlot=null;crosshairIndex=Math.max(0,index)}const scale=chartPriceScale;if(scale){const yy=Math.max(scale.top,Math.min(scale.priceBottom,clientY-rect.top));crosshairPrice=scale.hi-(yy-scale.top)/(scale.priceBottom-scale.top)*(scale.hi-scale.lo)}draw();drawRmi()}
 function crosshairX(){const a=candles[$('tf').value];if(!a?.length)return null;const index=crosshairIndex!==null?crosshairIndex:futureCrosshairSlot!==null?a.length+futureCrosshairSlot:null;if(index===null)return null;const {left,count}=visibleWindow(a),rect=chart.getBoundingClientRect();return rect.left+(index-left+.5)*(rect.width-80)/count}
+// Touch interception is capture-phase so the existing chart pan/pinch
+// handlers remain unchanged unless an unambiguous reservation-line tap occurs.
+let reservationTap=null;
+chart.addEventListener('touchstart',e=>{
+  reservationTap=null;
+  if(e.touches.length!==1)return;
+  const t=e.touches[0],o=pendingOrderAtChart(t.clientX,t.clientY);
+  if(o)reservationTap={id:o.id,x:t.clientX,y:t.clientY,at:Date.now()};
+},{capture:true,passive:true});
+chart.addEventListener('touchend',e=>{
+  if(!reservationTap||e.touches.length||e.changedTouches.length!==1)return;
+  const t=e.changedTouches[0],tap=reservationTap;reservationTap=null;
+  if(Date.now()-tap.at>650||Math.hypot(t.clientX-tap.x,t.clientY-tap.y)>10)return;
+  const o=pendingOrders.find(p=>p.id===tap.id);
+  if(!o)return;
+  e.preventDefault();e.stopImmediatePropagation();clearHold();touchStart=null;gesture=null;
+  suppressTapUntil=Date.now()+1200;
+  cancelPendingFromChart(o);
+},{capture:true,passive:false});
+chart.addEventListener('touchcancel',()=>{reservationTap=null},{capture:true});
+chart.addEventListener('click',e=>{
+  if(Date.now()<suppressTapUntil)return;
+  const o=pendingOrderAtChart(e.clientX,e.clientY);
+  if(o){e.preventDefault();e.stopImmediatePropagation();cancelPendingFromChart(o)}
+},true);
 chart.addEventListener('contextmenu',e=>e.preventDefault());
 chart.addEventListener('selectstart',e=>e.preventDefault());
 chart.addEventListener('dragstart',e=>e.preventDefault());
@@ -1401,7 +1475,7 @@ function renderPaperPerformance(){
 }
 
 function savePaperState(){try{localStorage.setItem(PAPER_SAVE_KEY,JSON.stringify({
-  position,hedgePositions,selectedHedgeSide,selectedPaperPositionId,paperMode:paperMode(),pending,autoPendingLimit,logs,closedPaperTrades,paperStatsBaseBalance,balance:$('balance').value,
+  position,hedgePositions,selectedHedgeSide,selectedPaperPositionId,paperMode:paperMode(),pendingOrders,autoPendingLimit,logs,closedPaperTrades,paperStatsBaseBalance,balance:$('balance').value,
   settings:{...Object.fromEntries(['lev','risk','stop','rr','hold','sizeMode','marginPct','pyramidEntryCount','autoMarketMode'].map(id=>[id,$(id).value])),autoMarketModeRevision:22}
 }))}catch(e){console.warn('모의매매 저장 실패',e)}}
 function restorePaperState(){
@@ -1420,7 +1494,15 @@ function restorePaperState(){
     if(state.paperMode==='oneway'||state.paperMode==='hedge')$('paperPositionMode').value=state.paperMode;
     if(typeof state.selectedPaperPositionId==='string')selectedPaperPositionId=state.selectedPaperPositionId;
     syncSelectedPaperPosition();
-    if(state.pending&&['LONG','SHORT'].includes(state.pending.side)&&Number(state.pending.price)>0)pending=state.pending;
+    if(Array.isArray(state.pendingOrders)){
+      pendingOrders=state.pendingOrders.filter(o=>o&&['LONG','SHORT'].includes(o.side)&&
+        Number.isFinite(Number(o.price))&&Number(o.price)>0&&
+        Number.isFinite(Number(o.margin))&&Number(o.margin)>0&&
+        Number.isFinite(Number(o.notional))&&Number(o.notional)>0&&
+        Number.isFinite(Number(o.leverage))&&Number(o.leverage)>0&&
+        Number.isFinite(Number(o.qty))&&Number(o.qty)>0&&
+        typeof o.id==='string'&&o.id).slice(0,50);
+    }
     if(state.autoPendingLimit&&['LONG','SHORT'].includes(state.autoPendingLimit.side)&&
       Number(state.autoPendingLimit.price)>0&&Number.isFinite(state.autoPendingLimit.createdAt)&&
       Number.isFinite(state.autoPendingLimit.expiresAt)&&state.autoPendingLimit.expiresAt>state.autoPendingLimit.createdAt)
@@ -1441,6 +1523,11 @@ function restorePaperState(){
       }else if(MARKET_MODE_OPTIONS.includes(previousMarketMode)){
         $('autoMarketMode').value=previousMarketMode;
       }
+    }
+    // Migrate one legacy manual order into a size-locked reservation.
+    if(!pendingOrders.length&&state.pending&&['LONG','SHORT'].includes(state.pending.side)&&Number(state.pending.price)>0){
+      const migrated=pendingOrderSnapshot(state.pending.side,Number(state.pending.price),Number(state.pending.createdAt)||Date.now());
+      if(migrated)pendingOrders.push(migrated);
     }
     syncSizeMode();renderLogs();renderPaperPerformance();updatePosition();
   }catch(e){console.warn('모의매매 복원 실패',e)}
@@ -1464,12 +1551,16 @@ function pyramidEntryCount(){
 }
 function manualHedgePyramidPlan(side,lev){
   const limit=pyramidEntryCount();
-  const manual=hedgePositions[side].filter(p=>!p.autoStrategy);
-  const index=manual.length;
+  const openManual=hedgePositions[side].filter(p=>!p.autoStrategy);
+  const reservedManual=pendingOrders.filter(o=>o.side===side);
+  const index=openManual.length+reservedManual.length;
   if(index>=limit)return {notional:0,margin:0,index,limit,full:true};
   const free=paperFreeMargin();
   if(!(free>0&&lev>0))return {notional:0,margin:0,index,limit,full:false};
-  const committed=manual.reduce((sum,p)=>sum+p.notional/(p.leverage||1),0);
+  // Already committed stages include both FILLED and UNFILLED reservations.
+  // This keeps the ladder budget stable as the next stage is placed.
+  const committed=openManual.reduce((sum,p)=>sum+p.notional/(p.leverage||1),0)+
+                  reservedManual.reduce((sum,o)=>sum+o.margin,0);
   const budget=free+committed;
   const sum=limit+.1*limit*(limit-1);
   const target=budget*(1+.2*index)/sum;
@@ -1515,31 +1606,42 @@ function capturePaperEntryPattern(timeframeOverride){
   }catch(e){console.warn('진입 패턴 기록 실패',e);return null}
 }
 let pendingFillType=null;
-function openTrade(side,entry){
-  let bal=Number($('balance').value),r=Number($('risk').value)/100,d=Number($('stop').value)/100;
-  const lev=Number($('lev').value),rr=Number($('rr').value),hold=Number($('hold').value);
-  if(!(bal>0&&r>0&&d>=.0005&&d<=.1&&lev>0&&rr>=1&&hold>0&&entry>0)){alert('전략 설정을 확인해 줘 (손절 거리 0.05~10%).');return false}
+function openTrade(side,entry,reserved=null){
+  let bal=Number($('balance').value);
+  const r=reserved?1:Number($('risk').value)/100;
+  const d=reserved?Number(reserved.stopPct):Number($('stop').value)/100;
+  const lev=reserved?Number(reserved.leverage):Number($('lev').value);
+  const rr=reserved?Number(reserved.rr):Number($('rr').value);
+  const hold=reserved?Number(reserved.hold):Number($('hold').value);
+  if(!(bal>0&&r>0&&d>=.0005&&d<=.1&&lev>0&&rr>=1&&hold>0&&entry>0)){
+    if(!reserved)alert('전략 설정을 확인해 줘 (손절 거리 0.05~10%).');
+    return false;
+  }
+  // Reserve is removed from pendingOrders immediately before fill,
+  // so it becomes available exactly once and then transfers to open margin.
   if(paperMode()==='oneway'){
     const reverse=side==='LONG'?'SHORT':'LONG';
     for(const p of [...hedgePositions[reverse]])closePositionById(p.id,'방향 전환 청산',false);
     bal=Number($('balance').value);
   }
   const free=paperFreeMargin();
-  const pyramid=paperMode()==='hedge'?manualHedgePyramidPlan(side,lev):null;
+  const pyramid=!reserved&&paperMode()==='hedge'?manualHedgePyramidPlan(side,lev):null;
   if(pyramid?.full){alert((side==='LONG'?'롱':'숏')+' 수동 피라미드 '+pyramid.limit+'개 한도에 도달했어요.');return false}
-  const intendedNotional=manualHedgePyramidNotional(side,bal,lev,r,d);
-  // Reserve 5% of the paper balance as a safety buffer, shared across both sides.
-  const notional=Math.min(intendedNotional,free*lev);
-  if(!(notional>0.01)||!Number.isFinite(notional)){alert('잔고 내 사용 가능한 가상 증거금이 부족해요. 기존 포지션을 청산하거나 크기를 줄여 주세요.');return false}
+  const intended=reserved?Number(reserved.notional):manualHedgePyramidNotional(side,bal,lev,r,d);
+  if(reserved&&free+1e-7<intended/lev)return false;
+  const notional=reserved?intended:Math.min(intended,free*lev);
+  if(!(notional>.01)||!Number.isFinite(notional)){if(!reserved)alert('사용 가능한 가상 증거금이 부족해요.');return false}
   const qty=notional/entry;
   const stop=side==='LONG'?entry*(1-d):entry*(1+d);
-  const tp=side==='LONG'?entry*(1+(rr*(d+2*paperTradeCost())+2*paperTradeCost())):entry*(1-(rr*(d+2*paperTradeCost())+2*paperTradeCost()));
-  const entryType=pendingFillType||document.querySelector('input[name="orderType"]:checked')?.value||'market';
+  const tp=side==='LONG'?entry*(1+(rr*(d+2*paperTradeCost())+2*paperTradeCost())):
+    entry*(1-(rr*(d+2*paperTradeCost())+2*paperTradeCost()));
+  const entryType=reserved?'limit':pendingFillType||document.querySelector('input[name="orderType"]:checked')?.value||'market';
   const entryFeeRate=entryType==='limit'?paperFeeRates().maker:paperFeeRates().taker;
-  const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,entryFeeRate,entryType,leverage:lev,opened:Date.now(),hold,entryPattern:capturePaperEntryPattern()};
+  const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,entryFeeRate,entryType,leverage:lev,
+    opened:Date.now(),hold,entryPattern:reserved?.entryPattern||capturePaperEntryPattern()};
   hedgePositions[side].push(p);
   selectedPaperPositionId=p.id;selectedHedgeSide=side;position=p;selected=null;
-  add('가상 '+side+' 개별 포지션 진입 '+fmt(entry)+' USDT · 총 규모 '+won(notional)+' · 남은 가상 증거금 '+fmt(paperFreeMargin())+' USDT');
+  add('가상 '+side+' 개별 포지션 진입 '+fmt(entry)+' USDT · 증거금 '+fmt(notional/lev)+' USDT · 남은 가상 증거금 '+fmt(paperFreeMargin())+' USDT');
   savePaperState();render();return true;
 }
 function request(side){
@@ -1558,12 +1660,15 @@ function request(side){
   }else{
     const price=Number($('limitPrice').value);
     if(!(price>0)||!Number.isFinite(price)){alert('유효한 지정가를 입력해 주세요.');return}
-    const replace=!!pending;
-    if(!confirm('가상 '+side+' '+(replace?'기존 대기 주문 교체 · ':'신규 ')+'지정가 '+fmt(price)+
-      ' USDT\n체결 시 잔여 증거금 기준으로 크기가 제한됩니다.'))return;
-    if(replace)add('이전 수동 지정가 대기 주문 취소 · 새 수동 주문으로 교체');
-    pending={side,price,createdAt:Date.now()};add('가상 '+side+' 지정가 주문 접수 · '+fmt(price)+' USDT · 가격 도달 시 모의 체결 대기');savePaperState();render();
-    // Marketable limits are eligible right away; no need to wait for a new tick.
+    const order=pendingOrderSnapshot(side,price);
+    if(!order){alert('수동 피라미드 한도 또는 사용 가능한 증거금이 부족해요.');return}
+    if(!(order.rr>=1&&order.hold>0)){alert('익절/유지 시간 설정을 확인해 주세요.');return}
+    const sideCount=hedgePositions[side].filter(p=>!p.autoStrategy).length+pendingOrders.filter(o=>o.side===side).length+1;
+    if(!confirm('가상 '+side+' #'+sideCount+' 예약 지정가 '+fmt(price)+' USDT\n예약 증거금 '+fmt(order.margin)+' USDT · 미체결 수량 '+order.qty.toFixed(6)+' BTC\n접수 즉시 가상 증거금을 예약합니다.'))return;
+    pendingOrders.push(order);
+    add('가상 '+side+' #'+sideCount+' 지정가 예약 '+fmt(price)+' USDT · 증거금 '+fmt(order.margin)+' USDT · 수량 '+order.qty.toFixed(6)+' BTC');
+    savePaperState();render();
+    // A marketable limit can be filled immediately using the snapshot size.
     process();
   }
   $('entrySheet').style.display='none';
@@ -1580,7 +1685,21 @@ function showOrderSheet(side){
 }
 function updateOrderType(){const limit=document.querySelector('input[name="orderType"]:checked').value==='limit';$('limitLabel').style.display=limit?'':'none';$('limitPrice').style.display=limit?'':'none';$('orderHelp').textContent=(limit?'지정가는 가격 도달 시 모의 체결':'시장가는 현재가 기준으로 즉시 모의 체결')+
   ' · 자동매매 전략과 무관하게 수동 진입 가능'}
-function renderLogs(){$('log').innerHTML=logs.length?logs.map(v=>'<div class="trade-log-item">'+v.replace(/(-?[0-9,]+원)(?= \()/g,(m)=>'<span class="'+(m.startsWith('-')?'pnl-negative':'pnl-positive')+'">'+m+'</span>')+'</div>').join(''):'기록 없음'}function add(s){logs.unshift(new Date().toLocaleTimeString('ko-KR')+' · '+s);logs=logs.slice(0,60);renderLogs()}
+function renderPendingHistory(){
+  const list=$('manualPendingHistory');if(!list)return;
+  list.replaceChildren();
+  const title=document.createElement('div');title.style.cssText='font-weight:750;margin:4px 0 9px;color:#dbe7f8';
+  title.textContent='미체결 지정가 '+pendingOrders.length+'건 · 예약 증거금 '+fmt(pendingOrders.reduce((sum,o)=>sum+o.margin,0))+' USDT';list.append(title);
+  for(const [i,o] of pendingOrders.entries()){
+    const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 5px;border-bottom:1px solid #314665';
+    const info=document.createElement('div');info.style.cssText='font-size:12px;min-width:0;line-height:1.6';
+    info.textContent=(o.side==='LONG'?'🟢 예약 롱':'🔴 예약 숏')+' · '+fmt(o.price)+' USDT · 미체결 수량 '+Number(o.qty).toFixed(6)+' BTC · 예약 증거금 '+fmt(o.margin)+' USDT';
+    const cancel=document.createElement('button');cancel.type='button';cancel.textContent='미체결 취소';cancel.style.cssText='flex-shrink:0;font-size:11px;padding:7px 8px';
+    cancel.onclick=()=>{if(confirm((o.side==='LONG'?'예약 롱':'예약 숏')+' '+fmt(o.price)+' USDT 주문을 취소할까요?'))cancelManualPendingOrder(o.id)};
+    row.append(info,cancel);list.append(row);
+  }
+}
+function renderLogs(){renderPendingHistory();$('log').innerHTML=logs.length?logs.map(v=>'<div class="trade-log-item">'+v.replace(/(-?[0-9,]+원)(?= \()/g,(m)=>'<span class="'+(m.startsWith('-')?'pnl-negative':'pnl-positive')+'">'+m+'</span>')+'</div>').join(''):'기록 없음'}function add(s){logs.unshift(new Date().toLocaleTimeString('ko-KR')+' · '+s);logs=logs.slice(0,60);renderLogs()}
 function closePositionById(id,reason='수동 청산',shouldRender=true){
   const p=allPaperPositions().find(x=>x.id===id);
   if(!p)return;
@@ -1609,21 +1728,17 @@ function process(){
     cancelAutoPendingLimit('횡보 박스 돌파 · 자동 주문 취소');
   if(!last)return;
   if(autoPendingLimit)fillAutoPendingLimit(last,Date.now());
-  if(pending&&(!demo&&Date.now()-lastTickAt<=10000||demo)){
-    const hit=pending.side==='LONG'?last<=pending.price:last>=pending.price;
-    if(hit){
-      const order=pending;
-      pendingFillType='limit';
+  if(demo||Date.now()-lastTickAt<=10000){
+    for(const order of [...pendingOrders]){
+      if(!pendingOrders.some(x=>x.id===order.id))continue;
+      const hit=order.side==='LONG'?last<=order.price:last>=order.price;
+      if(!hit)continue;
+      // Remove once, then turn exactly this reserved amount into position margin.
+      pendingOrders=pendingOrders.filter(x=>x.id!==order.id);
       let filled=false;
-      try{filled=openTrade(order.side,order.price)===true}
-      finally{pendingFillType=null}
-      if(filled){
-        if(pending===order)pending=null;
-        add('가상 '+order.side+' 예약 지정가 체결 완료 · '+fmt(order.price)+' USDT');
-      }else{
-        if(pending===order)pending=null;
-        add('가상 '+order.side+' 예약 지정가 체결 거절 · 증거금/피라미드 한도/설정 확인 · '+fmt(order.price)+' USDT');
-      }
+      try{filled=openTrade(order.side,order.price,order)===true}
+      catch(e){console.error('예약 지정가 체결 오류',e)}
+      add('가상 '+order.side+' 예약 지정가 '+(filled?'체결 완료':'체결 거절 · 예약 증거금 반환')+' · '+fmt(order.price)+' USDT · '+fmt(order.margin)+' USDT');
       savePaperState();render();
     }
   }
@@ -1699,7 +1814,7 @@ function updatePosition(){
     '최근 신호 · '+signalResult;
   el.innerHTML='<div class="hedge-margin-summary">사용 중인 증거금 <b>'+fmt(paperMarginInUse())+'</b> USDT · 추가 사용 가능 <b>'+fmt(paperFreeMargin())+'</b> USDT</div>'+
     '<div style="padding:5px 8px;line-height:1.5"><div data-auto-mode style="font-size:12px;font-weight:700"></div><div class="muted" data-auto-diagnostic style="font-size:11px"></div></div>'+
-    groups+(pending?'<p class="muted">수동 예약 지정가 대기 · '+(pending.side==='LONG'?'LONG ≤ ':'SHORT ≥ ')+fmt(pending.price)+' USDT · 가격 도달 시 체결 시도</p>':'')+autoPendingRow+
+    groups+(pendingOrders.length?'<p class="muted">수동 지정가 미체결 '+pendingOrders.length+'건 · 예약 증거금 '+fmt(pendingOrders.reduce((sum,o)=>sum+o.margin,0))+' USDT · 거래내역에서 개별 취소</p>':'')+autoPendingRow+
     '<div class="hedge-selected-detail"><b>선택한 포지션 상세 · '+selectedTitle+'</b>'+active+'</div>';
   const autoMode=el.querySelector('[data-auto-mode]');
   if(autoMode){
@@ -2010,7 +2125,7 @@ $('myFeeLookup').onclick=async()=>{
 $('myApiClear').onclick=()=>{for(const id of ['myBinanceKey','myBinanceSecret'])$(id).value='';unlockedApiCredentials=null;clearRealAccount('API 키 잠금 상태 · 조회한 실제 계좌 정보 지움');$('myWsAccountResult').textContent='화면 입력값과 현재 잠금 해제된 키를 지웠어요. 암호화 저장본은 별도 삭제 버튼으로 지울 수 있어요.';};
 
 $('sheetLong').onclick=()=>request('LONG');$('sheetShort').onclick=()=>request('SHORT');for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.addEventListener('change',updateOrderType);$('sheetCancel').onclick=()=>{$('entrySheet').style.display='none'};$('retry').onclick=()=>{savePaperState();const url=new URL(window.location.href);url.searchParams.set('app_refresh',String(Date.now()));window.location.replace(url.toString())};$('demo').onclick=startDemo;
-$('tf').onchange=()=>{viewOffset=0;resetStableChartScale();crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;$('candleTime').textContent='';render()};$('long').onclick=()=>showOrderSheet('LONG');$('short').onclick=()=>showOrderSheet('SHORT');$('close').onclick=()=>{const p=allPaperPositions().find(x=>x.id===selectedPaperPositionId);if(!p)return;const number=hedgePositions[p.side].findIndex(x=>x.id===p.id)+1;if(confirm('가상 '+(p.side==='LONG'?'롱':'숏')+' #'+number+' 포지션 한 개만 현재가로 청산할까요?'))closePositionById(p.id,'선택 포지션 수동 청산')};$('cancel').onclick=()=>{pending=null;add('가상 지정가 주문 취소');savePaperState();render()};$('clear').onclick=()=>{logs=[];renderLogs();savePaperState()};
+$('tf').onchange=()=>{viewOffset=0;resetStableChartScale();crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;$('candleTime').textContent='';render()};$('long').onclick=()=>showOrderSheet('LONG');$('short').onclick=()=>showOrderSheet('SHORT');$('close').onclick=()=>{const p=allPaperPositions().find(x=>x.id===selectedPaperPositionId);if(!p)return;const number=hedgePositions[p.side].findIndex(x=>x.id===p.id)+1;if(confirm('가상 '+(p.side==='LONG'?'롱':'숏')+' #'+number+' 포지션 한 개만 현재가로 청산할까요?'))closePositionById(p.id,'선택 포지션 수동 청산')};$('cancel').onclick=()=>{if(!pendingOrders.length)return;if(!confirm('수동 미체결 주문 '+pendingOrders.length+'건을 모두 취소할까요?'))return;const count=pendingOrders.length;pendingOrders=[];add('가상 지정가 미체결 '+count+'건 모두 취소 · 예약 증거금 반환');savePaperState();render()};$('clear').onclick=()=>{logs=[];renderLogs();savePaperState()};
 $('paperStatsReset').onclick=()=>{
   if(!confirm('청산 완료 모의거래 통계와 개별 수익률 기록만 초기화할까요? 가상 포지션·잔고·일반 거래내역은 유지됩니다.'))return;
   closedPaperTrades=[];paperStatsBaseBalance=null;renderPaperPerformance();savePaperState();
