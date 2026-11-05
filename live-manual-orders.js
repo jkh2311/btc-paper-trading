@@ -258,6 +258,13 @@ async function closeSelected(){
   void updateOpenOrders();
  });
 }
+document.addEventListener('btc:real-close-requested',e=>{
+ const requested=e.detail;
+ if(!requested||!['LONG','SHORT'].includes(requested.side)||busy)return;
+ // The live closing path always re-reads the Binance position before submitting.
+ selected=requested;
+ void closeSelected();
+});
 async function cancelOrders(){
  await run(async()=>{
   const normal=await signed('GET','/fapi/v1/openOrders',{symbol});
