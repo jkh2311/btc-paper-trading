@@ -69,7 +69,7 @@ function stageRecords(){
 }
 function saveStageRecord(side,order){
  const all=stageRecords(),entries=Array.isArray(all[side])?all[side]:[];
- entries.push({id:String(order.orderId),time:Date.now()});all[side]=entries.slice(-20);
+ entries.push({id:String(order.orderId),time:Date.now(),stop:Number($('stop').value),rr:Number($('rr').value),hold:Number($('hold').value)});all[side]=entries.slice(-20);
  try{const base=JSON.parse(localStorage.getItem(stageLedgerKey)||'{}');base[stageAccountId()]=all;localStorage.setItem(stageLedgerKey,JSON.stringify(base));}
  catch(_){}
 }
