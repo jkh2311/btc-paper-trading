@@ -5,6 +5,7 @@
 'use strict';
 const $=id=>document.getElementById(id),symbol='BTCUSDT',base='https://fapi.binance.com';
 let account=null,selected=null,busy=false,lastRequest=null,lastOrderIssue=false,refreshBusy=false;
+let confirmedLeverage=null,leverageBusy=false;
 const cred=()=>typeof getApiCredentials==='function'?getApiCredentials():null;
 const val=id=>Number($(id)?.value),fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:8});
 const status=$('realAccountUpdated'),result=document.querySelector('.real-trade-action-result');
@@ -53,6 +54,35 @@ async function run(fn){
  finally{busy=false;for(const id of ['sheetLong','sheetShort','cancel'])if($(id))$(id).disabled=false; if($('close'))$('close').disabled=!selected;}
 }
 function updateButtons(){for(const id of ['long','short'])if($(id))$(id).disabled=false;}
+const leverageButton=$('applyRealLeverage'),leverageStatus=$('realLeverageStatus');
+function showLeverageStatus(value){if(leverageStatus)leverageStatus.textContent=value;}
+function invalidateLeverage(value='레버리지 적용 확인 필요'){confirmedLeverage=null;showLeverageStatus(value);}
+$('lev')?.addEventListener('input',()=>invalidateLeverage('변경됨 · 바이낸스 적용 필요'));
+document.addEventListener('btc:real-account-cleared',()=>invalidateLeverage('계좌 재연결 후 레버리지 확인 필요'));
+async function verifyLeverage(expected){
+ const response=await signed('GET','/fapi/v3/positionRisk',{symbol});
+ const rows=Array.isArray(response)?response:[response];
+ const matching=rows.filter(x=>x?.symbol===symbol);
+ if(!matching.length||matching.some(p=>Number(p.leverage)!==expected))
+  throw Error('실계좌 레버리지 불일치 · 바이낸스에서 확인해 주세요');
+ return true;
+}
+if(leverageButton)leverageButton.onclick=async()=>{
+ if(leverageBusy||busy)return;
+ const lev=val('lev'),saved=cred();
+ if(!saved?.apiKey||!saved?.apiSecret){showLeverageStatus('API 잠금 해제 필요');return;}
+ if(!Number.isInteger(lev)||lev<1||lev>50){showLeverageStatus('레버리지는 1~50배로 설정하세요');return;}
+ if(!confirm('바이낸스 BTCUSDT 실제 레버리지를 '+lev+'배로 미리 적용할까요?'))return;
+ leverageBusy=true;leverageButton.disabled=true;invalidateLeverage('바이낸스 레버리지 적용 중…');
+ try{
+  const applied=await signed('POST','/fapi/v1/leverage',{symbol,leverage:String(lev)});
+  if(Number(applied?.leverage)!==lev)throw Error('바이낸스 레버리지 적용 응답 불일치');
+  await verifyLeverage(lev);
+  confirmedLeverage={value:lev,apiKey:saved.apiKey,at:Date.now()};
+  showLeverageStatus('✓ 바이낸스 '+lev+'배 적용·재조회 확인');
+ }catch(e){showLeverageStatus('적용 확인 실패: '+String(e?.message||e));}
+ finally{leverageBusy=false;leverageButton.disabled=false;}
+};
 document.addEventListener('btc:real-account-updated',e=>{account=e.detail; if(selected){const p=account?.positions?.find(p=>p.side===selected.positionSide&&Math.abs(Number(p.amount)-Number(selected.amount))<1e-8);if(!p)selected=null;} if($('close'))$('close').disabled=!selected;updateButtons();});
 document.addEventListener('btc:real-account-cleared',()=>{account=null;selected=null;});
 document.addEventListener('btc:real-position-selected',e=>{selected=e.detail||null;});
@@ -126,6 +156,8 @@ async function enter(side){
   const price=type==='LIMIT'?Number($('limitPrice').value):quote;
   if(!(price>0))throw Error('유효한 현재가/지정가가 필요합니다');
   const lev=val('lev'),count=val('pyramidEntryCount'),stop=val('stop');
+  if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
+   throw Error('설정에서 바이낸스 레버리지 적용을 먼저 눌러 확인해 주세요.');
   if(!Number.isInteger(lev)||lev<1||lev>125||!Number.isInteger(count)||count<1||count>20||!(stop>0&&stop<=10))throw Error('전략 레버리지/단계/손절 설정 확인');
   const wallet=Number(account.wallet),available=Number(account.available);
   if(!(wallet>0&&available>0))throw Error('주문 가능 증거금 없음');
@@ -156,12 +188,7 @@ async function enter(side){
   }
   const summary=(used+1)+'/'+count+'단계 · '+side+' '+type+' · '+qty+' BTC'+(order.price?' @ '+order.price:'')+' · '+lev+'배 · 예상 증거금 '+fmt(margin)+' USDT\n실제 계좌에 주문하며 손절/익절 보호 주문은 자동 등록되지 않습니다.';
   if(!confirm('바이낸스 실제 주문을 전송할까요?\n'+summary))return;
-  // No exchange-side mutation takes place before the user confirms the order.
-  if(!existing){
-   message('바이낸스 레버리지 확인 및 주문 요청 중…');
-   const leverageResult=await signed('POST','/fapi/v1/leverage',{symbol,leverage:String(lev)});
-   if(Number(leverageResult?.leverage)!==lev)throw Error('레버리지 재확인 실패');
-  }
+  // Leverage was explicitly applied and verified in Settings. Do not change it during entry.
   lastOrderIssue=true;lastRequest=order.newClientOrderId;
   let response;
   try{response=await signed('POST','/fapi/v1/order',order);}
