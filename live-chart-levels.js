@@ -10,7 +10,8 @@ const fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:2});
 const hint=document.createElement('div');
 hint.className='muted';
 hint.style.cssText='font-size:11px;margin:6px 2px;line-height:1.5;white-space:pre-line';
-hint.textContent='실전 손절·익절 선: 거래소 주문 조회 후 표시';
+hint.textContent='';
+hint.style.display='none';
 chart.closest('.chart-panel')?.insertAdjacentElement('afterend',hint);
 function redraw(){window.btcRedrawChart?.();}
 function creds(){return typeof getApiCredentials==='function'?getApiCredentials():null;}
@@ -57,7 +58,11 @@ function levels(){
  }
  return list;
 }
-function note(text,warning=false){hint.textContent=text;hint.style.color=warning?'#ff9aaa':'';}
+function note(text,warning=false){
+ hint.textContent=text;
+ hint.style.color=warning?'#ff9aaa':'';
+ hint.style.display=warning||/변경 요청 중|거래소 변경 확인/.test(text)?'block':'none';
+}
 window.btcLiveChartPrices=()=>levels().map(l=>l.price).filter(p=>Number.isFinite(p)&&p>0);
 window.btcDrawLiveLevels=(ctx,scale)=>{
  const all=levels();
