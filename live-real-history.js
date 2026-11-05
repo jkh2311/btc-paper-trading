@@ -11,7 +11,7 @@ window.liveHistoryViewActive=true;
 const card=history.querySelector('.paper-history-card');
 const title=card?.querySelector('summary span');
 if(title)title.textContent='실전매매 거래내역';
-const create=(name,text)=>{const e=document.createElement(name);if(text!==undefined)e.textContent=String(text);return e};
+const create=(name,text,cls)=>{const e=document.createElement(name);if(text!==undefined)e.textContent=String(text);if(cls)e.className=cls;return e};
 const status=create('p','실제 바이낸스 BTCUSDT 체결 내역을 조회해 주세요. 모의매매 기록은 표시하지 않습니다.');
 status.setAttribute('role','status');status.className='muted';
 const get=create('button','실제 체결 내역 조회');get.type='button';
