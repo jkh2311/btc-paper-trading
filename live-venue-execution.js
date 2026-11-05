@@ -13,6 +13,29 @@ const details=el('p','신규 수동 주문(order.place), 실제 체결 확인(or
 const state=el('p','안전 잠금 ON · 실전/테스트넷 주문 전송 0건');state.setAttribute('role','status');
 const button=el('button','실제 주문+손절·익절 실행 (검증 전 잠금)');
 button.disabled=true;button.type='button';card.append(heading,details,state,button);page.append(card);
+const preview=el('pre','수동 추가 진입·부분 청산 또는 RMI AUTO 계획이 생성되면 여기에 주문 입력값이 표시됩니다.');
+preview.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.6;padding:10px;background:#091827;border-radius:8px';
+card.append(preview);
+let lastPreview=null;
+document.addEventListener('btc:live-execution-preview',e=>{
+ const data=e.detail,order=data?.order;
+ if(!order||order.symbol!=='BTCUSDT'||!['BUY','SELL'].includes(order.side)||
+    !['BOTH','LONG','SHORT'].includes(order.positionSide)||order.type!=='LIMIT'||
+    order.timeInForce!=='FOK'||!(Number(order.quantity)>0)||!(Number(order.price)>0)||
+    data.tradeEnabled!==false){preview.textContent='주문 계획 데이터 검증 실패 · 실행 잠금';lastPreview=null;return}
+ lastPreview={source:data.source,order,stopCandidate:data.stopCandidate,
+  takeCandidate:data.takeCandidate,at:Date.now()};
+ preview.textContent='계획 연동 완료 · 실제 주문 0건\n'+
+  '경로: '+data.source+'\n주문 방향: '+order.side+' / '+order.positionSide+
+  '\n수량 '+order.quantity+' BTC · 가격 '+order.price+' USDT'+
+  '\n방식: LIMIT / FOK'+(order.reduceOnly?' / reduceOnly=true':'')+
+  '\n손절 후보 '+(data.stopCandidate?.triggerPrice??'해당 없음')+
+  ' · 익절 후보 '+(data.takeCandidate?.triggerPrice??'해당 없음')+
+  '\n실제 바이낸스 송신은 잠금 상태입니다.';
+});
+const clearPreview=()=>{lastPreview=null;preview.textContent='계좌/API 잠금 또는 화면 비활성화 · 주문 계획을 다시 만들어 주세요.'};
+document.addEventListener('btc:live-lock',clearPreview);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearPreview()});
 let busy=false;
 const TERMINAL=new Set(['FILLED','CANCELED','EXPIRED','EXPIRED_IN_MATCH','REJECTED']);
 const validateClientId=id=>typeof id==='string'&&/^btc[a-z0-9]{20}[est]$/.test(id);
