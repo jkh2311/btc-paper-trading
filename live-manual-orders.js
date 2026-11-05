@@ -228,32 +228,77 @@ async function enter(side){
   if($('paperStatsReset')){/* no paper statistics mutation */}
  });
 }
-async function closeSelected(){
+// The selected-position action places a user-priced LIMIT close. The individual
+// card button remains a fast MARKET close. Both recheck the live exchange position.
+async function closeSelected(orderKind='LIMIT'){
  await run(async()=>{
-  const s=selected;if(!s)throw Error('실제 LONG/SHORT 카드를 먼저 선택하세요');
+  const selection=selected;
+  if(!selection||!['LONG','SHORT'].includes(selection.side))
+   throw Error('실제 LONG/SHORT 카드를 먼저 선택하세요');
+  if(!['LIMIT','MARKET'].includes(orderKind))throw Error('지원하지 않는 청산 방식');
   const dual=await mode();
-  // Recheck actual position via account before using stale selected size.
-  if($('realAccountRefresh'))$('realAccountRefresh').click();
   const d=await signed('GET','/fapi/v3/positionRisk',{symbol});
   const positions=Array.isArray(d)?d:[d];
-  const p=positions.find(p=>p.symbol===symbol&&p.positionSide===(dual?s.side:'BOTH')&&Math.abs(Number(p.positionAmt))>0);
+  const p=positions.find(p=>p.symbol===symbol&&p.positionSide===(dual?selection.side:'BOTH')&&Math.abs(Number(p.positionAmt))>0);
   if(!p)throw Error('실제 청산 대상 포지션 없음');
-  const amount=Number(p.positionAmt),isLong=dual?s.side==='LONG':amount>0;
-  if((s.side==='LONG')!==isLong)throw Error('선택 포지션 방향이 달라졌습니다.');
-  const f=await filters(),qty=roundDown(Math.abs(amount),f.market.stepSize);
-  if(!(Number(qty)>0&&Math.abs(Number(qty)-Math.abs(amount))<1e-8))throw Error('청산 수량 필터 불일치 · 바이낸스에서 수량 확인');
-  if(!confirm('BTCUSDT 실제 '+s.side+' 포지션 '+qty+' BTC를 시장가로 전량 청산할까요?'))return;
+  const amount=Number(p.positionAmt),isLong=dual?selection.side==='LONG':amount>0;
+  if((selection.side==='LONG')!==isLong)throw Error('선택 포지션 방향이 달라졌습니다.');
+  const f=await filters(),lot=orderKind==='LIMIT'?f.lot:f.market;
+  const qty=roundDown(Math.abs(amount),lot.stepSize);
+  if(!(Number(qty)>0&&Math.abs(Number(qty)-Math.abs(amount))<1e-8))
+   throw Error('청산 수량 필터 불일치 · 바이낸스에서 수량 확인');
+
+  const exitSide=isLong?'SELL':'BUY',positionSide=dual?selection.side:'BOTH';
+  // An already-open reduce-only close must not be duplicated (hedge can reject
+  // or fill a second close independently). Ask user to cancel it first.
+  const open=await signed('GET','/fapi/v1/openOrders',{symbol});
+  if(!Array.isArray(open))throw Error('미체결 청산 주문 조회 실패');
+  const otherClose=open.find(o=>o.symbol===symbol&&o.side===exitSide&&
+   o.positionSide===positionSide&&(
+    dual||o.reduceOnly===true||o.reduceOnly==='true'||o.closePosition===true));
+  if(otherClose)throw Error('동일 방향 미체결 청산 주문 #'+otherClose.orderId+
+   '이 있습니다. 거래내역에서 기존 청산 주문을 확인/취소하세요.');
+
+  let price=null;
+  if(orderKind==='LIMIT'){
+   const tick=Number(f.price.tickSize);
+   const digits=Math.min(8,(String(f.price.tickSize).split('.')[1]||'').length);
+   if(!(tick>0))throw Error('지정가 호가 단위 조회 실패');
+   const proposed=Number(p.markPrice)>0?Number(p.markPrice):Number(selection.mark);
+   const defaultPrice=proposed>0?(Math.round(proposed/tick)*tick).toFixed(digits):'';
+   const typed=prompt('BTCUSDT '+selection.side+' 전량 지정가 청산 가격(USDT)을 입력하세요.\n미체결 시 주문이 대기하며, 시장가로 청산되지 않습니다.',defaultPrice);
+   if(typed===null)return;
+   if(!/^\\d+(?:\\.\\d+)?$/.test(typed.trim()))
+    throw Error('지정가에 올바른 USDT 가격을 입력하세요');
+   const n=Number(typed.trim()),steps=Math.round(n/tick);
+   if(!Number.isFinite(n)||n<=0||steps<1||Math.abs(n-steps*tick)>Math.max(1e-8,tick*1e-6))
+    throw Error('바이낸스 지정가 호가 단위 '+f.price.tickSize+' USDT에 맞게 입력하세요');
+   price=(steps*tick).toFixed(digits);
+   if(Number(f.price.minPrice)>0&&Number(price)<Number(f.price.minPrice)||
+      Number(f.price.maxPrice)>0&&Number(price)>Number(f.price.maxPrice))
+    throw Error('거래소 지정가 허용 범위를 벗어났습니다');
+  }
+  const desc=orderKind==='LIMIT'?'지정가 '+price+' USDT · 미체결 시 대기':'시장가 · 즉시 체결 요청';
+  if(!confirm('BTCUSDT '+selection.side+' 포지션 '+qty+' BTC 전량 청산 주문을 전송할까요?\n'+
+   desc+'\n'+(orderKind==='LIMIT'?'체결 전까지 포지션은 유지됩니다.':'체결가는 현재 가격과 다를 수 있습니다.')))return;
+
   const id='btcClose'+Date.now()+Math.floor(Math.random()*10000);
-  const order={symbol,side:isLong?'SELL':'BUY',positionSide:dual?s.side:'BOTH',type:'MARKET',quantity:qty,newClientOrderId:id,newOrderRespType:'RESULT'};
+  const order={symbol,side:exitSide,positionSide,type:orderKind,quantity:qty,
+   newClientOrderId:id,newOrderRespType:'RESULT'};
   if(!dual)order.reduceOnly='true';
+  if(orderKind==='LIMIT'){order.price=price;order.timeInForce='GTC';}
   let res;
   try{res=await signed('POST','/fapi/v1/order',order);}
   catch(e){
    try{res=await signed('GET','/fapi/v1/order',{symbol,origClientOrderId:id});}
-   catch(_){throw Error('청산 응답 미확정 · 바이낸스에서 ID '+id+'를 확인하세요. '+e.message);}
+   catch(_){throw Error('청산 주문 응답 미확정 · 바이낸스에서 ID '+id+'를 확인하세요. '+e.message);}
   }
-  message('실제 청산 주문 #'+res.orderId+' · '+res.status+' · 체결 '+(res.executedQty||'0')+' BTC\n미체결/잔여 포지션은 다시 조회하세요.');
-  selected=null;
+  const status=String(res?.status||'UNKNOWN'),filled=Number(res?.executedQty||0);
+  message((orderKind==='LIMIT'?'지정가':'시장가')+' 청산 주문 #'+res.orderId+' · '+status+
+    ' · 체결 '+(Number.isFinite(filled)?filled:0)+' / '+qty+' BTC\n'+
+    (status==='FILLED'?'체결 보고됨 · 잔여 포지션 재조회':
+     orderKind==='LIMIT'?'미체결/부분체결 시 거래내역에서 대기 주문을 확인하거나 개별 취소하세요.':
+     '체결 상태 및 잔여 포지션을 다시 확인하세요.'));
   $('realAccountRefresh')?.click();
   void updateOpenOrders();
  });
@@ -261,9 +306,8 @@ async function closeSelected(){
 document.addEventListener('btc:real-close-requested',e=>{
  const requested=e.detail;
  if(!requested||!['LONG','SHORT'].includes(requested.side)||busy)return;
- // The live closing path always re-reads the Binance position before submitting.
  selected=requested;
- void closeSelected();
+ void closeSelected('MARKET');
 });
 async function cancelOrders(){
  await run(async()=>{
