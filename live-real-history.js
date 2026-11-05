@@ -31,10 +31,24 @@ if(card){
  const box=card.querySelector('.paper-history-content');
  if(box)box.prepend(status,get);
 }
-if(refresh){refresh.textContent='실제 내역 새로고침';refresh.type='button'}
+if(refresh){refresh.textContent='새로고침';refresh.type='button'}
 if(clear){clear.textContent='화면 기록 비우기';clear.type='button'}
 const pattern=$('paperPatternDetails');if(pattern)pattern.hidden=true;
-const style=create('style');style.textContent='.live-real-history-note{font-size:11px;color:#aec5dd;line-height:1.6;margin:10px 0}.live-real-history-row{white-space:pre-line;line-height:1.6}.live-real-history-row .pnl-positive{color:#4ed6a6}.live-real-history-row .pnl-negative{color:#ff869b}';document.head.append(style);
+const style=create('style');style.textContent=`
+.live-real-history-note{font-size:11px;color:#aec5dd;line-height:1.35;margin:4px 0}
+.live-real-history-row{white-space:pre-line;line-height:1.6}
+.live-real-history-row .pnl-positive{color:#4ed6a6}
+.live-real-history-row .pnl-negative{color:#ff869b}
+#page-history .live-real-closed{padding:0!important;overflow:hidden;display:block!important}
+#page-history .live-real-closed>summary{display:grid;grid-template-columns:30px minmax(36px,.6fr) minmax(80px,1.3fr) auto;align-items:center;gap:7px;padding:10px 9px;cursor:pointer;list-style:none;min-height:42px}
+#page-history .live-real-closed>summary::-webkit-details-marker{display:none}
+#page-history .live-real-closed>summary::marker{content:''}
+#page-history .live-real-closed[open]>summary{border-bottom:1px solid #31445f}
+#page-history .live-real-closed .live-real-detail{padding:9px 11px 10px;margin:0;font-size:11px;line-height:1.5;white-space:pre-line;color:#a9bdd7}
+#page-history .live-real-closed .paper-closed-amount{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#page-history .live-real-closed .paper-closed-rate{font-size:11px;color:#8faac7;white-space:nowrap}
+#page-history .live-real-history-note{font-size:10px}
+`;document.head.append(style);
 let sequence=0,busy=false,controller=null;
 let lastTrades=null,realWallet=NaN;
 const num=v=>v===null||v===undefined||v===''?NaN:Number(v);
@@ -81,9 +95,7 @@ async function trades(account,signal){
 function showRows(rows){
  lastTrades=rows;
  empty();
- const tradesDesc=create('div',undefined,'live-real-history-note');
- tradesDesc.textContent='실제 체결 최대 100건 · '+new Date().toLocaleTimeString('ko-KR')+
-  ' · 전체 거래 기간을 포함하지 않을 수 있습니다.';
+ const tradesDesc=create('div','최근 체결 최대 100건 · '+new Date().toLocaleTimeString('ko-KR'),'live-real-history-note');
  pending.replaceChildren(tradesDesc);
  log.replaceChildren();
  if(!rows.length){
@@ -125,32 +137,44 @@ function showRows(rows){
  summary.replaceChildren();
  const grid=create('div',undefined,'paper-performance-grid paper-performance-minimal');
  const roi=Number.isFinite(realWallet)&&realWallet>0?net/realWallet*100:NaN;
- const totalReturn=create('div');totalReturn.append(create('small','조회 손익률 · 현재 지갑 잔고 대비'),
-  create('strong',Number.isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(2)+'%':'— (실제 잔고 조회 후 표시)'));
+ const totalReturn=create('div');
+ const rateLabel=Number.isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(2)+'%':'—';
+ const rateValue=create('strong',rateLabel);
+ rateValue.className=Number.isFinite(roi)?(roi>=0?'paper-stat-profit':'paper-stat-loss'):'';
+ totalReturn.append(create('small','조회 손익률'),rateValue);
+ totalReturn.title='최근 최대 100체결 손익 ÷ 현재 지갑 잔고 · 전체 누적 수익률 아님';
  const totalGain=create('div'),netValue=create('strong',won(net)+(otherFee?'*':''));
  netValue.className=net>=0?'paper-stat-profit':'paper-stat-loss';
- totalGain.append(create('small','조회 범위 순실현손익 (원화 추정)'),netValue);
+ totalGain.append(create('small','조회 순실현손익'),netValue);
  grid.append(totalReturn,totalGain);summary.append(grid);
- summary.append(create('div','실현손익이 확인된 청산 체결 그룹 '+groups.length+'건 · 수익 '+success+
-  '건 · 손실 '+failure+'건','paper-performance-count'));
- summary.append(create('p','※ 최근 최대 100체결 기준 · 수익률은 현재 지갑 잔고 대비 참고값이며 전체 누적 수익률이 아닙니다. USDT 수수료만 차감하며, 펀딩비·기타 자산 수수료는 제외'+
-  (otherFee?'(*)':'')+'.','live-real-history-note'));
+ const count=create('div',undefined,'paper-performance-count');
+ count.append(create('span','청산 체결 '+groups.length+'건 · '));
+ const wins=create('span','수익 '+success+'건');wins.className='paper-stat-profit';
+ const losses=create('span','손실 '+failure+'건');losses.className='paper-stat-loss';
+ count.append(wins,create('span',' · '),losses);
+ summary.append(count);
+ const notice=create('p','최근 100체결 기준 · 수익률은 현재 잔고 대비 참고값','live-real-history-note');
+ notice.title='전체 누적 수익률이 아니며, USDT 수수료만 차감. 펀딩비·기타 자산 수수료 제외'+(otherFee?' (기타 수수료 있음)':'');
+ summary.append(notice);
  closed.replaceChildren();
  if(!groups.length)closed.textContent='조회 범위 내 실현손익이 확인된 청산 체결이 없어요.';
  for(const entry of groups){
-  const node=create('div',undefined,'paper-closed-item');
-  const heading=create('div',undefined,'paper-closed-head');
-  const name=create('b',(entry.positionSide==='LONG'?'롱':entry.positionSide==='SHORT'?'숏':entry.side)+
-   ' 청산 체결 · 주문 #'+entry.id);
-  heading.append(name,create('span',new Date(entry.time).toLocaleString('ko-KR')));
-  const pnl=entry.pnl-entry.commission;
-  const detail=create('div',undefined,'live-real-history-note');
-  detail.textContent='체결 수량 '+fmt(entry.qty,8)+' BTC · 실현손익 '+won(entry.pnl)+
-   '\n청산 체결 USDT 수수료 '+feeWon(entry.commission,'USDT')+
-   '\n수수료 차감 후 '+won(pnl)+(entry.otherCommission?' · 기타 자산 수수료 별도':'');
-  detail.style.whiteSpace='pre-line';
-  node.append(heading,detail);
-  closed.append(node);
+  const netResult=entry.pnl-entry.commission;
+  const isLong=entry.positionSide==='LONG'||entry.positionSide==='BOTH'&&entry.side==='SELL';
+  const direction=entry.positionSide==='LONG'?'롱':entry.positionSide==='SHORT'?'숏':isLong?'롱':'숏';
+  // Do not invent a per-trade ROI without knowing the original entry margin.
+  const node=create('details',undefined,'paper-closed-item paper-closed-compact live-real-closed');
+  const header=create('summary');
+  const side=create('b',direction,'paper-closed-side '+(direction==='롱'?'hedge-long-text':'hedge-short-text'));
+  const rate=create('span','체결','paper-closed-rate');
+  const amount=create('span',won(netResult),'paper-closed-amount '+(netResult>=0?'paper-stat-profit':'paper-stat-loss'));
+  const time=create('small',new Date(entry.time).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),'paper-closed-time');
+  header.append(side,rate,amount,time);
+  const detail=create('div',undefined,'live-real-detail');
+  detail.textContent='주문 #'+entry.id+' · '+fmt(entry.qty,8)+' BTC\n실현손익 '+won(entry.pnl)+
+   ' · 수수료 '+feeWon(entry.commission,'USDT')+
+   '\n수수료 차감 후 '+won(netResult)+(entry.otherCommission?'\n기타 자산 수수료 별도':'');
+  node.append(header,detail);closed.append(node);
  }
 }
 async function run(){
