@@ -125,8 +125,18 @@ function showRows(rows){
  for(const t of candidates){
   const id=t.orderId+'-'+t.positionSide+'-'+t.side;
   const entry=byOrder.get(id)||{id:t.orderId,side:t.side,positionSide:t.positionSide,
-   time:t.time,qty:0,pnl:0,commission:0,otherCommission:false};
+   time:t.time,qty:0,pnl:0,commission:0,otherCommission:false,entryNotional:0,validEntryBasis:true};
   entry.qty+=t.qty;entry.pnl+=t.pnl;entry.time=Math.max(entry.time,t.time);
+  // USD-M linear BTCUSDT: realized PnL of a closing fill is
+  // (close - entry)*qty for LONG, (entry - close)*qty for SHORT.
+  // Derive the cost basis of the closed quantity without guessing
+  // the historical leverage or requiring the opening fill in the last 100 trades.
+  const positionDirection=t.positionSide==='LONG'?1:t.positionSide==='SHORT'?-1:
+   t.positionSide==='BOTH'?(t.side==='SELL'?1:-1):NaN;
+  const entryPrice=t.price-positionDirection*t.pnl/t.qty;
+  if(Number.isFinite(entryPrice)&&entryPrice>0&&Number.isFinite(positionDirection)){
+   entry.entryNotional+=entryPrice*t.qty;
+  }else entry.validEntryBasis=false;
   entry.commission+=t.feeAsset==='USDT'?t.fee:0;
   if(t.feeAsset!=='USDT'&&t.fee>0)entry.otherCommission=true;
   byOrder.set(id,entry);
@@ -162,16 +172,24 @@ function showRows(rows){
   const netResult=entry.pnl-entry.commission;
   const isLong=entry.positionSide==='LONG'||entry.positionSide==='BOTH'&&entry.side==='SELL';
   const direction=entry.positionSide==='LONG'?'롱':entry.positionSide==='SHORT'?'숏':isLong?'롱':'숏';
-  // Do not invent a per-trade ROI without knowing the original entry margin.
+  // Display an unleveraged price-based return only. Historical position
+  // leverage/margin cannot be recovered reliably from these trade fills.
+  const priceReturn=entry.validEntryBasis&&entry.entryNotional>0?
+   netResult/entry.entryNotional*100:NaN;
   const node=create('details',undefined,'paper-closed-item paper-closed-compact live-real-closed');
   const header=create('summary');
   const side=create('b',direction,'paper-closed-side '+(direction==='롱'?'hedge-long-text':'hedge-short-text'));
-  const rate=create('span','체결','paper-closed-rate');
+  const rate=create('span',Number.isFinite(priceReturn)?
+   (priceReturn>=0?'+':'')+priceReturn.toFixed(2)+'%':'—','paper-closed-rate');
+  rate.className+=' '+(Number.isFinite(priceReturn)?(priceReturn>=0?'paper-stat-profit':'paper-stat-loss'):'');
+  rate.title='가격 기준 손익률 · 레버리지 미반영 · 청산 체결 USDT 수수료 차감';
   const amount=create('span',won(netResult),'paper-closed-amount '+(netResult>=0?'paper-stat-profit':'paper-stat-loss'));
   const time=create('small',new Date(entry.time).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),'paper-closed-time');
   header.append(side,rate,amount,time);
   const detail=create('div',undefined,'live-real-detail');
-  detail.textContent='주문 #'+entry.id+' · '+fmt(entry.qty,8)+' BTC\n실현손익 '+won(entry.pnl)+
+  detail.textContent='주문 #'+entry.id+' · '+fmt(entry.qty,8)+' BTC'+
+   '\n가격 기준 수익률 '+(Number.isFinite(priceReturn)?(priceReturn>=0?'+':'')+priceReturn.toFixed(2)+'%':'계산 불가')+
+   ' (레버리지 미반영 · 청산 수수료 차감)\n실현손익 '+won(entry.pnl)+
    ' · 수수료 '+feeWon(entry.commission,'USDT')+
    '\n수수료 차감 후 '+won(netResult)+(entry.otherCommission?'\n기타 자산 수수료 별도':'');
   node.append(header,detail);closed.append(node);
