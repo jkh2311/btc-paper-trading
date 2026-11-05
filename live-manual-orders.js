@@ -206,10 +206,12 @@ function displayLiveQuote(){
  liveQuoteValue.style.color=fresh?'#6de5bf':'#f5bb75';
  if(fresh)followQuote();
 }
+let activeCloseEditor=null;
 document.addEventListener('btc:live-trade-price',e=>{
  const d=e.detail;
  if(d?.symbol!==symbol||!(Number(d.price)>0)||!Number.isFinite(Number(d.at)))return;
  liveQuote={price:Number(d.price),at:Number(d.at)};
+ activeCloseEditor?.paint();
  if(!isSheetOpen()||Date.now()-lastQuotePaint<90)return;
  lastQuotePaint=Date.now();displayLiveQuote();
 });
@@ -353,6 +355,70 @@ async function enter(side){
 }
 // The selected-position action places a user-priced LIMIT close. The individual
 // card button remains a fast MARKET close. Both recheck the live exchange position.
+function chooseLiveClosePrice(side,qty,initialPrice,tick,digits){
+ // Display the same trade stream as the chart; editable LIMIT only freezes on input.
+ return new Promise(resolve=>{
+  if(activeCloseEditor){resolve(null);return;}
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(3,9,19,.82);display:flex;align-items:center;justify-content:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom))';
+  const dialog=document.createElement('div');
+  dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
+  dialog.setAttribute('aria-label',side+' 지정가 청산 가격 선택');
+  dialog.style.cssText='background:#14243e;color:#e7edf8;border:1px solid #456280;border-radius:18px;padding:18px;width:min(100%,440px);max-height:90dvh;overflow-y:auto;box-shadow:0 15px 70px #0009;font-family:-apple-system,BlinkMacSystemFont,sans-serif';
+  const title=document.createElement('strong');title.textContent='BTCUSDT '+side+' 지정가 청산';
+  title.style.cssText='font-size:19px;display:block;margin-bottom:7px';
+  const quantity=document.createElement('p');quantity.textContent='선택 포지션 '+qty+' BTC · 전량 지정가 청산';
+  quantity.style.cssText='font-size:13px;color:#aac0d9;margin:0 0 15px';
+  const priceBox=document.createElement('div');
+  priceBox.style.cssText='background:#0b1b30;border:1px solid #36506d;border-radius:12px;padding:13px 15px;margin-bottom:12px';
+  const caption=document.createElement('div');caption.textContent='실시간 현재가 · 바이낸스 체결가';
+  caption.style.cssText='font-size:12px;color:#aabed6;margin-bottom:6px';
+  const live=document.createElement('strong');live.textContent='실시간 시세 연결 중…';
+  live.style.cssText='font-size:24px;font-variant-numeric:tabular-nums;color:#55dcac;display:block';
+  priceBox.append(caption,live);
+  const label=document.createElement('label');label.textContent='청산 주문 지정가 (USDT)';
+  label.style.cssText='display:block;font-size:13px;color:#b7cce4;margin-bottom:7px';
+  const input=document.createElement('input');input.type='text';input.inputMode='decimal';input.autocomplete='off';
+  input.style.cssText='font-size:22px;color:#fff;background:#294364;border:1px solid #567598;border-radius:12px;padding:12px 13px;width:100%;box-sizing:border-box;font-variant-numeric:tabular-nums';
+  const info=document.createElement('div');info.textContent='현재가 자동 연동 · 가격을 수정하면 지정가 고정';
+  info.style.cssText='font-size:11px;color:#afc6de;margin-top:7px;min-height:16px';
+  const actions=document.createElement('div');actions.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:16px';
+  const now=document.createElement('button');now.type='button';now.textContent='현재가 적용';
+  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='취소';
+  const accept=document.createElement('button');accept.type='button';accept.textContent='지정가 청산 확인';
+  for(const button of [now,cancel,accept])button.style.cssText='flex:1 1 auto;padding:12px 8px;min-height:43px;color:#fff;background:#294363;border:1px solid #4b6b89;border-radius:10px;font-size:13px';
+  accept.style.background='#146753';accept.style.borderColor='#40ad8d';
+  actions.append(now,cancel,accept);
+  const warning=document.createElement('p');
+  warning.textContent='지정가 주문은 즉시 체결되지 않을 수 있으며, 체결 전에는 포지션이 유지됩니다.';
+  warning.style.cssText='font-size:11px;line-height:1.5;color:#b5cbe2;margin:11px 0 0';
+  dialog.append(title,quantity,priceBox,label,input,info,actions,warning);
+  overlay.append(dialog);document.body.append(overlay);
+  let edited=false,closed=false;
+  const snap=price=>(Math.round(price/tick)*tick).toFixed(digits);
+  function paint(){
+   const fresh=liveQuote.price>0&&Date.now()-liveQuote.at<=3500;
+   live.textContent=fresh?liveQuote.price.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:2})+' USDT':'실시간 연결 확인 중…';
+   live.style.color=fresh?'#55dcac':'#f5ba75';
+   if(!edited&&fresh){input.value=snap(liveQuote.price);info.textContent='실시간 현재가 연동 · 직접 수정하면 지정가 고정';}
+  }
+  function finish(value){
+   if(closed)return;closed=true;
+   document.removeEventListener('keydown',keyHandler,true);
+   if(activeCloseEditor?.paint===paint)activeCloseEditor=null;
+   overlay.remove();resolve(value);
+  }
+  const keyHandler=e=>{if(e.key==='Escape'){e.preventDefault();finish(null);}};
+  document.addEventListener('keydown',keyHandler,true);
+  input.addEventListener('input',()=>{edited=true;info.textContent='입력한 지정가 고정 · 실시간 현재가는 계속 표시';});
+  now.onclick=()=>{if(!(liveQuote.price>0&&Date.now()-liveQuote.at<=3500)){info.textContent='실시간 연결 확인 후 다시 눌러 주세요';return;}edited=false;paint();};
+  cancel.onclick=()=>finish(null);
+  accept.onclick=()=>{const value=input.value.trim();if(!value){info.textContent='지정가를 입력하세요';return;}finish(value);};
+  activeCloseEditor={paint};
+  if(initialPrice>0)input.value=snap(initialPrice);
+  paint();
+ });
+}
 async function closeSelected(orderKind='LIMIT'){
  await run(async()=>{
   const selection=selected;
@@ -389,7 +455,7 @@ async function closeSelected(orderKind='LIMIT'){
    if(!(tick>0))throw Error('지정가 호가 단위 조회 실패');
    const proposed=Number(p.markPrice)>0?Number(p.markPrice):Number(selection.mark);
    const defaultPrice=proposed>0?(Math.round(proposed/tick)*tick).toFixed(digits):'';
-   const typed=prompt('BTCUSDT '+selection.side+' 전량 지정가 청산 가격(USDT)을 입력하세요.\n미체결 시 주문이 대기하며, 시장가로 청산되지 않습니다.',defaultPrice);
+   const typed=await chooseLiveClosePrice(selection.side,qty,Number(defaultPrice),tick,digits);
    if(typed===null)return;
    // iOS prompts can include grouping commas and surrounding whitespace.
    // Validate a numeric USDT price, never silently interpret extra text or currency units.
@@ -408,6 +474,13 @@ async function closeSelected(orderKind='LIMIT'){
   if(!confirm('BTCUSDT '+selection.side+' 포지션 '+qty+' BTC 전량 청산 주문을 전송할까요?\n'+
    desc+'\n'+(orderKind==='LIMIT'?'체결 전까지 포지션은 유지됩니다.':'체결가는 현재 가격과 다를 수 있습니다.')))return;
 
+  // The price dialog may have remained open while the exchange position changed.
+  // Check the exact position amount again before submitting a closing order.
+  const finalData=await signed('GET','/fapi/v3/positionRisk',{symbol});
+  const finalRows=Array.isArray(finalData)?finalData:[finalData];
+  const finalPosition=finalRows.find(x=>x.symbol===symbol&&x.positionSide===positionSide&&Math.abs(Number(x.positionAmt))>0);
+  if(!finalPosition||Math.abs(Math.abs(Number(finalPosition.positionAmt))-Number(qty))>1e-8)
+   throw Error('청산창을 여는 동안 보유 수량이 바뀌었습니다. 다시 조회 후 시도하세요.');
   const id='btcClose'+Date.now()+Math.floor(Math.random()*10000);
   const order={symbol,side:exitSide,positionSide,type:orderKind,quantity:qty,
    newClientOrderId:id,newOrderRespType:'RESULT'};
