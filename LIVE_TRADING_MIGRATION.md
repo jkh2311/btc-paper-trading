@@ -36,3 +36,13 @@
 7. 전체 주문 한도, 종목 고정 BTCUSDT, 레버리지 상한, 일손실 제한 및 긴급 중지 버튼
 
 **절대 모의매매의 로컬 캔들 가격만으로 실전 체결로 취급하지 마세요.**
+
+## 2026-11-05 업데이트: 실제 계좌 읽기 전용 UI 연결
+
+- `live-dashboard.js` 신규 추가. `index.html`의 마지막 외부 스크립트로 연결함.
+- 앱의 포지션 및 거래내역 탭에 실제 선물 USDT 잔고, 사용 가능 잔고, 현재 포지션, 일반 미체결 주문, 최근 체결을 표시할 대시보드 배치.
+- Cloudflare Worker HTTPS 주소와 `APP_AUTH_TOKEN`만 사용(토큰은 메모리만 사용하고 화면 비활성화 시 지움). Binance API 키/Secret은 화면에 입력하지 않음.
+- 백엔드 `btc-trading-api`의 `feature/read-only-live-account-snapshot` 브랜치에 인증된 `GET /private/live-snapshot` 및 엄격한 출처 제한 GET/OPTIONS CORS 처리 추가.
+- **미배포**: GitHub 브랜치만으로 사이트/Cloudflare Worker 업데이트가 되지 않음. 인증 및 실제 읽기 성공 검증 전까지 main 병합하지 않음.
+- 실전 주문/정정/취소/자동매매는 아직 구현되지 않음. BTCUSDT 거래 API 권한을 켜도 앱에서 실제 주문을 낼 수 없음.
+- 현재 주문목록 조회는 일반 미체결 주문이며 **조건부 손절·익절 Algo 주문은 아직 조회하지 않음**. 따라서 실제 보호 주문 유무 판단에는 사용하지 말 것.
