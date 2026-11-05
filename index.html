@@ -2546,4 +2546,4 @@ setInterval(()=>{
   else if(!wsConnected&&(!ws||ws.readyState===WebSocket.CLOSED))connectWs();
 },5000);
 timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),p=Math.max(1000,v.c*(1+(Math.random()-.5)*.001));a.push({t:Date.now(),o:v.c,h:Math.max(p,v.c),l:Math.min(p,v.c),c:p,v:Math.round(30+Math.random()*200)});a.shift()}last=candles['1m'].at(-1).c;process();render()}else refresh()},45000);
-</script><script src="./live-dashboard.js?v=order-status-06"></script><script src="./live-order-draft.js?v=preview-01"></script><script src="./live-open-orders.js?v=snapshot-01"></script></body></html>
+</script><script src="./live-dashboard.js?v=open-orders-07"></script><script src="./live-order-draft.js?v=preview-01"></script><script src="./live-open-orders.js?v=snapshot-01"></script></body></html>
