@@ -80,6 +80,14 @@ calc.onclick=async()=>{
    rows.map(x=>(x.i+1)+'단계 '+fmt(x.m,3)+' USDT · '+fmt(x.q,8)+' BTC'+(x.ok?'':' (최소 주문 조건 미달)')).join('\n')+
    '\n선택 '+(index+1)+'단계: '+(rows[index].ok?fmt(rows[index].q,8)+' BTC':'거래소 최소 조건 미달')+
    '\n\n실제 주문 전송 없음. 단계 수는 사용자가 관리하는 계획이며 바이낸스 포지션 수와 다릅니다.';
+  if(rows[index].ok&&Number.isFinite(rows[index].q)&&rows[index].q>0){
+   document.dispatchEvent(new CustomEvent('btc:live-stage-sized',{detail:{
+    symbol:'BTCUSDT',side:side.value,stage:index+1,limit:6,
+    price:p,quantity:rows[index].q,margin:rows[index].m,
+    leverage:position.lev,availableBalance:account.available,
+    positionSide:position.side,checkedAt:Date.now()
+   }}));
+  }
  }catch(e){result.textContent='계산 실패: '+String(e.message||e)}
  finally{calc.disabled=false}
 };
