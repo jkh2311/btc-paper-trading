@@ -101,7 +101,7 @@ function showRows(rows){
  const totalReturn=create('div');totalReturn.append(create('small','총 수익률'),
   create('strong','— (기준 계좌자산 미확인)'));
  const totalGain=create('div');totalGain.append(create('small','조회 범위 실현손익 (USDT)'),
-  create('strong',signed(net)+(otherFee?'*':'')));
+  create('strong',signed(net)+' USDT'+(otherFee?'*':'')));
  totalGain.querySelector('strong').className=net>=0?'paper-stat-profit':'paper-stat-loss';
  grid.append(totalReturn,totalGain);summary.append(grid);
  summary.append(create('div','실현손익이 확인된 청산 체결 그룹 '+groups.length+'건 · 수익 '+success+
@@ -150,6 +150,7 @@ get.onclick=()=>void run();
 if(refresh)refresh.onclick=()=>void run();
 if(clear)clear.onclick=()=>{sequence++;controller?.abort();empty('화면에서만 비웠습니다. 실제 거래소 기록은 삭제되지 않습니다.');status.textContent='화면 기록 초기화 · 실제 거래소 데이터는 그대로예요.'};
 const reset=()=>{sequence++;controller?.abort();empty('API 잠금 또는 화면 비활성화 · 다시 조회해 주세요.');status.textContent='실제 거래내역 재조회 필요'};
+document.addEventListener('btc:real-account-cleared',reset);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)reset()});
 window.addEventListener('pagehide',reset);
 empty();
