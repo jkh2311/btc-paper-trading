@@ -121,6 +121,7 @@ async function enter(side){
   lastOrderIssue=false;
   message('실제 주문 확인 · #'+response.orderId+' · '+response.status+' · 체결 '+(response.executedQty||'0')+' BTC\n보호 주문은 자동 등록되지 않습니다.');
   if($('realAccountRefresh'))$('realAccountRefresh').click();
+  void updateOpenOrders();
   if($('paperStatsReset')){/* no paper statistics mutation */}
  });
 }
@@ -151,6 +152,7 @@ async function closeSelected(){
   message('실제 청산 주문 #'+res.orderId+' · '+res.status+' · 체결 '+(res.executedQty||'0')+' BTC\n미체결/잔여 포지션은 다시 조회하세요.');
   selected=null;
   $('realAccountRefresh')?.click();
+  void updateOpenOrders();
  });
 }
 async function cancelOrders(){
@@ -169,6 +171,118 @@ async function cancelOrders(){
   $('realAccountRefresh')?.click();
  });
 }
+// Reuse the v61 expandable trade-history area; no extra trading dashboard.
+const historyContent=$('page-history')?.querySelector('.paper-history-content');
+const orderList=document.createElement('div');
+orderList.id='realOpenOrdersList';
+orderList.setAttribute('aria-live','polite');
+orderList.style.cssText='margin:10px 0 14px';
+if(historyContent){
+ const oldPending=$('manualPendingHistory');
+ if(oldPending)oldPending.insertAdjacentElement('beforebegin',orderList);
+ else historyContent.prepend(orderList);
+}
+let listedOrders=null,orderListError='',orderCancelBusy=false,orderReadGeneration=0;
+function formatOpenOrder(o){
+ const side=o.positionSide==='LONG'?'롱 LONG':o.positionSide==='SHORT'?'숏 SHORT':o.side==='BUY'?'롱 BUY':'숏 SELL';
+ const remaining=Math.max(0,Number(o.origQty)-Number(o.executedQty));
+ return {side,remaining,price:Number(o.price),qty:Number(o.origQty)};
+}
+function showOpenOrders(orders,error=''){
+ if(error){
+  orderListError=error;
+  orderList.textContent='실제 미체결 주문 조회 실패 · 마지막 목록은 최신 정보가 아닙니다. '+error;
+  return;
+ }
+ orderListError='';
+ listedOrders=orders;
+ orderList.replaceChildren();
+ const title=document.createElement('div');
+ title.style.cssText='font-size:13px;font-weight:750;color:#dbe7f8;margin:5px 0 9px';
+ title.textContent='실제 BTCUSDT 미체결 주문 · '+orders.length+'건';
+ orderList.append(title);
+ if(!orders.length){
+  const empty=document.createElement('p');empty.className='muted';
+  empty.textContent='현재 일반 미체결 주문이 없습니다. (조건부·Algo 주문은 별도)';
+  orderList.append(empty);return;
+ }
+ for(const o of orders){
+  if(o.symbol!==symbol||!Number.isSafeInteger(Number(o.orderId)))continue;
+  const details=formatOpenOrder(o);
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 5px;border-bottom:1px solid #314665';
+  const info=document.createElement('div');
+  info.style.cssText='font-size:12px;min-width:0;line-height:1.6;overflow-wrap:anywhere';
+  const heading=document.createElement('b');
+  heading.textContent=details.side+' · '+o.type+' · '+String(o.status||'미체결');
+  heading.style.color=o.side==='BUY'?'#4ed6a6':'#ff869b';
+  const description=document.createElement('div');
+  description.textContent='주문 #'+o.orderId+' · '+fmt(details.remaining)+' / '+fmt(details.qty)+' BTC 남음 · '+fmt(details.price)+' USDT';
+  info.append(heading,description);
+  const cancel=document.createElement('button');
+  cancel.type='button';cancel.textContent='개별 취소';
+  cancel.disabled=orderCancelBusy||!!orderListError;
+  cancel.style.cssText='flex-shrink:0;padding:8px 10px;font-size:12px';
+  cancel.onclick=()=>void cancelSingleOrder(o.orderId);
+  row.append(info,cancel);orderList.append(row);
+ }
+}
+async function fetchOpenOrders(){
+ const data=await signed('GET','/fapi/v1/openOrders',{symbol});
+ if(!Array.isArray(data)||data.some(o=>o?.symbol!==symbol||!Number.isSafeInteger(Number(o.orderId))))
+  throw Error('바이낸스 미체결 주문 데이터 확인 실패');
+ return data;
+}
+async function updateOpenOrders(){
+ const generation=++orderReadGeneration;
+ try{
+  const data=await fetchOpenOrders();
+  if(generation===orderReadGeneration&&!orderCancelBusy)showOpenOrders(data);
+ }catch(e){
+  if(generation===orderReadGeneration&&!orderCancelBusy)showOpenOrders([],String(e?.message||e));
+ }
+}
+async function cancelSingleOrder(orderId){
+ if(orderCancelBusy||busy||orderListError)return;
+ // Recheck the order directly before asking for permission to cancel it.
+ orderCancelBusy=true;
+ const generation=++orderReadGeneration;
+ try{
+  const before=await fetchOpenOrders();
+  const target=before.find(o=>String(o.orderId)===String(orderId));
+  if(!target){showOpenOrders(before);return;}
+  const details=formatOpenOrder(target);
+  if(!confirm('바이낸스 실제 주문 #'+orderId+'만 취소할까요?\n'+details.side+' · '+fmt(details.remaining)+' BTC · '+target.type+' @ '+fmt(details.price)+' USDT\n다른 주문은 유지됩니다.')){showOpenOrders(before);return;}
+  orderList.textContent='바이낸스 주문 #'+orderId+' 개별 취소 요청 중…';
+  let response=null,requestError=null;
+  try{response=await signed('DELETE','/fapi/v1/order',{symbol,orderId:String(orderId)});}
+  catch(e){requestError=e;}
+  // A timeout or CORS error does not tell us whether Binance canceled the order.
+  let after=null;
+  try{after=await fetchOpenOrders();}catch(e){
+   orderList.textContent='취소 결과 미확정 · 주문 #'+orderId+' · 바이낸스 앱에서 주문 상태를 확인하세요. '+String(e?.message||e);
+   return;
+  }
+  if(generation!==orderReadGeneration)return;
+  showOpenOrders(after);
+  const stillOpen=after.some(o=>String(o.orderId)===String(orderId));
+  const text=stillOpen?'취소 미완료 또는 응답 지연 · 주문 #'+orderId+'가 아직 미체결 목록에 있습니다.':
+   requestError?'주문 #'+orderId+'가 미체결 목록에서 사라졌습니다. 취소 여부와 체결 여부는 바이낸스 거래내역에서 확인하세요.':
+   response?.status==='CANCELED'?'주문 #'+orderId+' 실제 취소 확인 (CANCELED)':
+   '주문 #'+orderId+'가 미체결 목록에서 사라졌습니다. 최종 상태는 바이낸스에서 확인하세요.';
+  const note=document.createElement('p');note.className='muted';note.style.cssText='font-size:11px;line-height:1.6';
+  note.textContent=text;orderList.append(note);
+ }catch(e){
+  orderList.textContent='개별 취소를 진행할 수 없습니다 · '+String(e?.message||e);
+ }finally{
+  orderCancelBusy=false;
+  // Restore per-order button state on next five-second account refresh.
+ }
+}
+if(historyContent){
+ orderList.textContent='실제 미체결 주문 조회 전 · API 잠금 해제 후 자동 갱신';
+}
+
 let lastOrdersStatus=0;
 async function refreshLoop(){
  if(!visible()||refreshBusy||busy||!credentialsSafeSilent())return;
@@ -181,12 +295,10 @@ async function refreshLoop(){
    button?.click();
   }
   if(Date.now()-lastOrdersStatus>5000){
-   const orders=await signed('GET','/fapi/v1/openOrders',{symbol});
-   if(Array.isArray(orders)){
-    lastOrdersStatus=Date.now();
-    const note=$('realAccountUpdated');
-    if(note)note.title='BTCUSDT 일반 미체결 '+orders.length+'건 · '+new Date().toLocaleTimeString('ko-KR');
-   }
+   await updateOpenOrders();
+   lastOrdersStatus=Date.now();
+   const note=$('realAccountUpdated');
+   if(note&&Array.isArray(listedOrders)&&!orderListError)note.title='BTCUSDT 일반 미체결 '+listedOrders.length+'건 · '+new Date().toLocaleTimeString('ko-KR');
   }
  }catch(e){console.warn('실계좌 자동 조회 실패:',e.message)}
  finally{refreshBusy=false;}
