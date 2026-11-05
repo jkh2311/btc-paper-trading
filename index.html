@@ -319,7 +319,7 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
  <div id="candleTime" class="muted candle-info"></div>
  <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button></div>
  <div id="range" style="display:none"></div><div id="chartHint" style="display:none"></div><p id="selected" style="display:none"></p>
- <div id="entrySheet" class="card" style="display:none"><b id="sheetPrice">가상 주문</b><div class="order-types"><label><input type="radio" name="orderType" value="limit" checked> 지정가</label><label><input type="radio" name="orderType" value="market"> 시장가</label></div><label id="limitLabel" for="limitPrice">지정가 (USDT)</label><input id="limitPrice" type="number" min="0.01" step="0.1" inputmode="decimal" placeholder="원하는 진입 가격"><p id="orderHelp" class="muted" style="font-size:11px">지정가 주문은 가격 도달 시 모의 체결됩니다.</p><div class="row"><button class="buy" id="sheetLong">롱 진입</button><button class="sell" id="sheetShort">숏 진입</button><button id="sheetCancel">닫기</button></div></div>
+ <div id="entrySheet" class="card" style="display:none"><b id="sheetPrice">실제 BTCUSDT 주문</b><div class="order-types"><label><input type="radio" name="orderType" value="limit" checked> 지정가</label><label><input type="radio" name="orderType" value="market"> 시장가</label></div><label id="limitLabel" for="limitPrice">지정가 (USDT)</label><input id="limitPrice" type="number" min="0.01" step="0.1" inputmode="decimal" placeholder="원하는 진입 가격"><p id="orderHelp" class="muted" style="font-size:11px">지정가 주문은 바이낸스에 실제 전송됩니다.</p><div class="row"><button class="buy" id="sheetLong">롱 진입</button><button class="sell" id="sheetShort">숏 진입</button><button id="sheetCancel">닫기</button></div></div>
  <div class="account-strip"><div><small>가상 잔고</small><strong id="balanceSummary">822.00 USDT</strong></div><div><small>순손익 (원화 추정)</small><strong id="pnlSummary">₩0</strong></div></div>
 </section>
 <section class="tab-page" id="page-position">
@@ -364,7 +364,7 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
 <label for="myBinanceKey">API Key</label><input type="password" id="myBinanceKey" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 API Key">
 <label for="myBinanceSecret">Secret Key</label><input type="password" id="myBinanceSecret" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 Secret Key">
 <div class="api-secondary-actions"><button id="myWsPublic" type="button">연결 확인</button><button id="myApiClear" type="button">입력 지우기</button><button id="myVaultDelete" type="button">저장 키 삭제</button><button id="myFeeForget" type="button">수수료 기록 삭제</button></div>
-<p class="api-footnote">키는 잠금 비밀번호로 이 기기에 암호화 저장됩니다. 읽기 전용 API 키만 사용하세요. 실제 주문은 실행하지 않습니다.</p>
+<p class="api-footnote">키는 잠금 비밀번호로 이 기기에 암호화 저장됩니다. 실주문에는 선물 거래 권한이 필요합니다. API 시크릿은 이 기기에 암호화 저장됩니다.</p>
 </div></details>
 </div><div class="card"><h2>실전매매 포지션 모드</h2><label for="paperPositionMode">포지션 방식</label><select id="paperPositionMode"><option value="hedge">헤지 모드 · 롱/숏 동시 보유</option><option value="oneway">단방향 모드 · 한쪽만 보유</option></select>
 <label for="autoMarketMode">RMI AUTO 시장 모드</label>
@@ -2176,7 +2176,7 @@ function clearRealAccount(message='조회 전 · 저장된 API 키는 잠금 해
   $('realWalletBalance').textContent='—';$('realAvailableBalance').textContent='—';
   $('realUnrealizedPnl').textContent='—';$('realPositionCount').textContent='—';
   $('realUnrealizedPnl').className='';$('realPositions').textContent=message;
-  $('realAccountUpdated').textContent='실제 계좌 정보 미조회 · 자동 실시간 갱신 아님';
+  $('realAccountUpdated').textContent='실제 계좌 정보 미조회 · 잠금 해제 후 앱 활성 중 5초 갱신';
 }
 function renderRealAccount(data){
   liveAccountSnapshot={data,at:Date.now()};
@@ -2207,7 +2207,7 @@ function renderRealAccount(data){
     ].join(String.fromCharCode(10));
     row.append(top,details);root.append(row);
   }
-  $('realAccountUpdated').textContent='마지막 조회: '+new Date().toLocaleString('ko-KR')+' · 수동 새로고침';
+  $('realAccountUpdated').textContent='마지막 조회: '+new Date().toLocaleString('ko-KR')+' · 앱 활성 중 5초 자동 갱신';
   document.dispatchEvent(new CustomEvent('btc:real-account-updated',{detail:{
     at:Date.now(),wallet:usdt?.walletBalance??null,available:usdt?.availableBalance??null,
     margin:data.totalPositionInitialMargin??null,
@@ -2350,7 +2350,7 @@ $('autoMarketMode').addEventListener('change',()=>{
   if(autoPendingLimit)cancelAutoPendingLimit('사용자가 시장 모드 변경');
   savePaperState();render();updatePosition();void pushSyncSettings();
 });
-$('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState()});$('marginPct').addEventListener('change',()=>{calc();savePaperState()});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
+$('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState()});$('marginPct').addEventListener('change',()=>{calc();savePaperState()});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){if(getApiCredentials()?.apiKey)return;savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
 
 // Local-only RMI alert: no push subscription, account, or third-party server.
 const SIGNAL_ALERT_KEY='btc-paper-local-signal-alert-v1';
@@ -2529,4 +2529,4 @@ setInterval(()=>{
   else if(!wsConnected&&(!ws||ws.readyState===WebSocket.CLOSED))connectWs();
 },5000);
 timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),p=Math.max(1000,v.c*(1+(Math.random()-.5)*.001));a.push({t:Date.now(),o:v.c,h:Math.max(p,v.c),l:Math.min(p,v.c),c:p,v:Math.round(30+Math.random()*200)});a.shift()}last=candles['1m'].at(-1).c;process();render()}else refresh()},45000);
-</script><script src="./real-position-hedge.js?v=real-68"></script><script src="./live-position-mode-sync.js?v=mode-65"></script><script src="./live-real-history.js?v=real-66c"></script><script src="./live-trading-controls.js?v=controls-67b"></script></body></html>
+</script><script src="./real-position-hedge.js?v=real-68"></script><script src="./live-position-mode-sync.js?v=mode-65"></script><script src="./live-real-history.js?v=real-66c"></script><script src="./live-trading-controls.js?v=controls-67b"></script><script src="./live-manual-orders.js?v=orders-69"></script></body></html>
