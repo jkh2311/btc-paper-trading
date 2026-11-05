@@ -50,6 +50,11 @@ document.addEventListener('btc:live-rmi-candidate',e=>{
  const fresh=account&&now-account.at<=60000&&account.canTrade&&Number.isFinite(account.available)&&account.available>0;
  status.textContent='신호 '+signalCount+'건 관찰 · '+s.side+(fresh?' · 계좌 조회 유효':' · 실계좌 재조회 필요')+
   ' · 주문 미전송 / AUTO 실행 기능 미구현';
+ if(fresh)document.dispatchEvent(new CustomEvent('btc:live-auto-plan-request',{detail:{
+  symbol:'BTCUSDT',side:s.side,barTime:bar,signalPrice:Number(s.price),
+  marketMode:s.marketMode,minuteRmi:s.minuteRmi,volumeRatio:s.volumeRatio,
+  accountAvailable:account.available,checkedAt:now
+ }}));
 });
 document.addEventListener('btc:live-lock',()=>disable('API 잠금 · RMI 관찰 OFF'));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)disable('앱 비활성화 · RMI 관찰 OFF')});
