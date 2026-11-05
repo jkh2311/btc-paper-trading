@@ -123,7 +123,20 @@ if(settingsCard){
     stop>0&&stop<=10&&rr>0&&rr<=10&&price>0)){
    output.textContent='레버리지·진입 개수·손절 거리·손익비·시세를 확인해 주세요.';return;
   }
-  const usable=Math.min(account.available,account.wallet)*.95;
+  const mode=$('sizeMode')?.value,marginPct=value($('marginPct')?.value),
+   riskPct=value($('risk')?.value),hold=value($('hold')?.value);
+  if(!['risk','margin'].includes(mode)||!(hold>=1&&hold<=24)){
+   output.textContent='포지션 크기 계산 방식과 최대 보유 시간을 확인해 주세요.';return;
+  }
+  let desiredMargin;
+  if(mode==='margin'){
+   if(!(marginPct>0&&marginPct<=100)){output.textContent='증거금 사용 비율은 0~100% 범위에서 설정해 주세요.';return}
+   desiredMargin=account.available*marginPct/100;
+  }else{
+   if(!(riskPct>0&&riskPct<=5)){output.textContent='계좌 위험 비율은 0~5% 범위에서 설정해 주세요.';return}
+   desiredMargin=account.wallet*(riskPct/100)/(stop/100)/lev;
+  }
+  const usable=Math.min(desiredMargin,account.available*.95);
   if(!(usable>0)){output.textContent='실제 사용 가능한 증거금 없음';return}
   const weights=Array.from({length:count},(_,i)=>1+i*.2);
   const total=weights.reduce((a,b)=>a+b,0);
@@ -133,10 +146,12 @@ if(settingsCard){
    return (i+1)+'단계 · 예상 증거금 '+fmt(margin,2)+' USDT · '+fmt(margin*lev/price,8)+' BTC';
   });
   output.textContent='실제 잔고 기준 주문 계획 · 실제 주문 전송 없음\n실제 사용 가능 '+fmt(account.available,2)+
-   ' USDT / 계획 예산(5% 여유) '+fmt(usable,2)+' USDT\n현재 입력 레버리지 '+lev+
+   ' USDT / 계산 증거금 '+fmt(usable,2)+' USDT (최대 가용 잔고 95%)\n'+
+   (mode==='margin'?'남은 증거금 사용 비율 '+fmt(marginPct,2)+'%':'1회 계좌 위험 '+fmt(riskPct,2)+'% (수수료·슬리피지 제외 추산)')+
+   '\n현재 입력 레버리지 '+lev+
    '배 (바이낸스 설정 변경 아님) · '+side+'\n'+
    stages.join('\n')+(count>10?'\n… 나머지 '+(count-10)+'단계':'' )+
-   '\n손절 '+fmt(stop,2)+'% · 목표 손익비 '+fmt(rr,2)+
+   '\n손절 '+fmt(stop,2)+'% · 목표 손익비 '+fmt(rr,2)+' · 최대 보유 '+hold+'시간'+
    '\n실제 거래소 수량 필터·호가/레버리지 재검증 전의 계산 결과입니다.';
  };
  button.onclick=plan;
