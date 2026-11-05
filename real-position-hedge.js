@@ -134,8 +134,8 @@ document.addEventListener('btc:real-account-cleared',e=>{
  const note=e.detail?.message;
  if(note)message.textContent=String(note).slice(0,160)+' · 가상 포지션은 표시하지 않습니다.';
 });
-document.addEventListener('visibilitychange',()=>{if(document.hidden){snapshot=null;selection=null;render()}});
-window.addEventListener('pagehide',()=>{snapshot=null;selection=null});
+// Keep last verified snapshot while iOS temporarily suspends this PWA; timestamps remain visible.
+// A genuine page reload naturally discards in-memory account details.
 window.renderActualHedgePosition=render;
 document.body.classList.add('real-position-ready');
 render();
