@@ -11,7 +11,7 @@ window.liveHistoryViewActive=true;
 const autoPanel=document.getElementById('autoPaperToggle')?.closest('.auto-panel');
 if(autoPanel){
  const observer=document.createElement('p');observer.className='muted';
- observer.style.cssText='font-size:11px;margin:8px 0;line-height:1.5';
+ observer.style.cssText='position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap';
  observer.textContent='AUTO · 신호 관찰만 (실주문 OFF)';
  autoPanel.querySelector('.auto-panel-header')?.insertAdjacentElement('afterend',observer);
  document.addEventListener('btc:live-rmi-observed',e=>{
