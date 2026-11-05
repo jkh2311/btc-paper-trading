@@ -38,7 +38,7 @@ document.addEventListener('btc:real-position-selected',e=>{
  const p=e.detail;
  selected=p&&['LONG','SHORT'].includes(p.side)?p:null;
  if(close)close.disabled=!selected;
- result.textContent=selected?'선택 '+selected.side+' · '+fmt(Math.abs(value(selected.amount)),8)+' BTC · 청산 계획을 확인하려면 버튼을 누르세요.':'포지션을 선택해 주세요.';
+ result.textContent=selected?'선택 '+selected.side+' · '+fmt(Math.abs(value(selected.amount)),8)+' BTC':'포지션을 선택해 주세요.';
 });
 document.addEventListener('btc:real-account-updated',e=>{
  const d=e.detail;
@@ -49,7 +49,7 @@ document.addEventListener('btc:real-account-updated',e=>{
   if(match)selected={...selected,accountAt:d.at};else selected=null;
  }
  if(close)close.disabled=!selected;
- if(!selected)result.textContent='실제 계좌 '+new Date(d.at).toLocaleTimeString('ko-KR')+' 조회 · 포지션을 선택하거나 대기 주문을 확인해 주세요.';
+ if(!selected)result.textContent='실계좌 조회 '+new Date(d.at).toLocaleTimeString('ko-KR');
  updateBalance();
 });
 document.addEventListener('btc:real-account-cleared',reset);
