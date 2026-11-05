@@ -95,8 +95,8 @@ calculate.onclick=async()=>{
    orderSide=s==='LONG'?'SELL':'BUY';
    remark='청산 전 거래소 포지션을 다시 확인해야 합니다. One-way 모드 청산에는 reduceOnly 설정이 필요합니다.';
   }
-  if(!(qty>=f.min)&&!(kind==='REDUCE'&&qty>0))
-   throw Error('주문 최소 수량 미달');
+  if(!(qty>=f.min))
+   throw Error('거래소 최소 주문 수량 미달. 실제 포지션 전량 종료가 필요한 소량 포지션은 바이낸스 앱에서 직접 확인하세요');
   if(Number.isFinite(f.max)&&f.max>0&&qty>f.max)throw Error('거래소 최대 수량 초과');
   output.textContent=(kind==='ADD'?'추가 진입':'부분 청산')+' 계산만 완료 · 실제 주문 0건\n'+
    '포지션 '+s+' · 거래소 positionSide '+pos.side+'\n'+
