@@ -59,15 +59,10 @@ function render(){
     '메모: '+(rec.details||'거래소에서 확인 전')
   ].join('\n'));
   box.append(header,info);
-  const close=make('button','거래소에서 종료 확인 후 기록 표시');
-  close.type='button';close.disabled=rec.status==='VERIFIED_CLOSED';
-  close.onclick=()=>{
-   if(!confirm('바이낸스 앱에서 진입 주문이 종료되고, 해당 주문으로 열린 포지션도 없으며, 남은 보호 주문이 없는 상태를 모두 확인했나요?\n확인되지 않았다면 절대 기록을 해제하지 마세요.'))return;
-   if(!confirm('주의: 이 버튼은 거래소를 조회해 검증하지 않고 사용자의 확인에 따라 기록만 종료 표시합니다. 신규 주문 중복 차단이 풀릴 수 있어요. 계속할까요?'))return;
-   rec.status='VERIFIED_CLOSED';rec.updatedAt=Date.now();rec.details='사용자 직접 확인에 따른 기록 종료 (자동 검증 아님)';
-   save();render();
-  };
-  box.append(close);list.append(box);
+  const note=make('small',rec.status==='VERIFIED_CLOSED'?
+    '검증 완료로 기록된 과거 항목':
+    '안전 잠금 유지 · 이 화면에서 기록 해제 불가. 거래소 주문·포지션·보호 주문을 모두 객관적으로 조회해 검증한 뒤에만 향후 기능에서 해제 가능.');
+  box.append(note);list.append(box);
  }
  const blocked=isBlocked();
  prepare.disabled=busy||blocked||!draft||!account;
