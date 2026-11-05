@@ -20,12 +20,21 @@ const intro=make('p','설정 > API 키 관리에서 한 번 암호화 저장하�
 const controls=make('div');const refresh=make('button','실제 계좌 조회');const lock=make('button','API 잠금');const settings=make('button','API 키 설정');
 controls.append(refresh,settings,lock);
 settings.addEventListener('click',()=>{if(typeof switchTab==='function')switchTab('settings');const el=document.getElementById('myApiManage');if(el)el.open=true});
+const orderSection=make('section');
+orderSection.className='direct-live';
+orderSection.append(make('h2','실제 주문 ID 조회 · 읽기 전용'));
+const orderHelp=make('p','바이낸스 선물 BTCUSDT 주문 번호를 입력하면 주문 상태와 미체결 수량을 조회합니다. 주문 취소·가격 정정은 아직 제공하지 않습니다.');
+const orderIdInput=make('input');orderIdInput.placeholder='바이낸스 주문 ID (숫자)';orderIdInput.type='text';orderIdInput.inputMode='numeric';orderIdInput.autocomplete='off';
+const lookupButton=make('button','주문 상태 확인');lookupButton.type='button';
+const orderOutput=make('div','주문 번호를 입력하고 조회하세요.');
+orderOutput.className='item';orderOutput.setAttribute('role','status');
+orderSection.append(orderHelp,orderIdInput,lookupButton,orderOutput);
 const status=make('p','API 키 잠금 상태 · 설정에서 잠금 해제 필요');
 status.setAttribute('role','status');
 const stats=make('div');stats.className='row2';
 const positions=make('div'),orders=make('div');
 root.append(title,intro,controls,status,stats,make('h2','실제 BTCUSDT 포지션'),positions,make('h2','실제 미체결 주문'),orders);
-accountPage.prepend(root);
+accountPage.prepend(root);root.insertAdjacentElement('afterend',orderSection);
 const history=make('section');history.className='direct-live';
 history.append(make('h2','실제 체결 기록'),make('p','실제 체결내역은 아직 연결되지 않았습니다. 모의 기록을 실전 기록으로 표시하지 않습니다.'));
 historyPage.prepend(history);
@@ -42,6 +51,29 @@ async function signedCall(method,fields,creds){
  // Existing browser-only authenticated WSS request helper.
  return directBinanceWS(method,params,status,11000);
 }
+let orderBusy=false;
+lookupButton.addEventListener('click',async()=>{
+ if(orderBusy)return;
+ const entered=orderIdInput.value.trim();
+ if(!/^[1-9][0-9]{0,18}$/.test(entered)){orderOutput.textContent='올바른 BTCUSDT 주문 번호를 입력해 주세요.';return}
+ const creds=typeof getApiCredentials==='function'?getApiCredentials():null;
+ if(!creds?.apiKey||!creds?.apiSecret){orderOutput.textContent='설정에서 API 잠금을 먼저 해제해 주세요.';return}
+ orderBusy=true;lookupButton.disabled=true;orderOutput.textContent='바이낸스 주문 상태 조회 중…';
+ try{
+   const data=await signedCall('order.status',{symbol:'BTCUSDT',orderId:Number(entered)},creds);
+   if(!data||data.symbol!=='BTCUSDT'||String(data.orderId)!==entered)throw Error('주문 응답 확인 실패');
+   const orig=Number(data.origQty),filled=Number(data.executedQty);
+   if(!Number.isFinite(orig)||!Number.isFinite(filled)||orig<0||filled<0||filled>orig)throw Error('주문 수량 형식 오류');
+   orderOutput.replaceChildren();
+   item(orderOutput,'주문 #'+entered+' · '+String(data.status||'상태 미확인'),
+     '방향 '+String(data.side||'—')+' / 포지션 '+String(data.positionSide||'—')+
+     ' / 유형 '+String(data.type||'—')+
+     ' / 가격 '+amount(data.price)+' USDT / 원주문 '+amount(orig,6)+
+     ' BTC / 체결 '+amount(filled,6)+' BTC / 미체결 '+amount(orig-filled,6)+' BTC');
+ }catch(e){orderOutput.textContent='주문 조회 실패: '+(e?.message||'연결 오류')+
+   ' · 주문을 찾을 수 없거나 이미 오래된 주문일 수 있습니다.'}
+ finally{orderBusy=false;lookupButton.disabled=false}
+});
 function render(acc,positionList){
  if(!acc||typeof acc!=='object'||!Array.isArray(positionList))throw Error('바이낸스 응답 형식 오류');
  reset();
