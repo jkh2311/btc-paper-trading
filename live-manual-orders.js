@@ -462,7 +462,7 @@ for(const [id,side] of [['long','LONG'],['short','SHORT']]){
  const b=$(id);if(!b)continue;b.disabled=false;b.onclick=()=>showSheet(side);
 }
 for(const [id,side] of [['sheetLong','LONG'],['sheetShort','SHORT']])if($(id))$(id).onclick=()=>enter(side);
-if($('close')){$('close').textContent='포지션 선택 후 청산';$('close').onclick=closeSelected;}
+if($('close')){$('close').textContent='선택 포지션 지정가 청산';$('close').onclick=()=>void closeSelected('LIMIT');}
 if($('cancel')){$('cancel').textContent='대기 주문 취소';$('cancel').onclick=cancelOrders;}
 $('sheetPrice').textContent='실제 BTCUSDT 주문';
 $('orderHelp').textContent='실전 주문 · 지정가 / 시장가';
