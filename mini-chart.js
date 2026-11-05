@@ -1,7 +1,7 @@
 /* Mini BTC chart: inside the PWA only (not system PiP). */
 (() => {
 'use strict';
-const css = '#miniBtcBtn{position:fixed;right:10px;top:58px;z-index:9399;padding:7px;font-size:12px;background:#193650;color:white;border:1px solid #536e89;border-radius:10px}'+
+const css = '#miniBtcBtn{flex:1;min-width:0;position:static;z-index:auto;height:28px;padding:3px 5px;font-size:11px;background:#193650;color:white;border:1px solid #536e89;border-radius:9px;white-space:nowrap}'+
 '#miniBtcBox{position:fixed;right:10px;top:100px;width:240px;max-width:calc(100vw - 20px);z-index:9400;padding:10px;border-radius:14px;border:1px solid #536e89;background:#0b192c;color:white;box-shadow:0 8px 30px #000a}'+
 '#miniBtcBox[hidden]{display:none}#miniBtcHandle{display:flex;justify-content:space-between;align-items:center;touch-action:none;user-select:none;font-size:12px;font-weight:bold}'+
 '#miniBtcClose{background:transparent;border:0;padding:2px 6px;color:white}#miniBtcPrice{font-size:22px;font-weight:700;margin:9px 0}'+
@@ -10,7 +10,10 @@ const style=document.createElement('style');style.textContent=css;document.head.
 const btn=document.createElement('button');btn.id='miniBtcBtn';btn.type='button';btn.textContent='▣ 미니';btn.setAttribute('aria-label','미니 차트 열기');
 const box=document.createElement('div');box.id='miniBtcBox';box.hidden=true;
 box.innerHTML='<div id="miniBtcHandle"><span>₿ BTCUSDT · <span id="miniBtcTf">1분</span></span><button id="miniBtcClose" type="button" aria-label="닫기">✕</button></div><div id="miniBtcPrice">-- USDT</div><canvas id="miniBtcCanvas" width="440" height="184"></canvas><div id="miniBtcInfo"><span id="miniBtcTrend">추세 대기</span><span id="miniBtcRmi">RMI --</span></div><div id="miniBtcNote">PWA 앱 내부 전용</div>';
-document.body.append(btn,box);
+const chartTools=document.querySelector('#page-chart .chart-tools');
+if(chartTools)chartTools.appendChild(btn);
+else document.body.appendChild(btn);
+document.body.appendChild(box);
 const el=id=>document.getElementById(id);
 const key='btc-mini-chart-open-v1';
 function paint(){
