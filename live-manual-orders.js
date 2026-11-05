@@ -48,7 +48,7 @@ async function run(fn){
  finally{busy=false;for(const id of ['sheetLong','sheetShort','cancel'])if($(id))$(id).disabled=false; if($('close'))$('close').disabled=!selected;}
 }
 function updateButtons(){for(const id of ['long','short'])if($(id))$(id).disabled=false;}
-document.addEventListener('btc:real-account-updated',e=>{account=e.detail; updateButtons();});
+document.addEventListener('btc:real-account-updated',e=>{account=e.detail; if(selected){const p=account?.positions?.find(p=>p.side===selected.positionSide&&Math.abs(Number(p.amount)-Number(selected.amount))<1e-8);if(!p)selected=null;} if($('close'))$('close').disabled=!selected;updateButtons();});
 document.addEventListener('btc:real-account-cleared',()=>{account=null;selected=null;});
 document.addEventListener('btc:real-position-selected',e=>{selected=e.detail||null;});
 function showSheet(side){
@@ -169,8 +169,7 @@ async function refreshLoop(){
  try{
   $('realAccountRefresh')?.click();
   // Keep calls sequential and skip overlapping requests; app suspension stops timers.
-  if($('page-history')?.classList.contains('active'))$('paperStatsReset')?.click;
-  if($('page-history')?.classList.contains('active')){
+  {
    const button=[...document.querySelectorAll('#page-history button')].find(e=>e.textContent.includes('실제 체결 내역 조회'));
    button?.click();
   }
@@ -197,6 +196,7 @@ $('orderHelp').textContent='실제 선물 주문 · 지정가/시장가 · 바�
 const note=document.querySelector('.real-account-note');
 if(note)note.textContent='앱 실행·활성 상태에서 실계좌를 약 5초마다 자동 조회합니다. 백그라운드 상태에서는 갱신하지 않습니다.';
 const auto=setInterval(refreshLoop,5000);
+document.addEventListener('btc:credentials-unlocked',()=>void refreshLoop());
 document.addEventListener('visibilitychange',()=>{if(visible())void refreshLoop();});
 window.addEventListener('focus',()=>{void refreshLoop();});
 setTimeout(()=>{if(credentialsSafeSilent())void refreshLoop();},500);
