@@ -111,7 +111,7 @@ function showSheet(side){
  $('sheetLong').style.display=side==='LONG'?'':'none';
  $('sheetShort').style.display=side==='SHORT'?'':'none';
  $('sheetPrice').textContent='BTCUSDT 실제 '+(side==='LONG'?'롱':'숏')+' 주문';
- $('orderHelp').textContent='실제 바이낸스 선물 주문입니다. 지정가 또는 시장가를 선택하세요.';
+ $('orderHelp').textContent='실전 주문 · 지정가 / 시장가';
  sh.dataset.realSide=side;
  const type=document.querySelector('input[name="orderType"]:checked')?.value||'limit';
  if(type==='limit'&&!Number($('limitPrice').value))$('limitPrice').value=String(Number(String($('price')?.textContent||'').replace(/[^0-9.]/g,''))||'');
@@ -364,9 +364,9 @@ for(const [id,side] of [['sheetLong','LONG'],['sheetShort','SHORT']])if($(id))$(
 if($('close')){$('close').textContent='포지션 선택 후 청산';$('close').onclick=closeSelected;}
 if($('cancel')){$('cancel').textContent='대기 주문 취소';$('cancel').onclick=cancelOrders;}
 $('sheetPrice').textContent='실제 BTCUSDT 주문';
-$('orderHelp').textContent='실제 선물 주문 · 지정가/시장가 · 바이낸스 주문 응답을 확인합니다.';
+$('orderHelp').textContent='실전 주문 · 지정가 / 시장가';
 const note=document.querySelector('.real-account-note');
-if(note)note.textContent='앱 실행·활성 상태에서 실계좌를 약 5초마다 자동 조회합니다. 백그라운드 상태에서는 갱신하지 않습니다.';
+if(note)note.textContent='앱 활성 중 5초 갱신';
 const auto=setInterval(refreshLoop,5000);
 document.addEventListener('btc:credentials-unlocked',()=>void refreshLoop());
 document.addEventListener('visibilitychange',()=>{if(visible())void refreshLoop();});
