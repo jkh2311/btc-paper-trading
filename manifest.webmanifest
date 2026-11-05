@@ -1,7 +1,7 @@
 {
   "id": "/btc-paper-trading/",
-  "name": "BTCUSDT 모의매매",
-  "short_name": "BTC 모의",
+  "name": "BTCUSDT 실전매매",
+  "short_name": "BTC LIVE",
   "start_url": "/btc-paper-trading/",
   "scope": "/btc-paper-trading/",
   "display": "standalone",
@@ -14,5 +14,6 @@
       "type": "image/svg+xml",
       "purpose": "any"
     }
-  ]
+  ],
+  "description": "바이낸스 BTCUSDT USDⓈ-M 선물 실계좌·포지션·주문 조회 및 RMI 신호 앱. 실제 주문 전송은 검증 전 잠금."
 }
