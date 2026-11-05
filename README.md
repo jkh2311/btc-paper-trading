@@ -1,1 +1,10 @@
-# btc-paper-trading
+# BTCUSDT 실전매매 PWA
+
+바이낸스 USDⓈ-M BTCUSDT 실계좌 대시보드, 포지션·주문 조회, 체결 내역, 수동 주문·6단계 피라미드·RMI AUTO 신호 계획을 표시합니다.
+
+**현재 상태:** 실제 주문 전송과 실전 AUTO 주문 실행은 검증 전까지 비활성화되어 있습니다. 계좌 조회와 주문 관련 기능은 아이폰 환경의 바이낸스 API 접근 및 CORS 제한에 따라 실패할 수 있습니다. 실제 주문은 바이낸스 공식 앱에서 관리하세요.
+
+- Cloudflare Worker 없이 브라우저에서 Binance API에 직접 연결합니다.
+- API Key와 Secret은 사용자 기기에 암호화 저장되며 비밀번호로 잠금 해제합니다. API 비밀키를 GitHub나 채팅에 저장하지 마세요.
+- 기존 모의매매 v61은 `archive/paper-trading-v61-20261105` 브랜치에 보관합니다. 메인 앱은 실전 계좌용으로 전환했습니다.
+- 실전 앱 상태 및 알려진 제한은 `LIVE_TRADING_MIGRATION.md`에 기록되어 있습니다.
