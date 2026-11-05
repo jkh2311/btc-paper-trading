@@ -216,9 +216,7 @@ function showRows(rows){
  pending.replaceChildren(tradesDesc);
  log.replaceChildren();
  if(!rows.length){
-  log.textContent='조회 범위 내 실제 BTCUSDT 체결 내역이 없어요.';
-  summary.textContent='최근 체결 없음';
-  closed.textContent='조회된 청산 체결 없음';return;
+  log.textContent='최근 조회 범위에 BTCUSDT 체결이 없습니다. 누적 내역은 별도로 조회할 수 있습니다.';
  }
  for(const t of [...rows].reverse()){
   const box=create('div',undefined,'trade-log-item live-real-history-row');
@@ -281,7 +279,7 @@ function showRows(rows){
  const losses=create('span','손실 '+failure+'건');losses.className='paper-stat-loss';
  count.append(wins,create('span',' · '),losses);
  summary.append(count);
- const notice=create('p','완료 거래 목록은 최근 100체결 기준 · 위 누적 수치는 별도 기간 전체 조회','live-real-history-note');
+ const notice=create('p','완료 거래 목록은 최근 100체결 기준 · 누적 수익률은 별도 기간 전체 조회','live-real-history-note');
  notice.title='위 누적 손익은 거래소 소득내역을 기간별 조회하고 펀딩비와 USDT 수수료를 포함합니다. 최근 거래 목록은 최대 100체결만 보여줍니다.';
  summary.append(notice);
  closed.replaceChildren();
