@@ -12,6 +12,7 @@ else host.prepend(c);
 const e=id=>document.getElementById(id),result=e('draftResult');
 let snapshot=null,filters=null;
 document.addEventListener('btc:live-account-read',event=>{snapshot=event.detail;result.textContent='계좌 조회 완료 · 지정가와 증거금을 입력해 검증할 수 있어요.'});
+document.addEventListener('btc:live-lock',()=>{snapshot=null;result.textContent='API 잠금됨 · 계좌를 다시 조회해야 합니다.'});
 async function exchangeFilters(){
  if(filters)return filters;
  const r=await fetch('https://fapi.binance.com/fapi/v1/exchangeInfo',{cache:'no-store',signal:AbortSignal.timeout(7000)});
@@ -52,6 +53,12 @@ e('draftCalculate').onclick=async()=>{
    '예상 주문 수량: '+format(qty,8)+' BTC\n명목 금액: '+format(qty*price,2)+' USDT\n'+
    '예상 최초 증거금: '+format(qty*price/lev,3)+' USDT\n손절 목표 가격: '+format(stop,4)+' USDT\n'+
    '주의: 수수료, 유지증거금, 최소 명목가·주문 동시 제한 등은 별도 검증이 필요합니다. 실제 주문은 제출되지 않았습니다.';
+  document.dispatchEvent(new CustomEvent('btc:entry-draft-validated',{detail:{
+    symbol:'BTCUSDT',side,positionSide:active?.positionSide||'UNKNOWN',
+    leverage:lev,price,quantity:Number(qty.toFixed(8)),stopPrice:stop,
+    stopPct:Number((stopPct*100).toFixed(4)),availableBalance:available,
+    validatedAt:Date.now()
+  }}));
  }catch(err){result.textContent='미리보기 불가: '+(err?.message||'입력 확인 실패')}
 };
 })();
