@@ -82,7 +82,7 @@ refresh.addEventListener('click',async()=>{
   try{const details=await signedCall('account.position',{symbol:'BTCUSDT'},creds);
     if(Array.isArray(details))pos=details;
   }catch(_){/* account.status positions still usable */ }
-  if(id===seq)render(acc,pos);
+  if(id===seq){render(acc,pos);document.dispatchEvent(new CustomEvent('btc:live-account-read',{detail:{account:{availableBalance:acc.availableBalance,canTrade:acc.canTrade},positions:pos.filter(p=>p.symbol==='BTCUSDT').map(p=>({positionSide:p.positionSide,leverage:p.leverage,positionAmt:p.positionAmt}))}}))}
  }catch(err){if(id===seq){reset();status.className='error';status.textContent='계좌 조회 실패 · '+(err?.message||'연결 오류')}}
  finally{busy=false;refresh.disabled=false}
 });
