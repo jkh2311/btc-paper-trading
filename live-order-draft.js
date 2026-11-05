@@ -55,7 +55,7 @@ e('draftCalculate').onclick=async()=>{
    '주의: 수수료, 유지증거금, 최소 명목가·주문 동시 제한 등은 별도 검증이 필요합니다. 실제 주문은 제출되지 않았습니다.';
   document.dispatchEvent(new CustomEvent('btc:entry-draft-validated',{detail:{
     symbol:'BTCUSDT',side,positionSide:active?.positionSide||'UNKNOWN',
-    leverage:lev,price,quantity:Number(qty.toFixed(8)),stopPrice:stop,
+    leverage:lev,price,quantity:Number(qty.toFixed(8)),stopPrice:stop,tickSize:f.tick,quantityStep:f.step,
     stopPct:Number((stopPct*100).toFixed(4)),availableBalance:available,
     validatedAt:Date.now()
   }}));
