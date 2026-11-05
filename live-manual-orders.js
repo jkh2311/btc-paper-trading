@@ -157,6 +157,54 @@ async function currentManualPositions(){
  return rows.filter(p=>Math.abs(Number(p.positionAmt))>0);
 }
 
+// Follow a fresh Binance quote while the limit sheet is open, until the user
+// deliberately edits their limit. Never reuse a price left over from a prior order.
+let sheetQuoteGeneration=0,sheetPriceEdited=false,sheetQuoteBusy=false,sheetQuoteLastAt=0;
+const limitInput=$('limitPrice');
+const quoteReset=document.createElement('button');
+quoteReset.type='button';quoteReset.textContent='현재가';
+quoteReset.style.cssText='font-size:12px;min-height:32px;padding:5px 12px;margin:6px 0 3px';
+const quoteState=document.createElement('span');
+quoteState.className='muted';quoteState.style.cssText='font-size:11px;margin-left:8px';
+quoteState.textContent='';
+if(limitInput){
+ limitInput.insertAdjacentElement('afterend',quoteReset);
+ quoteReset.insertAdjacentElement('afterend',quoteState);
+ limitInput.addEventListener('input',()=>{
+  sheetPriceEdited=true;
+  quoteState.textContent='수동 지정가 · 자동 갱신 중지';
+ });
+}
+const limitOrderSelected=()=>document.querySelector('input[name="orderType"]:checked')?.value!=='market';
+const isSheetOpen=()=>{const e=$('entrySheet');return !!e&&e.style.display!=='none'&&e.dataset.realSide;};
+async function updateLimitQuote(force=false){
+ if(sheetQuoteBusy||!isSheetOpen()||!limitOrderSelected()||!limitInput)return;
+ if(sheetPriceEdited&&!force)return;
+ sheetQuoteBusy=true;
+ const generation=sheetQuoteGeneration;
+ try{
+  const data=await publicJson('/fapi/v1/ticker/price?symbol='+symbol);
+  if(generation!==sheetQuoteGeneration||!isSheetOpen()||!limitOrderSelected()||sheetPriceEdited&&!force)return;
+  const price=Number(data?.price),stamp=Number(data?.time);
+  if(data?.symbol!==symbol||!(price>0)||!Number.isFinite(price)||
+    (stamp>0&&Math.abs(Date.now()-stamp)>30000))
+   throw Error('최신 BTCUSDT 시세를 확인할 수 없습니다');
+  const tick=(await filters()).price.tickSize;
+  if(generation!==sheetQuoteGeneration||!isSheetOpen()||!limitOrderSelected()||sheetPriceEdited&&!force)return;
+  const step=Number(tick),digits=Math.min(8,(String(tick).split('.')[1]||'').length);
+  if(!(step>0))throw Error('BTCUSDT 호가 단위 조회 실패');
+  limitInput.value=(Math.round(price/step)*step).toFixed(digits);
+  sheetQuoteLastAt=Date.now();
+  if(force)sheetPriceEdited=false;
+  quoteState.textContent='현재가 자동 반영 · 직접 수정 시 고정';
+ }catch(e){
+  if(generation===sheetQuoteGeneration&&!sheetPriceEdited){
+   // A stale quote must never be shown as a live default price.
+   if(Date.now()-sheetQuoteLastAt>10000)limitInput.value='';
+   quoteState.textContent='실시간 시세 조회 실패 · 가격을 직접 입력하세요';
+  }
+ }finally{sheetQuoteBusy=false;}
+}
 function showSheet(side){
  if(!credentialsSafe())return;
  const sh=$('entrySheet');if(!sh)return;
@@ -166,9 +214,28 @@ function showSheet(side){
  $('sheetPrice').textContent='BTCUSDT 실제 '+(side==='LONG'?'롱':'숏')+' 주문';
  $('orderHelp').textContent='실전 주문 · 지정가 / 시장가';
  sh.dataset.realSide=side;
- const type=document.querySelector('input[name="orderType"]:checked')?.value||'limit';
- if(type==='limit'&&!Number($('limitPrice').value))$('limitPrice').value=String(Number(String($('price')?.textContent||'').replace(/[^0-9.]/g,''))||'');
+ sheetQuoteGeneration++;sheetPriceEdited=false;sheetQuoteLastAt=0;
+ if(limitInput)limitInput.value='';
+ quoteState.textContent='최신 지정가 불러오는 중…';
+ void updateLimitQuote();
 }
+quoteReset.onclick=()=>{
+ if(!isSheetOpen())return;
+ sheetPriceEdited=false;sheetQuoteGeneration++;sheetQuoteLastAt=0;
+ if(limitInput)limitInput.value='';
+ quoteState.textContent='최신 지정가 불러오는 중…';
+ void updateLimitQuote(true);
+};
+for(const radio of document.querySelectorAll('input[name="orderType"]')){
+ radio.addEventListener('change',()=>{
+  if(!isSheetOpen()||!limitOrderSelected())return;
+  sheetQuoteGeneration++;sheetPriceEdited=false;sheetQuoteLastAt=0;
+  if(limitInput)limitInput.value='';
+  void updateLimitQuote();
+ });
+}
+setInterval(()=>{if(isSheetOpen()&&limitOrderSelected()&&!sheetPriceEdited&&Date.now()-sheetQuoteLastAt>=3000)void updateLimitQuote();},1000);
+
 function credentialsSafe(){if(!cred()?.apiKey||!cred()?.apiSecret){message('설정에서 API 키를 잠금 해제한 뒤 실전 주문을 이용하세요.');return false;}return true;}
 async function enter(side){
  await run(async()=>{
