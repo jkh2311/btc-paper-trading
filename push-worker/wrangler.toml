@@ -1,0 +1,11 @@
+name = "btc-paper-signal-push"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[triggers]
+crons = ["* * * * *"]
+
+# Replace YOUR_KV_NAMESPACE_ID with your Cloudflare KV namespace ID before deploy.
+[[kv_namespaces]]
+binding = "PUSH_STORE"
+id = "YOUR_KV_NAMESPACE_ID"
