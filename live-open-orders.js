@@ -97,6 +97,11 @@ async function sync(){
   const ok=plain.status==='fulfilled'&&algo.status==='fulfilled';
   enabled=ok;
   lastResultAt=ok?Date.now():0;
+  if(ok)document.dispatchEvent(new CustomEvent('btc:open-order-snapshot',{
+    detail:{orders:plain.value.filter(order=>order?.symbol==='BTCUSDT').map(order=>({
+      symbol:'BTCUSDT',orderId:order.orderId
+    })),receivedAt:lastResultAt}
+  }));
   state.className=ok?'success':'order-warn';
   state.textContent=ok?
     '조회 완료 · '+new Date(lastResultAt).toLocaleTimeString('ko-KR')+' · 일반 '+plain.value.length+'건 / 조건부 '+algo.value.length+'건':
