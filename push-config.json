@@ -1,0 +1,4 @@
+{
+  "workerUrl": "",
+  "message": "Cloudflare Worker를 배포한 뒤 주소를 workerUrl에 넣으세요. 빈 상태에서는 잠금 화면 푸시가 비활성입니다."
+}
