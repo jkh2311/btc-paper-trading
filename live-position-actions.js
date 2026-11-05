@@ -105,6 +105,13 @@ calculate.onclick=async()=>{
    '실제 레버리지 '+pos.leverage+'배'+
    (kind==='REDUCE'?'\n현재 포지션 '+fmt(Math.abs(pos.qty))+' BTC · 청산 후 예상 '+fmt(Math.max(0,Math.abs(pos.qty)-qty))+' BTC':'')+
    '\n'+remark;
+  document.dispatchEvent(new CustomEvent('btc:position-action-planned',{detail:{
+   symbol:'BTCUSDT',kind,side:s,orderSide,positionSide:pos.side,
+   quantity:Number(qty.toFixed(8)),price:p,leverage:pos.leverage,
+   heldQty:Math.abs(pos.qty),margin:kind==='ADD'?numeric(margin.value):0,
+   checkedAt:Date.now(),accountAt:account.at,
+   oneWay:pos.side==='BOTH'
+  }}));
  }catch(err){output.textContent='계산 실패: '+String(err.message||err)}
  finally{calculate.disabled=false}
 };
