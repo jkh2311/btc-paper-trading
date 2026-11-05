@@ -56,6 +56,54 @@ function updateButtons(){for(const id of ['long','short'])if($(id))$(id).disable
 document.addEventListener('btc:real-account-updated',e=>{account=e.detail; if(selected){const p=account?.positions?.find(p=>p.side===selected.positionSide&&Math.abs(Number(p.amount)-Number(selected.amount))<1e-8);if(!p)selected=null;} if($('close'))$('close').disabled=!selected;updateButtons();});
 document.addEventListener('btc:real-account-cleared',()=>{account=null;selected=null;});
 document.addEventListener('btc:real-position-selected',e=>{selected=e.detail||null;});
+// Count manual stage reservations independently of Binance's merged directional positions.
+const stageLedgerKey='btc-manual-stage-ledger-v1';
+function stageAccountId(){
+ const key=cred()?.apiKey||'';let h=2166136261;
+ for(let i=0;i<key.length;i++)h=Math.imul(h^key.charCodeAt(i),16777619);
+ return String(h>>>0);
+}
+function stageRecords(){
+ try{const all=JSON.parse(localStorage.getItem(stageLedgerKey)||'{}');return all[stageAccountId()]||{LONG:[],SHORT:[]};}
+ catch(_){return {LONG:[],SHORT:[]};}
+}
+function saveStageRecord(side,order){
+ const all=stageRecords(),entries=Array.isArray(all[side])?all[side]:[];
+ entries.push({id:String(order.orderId),time:Date.now()});all[side]=entries.slice(-20);
+ try{const base=JSON.parse(localStorage.getItem(stageLedgerKey)||'{}');base[stageAccountId()]=all;localStorage.setItem(stageLedgerKey,JSON.stringify(base));}
+ catch(_){}
+}
+async function usedManualStages(side,dual){
+ const live=await currentManualPositions(),open=await fetchOpenOrders();
+ const records=stageRecords(),entries=Array.isArray(records[side])?records[side]:[];
+ const position=live.some(p=>dual?p.positionSide===side:
+  p.positionSide==='BOTH'&&(side==='LONG'?Number(p.positionAmt)>0:Number(p.positionAmt)<0));
+ const sideOrders=open.filter(o=>dual?o.positionSide===side:o.side===(side==='LONG'?'BUY':'SELL'));
+ const activeIds=new Set(sideOrders.map(o=>String(o.orderId)));
+ const retained=[];
+ for(const item of entries){
+  if(activeIds.has(String(item.id))){retained.push(item);continue;}
+  try{
+   const state=await signed('GET','/fapi/v1/order',{symbol,orderId:String(item.id)});
+   if(Number(state.executedQty)>0&&position||['NEW','PARTIALLY_FILLED'].includes(state.status))retained.push(item);
+  }catch(_){retained.push(item);}
+ }
+ const counted=new Set(retained.map(x=>String(x.id)));
+ const external=sideOrders.filter(o=>!counted.has(String(o.orderId))).length;
+ if(!position&&!sideOrders.length)retained.length=0;
+ if(retained.length!==entries.length){
+  const data=stageRecords();data[side]=retained;
+  try{const all=JSON.parse(localStorage.getItem(stageLedgerKey)||'{}');all[stageAccountId()]=data;localStorage.setItem(stageLedgerKey,JSON.stringify(all));}catch(_){}
+ }
+ return Math.max(position?1:0,retained.length)+external;
+}
+async function currentManualPositions(){
+ const data=await signed('GET','/fapi/v3/positionRisk',{symbol});
+ const rows=Array.isArray(data)?data:[data];
+ if(rows.some(p=>p?.symbol!==symbol))throw Error('포지션 응답 오류');
+ return rows.filter(p=>Math.abs(Number(p.positionAmt))>0);
+}
+
 function showSheet(side){
  if(!credentialsSafe())return;
  const sh=$('entrySheet');if(!sh)return;
@@ -89,7 +137,11 @@ async function enter(side){
   totalMargin=Math.min(totalMargin,available*.95);
   // One order is one pyramid stage; repeated manual entries are explicitly separate orders.
   const weight=1,weightSum=Array.from({length:count},(_,i)=>1+i*.2).reduce((a,b)=>a+b,0);
-  const margin=totalMargin*weight/weightSum,lot=type==='MARKET'?f.market:f.lot;
+  const used=await usedManualStages(side,dual);
+  if(used>=count)throw Error('실계좌 보유/미체결 기준 '+count+'단계 한도에 도달했습니다.');
+  const weights=Array.from({length:count},(_,i)=>1+i*.2);
+  const margin=totalMargin*weights[used]/weights.slice(used).reduce((a,b)=>a+b,0);
+  const lot=type==='MARKET'?f.market:f.lot;
   const qty=roundDown(margin*lev/price,lot.stepSize);
   if(!(Number(qty)>=Number(lot.minQty)&&Number(qty)<=Number(lot.maxQty)))throw Error('바이낸스 최소/최대 주문 수량 불충족: '+qty+' BTC');
   if(Number(qty)*price<f.minNotional)throw Error('최소 주문금액 미달: '+fmt(Number(qty)*price)+' USDT');
@@ -102,7 +154,7 @@ async function enter(side){
    if(!(Number(p)>0))throw Error('지정가 호가 단위 오류');
    order.price=p;order.timeInForce='GTC';
   }
-  const summary=side+' '+type+' · '+qty+' BTC'+(order.price?' @ '+order.price:'')+' · '+lev+'배 · 예상 증거금 '+fmt(margin)+' USDT\n실제 계좌에 주문하며 손절/익절 보호 주문은 자동 등록되지 않습니다.';
+  const summary=(used+1)+'/'+count+'단계 · '+side+' '+type+' · '+qty+' BTC'+(order.price?' @ '+order.price:'')+' · '+lev+'배 · 예상 증거금 '+fmt(margin)+' USDT\n실제 계좌에 주문하며 손절/익절 보호 주문은 자동 등록되지 않습니다.';
   if(!confirm('바이낸스 실제 주문을 전송할까요?\n'+summary))return;
   // No exchange-side mutation takes place before the user confirms the order.
   if(!existing){
@@ -119,6 +171,7 @@ async function enter(side){
    response=known;
   }
   lastOrderIssue=false;
+  if(response?.orderId&& !['REJECTED','CANCELED','EXPIRED'].includes(response.status))saveStageRecord(side,response);
   message('실제 주문 확인 · #'+response.orderId+' · '+response.status+' · 체결 '+(response.executedQty||'0')+' BTC\n보호 주문은 자동 등록되지 않습니다.');
   if($('realAccountRefresh'))$('realAccountRefresh').click();
   void updateOpenOrders();
