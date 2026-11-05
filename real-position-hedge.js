@@ -18,6 +18,24 @@ const fmt=(v,d=4)=>Number.isFinite(v)?v.toLocaleString('ko-KR',{maximumFractionD
 const cleanSide=p=>p.side==='LONG'?'LONG':p.side==='SHORT'?'SHORT':
  p.side==='BOTH'?(p.amount>0?'LONG':p.amount<0?'SHORT':null):null;
 let snapshot=null,selection=null;
+const fx=()=>{const rate=Number(document.getElementById('fx')?.value);return rate>0?rate:NaN};
+const won=amount=>{
+ if(!Number.isFinite(amount)||!Number.isFinite(fx()))return '원화 환산 불가';
+ const krw=Math.round(amount*fx());
+ return (krw>0?'+':krw<0?'-':'')+'₩'+Math.abs(krw).toLocaleString('ko-KR');
+};
+function renderActualBalanceStrip(){
+ const balance=document.getElementById('balanceSummary'),pnl=document.getElementById('pnlSummary');
+ if(!balance||!pnl)return;
+ const available=snapshot?.available,positionPnl=snapshot?.positions.reduce((sum,p)=>sum+(Number.isFinite(p.unrealized)?p.unrealized:0),0);
+ balance.textContent=Number.isFinite(available)?fmt(available,3)+' USDT':'—';
+ pnl.textContent=snapshot?won(positionPnl):'—';
+ pnl.classList.toggle('pnl-positive',!!snapshot&&positionPnl>0);
+ pnl.classList.toggle('pnl-negative',!!snapshot&&positionPnl<0);
+}
+window.renderActualBalanceStrip=renderActualBalanceStrip;
+document.getElementById('fx')?.addEventListener('input',()=>{render();renderActualBalanceStrip();});
+
 const controls=make('div',undefined,'real-hedge-controls');
 const refresh=make('button','실제 계좌 새로고침');
 const manage=make('button','API 키 관리');
@@ -87,7 +105,7 @@ function render(){
     make('small',fmt(Math.abs(p.amount),8)+' BTC'));
    const est=Number.isFinite(p.margin)?fmt(p.margin,3)+' USDT':'—';
    const entry=make('div','진입가 '+fmt(p.entry,2)+' USDT · 증거금 '+est,'real-position-meta');
-   const pnl=make('div','미실현 손익 '+fmt(p.unrealized,4)+' USDT'+
+   const pnl=make('div','미실현 손익 '+won(p.unrealized)+
     (Number.isFinite(p.leverage)?' · '+fmt(p.leverage,0)+'배':''),'hedge-pnl');
    pnl.classList.add(p.unrealized>=0?'pnl-positive':'pnl-negative');
    row.append(head,entry,pnl);
@@ -113,12 +131,13 @@ function render(){
   '평균 진입가 '+fmt(p.entry,2)+' USDT',
   '마크 가격 '+fmt(p.mark,2)+' USDT',
   '레버리지 '+fmt(p.leverage,0)+'배',
-  '미실현 손익 '+fmt(p.unrealized,4)+' USDT',
+  '미실현 손익 '+won(p.unrealized),
   '추정 청산가 '+(p.liquidation>0?fmt(p.liquidation,2)+' USDT':'—')
  ].join('\n'),'real-position-detail'));
  root.append(detail);
  message.textContent=snapshot?'실계좌 조회 '+new Date(snapshot.at).toLocaleTimeString('ko-KR'):
   '실계좌 조회 전';
+ renderActualBalanceStrip();
 }
 document.addEventListener('btc:real-account-updated',e=>{
  const next=normalize(e.detail);
