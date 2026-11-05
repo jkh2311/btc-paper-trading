@@ -146,8 +146,8 @@ async function run(){
   clearTimeout(timeout);busy=false;get.disabled=false;if(refresh)refresh.disabled=false;
  }
 }
-get.onclick=()=>void run();
-if(refresh)refresh.onclick=()=>void run();
+get.onclick=()=>run();
+if(refresh)refresh.onclick=()=>run();
 if(clear)clear.onclick=()=>{sequence++;controller?.abort();empty('화면에서만 비웠습니다. 실제 거래소 기록은 삭제되지 않습니다.');status.textContent='화면 기록 초기화 · 실제 거래소 데이터는 그대로예요.'};
 const reset=()=>{sequence++;controller?.abort();empty('API 잠금 또는 화면 비활성화 · 다시 조회해 주세요.');status.textContent='실제 거래내역 재조회 필요'};
 document.addEventListener('btc:real-account-cleared',reset);
