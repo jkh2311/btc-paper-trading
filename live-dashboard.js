@@ -1,57 +1,96 @@
-/* Real BTCUSDT USD-M read-only dashboard; no order or key storage. */
-(() => {
+/* Direct Binance futures read-only account panel.
+ * Uses the existing AES-GCM/PBKDF2 encrypted local PWA vault.
+ * No Cloudflare Worker, no API key persistence outside the existing vault.
+ * Trade execution is intentionally disabled until protections are verified.
+ */
+(()=>{
 'use strict';
 const accountPage=document.getElementById('page-position');
 const historyPage=document.getElementById('page-history');
 if(!accountPage||!historyPage)return;
-const styles=document.createElement('style');styles.textContent='.live-dash{background:#11243b;color:#eaf1ff;border:1px solid #4a6382;border-radius:13px;padding:13px;margin:10px 0}.live-dash h2{font-size:17px;margin:0 0 8px}.live-dash .note{font-size:12px;color:#aec5df;line-height:1.5}.live-dash input{width:100%;box-sizing:border-box;padding:10px;margin:5px 0;background:#182c44;color:#fff;border:1px solid #526d8c;border-radius:8px}.live-dash button{padding:8px 12px;margin:4px}.live-dash .stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}.live-dash .stat,.live-dash .line{background:#0c1b2e;border-radius:8px;padding:9px;margin:4px 0;overflow-wrap:anywhere}.live-dash small{display:block;color:#9eb6ce}.live-dash .error{color:#ff9bab;white-space:pre-wrap}';document.head.append(styles);
-const elt=(tag,value)=>{const e=document.createElement(tag);if(value!==undefined)e.textContent=String(value);return e};
-const fmt=(v,n=3)=>Number.isFinite(Number(v))&&v!==null?v.toLocaleString?.('ko-KR',{maximumFractionDigits:n})??Number(v).toFixed(n):'—';
-const root=elt('section');root.className='live-dash';
-root.append(elt('h2','바이낸스 BTCUSDT 실전 계좌 · 조회 전용'),elt('p','실제 주문 및 AUTO는 잠겨 있습니다. APP_AUTH_TOKEN만 입력하고 Binance API Key/Secret은 입력하지 마세요.'));
-const url=elt('input');url.placeholder='https://계정명.서브도메인.workers.dev';url.setAttribute('aria-label','Cloudflare Worker 주소');url.autocomplete='off';
-const token=elt('input');token.type='password';token.placeholder='APP_AUTH_TOKEN (32자 이상)';token.autocomplete='off';token.setAttribute('aria-label','Worker 인증 토큰');
-const refresh=elt('button','계좌 새로고침');refresh.type='button';const disconnect=elt('button','연결 해제');disconnect.type='button';
-const status=elt('p','연결 전');status.className='note';status.setAttribute('role','status');
-const stats=elt('div');stats.className='stats';const positions=elt('div'),orders=elt('div');
-root.append(url,token,refresh,disconnect,status,stats,elt('h2','실제 포지션'),positions,elt('h2','실제 미체결'),orders);
+const css=document.createElement('style');
+css.textContent='.direct-live{background:#102139;color:#eaf2ff;border:1px solid #4d6685;border-radius:14px;padding:13px;margin:10px 0}.direct-live h2{font-size:17px;margin:0 0 9px}.direct-live p{font-size:12px;color:#b5c9e2;line-height:1.65}.direct-live button{font-size:12px;padding:9px;margin:4px 0}.direct-live .row2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.direct-live .metric,.direct-live .item{background:#0c1b2e;border-radius:9px;padding:10px;margin:4px 0;overflow-wrap:anywhere}.direct-live small{display:block;color:#abc0d7;margin-bottom:5px}.direct-live input{width:100%;box-sizing:border-box;padding:8px;background:#192e49;border:1px solid #5a718e;color:white}.direct-live .error{color:#ffa0aa}.direct-live .success{color:#57dcb2}';
+document.head.append(css);
+function make(tag,text){const el=document.createElement(tag);if(text!==undefined)el.textContent=String(text);return el}
+function amount(n,d=3){if(n===null||n===undefined||n==='')return '—';const x=Number(n);return Number.isFinite(x)?x.toLocaleString('ko-KR',{maximumFractionDigits:d}):'—'}
+function item(parent,head,body){const e=make('div');e.className='item';e.append(make('b',head),make('small',body));parent.append(e)}
+const root=make('section');root.className='direct-live';
+const title=make('h2','바이낸스 실제 선물계좌 · 직접 연결');
+const intro=make('p','설정 > API 키 관리에서 한 번 암호화 저장하고, 앱 재실행 후 비밀번호로 잠금 해제하세요. 서버에 키를 보내지 않고 바이낸스 WebSocket으로 직접 조회합니다.');
+const controls=make('div');const refresh=make('button','실제 계좌 조회');const lock=make('button','API 잠금');
+controls.append(refresh,lock);
+const status=make('p','API 키 잠금 상태 · 설정에서 잠금 해제 필요');
+status.setAttribute('role','status');
+const stats=make('div');stats.className='row2';
+const positions=make('div'),orders=make('div');
+root.append(title,intro,controls,status,stats,make('h2','실제 BTCUSDT 포지션'),positions,make('h2','실제 미체결 주문'),orders);
 accountPage.prepend(root);
-const history=elt('section');history.className='live-dash';history.append(elt('h2','실제 체결 기록'));
-const fills=elt('div','연결 후 최근 체결 내역 표시');history.append(fills);historyPage.prepend(history);
-let bearer='',endpoint='',controller=null;
-const appendLine=(parent,title,description)=>{const row=elt('div');row.className='line';row.append(elt('b',title),elt('small',description));parent.append(row)};
-function clear(){stats.replaceChildren();positions.replaceChildren();orders.replaceChildren();fills.textContent='연결 후 최근 체결 내역 표시'}
-function render(data){
- if(data?.source!=='BINANCE_USDM_FUTURES'||data?.mode!=='READ_ONLY'||data?.liveTradingEnabled!==false)throw Error('예상과 다른 서버 응답');
- clear();const acc=data.account||{};
- for(const [name,value] of [['실제 USDT 잔고',acc.walletBalance],['사용 가능 USDT',acc.availableBalance],['포지션 증거금',acc.totalPositionInitialMargin],['미체결 증거금',acc.totalOpenOrderInitialMargin]]){
- const cell=elt('div');cell.className='stat';cell.append(elt('small',name),elt('b',fmt(value)+' USDT'));stats.append(cell)}
- const active=(Array.isArray(data.positions)?data.positions:[]).filter(x=>Number(x.quantity)!==0);
- if(!active.length)positions.append(elt('p','현재 BTCUSDT 포지션 없음'));
- for(const p of active)appendLine(positions,p.side+' · '+fmt(p.quantity,6)+' BTC · '+fmt(p.leverage,0)+'배','진입 '+fmt(p.entryPrice)+' / 미실현손익 '+fmt(p.unrealizedPnl)+' USDT / 청산가 '+fmt(p.liquidationPrice));
- const open=Array.isArray(data.openOrders)?data.openOrders:[];
- if(!open.length)orders.append(elt('p','미체결 주문 없음'));
- for(const o of open)appendLine(orders,o.side+' '+o.positionSide+' · '+fmt(o.price)+' USDT','주문 '+o.id+' / 미체결 '+fmt(o.remainingQty,6)+' BTC / 취소는 바이낸스 앱에서');
- const recent=Array.isArray(data.recentFills)?data.recentFills:[];
- if(!recent.length)fills.append(elt('p','최근 체결 내역 없음'));
- else{fills.replaceChildren();for(const x of [...recent].reverse().slice(0,40))appendLine(fills,x.side+' '+fmt(x.price)+' USDT · '+fmt(x.quantity,6)+' BTC','실현손익 '+fmt(x.realizedPnl)+' USDT / 수수료 '+fmt(x.commission,5)+' '+(x.commissionAsset||''))}
- status.className='note';status.textContent='실제 계좌 조회 · '+new Date(data.asOf).toLocaleString('ko-KR')+' · '+(data.hedgeMode?'헤지 모드':'단방향 모드');
+const history=make('section');history.className='direct-live';
+history.append(make('h2','실제 체결 기록'),make('p','실제 체결내역은 아직 연결되지 않았습니다. 모의 기록을 실전 기록으로 표시하지 않습니다.'));
+historyPage.prepend(history);
+let busy=false,seq=0;
+function reset(){
+ stats.replaceChildren();positions.replaceChildren();orders.replaceChildren();
 }
-function validOrigin(value){try{const u=new URL(value);return u.protocol==='https:'&&/^[a-z0-9-]+\.[a-z0-9-]+\.workers\.dev$/i.test(u.hostname)&&!u.username&&!u.password&&!u.search&&!u.hash&&(u.pathname==='/'||u.pathname==='')}catch{return false}}
+async function signedCall(method,fields,creds){
+ const params={apiKey:creds.apiKey,recvWindow:5000,timestamp:Date.now(),...fields};
+ const string=Object.keys(params).sort().map(k=>k+'='+encodeURIComponent(params[k])).join('&');
+ const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(creds.apiSecret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ const signature=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(string));
+ params.signature=[...new Uint8Array(signature)].map(x=>x.toString(16).padStart(2,'0')).join('');
+ // Existing browser-only authenticated WSS request helper.
+ return directBinanceWS(method,params,status,11000);
+}
+function render(acc,positionList){
+ if(!acc||typeof acc!=='object'||!Array.isArray(positionList))throw Error('바이낸스 응답 형식 오류');
+ reset();
+ const usdt=Array.isArray(acc.assets)?acc.assets.find(v=>v.asset==='USDT'):null;
+ if(!usdt)throw Error('USDT 계좌 정보를 받지 못했습니다');
+ for(const [label,value] of [
+  ['실제 USDT 지갑 잔고',usdt.walletBalance],
+  ['사용 가능 USDT',usdt.availableBalance],
+  ['미실현 손익',usdt.unrealizedProfit],
+  ['현재 증거금',acc.totalPositionInitialMargin]
+ ]){
+  const e=make('div');e.className='metric';e.append(make('small',label),make('b',amount(value)+' USDT'));stats.append(e);
+ }
+ const live=positionList.filter(p=>p.symbol==='BTCUSDT'&&Math.abs(Number(p.positionAmt))>0);
+ if(!live.length)positions.append(make('p','현재 BTCUSDT 포지션 없음'));
+ for(const p of live){
+  const side=p.positionSide==='BOTH'?(Number(p.positionAmt)>0?'LONG':'SHORT'):p.positionSide;
+  item(positions,side+' · '+amount(Math.abs(Number(p.positionAmt)),6)+' BTC',
+   '진입 '+amount(p.entryPrice)+' / 레버리지 '+amount(p.leverage,0)+'배 / 미실현 '+amount(p.unRealizedProfit)+' USDT / 청산 '+amount(p.liquidationPrice));
+ }
+ orders.append(make('p','미체결 주문 자동 조회는 아직 미구현입니다. 앱이 실제 주문 목록을 확인하기 전에는 취소·정정할 수 없습니다. 바이낸스 앱에서 확인하세요.'));
+ status.className='success';status.textContent='바이낸스 직접 조회 성공 · '+new Date().toLocaleTimeString('ko-KR')+' · 실거래 주문 잠금';
+}
 refresh.addEventListener('click',async()=>{
- const u=url.value.trim(),entered=token.value.trim();
- if(!validOrigin(u)){status.className='error';status.textContent='Cloudflare Workers HTTPS 주소를 확인해 주세요.';return}
- if(entered)bearer=entered;
- token.value='';
- if(bearer.length<32){status.className='error';status.textContent='APP_AUTH_TOKEN은 32자 이상이어야 합니다.';return}
- endpoint=new URL(u).origin;controller?.abort();controller=new AbortController();
- refresh.disabled=true;status.className='note';status.textContent='실제 계좌 조회 중…';
+ if(busy)return;
+ if(typeof getApiCredentials!=='function'){status.className='error';status.textContent='API 키 관리 기능을 찾을 수 없습니다';return}
+ const creds=getApiCredentials();
+ if(!creds?.apiKey||!creds?.apiSecret){
+  status.className='error';status.textContent='설정의 API 키 관리에서 비밀번호로 잠금 해제해 주세요.';
+  if(typeof switchTab==='function'){switchTab('settings');document.getElementById('myApiManage').open=true}
+  return;
+ }
+ const id=++seq;busy=true;refresh.disabled=true;
+ status.className='';status.textContent='바이낸스에 직접 연결 중…';
  try{
- const res=await fetch(endpoint+'/private/live-snapshot',{method:'GET',headers:{Authorization:'Bearer '+bearer},mode:'cors',cache:'no-store',credentials:'omit',signal:controller.signal});
- if(!res.ok)throw Error('HTTP '+res.status+' · 인증/Worker 배포/API 권한 확인');
- render(await res.json());
- }catch(e){if(e.name!=='AbortError'){clear();status.className='error';status.textContent='연결 실패: '+e.message+' · CORS 또는 인증 설정을 확인해 주세요.'}}finally{refresh.disabled=false}
+  const [acc,pos]=await Promise.all([
+   signedCall('account.status',{},creds),
+   signedCall('account.position',{symbol:'BTCUSDT'},creds)
+  ]);
+  if(id===seq)render(acc,pos);
+ }catch(err){if(id===seq){reset();status.className='error';status.textContent='계좌 조회 실패 · '+(err?.message||'연결 오류')}}
+ finally{busy=false;refresh.disabled=false}
 });
-disconnect.addEventListener('click',()=>{controller?.abort();bearer='';endpoint='';token.value='';clear();status.className='note';status.textContent='연결 해제'});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){controller?.abort();bearer='';status.textContent='보안을 위해 인증 해제 · 다시 인증해 주세요.'}});
+lock.addEventListener('click',()=>{
+ seq++;if(typeof unlockedApiCredentials!=='undefined')unlockedApiCredentials=null;
+ for(const id of ['myBinanceKey','myBinanceSecret','myVaultPassword']){
+  const el=document.getElementById(id);if(el)el.value='';
+ }
+ reset();status.className='';status.textContent='잠금 완료 · 저장된 암호화 API 키는 유지됨';
+ if(typeof clearRealAccount==='function')clearRealAccount('API 키 잠금');
+ if(typeof showVaultStatus==='function')showVaultStatus();
+});
 })();
