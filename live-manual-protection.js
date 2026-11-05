@@ -94,7 +94,8 @@ async function protect(side,p,info){
 async function closeAtDeadline(side,p,orders,info,dual){
  const qty=Math.abs(Number(p.positionAmt));if(!(qty>0))return;
  // Clear matching entry orders before time close to prevent reopening.
- for(const o of orders.filter(o=>dual?o.positionSide===side:o.side===(side==='LONG'?'BUY':'SELL'))){
+ const ownIds=new Set((records()[side]||[]).map(x=>String(x.id)));
+ for(const o of orders.filter(o=>ownIds.has(String(o.orderId))&&(dual?o.positionSide===side:o.side===(side==='LONG'?'BUY':'SELL')))){
   await signed('DELETE','/fapi/v1/order',{symbol,orderId:String(o.orderId)});
  }
  const exchange=await fetch(base+'/fapi/v1/exchangeInfo?symbol='+symbol,{cache:'no-store'}).then(r=>r.json());
@@ -103,10 +104,14 @@ async function closeAtDeadline(side,p,orders,info,dual){
  const quantity=tick(qty,market.stepSize);
  if(!(Number(quantity)>0&&Math.abs(Number(quantity)-qty)<1e-8))throw Error('포지션 전체 수량 확인 실패');
  const id='btcMaxHold'+Date.now().toString(36);
+ const lockKey='btc-max-hold-submission-'+tag()+'-'+side+'-'+info.id;
+ if(localStorage.getItem(lockKey))throw Error('이 보유기간의 청산 요청 이력이 있습니다. 바이낸스에서 청산 완료를 확인하세요.');
  const request={symbol,side:side==='LONG'?'SELL':'BUY',positionSide:dual?side:'BOTH',type:'MARKET',
   quantity,newClientOrderId:id,newOrderRespType:'RESULT'};
  if(!dual)request.reduceOnly='true';
  let response;
+ // Persist an at-most-once submission marker to avoid accidental duplicate closes after timeout or reload.
+ localStorage.setItem(lockKey,id);
  try{response=await signed('POST','/fapi/v1/order',request);}
  catch(e){try{response=await signed('GET','/fapi/v1/order',{symbol,origClientOrderId:id});}
   catch(_){throw Error('보유시간 청산 결과 불확실 · 주문 ID '+id+'를 바이낸스에서 확인하세요');}}
@@ -133,7 +138,7 @@ async function run(){
    for(const x of entries){
     try{
      const state=await signed('GET','/fapi/v1/order',{symbol,orderId:String(x.id)});
-     if(Number(state.executedQty)>0)fills.push({...x,filledAt:Number(state.time)||Number(x.time)});
+     if(Number(state.executedQty)>0)fills.push({...x,filledAt:Number(state.updateTime)||Number(x.time)});
     }catch(_){} 
    }
    if(!fills.length)continue;
