@@ -17,8 +17,9 @@ function item(parent,head,body){const e=make('div');e.className='item';e.append(
 const root=make('section');root.className='direct-live';
 const title=make('h2','바이낸스 실제 선물계좌 · 직접 연결');
 const intro=make('p','설정 > API 키 관리에서 한 번 암호화 저장하고, 앱 재실행 후 비밀번호로 잠금 해제하세요. 서버에 키를 보내지 않고 바이낸스 WebSocket으로 직접 조회합니다.');
-const controls=make('div');const refresh=make('button','실제 계좌 조회');const lock=make('button','API 잠금');
-controls.append(refresh,lock);
+const controls=make('div');const refresh=make('button','실제 계좌 조회');const lock=make('button','API 잠금');const settings=make('button','API 키 설정');
+controls.append(refresh,settings,lock);
+settings.addEventListener('click',()=>{if(typeof switchTab==='function')switchTab('settings');const el=document.getElementById('myApiManage');if(el)el.open=true});
 const status=make('p','API 키 잠금 상태 · 설정에서 잠금 해제 필요');
 status.setAttribute('role','status');
 const stats=make('div');stats.className='row2';
@@ -48,9 +49,9 @@ function render(acc,positionList){
  if(!usdt)throw Error('USDT 계좌 정보를 받지 못했습니다');
  for(const [label,value] of [
   ['실제 USDT 지갑 잔고',usdt.walletBalance],
-  ['사용 가능 USDT',usdt.availableBalance],
+  ['사용 가능 USDT',acc.availableBalance],
   ['미실현 손익',usdt.unrealizedProfit],
-  ['현재 증거금',acc.totalPositionInitialMargin]
+  ['현재 증거금',acc.totalPositionInitialMargin],['예약 주문 증거금',acc.totalOpenOrderInitialMargin]
  ]){
   const e=make('div');e.className='metric';e.append(make('small',label),make('b',amount(value)+' USDT'));stats.append(e);
  }
@@ -62,7 +63,7 @@ function render(acc,positionList){
    '진입 '+amount(p.entryPrice)+' / 레버리지 '+amount(p.leverage,0)+'배 / 미실현 '+amount(p.unRealizedProfit)+' USDT / 청산 '+amount(p.liquidationPrice));
  }
  orders.append(make('p','미체결 주문 자동 조회는 아직 미구현입니다. 앱이 실제 주문 목록을 확인하기 전에는 취소·정정할 수 없습니다. 바이낸스 앱에서 확인하세요.'));
- status.className='success';status.textContent='바이낸스 직접 조회 성공 · '+new Date().toLocaleTimeString('ko-KR')+' · 실거래 주문 잠금';
+ status.className='success';status.textContent='바이낸스 직접 조회 성공 · '+new Date().toLocaleTimeString('ko-KR')+' · 거래 권한 '+(acc.canTrade?'있음':'없음')+' · 앱 주문 전송 잠금';
 }
 refresh.addEventListener('click',async()=>{
  if(busy)return;
@@ -76,10 +77,11 @@ refresh.addEventListener('click',async()=>{
  const id=++seq;busy=true;refresh.disabled=true;
  status.className='';status.textContent='바이낸스에 직접 연결 중…';
  try{
-  const [acc,pos]=await Promise.all([
-   signedCall('account.status',{},creds),
-   signedCall('account.position',{symbol:'BTCUSDT'},creds)
-  ]);
+  const acc=await signedCall('account.status',{},creds);
+  let pos=Array.isArray(acc?.positions)?acc.positions:[];
+  try{const details=await signedCall('account.position',{symbol:'BTCUSDT'},creds);
+    if(Array.isArray(details))pos=details;
+  }catch(_){/* account.status positions still usable */ }
   if(id===seq)render(acc,pos);
  }catch(err){if(id===seq){reset();status.className='error';status.textContent='계좌 조회 실패 · '+(err?.message||'연결 오류')}}
  finally{busy=false;refresh.disabled=false}
