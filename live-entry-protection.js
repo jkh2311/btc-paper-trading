@@ -52,7 +52,7 @@ preview.addEventListener('click',()=>{
   if(!['BOTH','LONG','SHORT'].includes(ps))throw Error('실제 계좌 포지션 모드 확인 필요');
   if(ps!=='BOTH'&&ps!==draft.side)throw Error('계좌 포지션 방향이 진입 방향과 다릅니다');
   const entry={symbol:'BTCUSDT',side:entrySide,positionSide:ps,type:'LIMIT',
-    timeInForce:'GTC',quantity:fixed(draft.quantity),price:fixed(draft.price,4)};
+    timeInForce:'FOK',quantity:fixed(draft.quantity),price:fixed(draft.price,4)};
   const stop={algoType:'CONDITIONAL',symbol:'BTCUSDT',side:exitSide,positionSide:ps,
     type:'STOP_MARKET',triggerPrice:fixed(draft.stopPrice,4),workingType:'MARK_PRICE'};
   const take={algoType:'CONDITIONAL',symbol:'BTCUSDT',side:exitSide,positionSide:ps,
