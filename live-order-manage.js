@@ -112,7 +112,7 @@ id.addEventListener('input',()=>{sequence++;invalidate('주문 번호가 변경�
 price.addEventListener('input',()=>{sequence++;invalidate('변경 가격이 바뀌었습니다. 다시 검증해 주세요.')});
 async function transact(method){
  if(!LIVE_ORDER_WRITES_VERIFIED)return;
- if(pending||!verified||Date.now()-verified.verifiedAt>10000){invalidate('다시 조회 후 진행하세요');return}
+ if(!verified||Date.now()-verified.verifiedAt>10000){invalidate('다시 조회 후 진행하세요');return}
  const request=verified;
  const creds=credentials();
  if(!creds)return;
