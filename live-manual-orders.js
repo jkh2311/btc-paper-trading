@@ -157,12 +157,25 @@ async function currentManualPositions(){
  return rows.filter(p=>Math.abs(Number(p.positionAmt))>0);
 }
 
-// Follow a fresh Binance quote while the limit sheet is open, until the user
-// deliberately edits their limit. Never reuse a price left over from a prior order.
+// Share the chart's actual Binance futures WebSocket trade stream with this order
+// sheet. The displayed live quote is separate from the order's LIMIT price.
+// Editing the LIMIT price freezes only that field, not the moving live quote.
 let sheetQuoteGeneration=0,sheetPriceEdited=false,sheetQuoteBusy=false,sheetQuoteLastAt=0;
-const limitInput=$('limitPrice');
+let liveQuote={price:NaN,at:0},sheetTick=NaN,sheetTickDigits=1,lastQuotePaint=0;
+const limitInput=$('limitPrice'),sheetPriceHeader=$('sheetPrice');
+const liveQuoteView=document.createElement('div');
+liveQuoteView.setAttribute('aria-label','바이낸스 BTCUSDT 실시간 현재가');
+liveQuoteView.style.cssText='margin:9px 0 4px;padding:8px 10px;border:1px solid #305d77;border-radius:9px;background:#0a2036;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap';
+const liveQuoteLabel=document.createElement('small');
+liveQuoteLabel.textContent='실시간 현재가';
+liveQuoteLabel.style.cssText='color:#aec8df;font-size:11px';
+const liveQuoteValue=document.createElement('strong');
+liveQuoteValue.textContent='연결 중…';
+liveQuoteValue.style.cssText='color:#6de5bf;font-size:20px;font-variant-numeric:tabular-nums';
+liveQuoteView.append(liveQuoteLabel,liveQuoteValue);
+sheetPriceHeader?.insertAdjacentElement('afterend',liveQuoteView);
 const quoteReset=document.createElement('button');
-quoteReset.type='button';quoteReset.textContent='현재가';
+quoteReset.type='button';quoteReset.textContent='현재가 적용';
 quoteReset.style.cssText='font-size:12px;min-height:32px;padding:5px 12px;margin:6px 0 3px';
 const quoteState=document.createElement('span');
 quoteState.className='muted';quoteState.style.cssText='font-size:11px;margin-left:8px';
@@ -172,36 +185,70 @@ if(limitInput){
  quoteReset.insertAdjacentElement('afterend',quoteState);
  limitInput.addEventListener('input',()=>{
   sheetPriceEdited=true;
-  quoteState.textContent='수동 지정가 · 자동 갱신 중지';
+  quoteState.textContent='직접 입력한 지정가 고정 · 현재가는 계속 표시';
  });
 }
 const limitOrderSelected=()=>document.querySelector('input[name="orderType"]:checked')?.value!=='market';
 const isSheetOpen=()=>{const e=$('entrySheet');return !!e&&e.style.display!=='none'&&e.dataset.realSide;};
+function followQuote(){
+ if(!isSheetOpen()||!limitOrderSelected()||sheetPriceEdited||!limitInput||
+    !(sheetTick>0)||!(liveQuote.price>0)||Date.now()-liveQuote.at>3500)return;
+ limitInput.value=(Math.round(liveQuote.price/sheetTick)*sheetTick).toFixed(sheetTickDigits);
+ sheetQuoteLastAt=Date.now();
+ quoteState.textContent='실시간 현재가 연동 · 직접 수정하면 지정가 고정';
+}
+function displayLiveQuote(){
+ if(!isSheetOpen())return;
+ const fresh=liveQuote.price>0&&Date.now()-liveQuote.at<=3500;
+ liveQuoteValue.textContent=fresh?
+  liveQuote.price.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:2})+' USDT':
+  '실시간 연결 확인 중…';
+ liveQuoteValue.style.color=fresh?'#6de5bf':'#f5bb75';
+ if(fresh)followQuote();
+}
+document.addEventListener('btc:live-trade-price',e=>{
+ const d=e.detail;
+ if(d?.symbol!==symbol||!(Number(d.price)>0)||!Number.isFinite(Number(d.at)))return;
+ liveQuote={price:Number(d.price),at:Number(d.at)};
+ if(!isSheetOpen()||Date.now()-lastQuotePaint<90)return;
+ lastQuotePaint=Date.now();displayLiveQuote();
+});
+async function ensureSheetTick(){
+ if(sheetTick>0)return;
+ const f=await filters(),tick=Number(f.price.tickSize);
+ if(!(tick>0))throw Error('지정가 호가 단위 조회 실패');
+ sheetTick=tick;
+ sheetTickDigits=Math.min(8,(String(f.price.tickSize).split('.')[1]||'').length);
+}
 async function updateLimitQuote(force=false){
  if(sheetQuoteBusy||!isSheetOpen()||!limitOrderSelected()||!limitInput)return;
  if(sheetPriceEdited&&!force)return;
  sheetQuoteBusy=true;
  const generation=sheetQuoteGeneration;
  try{
+  await ensureSheetTick();
+  if(generation!==sheetQuoteGeneration||!isSheetOpen()||sheetPriceEdited&&!force)return;
+  // Prefer sub-second WebSocket trade ticks; REST is for stream interruptions.
+  if(liveQuote.price>0&&Date.now()-liveQuote.at<=3500){
+   if(force)sheetPriceEdited=false;
+   displayLiveQuote();followQuote();return;
+  }
   const data=await publicJson('/fapi/v1/ticker/price?symbol='+symbol);
-  if(generation!==sheetQuoteGeneration||!isSheetOpen()||!limitOrderSelected()||sheetPriceEdited&&!force)return;
+  if(generation!==sheetQuoteGeneration||!isSheetOpen()||sheetPriceEdited&&!force)return;
   const price=Number(data?.price),stamp=Number(data?.time);
   if(data?.symbol!==symbol||!(price>0)||!Number.isFinite(price)||
     (stamp>0&&Math.abs(Date.now()-stamp)>30000))
    throw Error('최신 BTCUSDT 시세를 확인할 수 없습니다');
-  const tick=(await filters()).price.tickSize;
-  if(generation!==sheetQuoteGeneration||!isSheetOpen()||!limitOrderSelected()||sheetPriceEdited&&!force)return;
-  const step=Number(tick),digits=Math.min(8,(String(tick).split('.')[1]||'').length);
-  if(!(step>0))throw Error('BTCUSDT 호가 단위 조회 실패');
-  limitInput.value=(Math.round(price/step)*step).toFixed(digits);
-  sheetQuoteLastAt=Date.now();
   if(force)sheetPriceEdited=false;
-  quoteState.textContent='현재가 자동 반영 · 직접 수정 시 고정';
+  // REST fallback shows a reference price, not a live WebSocket tick.
+  limitInput.value=(Math.round(price/sheetTick)*sheetTick).toFixed(sheetTickDigits);
+  sheetQuoteLastAt=Date.now();
+  quoteState.textContent='최근 조회가 반영 · 실시간 스트림 재연결 중';
+  displayLiveQuote();
  }catch(e){
   if(generation===sheetQuoteGeneration&&!sheetPriceEdited){
-   // A stale quote must never be shown as a live default price.
    if(Date.now()-sheetQuoteLastAt>10000)limitInput.value='';
-   quoteState.textContent='실시간 시세 조회 실패 · 가격을 직접 입력하세요';
+   quoteState.textContent='시세 조회 실패 · 가격을 직접 입력하세요';
   }
  }finally{sheetQuoteBusy=false;}
 }
@@ -217,24 +264,33 @@ function showSheet(side){
  sheetQuoteGeneration++;sheetPriceEdited=false;sheetQuoteLastAt=0;
  if(limitInput)limitInput.value='';
  quoteState.textContent='최신 지정가 불러오는 중…';
+ displayLiveQuote();
  void updateLimitQuote();
 }
 quoteReset.onclick=()=>{
  if(!isSheetOpen())return;
  sheetPriceEdited=false;sheetQuoteGeneration++;sheetQuoteLastAt=0;
  if(limitInput)limitInput.value='';
- quoteState.textContent='최신 지정가 불러오는 중…';
+ quoteState.textContent='실시간 현재가 다시 적용 중…';
+ displayLiveQuote();
  void updateLimitQuote(true);
 };
 for(const radio of document.querySelectorAll('input[name="orderType"]')){
  radio.addEventListener('change',()=>{
-  if(!isSheetOpen()||!limitOrderSelected())return;
+  if(!isSheetOpen())return;
+  displayLiveQuote();
+  if(!limitOrderSelected())return;
   sheetQuoteGeneration++;sheetPriceEdited=false;sheetQuoteLastAt=0;
   if(limitInput)limitInput.value='';
   void updateLimitQuote();
  });
 }
-setInterval(()=>{if(isSheetOpen()&&limitOrderSelected()&&!sheetPriceEdited&&Date.now()-sheetQuoteLastAt>=3000)void updateLimitQuote();},1000);
+setInterval(()=>{
+ if(!isSheetOpen())return;
+ displayLiveQuote();
+ if(limitOrderSelected()&&!sheetPriceEdited&&
+  Date.now()-sheetQuoteLastAt>=3000)void updateLimitQuote();
+},1000);
 
 function credentialsSafe(){if(!cred()?.apiKey||!cred()?.apiSecret){message('설정에서 API 키를 잠금 해제한 뒤 실전 주문을 이용하세요.');return false;}return true;}
 async function enter(side){
