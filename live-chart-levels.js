@@ -58,6 +58,7 @@ function levels(){
  return list;
 }
 function note(text,warning=false){hint.textContent=text;hint.style.color=warning?'#ff9aaa':'';}
+window.btcLiveChartPrices=()=>levels().map(l=>l.price).filter(p=>Number.isFinite(p)&&p>0);
 window.btcDrawLiveLevels=(ctx,scale)=>{
  const all=levels();
  for(const level of all){
@@ -137,6 +138,8 @@ async function moveProtection(l,raw){
  const step=Number(tick),digits=(String(tick).split('.')[1]||'').length;
  const snapped=(Math.round(targetRaw/step)*step).toFixed(Math.min(digits,8));
  if(!(Number(snapped)>0))return;
+ const validSnapped=s==='LONG'?(kind==='sl'?Number(snapped)<mark:Number(snapped)>mark):(kind==='sl'?Number(snapped)>mark:Number(snapped)<mark);
+ if(!validSnapped)return note('호가 단위 반영 후 현재 마크가를 넘습니다. 다른 가격을 선택하세요.',true);
  if(!confirm(s+' '+(kind==='sl'?'손절':'익절')+' 실제 주문 가격을 '+fmt(snapped)+' USDT로 '+(current?'변경':'등록')+'할까요?\n바이낸스 조건부 주문을 실제로 전송합니다.'))return;
  requestBusy=true;note('실제 보호 주문 변경 요청 중…');
  try{
@@ -147,6 +150,15 @@ async function moveProtection(l,raw){
   if(current&&(!found.some(a=>String(a.algoId)===String(current.algoId))||found.length!==1))
    throw Error('실제 보호 주문이 변경되었습니다. 중복 주문 방지를 위해 중단합니다');
   if(!current&&found.length)throw Error('다른 보호 주문이 존재합니다. 바이낸스에서 확인하세요');
+  const freshPosition=await signed('GET','/fapi/v3/positionRisk',{symbol});
+  const currentPositions=Array.isArray(freshPosition)?freshPosition:[freshPosition];
+  const live=currentPositions.find(x=>x?.symbol===symbol&&x.positionSide===p.side&&
+   Math.abs(num(x.positionAmt))>0);
+  if(!live)throw Error('실제 보유 포지션이 없습니다. 보호 주문 변경을 중단합니다');
+  const liveMark=num(live.markPrice);
+  const validNow=s==='LONG'?(kind==='sl'?Number(snapped)<liveMark:Number(snapped)>liveMark):
+   (kind==='sl'?Number(snapped)>liveMark:Number(snapped)<liveMark);
+  if(!(liveMark>0&&validNow))throw Error('마크가 변동으로 지정 가격이 유효하지 않습니다');
   const type=kind==='sl'?'STOP_MARKET':'TAKE_PROFIT_MARKET';
   const newId='btcp'+(kind==='sl'?'s':'t')+s[0]+Date.now().toString(36);
   const req={algoType:'CONDITIONAL',symbol,side:s==='LONG'?'SELL':'BUY',positionSide:p.side,type,
