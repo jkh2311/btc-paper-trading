@@ -60,11 +60,16 @@ function invalidateLeverage(value='레버리지 적용 확인 필요'){confirmed
 $('lev')?.addEventListener('input',()=>invalidateLeverage('변경됨 · 바이낸스 적용 필요'));
 document.addEventListener('btc:real-account-cleared',()=>invalidateLeverage('계좌 재연결 후 레버리지 확인 필요'));
 async function verifyLeverage(expected){
- const response=await signed('GET','/fapi/v3/positionRisk',{symbol});
+ // Position Risk V3 omits symbols without an open position or open orders.
+ // Symbol configuration reports the leverage even when BTCUSDT is flat.
+ const response=await signed('GET','/fapi/v1/symbolConfig',{symbol});
  const rows=Array.isArray(response)?response:[response];
  const matching=rows.filter(x=>x?.symbol===symbol);
- if(!matching.length||matching.some(p=>Number(p.leverage)!==expected))
-  throw Error('실계좌 레버리지 불일치 · 바이낸스에서 확인해 주세요');
+ if(matching.length!==1||!Number.isInteger(Number(matching[0].leverage)))
+  throw Error('바이낸스 BTCUSDT 설정 조회 실패 · 레버리지 미확인');
+ const actual=Number(matching[0].leverage);
+ if(actual!==expected)
+  throw Error('설정 '+expected+'배 / 바이낸스 '+actual+'배 · 적용 후 재확인하세요');
  return true;
 }
 let leverageCheckBusy=false;
