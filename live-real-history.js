@@ -83,7 +83,7 @@ function renderCumulative(){
  rhs.querySelector('small').textContent='누적 순실현손익';
  lhs.title=good?'기간 '+period+' · 기간 내 자금 이동을 시간가중 반영한 수정 Dietz 방식의 실현손익률 · 미실현손익 제외':'전체 누적 내역 조회가 필요합니다';
  rhs.title=good?'기간 '+period+' · 선물 USDT 실현손익·수수료·펀딩비 등 합계 (미실현손익 제외)':'전체 누적 내역 조회가 필요합니다';
- if(good)cumulativeInfo.textContent=period+' · 거래소 손익 내역 '+cumulative.count+'건 집계'+
+ if(good)cumulativeInfo.textContent=period+' · USDⓈ-M 선물 계좌 USDT 손익 '+cumulative.count+'건 집계'+
   ' · 미실현손익 제외 · 과거 API 제공 범위 밖 기록은 미포함';
 }
 async function signedIncome(account,startTime,endTime,page,signal){
