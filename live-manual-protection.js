@@ -133,7 +133,7 @@ async function run(){
    if(!entries.length)continue;
    const p=pos.find(x=>dual?x.positionSide===side:x.positionSide==='BOTH'&&
     (side==='LONG'?Number(x.positionAmt)>0:Number(x.positionAmt)<0));
-   if(!p)continue;
+   if(!p){note.textContent=side+' 보유 포지션 없음 · 보호 주문 상태는 바이낸스에서 확인하세요.';continue;}
    const fills=[];
    for(const x of entries){
     try{
@@ -154,6 +154,7 @@ async function run(){
  finally{busy=false;}
 }
 setInterval(run,15000);
+document.addEventListener('btc:real-account-updated',()=>{if(Date.now()-lastRun>5000){lastRun=Date.now();void run();}});
 document.addEventListener('btc:credentials-unlocked',()=>setTimeout(run,1000));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void run()});
 setTimeout(run,2500);
