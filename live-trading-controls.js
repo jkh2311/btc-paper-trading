@@ -158,5 +158,5 @@ if(settingsCard){
  const autoLabel=create('p','RMI AUTO ON은 신호 관찰용입니다. 이 전략값은 수동매매 계획에 활용하며 실제 주문 전송이나 레버리지 변경은 하지 않습니다.','real-balance-note');
  settingsCard.append(autoLabel);
 }
-document.addEventListener('visibilitychange',()=>{if(document.hidden)reset()});
+// Keep the last known account snapshot across brief app switches; freshness is checked before use.
 })();
