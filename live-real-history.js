@@ -51,6 +51,123 @@ const style=create('style');style.textContent=`
 `;document.head.append(style);
 let sequence=0,busy=false,controller=null;
 let lastTrades=null,realWallet=NaN;
+let cumulative=null,cumulativeBusy=false;
+const historyStart=document.createElement('input');
+historyStart.type='date';historyStart.value='2026-11-05';
+historyStart.setAttribute('aria-label','누적 손익 조회 시작일');
+historyStart.style.cssText='background:#294363;color:#e7edf8;border:1px solid #4a6485;border-radius:8px;font:12px -apple-system,BlinkMacSystemFont,sans-serif;padding:7px;max-width:145px;min-height:34px';
+const cumulativeBtn=create('button','누적 내역 조회');
+cumulativeBtn.type='button';cumulativeBtn.style.cssText='font-size:11px;padding:7px 9px;min-height:34px';
+const cumulativeControls=create('div');
+cumulativeControls.style.cssText='display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin:5px 0 8px';
+cumulativeControls.append(create('small','집계 시작일'),historyStart,cumulativeBtn);
+summary.insertAdjacentElement('beforebegin',cumulativeControls);
+const cumulativeInfo=create('div','누적 조회를 눌러 기간 전체의 실현손익·수수료·펀딩비를 집계하세요.','live-real-history-note');
+cumulativeControls.insertAdjacentElement('afterend',cumulativeInfo);
+historyStart.onchange=()=>{cumulative=null;renderCumulative();};
+function renderCumulative(){
+ const grid=summary.querySelector('.paper-performance-grid');
+ if(!grid)return;
+ const lhs=grid.children[0],rhs=grid.children[1];
+ if(!lhs||!rhs)return;
+ const leftValue=lhs.querySelector('strong'),rightValue=rhs.querySelector('strong');
+ if(!leftValue||!rightValue)return;
+ const good=!!cumulative&&cumulative.startDay===historyStart.value;
+ const roi=good?cumulative.roi:NaN,net=good?cumulative.net:NaN;
+ leftValue.textContent=Number.isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(2)+'%':'—';
+ rightValue.textContent=Number.isFinite(net)?won(net):'—';
+ leftValue.className=Number.isFinite(roi)?(roi>=0?'paper-stat-profit':'paper-stat-loss'):'';
+ rightValue.className=Number.isFinite(net)?(net>=0?'paper-stat-profit':'paper-stat-loss'):'';
+ const period=good?historyStart.value+'~'+new Date(cumulative.checkedAt).toLocaleDateString('ko-KR'):'';
+ lhs.querySelector('small').textContent='총 수익률';
+ rhs.querySelector('small').textContent='누적 순실현손익';
+ lhs.title=good?'기간 '+period+' · 기간 내 자금 이동을 시간가중 반영한 수정 Dietz 방식의 실현손익률 · 미실현손익 제외':'전체 누적 내역 조회가 필요합니다';
+ rhs.title=good?'기간 '+period+' · 선물 USDT 실현손익·수수료·펀딩비 등 합계 (미실현손익 제외)':'전체 누적 내역 조회가 필요합니다';
+ if(good)cumulativeInfo.textContent=period+' · 거래소 손익 내역 '+cumulative.count+'건 집계'+
+  ' · 미실현손익 제외 · 과거 API 제공 범위 밖 기록은 미포함';
+}
+async function signedIncome(account,startTime,endTime,page,signal){
+ const params=new URLSearchParams({startTime:String(startTime),endTime:String(endTime),
+  page:String(page),limit:'1000',recvWindow:'5000',timestamp:String(Date.now())});
+ const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(account.apiSecret),
+  {name:'HMAC',hash:'SHA-256'},false,['sign']);
+ const signature=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(params.toString()));
+ params.set('signature',Array.from(new Uint8Array(signature),b=>b.toString(16).padStart(2,'0')).join(''));
+ const response=await fetch('https://fapi.binance.com/fapi/v1/income?'+params.toString(),
+  {method:'GET',mode:'cors',cache:'no-store',credentials:'omit',redirect:'error',
+   headers:{'X-MBX-APIKEY':account.apiKey},signal});
+ if(!response.ok)throw Error('바이낸스 누적 손익 조회 HTTP '+response.status);
+ const json=await response.json();
+ if(!Array.isArray(json))throw Error('선물 누적 손익 데이터 형식 오류');
+ return json;
+}
+async function syncCumulative(){
+ if(cumulativeBusy||document.hidden)return;
+ const account=typeof getApiCredentials==='function'?getApiCredentials():null;
+ if(!account?.apiKey||!account?.apiSecret){cumulativeInfo.textContent='API 잠금 해제 후 조회해 주세요';return;}
+ const selected=historyStart.value;
+ const start=new Date(selected+'T00:00:00+09:00').getTime();
+ const end=Date.now();
+ // Regular income-history endpoint documents a 3-month retention limit.
+ // Never call an incomplete result 'all-time'.
+ const availableSince=new Date();availableSince.setMonth(availableSince.getMonth()-3);
+ if(!Number.isFinite(start)||start>=end||start<availableSince.getTime()){
+  cumulative=null;renderCumulative();
+  cumulativeInfo.textContent='선택한 시작일이 바이낸스 일반 API의 약 3개월 조회 범위를 벗어납니다. 과거 내역 파일을 포함하지 않으면 전체 수익률을 계산할 수 없습니다.';
+  return;
+ }
+ cumulativeBusy=true;cumulativeBtn.disabled=true;cumulativeBtn.textContent='조회 중…';
+ cumulative=null;renderCumulative();
+ const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),100000);
+ const duration=end-start;
+ try{
+  const seen=new Set(),entries=[],week=7*86400000;
+  for(let from=start;from<end;from+=week){
+   const until=Math.min(end-1,from+week-1);
+   for(let page=1;page<=80;page++){
+    if(abort.signal.aborted||document.hidden)throw Error('앱이 백그라운드로 이동하여 조회가 중단되었습니다');
+    cumulativeInfo.textContent='누적 실제 내역 조회 '+Math.min(100,Math.round((from-start)/duration*100))+'% · '+new Date(from).toLocaleDateString('ko-KR');
+    const rows=await signedIncome(account,from,until,page,abort.signal);
+    for(const x of rows){
+     const amount=Number(x.income),t=Number(x.time);
+     if(!Number.isFinite(amount)||!Number.isFinite(t)||!x.incomeType||!x.asset)
+      throw Error('거래소 손익 기록의 필수 항목 누락');
+     const k=String(x.tranId)+'/'+String(x.incomeType)+'/'+String(x.asset)+'/'+t+'/'+String(x.symbol||'');
+     if(seen.has(k))continue;seen.add(k);entries.push({asset:String(x.asset),kind:String(x.incomeType),value:amount,time:t,symbol:String(x.symbol||'')});
+    }
+    if(rows.length<1000)break;
+    if(page===80)throw Error('손익 거래내역이 많아 일부 기록이 누락될 수 있어 집계를 중단했습니다');
+   }
+  }
+  if(!Number.isFinite(realWallet)||realWallet<=0)throw Error('실제 선물 지갑 잔고 재조회가 필요합니다');
+  // Realized exchange income already includes actual commissions. Do not
+  // multiply PnL/fees by leverage, and do not count cash transfers as trading returns.
+  const realizedTypes=new Set(['REALIZED_PNL','COMMISSION','FUNDING_FEE','INSURANCE_CLEAR',
+   'COMMISSION_REBATE','API_REBATE','FEE_RETURN']);
+  if(entries.some(x=>x.asset!=='USDT'&&Math.abs(x.value)>1e-10))
+   throw Error('USDT 외 자산 거래/수수료가 있어 계좌 전체 손익을 정확히 USDT로 환산할 수 없습니다');
+  const usdtEntries=entries.filter(x=>x.asset==='USDT');
+  const totalWalletChange=usdtEntries.reduce((a,x)=>a+x.value,0);
+  const beginning=realWallet-totalWalletChange;
+  const flows=usdtEntries.filter(x=>!realizedTypes.has(x.kind));
+  const trading=usdtEntries.filter(x=>realizedTypes.has(x.kind));
+  const net=trading.reduce((a,x)=>a+x.value,0);
+  // Modified Dietz: realized trading return divided by starting capital plus
+  // time-weighted contributions. PnL here excludes open-position unrealized PnL.
+  const capital=beginning+flows.reduce((a,x)=>a+x.value*Math.max(0,Math.min(1,(end-x.time)/duration)),0);
+  if(!(capital>0)&&Math.abs(net)>1e-10)
+   throw Error('시작자산과 입출금 내역만으로 양의 투자원금을 확인할 수 없습니다');
+  const roi=capital>0?net/capital*100:0;
+  if(!Number.isFinite(roi))throw Error('총 수익률 계산 실패');
+  cumulative={startDay:selected,checkedAt:end,net,roi,count:entries.length};
+  renderCumulative();
+ }catch(e){
+  cumulative=null;renderCumulative();
+  cumulativeInfo.textContent='누적 내역 계산 미완료: '+String(e?.message||e)+' · 일부 기록만 합산해 표시하지 않습니다';
+ }finally{clearTimeout(timeout);cumulativeBusy=false;cumulativeBtn.disabled=false;cumulativeBtn.textContent='누적 내역 조회';}
+}
+cumulativeBtn.onclick=syncCumulative;
+
 const num=v=>v===null||v===undefined||v===''?NaN:Number(v);
 const fmt=(v,d=4)=>Number.isFinite(v)?v.toLocaleString('ko-KR',{maximumFractionDigits:d}):'—';
 const signed=v=>v>0?'+'+fmt(v):fmt(v);
@@ -100,7 +217,7 @@ function showRows(rows){
  log.replaceChildren();
  if(!rows.length){
   log.textContent='조회 범위 내 실제 BTCUSDT 체결 내역이 없어요.';
-  summary.textContent='조회 범위 내 체결 없음 · 전체 누적 수익률은 계산되지 않음';
+  summary.textContent='최근 체결 없음';
   closed.textContent='조회된 청산 체결 없음';return;
  }
  for(const t of [...rows].reverse()){
@@ -146,25 +263,26 @@ function showRows(rows){
  const failure=groups.filter(t=>t.pnl-t.commission<0).length;
  summary.replaceChildren();
  const grid=create('div',undefined,'paper-performance-grid paper-performance-minimal');
- const roi=Number.isFinite(realWallet)&&realWallet>0?net/realWallet*100:NaN;
+ const roi=NaN; // never mislabel the latest 100 fills as total account return
  const totalReturn=create('div');
  const rateLabel=Number.isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(2)+'%':'—';
  const rateValue=create('strong',rateLabel);
  rateValue.className=Number.isFinite(roi)?(roi>=0?'paper-stat-profit':'paper-stat-loss'):'';
  totalReturn.append(create('small','총 수익률'),rateValue);
- totalReturn.title='최근 최대 100체결 손익 ÷ 현재 지갑 잔고 · 전체 누적 수익률 아님';
+ totalReturn.title='실제 전체 조회가 끝난 경우에만 기간 총 수익률 표시';
  const totalGain=create('div'),netValue=create('strong',won(net)+(otherFee?'*':''));
  netValue.className=net>=0?'paper-stat-profit':'paper-stat-loss';
  totalGain.append(create('small','누적 순실현손익'),netValue);
  grid.append(totalReturn,totalGain);summary.append(grid);
+ renderCumulative();
  const count=create('div',undefined,'paper-performance-count');
  count.append(create('span','청산 체결 '+groups.length+'건 · '));
  const wins=create('span','수익 '+success+'건');wins.className='paper-stat-profit';
  const losses=create('span','손실 '+failure+'건');losses.className='paper-stat-loss';
  count.append(wins,create('span',' · '),losses);
  summary.append(count);
- const notice=create('p','최근 100체결 기준 · 수익률은 현재 잔고 대비 참고값','live-real-history-note');
- notice.title='전체 누적 수익률이 아니며, USDT 수수료만 차감. 펀딩비·기타 자산 수수료 제외'+(otherFee?' (기타 수수료 있음)':'');
+ const notice=create('p','완료 거래 목록은 최근 100체결 기준 · 위 누적 수치는 별도 기간 전체 조회','live-real-history-note');
+ notice.title='위 누적 손익은 거래소 소득내역을 기간별 조회하고 펀딩비와 USDT 수수료를 포함합니다. 최근 거래 목록은 최대 100체결만 보여줍니다.';
  summary.append(notice);
  closed.replaceChildren();
  if(!groups.length)closed.textContent='조회 범위 내 실현손익이 확인된 청산 체결이 없어요.';
