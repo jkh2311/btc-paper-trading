@@ -90,8 +90,8 @@ async function sync(){
    signedRead('/fapi/v1/openOrders',credentials,controller.signal),
    signedRead('/fapi/v1/openAlgoOrders',credentials,controller.signal)
  ]);
- clear('조회 실패 · 미체결 없음으로 판단할 수 없음');
  if(current===seq){
+  clear('조회 실패 · 미체결 없음으로 판단할 수 없음');
   if(plain.status==='fulfilled')renderNormal(plain.value);
   if(algo.status==='fulfilled')renderAlgo(algo.value);
   const ok=plain.status==='fulfilled'&&algo.status==='fulfilled';
@@ -108,6 +108,7 @@ button.addEventListener('click',sync);
 const poll=setInterval(()=>{
  if(enabled&&!loading&&!document.hidden&&Date.now()-lastResultAt>=30000)void sync();
 },5000);
+document.addEventListener('btc:live-lock',locked);
 document.addEventListener('visibilitychange',()=>{
  if(document.hidden){locked();state.textContent='보안상 화면 비활성화 시 목록 초기화 · 다시 조회 필요'}
 });
