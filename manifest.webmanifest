@@ -1,0 +1,18 @@
+{
+  "id": "/btc-paper-trading/",
+  "name": "BTCUSDT 모의매매",
+  "short_name": "BTC 모의",
+  "start_url": "/btc-paper-trading/",
+  "scope": "/btc-paper-trading/",
+  "display": "standalone",
+  "background_color": "#09111f",
+  "theme_color": "#09111f",
+  "icons": [
+    {
+      "src": "./push-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
