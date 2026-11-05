@@ -36,9 +36,19 @@ if(clear){clear.textContent='화면 기록 비우기';clear.type='button'}
 const pattern=$('paperPatternDetails');if(pattern)pattern.hidden=true;
 const style=create('style');style.textContent='.live-real-history-note{font-size:11px;color:#aec5dd;line-height:1.6;margin:10px 0}.live-real-history-row{white-space:pre-line;line-height:1.6}.live-real-history-row .pnl-positive{color:#4ed6a6}.live-real-history-row .pnl-negative{color:#ff869b}';document.head.append(style);
 let sequence=0,busy=false,controller=null;
+let lastTrades=null,realWallet=NaN;
 const num=v=>v===null||v===undefined||v===''?NaN:Number(v);
 const fmt=(v,d=4)=>Number.isFinite(v)?v.toLocaleString('ko-KR',{maximumFractionDigits:d}):'—';
 const signed=v=>v>0?'+'+fmt(v):fmt(v);
+const currentFx=()=>{const x=num($('fx')?.value);return Number.isFinite(x)&&x>0?x:NaN;};
+const won=(v)=>{
+ const rate=currentFx();if(!Number.isFinite(v)||!Number.isFinite(rate))return '원화 환산 불가';
+ const krw=Math.round(v*rate);
+ return (krw>0?'+':krw<0?'-':'')+Math.abs(krw).toLocaleString('ko-KR')+'원';
+};
+const feeWon=(v,asset)=>asset==='USDT'?won(-v).replace(/^-/, ''):
+ (v>0?'수수료 '+fmt(v,6)+' '+asset+' (원화 미지원)':'0원');
+
 const showError=message=>{status.textContent=message;status.style.color='#ff9aaa'};
 function empty(heading){
  log.replaceChildren();log.textContent=heading||'실제 체결 내역 조회 전';
@@ -69,6 +79,7 @@ async function trades(account,signal){
  return json.map(validateTrade).sort((a,b)=>a.time-b.time||Number(a.id)-Number(b.id));
 }
 function showRows(rows){
+ lastTrades=rows;
  empty();
  const tradesDesc=create('div',undefined,'live-real-history-note');
  tradesDesc.textContent='실제 체결 최대 100건 · '+new Date().toLocaleTimeString('ko-KR')+
@@ -82,11 +93,13 @@ function showRows(rows){
  }
  for(const t of [...rows].reverse()){
   const box=create('div',undefined,'trade-log-item live-real-history-row');
-  const pnl=create('span',(t.pnl>0?'+':'')+fmt(t.pnl,4)+' USDT');
+  const isUsdt=t.feeAsset==='USDT',net=t.pnl-(isUsdt?t.fee:0);
+  const pnl=create('span',won(t.pnl));
   pnl.className=t.pnl>=0?'pnl-positive':'pnl-negative';
   box.append(create('span',new Date(t.time).toLocaleTimeString('ko-KR')+' · 실제 '+t.side+' '+
    fmt(t.qty,8)+' BTC @ '+fmt(t.price,2)+' USDT\n주문 #'+t.orderId+' · 실현손익 '),pnl,
-   create('span',' · 수수료 '+fmt(t.fee,6)+' '+t.feeAsset));
+   create('span',' · 수수료 '+(isUsdt?feeWon(t.fee,'USDT'):fmt(t.fee,6)+' '+t.feeAsset+' (원화 환산 제외)')+
+    '\n수수료 차감 후 '+won(net)+(isUsdt?'':' · 기타 자산 수수료 별도')));
   log.append(box);
  }
  const pnlSum=rows.reduce((x,t)=>x+t.pnl,0);
@@ -100,9 +113,10 @@ function showRows(rows){
  for(const t of candidates){
   const id=t.orderId+'-'+t.positionSide+'-'+t.side;
   const entry=byOrder.get(id)||{id:t.orderId,side:t.side,positionSide:t.positionSide,
-   time:t.time,qty:0,pnl:0,commission:0};
+   time:t.time,qty:0,pnl:0,commission:0,otherCommission:false};
   entry.qty+=t.qty;entry.pnl+=t.pnl;entry.time=Math.max(entry.time,t.time);
   entry.commission+=t.feeAsset==='USDT'?t.fee:0;
+  if(t.feeAsset!=='USDT'&&t.fee>0)entry.otherCommission=true;
   byOrder.set(id,entry);
  }
  const groups=[...byOrder.values()].sort((a,b)=>b.time-a.time);
@@ -110,16 +124,17 @@ function showRows(rows){
  const failure=groups.filter(t=>t.pnl-t.commission<0).length;
  summary.replaceChildren();
  const grid=create('div',undefined,'paper-performance-grid paper-performance-minimal');
- const totalReturn=create('div');totalReturn.append(create('small','총 수익률'),
-  create('strong','— (기준 계좌자산 미확인)'));
- const totalGain=create('div'),netValue=create('strong',signed(net)+' USDT'+(otherFee?'*':''));
+ const roi=Number.isFinite(realWallet)&&realWallet>0?net/realWallet*100:NaN;
+ const totalReturn=create('div');totalReturn.append(create('small','조회 손익률 · 현재 지갑 잔고 대비'),
+  create('strong',Number.isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(2)+'%':'— (실제 잔고 조회 후 표시)'));
+ const totalGain=create('div'),netValue=create('strong',won(net)+(otherFee?'*':''));
  netValue.className=net>=0?'paper-stat-profit':'paper-stat-loss';
- totalGain.append(create('small','조회 범위 실현손익 (USDT)'),netValue);
+ totalGain.append(create('small','조회 범위 순실현손익 (원화 추정)'),netValue);
  grid.append(totalReturn,totalGain);summary.append(grid);
  summary.append(create('div','실현손익이 확인된 청산 체결 그룹 '+groups.length+'건 · 수익 '+success+
   '건 · 손실 '+failure+'건','paper-performance-count'));
- summary.append(create('p','※ 최근 최대 100체결 기준 · USDT 수수료 차감, 펀딩비·기타 자산 수수료는 제외'+
-  (otherFee?'(*)':'')+'. 전체 계좌 누적 수익률이나 포지션 완전 청산 건수로 볼 수 없습니다.','live-real-history-note'));
+ summary.append(create('p','※ 최근 최대 100체결 기준 · 수익률은 현재 지갑 잔고 대비 참고값이며 전체 누적 수익률이 아닙니다. USDT 수수료만 차감하며, 펀딩비·기타 자산 수수료는 제외'+
+  (otherFee?'(*)':'')+'.','live-real-history-note'));
  closed.replaceChildren();
  if(!groups.length)closed.textContent='조회 범위 내 실현손익이 확인된 청산 체결이 없어요.';
  for(const entry of groups){
@@ -129,8 +144,12 @@ function showRows(rows){
    ' 청산 체결 · 주문 #'+entry.id);
   heading.append(name,create('span',new Date(entry.time).toLocaleString('ko-KR')));
   const pnl=entry.pnl-entry.commission;
-  node.append(heading,create('div','체결 수량 '+fmt(entry.qty,8)+' BTC · 실현손익 '+signed(pnl)+' USDT'+
-   ' (USDT 수수료 반영)','live-real-history-note'));
+  const detail=create('div',undefined,'live-real-history-note');
+  detail.textContent='체결 수량 '+fmt(entry.qty,8)+' BTC · 실현손익 '+won(entry.pnl)+
+   '\n청산 체결 USDT 수수료 '+feeWon(entry.commission,'USDT')+
+   '\n수수료 차감 후 '+won(pnl)+(entry.otherCommission?' · 기타 자산 수수료 별도':'');
+  detail.style.whiteSpace='pre-line';
+  node.append(heading,detail);
   closed.append(node);
  }
 }
@@ -163,6 +182,15 @@ if(refresh)refresh.onclick=()=>run();
 if(clear)clear.onclick=()=>{sequence++;controller?.abort();empty('화면에서만 비웠습니다. 실제 거래소 기록은 삭제되지 않습니다.');status.textContent='화면 기록 초기화 · 실제 거래소 데이터는 그대로예요.'};
 const reset=()=>{sequence++;controller?.abort();empty('API 잠금 또는 화면 비활성화 · 다시 조회해 주세요.');status.textContent='실제 거래내역 재조회 필요'};
 document.addEventListener('btc:real-account-cleared',reset);
+document.addEventListener('btc:real-account-updated',e=>{
+ const wallet=num(e.detail?.wallet);
+ if(Number.isFinite(wallet)&&wallet>0&&wallet!==realWallet){
+  realWallet=wallet;
+  if(lastTrades)showRows(lastTrades);
+ }
+});
+$('fx')?.addEventListener('input',()=>{if(lastTrades)showRows(lastTrades)});
+
 // Retain last fetched fills on brief app switches; resume refreshes on return.
 // Do not erase the visible last-read history merely because iOS suspends the page.
 empty();
