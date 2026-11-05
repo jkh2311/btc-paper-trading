@@ -8,6 +8,18 @@ const history=$('page-history'),log=$('log'),pending=$('manualPendingHistory');
 const summary=$('paperPerformanceSummary'),closed=$('paperClosedTradeList'),refresh=$('paperStatsReset'),clear=$('clear');
 if(!history||!log||!pending||!summary||!closed)return;
 window.liveHistoryViewActive=true;
+const autoPanel=document.getElementById('autoPaperToggle')?.closest('.auto-panel');
+if(autoPanel){
+ const observer=document.createElement('p');observer.className='muted';
+ observer.style.cssText='font-size:11px;margin:8px 0;line-height:1.5';
+ observer.textContent='RMI AUTO: 확정봉 신호 관찰 · 실제 주문 전송은 아직 연결되지 않았습니다.';
+ autoPanel.querySelector('.auto-panel-header')?.insertAdjacentElement('afterend',observer);
+ document.addEventListener('btc:live-rmi-observed',e=>{
+  const d=e.detail;if(d?.symbol!=='BTCUSDT'||!['LONG','SHORT'].includes(d.side))return;
+  observer.textContent='RMI 신호 감지: '+d.side+' · '+new Date(d.barTime+60000).toLocaleTimeString('ko-KR')+
+   ' · 실제 주문 미전송';
+ });
+}
 const card=history.querySelector('.paper-history-card');
 const title=card?.querySelector('summary span');
 if(title)title.textContent='실전매매 거래내역';
