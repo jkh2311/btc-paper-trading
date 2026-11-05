@@ -67,6 +67,24 @@ async function verifyLeverage(expected){
   throw Error('실계좌 레버리지 불일치 · 바이낸스에서 확인해 주세요');
  return true;
 }
+let leverageCheckBusy=false;
+async function checkExistingLeverage(){
+ if(leverageCheckBusy||leverageBusy||busy)return;
+ const a=cred(),expected=val('lev');
+ if(!a?.apiKey||!a?.apiSecret||!Number.isInteger(expected)||expected<1||expected>50)return;
+ leverageCheckBusy=true;
+ try{
+  await verifyLeverage(expected);
+  confirmedLeverage={value:expected,apiKey:a.apiKey,at:Date.now()};
+  showLeverageStatus('✓ 바이낸스 '+expected+'배 확인');
+ }catch(e){
+  if(confirmedLeverage?.value===expected&&confirmedLeverage.apiKey===a.apiKey){
+   showLeverageStatus('이전 '+expected+'배 적용 확인 · 재조회 실패');
+  }else showLeverageStatus('바이낸스 적용 확인 필요 · 적용 버튼을 누르세요');
+ }finally{leverageCheckBusy=false;}
+}
+document.addEventListener('btc:credentials-unlocked',()=>setTimeout(checkExistingLeverage,350));
+setTimeout(checkExistingLeverage,1500);
 if(leverageButton)leverageButton.onclick=async()=>{
  if(leverageBusy||busy)return;
  const lev=val('lev'),saved=cred();
