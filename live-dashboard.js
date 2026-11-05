@@ -119,6 +119,7 @@ refresh.addEventListener('click',async()=>{
  finally{busy=false;refresh.disabled=false}
 });
 lock.addEventListener('click',()=>{
+ document.dispatchEvent(new Event('btc:live-lock'));
  seq++;if(typeof unlockedApiCredentials!=='undefined')unlockedApiCredentials=null;
  for(const id of ['myBinanceKey','myBinanceSecret','myVaultPassword']){
   const el=document.getElementById(id);if(el)el.value='';
