@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261106-independent-history-10m-v140"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261106-date-time-jump-minute-2months-v141"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -536,6 +536,12 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
 #page-chart .chart-panel{position:relative}
 #dailyHistoryJump,#intradayHistoryJump{position:absolute;top:5px;left:6px;z-index:46;display:none;min-height:27px;padding:3px 8px;border:1px solid #556f86;border-radius:7px;background:rgba(25,42,63,.91);color:#e6f0fb;font-size:11px;font-weight:650;touch-action:manipulation}
 #dailyHistoryJump[disabled],#intradayHistoryJump[disabled]{opacity:.65}
+#dailyHistoryJump{display:none!important}
+#chartTimeJumpControls{margin-top:9px;padding-top:9px;border-top:1px solid #465b72}
+#chartTimeJumpControls .time-jump-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+#chartTimeJumpControls .time-jump-grid input{min-width:0;width:100%;height:34px;font-size:12px;padding:4px 5px;color:#e7edf8;background:#101c2d;border:1px solid #5a7590;border-radius:6px}
+#chartTimeJumpControls button{width:100%;min-height:31px;margin-top:7px;padding:5px;background:#304d70;color:#f5f8ff;font-size:12px}
+#chartTimeJumpStatus{font-size:11px;color:#b8d6e8;line-height:1.5;margin-top:5px;overflow-wrap:anywhere}
 #chartIndicatorsDock{position:absolute;right:7px;bottom:6px;z-index:45;pointer-events:none}
 #chartIndicatorsDock>*{pointer-events:auto}
 #chartIndicatorToggle{height:30px;min-height:30px;padding:3px 10px;border-radius:9px;font-size:12px;font-weight:650;background:rgba(31,47,65,.96);color:#e7edf8;border:1px solid #718395;box-shadow:0 2px 12px #0008;touch-action:manipulation}
@@ -566,7 +572,11 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
    </div>
   </details>
  </section>
-<div class="chart-panel"><button id="dailyHistoryJump" type="button" title="일봉 2017년 과거 기록 / 최신으로 이동">⟵ 2017</button><button id="intradayHistoryJump" type="button" title="선택한 시간봉의 과거 기록 / 최신으로 이동">⟵ 과거</button><div id="chartIndicatorsDock"><button id="chartIndicatorToggle" type="button" aria-expanded="false" aria-controls="chartIndicatorMenu" aria-label="차트 지표 표시 설정">⚙ 지표</button><div id="chartIndicatorMenu" hidden role="group" aria-label="차트 지표 표시 선택"><strong>차트 지표 표시</strong><label><input type="checkbox" data-chart-indicator="ma5" checked>5 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma10" checked>10 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma40" checked>40 이동평균선 · 흰색</label><label><input type="checkbox" data-chart-indicator="ma60" checked>60 이동평균선 · 파랑</label><label><input type="checkbox" data-chart-indicator="ma90" checked>90 이동평균선 · 하늘색</label><label><input type="checkbox" data-chart-indicator="ma120" checked>120 이동평균선 · 빨강</label><label><input type="checkbox" data-chart-indicator="ma160" checked>160 이동평균선 · 보라</label><label><input type="checkbox" data-chart-indicator="ma200" checked>200 이동평균선 · 주황</label><label><input type="checkbox" data-chart-indicator="bb" checked>볼린저밴드</label><label><input type="checkbox" data-chart-indicator="fib" checked>오토 피보나치</label><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label></div></div><div id="combinedChart"><canvas id="chart"></canvas><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label">RMI (5, 14) <span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
+<div class="chart-panel"><button id="dailyHistoryJump" type="button" title="일봉 2017년 과거 기록 / 최신으로 이동">⟵ 2017</button><button id="intradayHistoryJump" type="button" title="선택한 시간봉의 과거 기록 / 최신으로 이동">⟵ 과거</button><div id="chartIndicatorsDock"><button id="chartIndicatorToggle" type="button" aria-expanded="false" aria-controls="chartIndicatorMenu" aria-label="차트 지표 표시 설정">⚙ 지표</button><div id="chartIndicatorMenu" hidden role="group" aria-label="차트 지표 표시 선택"><strong>차트 지표 표시</strong><label><input type="checkbox" data-chart-indicator="ma5" checked>5 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma10" checked>10 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma40" checked>40 이동평균선 · 흰색</label><label><input type="checkbox" data-chart-indicator="ma60" checked>60 이동평균선 · 파랑</label><label><input type="checkbox" data-chart-indicator="ma90" checked>90 이동평균선 · 하늘색</label><label><input type="checkbox" data-chart-indicator="ma120" checked>120 이동평균선 · 빨강</label><label><input type="checkbox" data-chart-indicator="ma160" checked>160 이동평균선 · 보라</label><label><input type="checkbox" data-chart-indicator="ma200" checked>200 이동평균선 · 주황</label><label><input type="checkbox" data-chart-indicator="bb" checked>볼린저밴드</label><label><input type="checkbox" data-chart-indicator="fib" checked>오토 피보나치</label><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label>
+<div id="chartTimeJumpControls"><strong>날짜·시간으로 차트 이동</strong><span style="font-size:10px;color:#adc0d5">한국시간(KST) 기준 · 선택한 시간봉</span>
+<div class="time-jump-grid"><input id="chartJumpDate" type="date" aria-label="이동할 연도 월 일"><input id="chartJumpTime" type="time" value="12:00" step="60" aria-label="이동할 시간 분"></div>
+<button id="chartJumpGo" type="button">선택 날짜로 이동</button><button id="chartJumpLatest" type="button">최신 차트로 복귀</button>
+<div id="chartTimeJumpStatus" role="status" aria-live="polite"></div></div></div></div><div id="combinedChart"><canvas id="chart"></canvas><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label">RMI (5, 14) <span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
  <div id="candleTime" class="muted candle-info"></div>
  <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button></div>
  <div id="range" style="display:none"></div><div id="chartHint" style="display:none"></div><p id="selected" style="display:none"></p>
@@ -944,7 +954,7 @@ function initDailyHistoryJump(){
 // 10m uses two 5m klines and shares the longer 5m history.
 // Requested historical horizons are independent: 5m 3mo, synthesized 10m
 // 6mo, 15m 6mo, 30m/1h/4h 1yr. Never change 1m trading/signal history.
-const HISTORY_LOOKBACK_MONTHS={'5m':3,'10m':6,'15m':6,'30m':12,'1h':12,'4h':12};
+const HISTORY_LOOKBACK_MONTHS={'1m':2,'5m':3,'10m':6,'15m':6,'30m':12,'1h':12,'4h':12};
 const HISTORY_SOURCE_TF={'10m':'5m'};
 const historyReadyUntil={},historyLoading={},historyRetryAt={};
 function historyCutoff(tf,now=Date.now()){
@@ -961,13 +971,13 @@ function updateIntradayHistoryJump(){
   button.style.display=active?'block':'none';if(!active)return;
   const cutoff=historyCutoff(tf),ready=historyReadyUntil[tf]!==undefined&&historyReadyUntil[tf]<=cutoff;
   const loading=!!historyLoading[tf];button.disabled=loading;
-  button.textContent=loading?'과거 로딩 중…':ready?
+  button.textContent=loading?'과거 로딩 중…':chartJumpSegment?.tf===tf?'최신 ⟶':ready?
     (viewOffset>0?'최신 ⟶':'⟵ '+historyPeriodLabel(tf)):'⟵ '+historyPeriodLabel(tf)+' 조회';
   button.title=loading?'선택한 시간봉의 과거 캔들을 불러오는 중':ready?
     '과거와 최신 차트 사이 이동':'BTCUSDT 선물 '+historyPeriodLabel(tf)+' 과거 '+tf+' 데이터 조회';
 }
 async function loadIntradayHistory(tf){
-  if(demo||!Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf))return false;
+  if(demo||tf==='1m'||!Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf))return false;
   const source=historySourceTf(tf),duration=candleDuration[source],cutoff=historyCutoff(tf);
   if(historyLoading[tf])return false;
   if(historyReadyUntil[tf]!==undefined&&historyReadyUntil[tf]<=cutoff)return true;
@@ -1021,6 +1031,8 @@ function initIntradayHistoryJump(){
  const button=$('intradayHistoryJump');if(!button)return;
  button.addEventListener('click',async()=>{
    const tf=$('tf').value;if(!Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf))return;
+   if(chartJumpSegment?.tf===tf){resetChartTimeJump();return;}
+   if(tf==='1m'){await jumpChartToUtc(historyCutoff('1m')+12*3600000);return;}
    const cutoff=historyCutoff(tf);
    if(!(historyReadyUntil[tf]!==undefined&&historyReadyUntil[tf]<=cutoff)){
      const ok=await loadIntradayHistory(tf);if(!ok||$('tf').value!==tf)return;
@@ -1175,7 +1187,7 @@ function visibleFutureSlots(count){return Math.min(futureSlots,Math.max(4,Math.f
 function visibleWindow(a){let count=viewCount,blank=visibleFutureSlots(count),left=Math.max(0,a.length-count+blank-viewOffset),start=Math.floor(left),end=Math.min(a.length,Math.ceil(left+count));return {left,start,end,count,slots:Math.max(0,Math.ceil(left+count)-a.length)}}
 function drawRmi(){
  if(!chartIndicators.rmi)return;
- const a=candles[$('tf').value],cv=$('rmiChart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(52,cv.getBoundingClientRect().height||130),dpr=devicePixelRatio||1;
+ const a=chartViewBars(),cv=$('rmiChart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(52,cv.getBoundingClientRect().height||130),dpr=devicePixelRatio||1;
  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
  const pw=w-80,y=v=>8+(100-v)/100*Math.max(20,h-16);ctx.font='11px sans-serif';
  for(const v of ($('tf').value==='1m'?[15,20,50,85,90]:[30,50,70])){ctx.strokeStyle=v>=70?'#e53935':v<=30?'#4855e5':'#586477';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(0,y(v));ctx.lineTo(pw,y(v));ctx.stroke();ctx.fillStyle='#a4b4c8';ctx.fillText(String(v),pw+7,y(v)+4)}
@@ -1358,7 +1370,7 @@ function stableChartVolumeMax(a,tf){
   return chartVolumeAnchor.max;
 }
 function zoomChartKeepingAnchor(nextCount){
-  const a=candles[$('tf').value]||[],previous=visibleWindow(a);
+  const a=chartViewBars()||[],previous=visibleWindow(a);
   const next=Math.max(20,Math.min(400,Math.round(nextCount)));
   if(a.length){
     const ratio=previous.end===a.length
@@ -2309,9 +2321,104 @@ function initChartIndicatorControls(){
   document.addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false)});
   apply();
 }
+// Historical chart-only segment. Never insert archived 1m bars into the
+// live candles['1m'] signal engine: it must remain limited to recent bars.
+let chartJumpSegment=null,chartJumpBusy=false;
+function chartViewBars(){return chartJumpSegment?.tf===$('tf').value?
+  chartJumpSegment.bars:candles[$('tf').value]}
+function dateJumpKstMillis(dateText,timeText){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(dateText)||!/^\d{2}:\d{2}$/.test(timeText))return NaN;
+ const [year,month,day]=dateText.split('-').map(Number),[hour,minute]=timeText.split(':').map(Number);
+ if(month<1||month>12||hour>23||minute>59)return NaN;
+ const utc=Date.UTC(year,month-1,day,hour-9,minute);
+ const back=new Date(utc+9*3600000);
+ return back.getUTCFullYear()===year&&back.getUTCMonth()+1===month&&
+   back.getUTCDate()===day&&back.getUTCHours()===hour&&back.getUTCMinutes()===minute?utc:NaN;
+}
+function resetChartTimeJump(){
+ chartJumpSegment=null;viewOffset=0;crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;
+ resetStableChartScale();updateIntradayHistoryJump();draw();drawRmi();
+ const status=$('chartTimeJumpStatus');if(status)status.textContent='최신 차트로 돌아왔어요.';
+}
+function centerChartOnTimestamp(bars,time){
+ if(!Array.isArray(bars)||bars.length<22)return false;
+ let lo=0,hi=bars.length;
+ while(lo<hi){const mid=(lo+hi)>>1;if(bars[mid].t<time)lo=mid+1;else hi=mid;}
+ const index=Math.max(0,Math.min(bars.length-1,lo));
+ // Target at the center of the visible candle viewport.
+ viewOffset=Math.max(0,bars.length-viewCount+visibleFutureSlots(viewCount)-
+   (index-Math.floor(viewCount*.5)));
+ crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;
+ resetStableChartScale();draw();drawRmi();return true;
+}
+async function jumpChartToUtc(requestedTime){
+ const tf=$('tf').value,button=$('chartJumpGo'),status=$('chartTimeJumpStatus');
+ if(chartJumpBusy||demo)return;
+ if(!Number.isFinite(requestedTime)||requestedTime>Date.now()+60000){
+   if(status)status.textContent='유효한 과거 날짜·시간을 선택해 줘.';return;
+ }
+ const minimum=tf==='1d'?Date.UTC(2017,7,17):historyCutoff(tf);
+ if(requestedTime<minimum){
+   if(status)status.textContent=tf==='1d'?'일봉은 2017년 8월 17일부터 볼 수 있어.':
+    (HISTORY_LOOKBACK_MONTHS[tf]||0)+'개월 이내의 날짜를 선택해 줘.';
+   return;
+ }
+ const duration=candleDuration[tf]||60000;
+ const target=Math.floor(requestedTime/duration)*duration;
+ const existing=chartViewBars();
+ if(existing?.length>=22&&target>=existing[0].t&&target<=existing.at(-1).t){
+   if(status)status.textContent='선택한 날짜로 이동했어.';
+   centerChartOnTimestamp(existing,target);return;
+ }
+ chartJumpBusy=true;if(button)button.disabled=true;
+ if(status)status.textContent='선택한 날짜 주변 캔들 불러오는 중…';
+ try{
+   const source=tf==='10m'?'5m':tf;
+   const sourceDuration=candleDuration[source];
+   const from=Math.max(minimum-duration*360,target-duration*360);
+   const until=Math.min(Date.now(),target+duration*260);
+   const fetched=[];
+   const spot=tf==='1d'&&target<Date.UTC(2019,8,9);
+   const endpoint=spot?'https://data-api.binance.vision/api/v3/klines':
+     'https://fapi.binance.com/fapi/v1/klines';
+   // Binance /klines returns at most 1000 rows per request. Small focused
+   // slices avoid transferring 2 months of 1m bars into an iPhone's memory.
+   for(let cursor=Math.floor(from/sourceDuration)*sourceDuration;cursor<=until;
+       cursor+=1000*sourceDuration){
+     const end=Math.min(until,cursor+999*sourceDuration);
+     const url=endpoint+'?symbol=BTCUSDT&interval='+source+'&limit=1000'+
+       '&startTime='+cursor+'&endTime='+end;
+     const resp=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(15000)});
+     if(!resp.ok)throw Error('과거 조회 HTTP '+resp.status);
+     const raw=await resp.json();
+     if(!Array.isArray(raw))throw Error('과거 캔들 응답 형식 오류');
+     fetched.push(...raw.map(v=>({t:+v[0],o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:+v[5]}))
+       .filter(v=>Number.isFinite(v.t)&&v.c>0));
+   }
+   const bars=tf==='10m'?buildTenMinuteCandles(fetched):fetched;
+   if(bars.length<22||!bars.some(v=>Math.abs(v.t-target)<duration*2))
+     throw Error('해당 시간대의 거래소 캔들을 찾지 못했어');
+   if($('tf').value!==tf)return;
+   chartJumpSegment={tf,bars};
+   centerChartOnTimestamp(bars,target);
+   if(status)status.textContent='이동 완료 · '+tf+' · 한국시간 기준 · 최신 복귀 가능';
+ }catch(e){
+   if(status)status.textContent='과거 조회 실패: '+String(e.message||e);
+ }finally{chartJumpBusy=false;if(button)button.disabled=false;updateIntradayHistoryJump();}
+}
+function initChartTimeJump(){
+ const date=$('chartJumpDate'),time=$('chartJumpTime'),go=$('chartJumpGo');
+ if(!date||!time||!go)return;
+ const kst=new Date(Date.now()+9*3600000);
+ date.value=kst.toISOString().slice(0,10);
+ time.value=String(kst.getUTCHours()).padStart(2,'0')+':'+
+   String(kst.getUTCMinutes()).padStart(2,'0');
+ go.addEventListener('click',()=>{void jumpChartToUtc(dateJumpKstMillis(date.value,time.value))});
+ $('chartJumpLatest')?.addEventListener('click',resetChartTimeJump);
+}
 window.btcRedrawChart=()=>draw();
-function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=candles[$('tf').value],cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-(document.body.classList.contains('chart-focus-mode')?Math.max(31,h*focusVolumeFraction):h*.24)),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
-if(($('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
+function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-(document.body.classList.contains('chart-focus-mode')?Math.max(31,h*focusVolumeFraction):h*.24)),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
+if((chartJumpSegment||$('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
    Math.abs(verticalPan)<1e-9&&verticalZoom===1){
   // Past 1m prices may be far from today's fixed live-price scale.
   // Auto-fit only when browsing history; preserve manual vertical zoom/pan.
@@ -2336,8 +2443,8 @@ if(document.body.classList.contains('chart-focus-mode')&&
 // Keep ENTRY / STOP / TAKE-PROFIT visible after switching between all seven
 // timeframes. The old price fitting used real positions only; paper levels
 // could be outside the 5m/15m/30m/1h/4h/1d price range and disappear.
-const liveLevels=typeof window.btcLiveChartPrices==='function'?window.btcLiveChartPrices():[];
-const paperLevels=liveLevels.length?[]:paperChartLevels().map(level=>level.price);
+const liveLevels=!chartJumpSegment&&typeof window.btcLiveChartPrices==='function'?window.btcLiveChartPrices():[];
+const paperLevels=chartJumpSegment||liveLevels.length?[]:paperChartLevels().map(level=>level.price);
 const levels=[...liveLevels,...paperLevels].filter(p=>Number.isFinite(p)&&p>0);
 // While viewing far-back history, an unrelated current open position can
 // be tens of thousands of dollars away. Do not compress historical candles
@@ -2381,7 +2488,7 @@ for(let i=0;i<5;i++){let p=lo+(hi-lo)*i,yy=y(p);ctx.beginPath();ctx.moveTo(0,yy)
     if(!started){ctx.moveTo(x,y(ma));started=true}else ctx.lineTo(x,y(ma));
   });
   if(started)ctx.stroke();
-}if(chartIndicators.bb)for(let [key,color] of [['upper','#63b6a8'],['lower','#63b6a8'],['mid','#63b6a8']]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=key==='mid'?1.8:2.1;let started=false;bb.forEach((v,i)=>{if(!v)return;let x=(start+i-left+.5)*bw;if(!started){ctx.moveTo(x,y(v[key]));started=true}else ctx.lineTo(x,y(v[key]))});ctx.stroke()}ctx.restore();drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)});ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'1d':86400000}[$('tf').value],stamp=new Date(a[a.length-1].t+(futureCrosshairSlot+1)*ms),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);}renderChartTimeAxis(a,left,count,plotW);$('range').textContent='표시 '+data.length+'개 / 전체 '+a.length+'개 캔들'+(viewOffset===0?' · 오른쪽 미래 빈 공간 '+slots+'칸':'')+' · '+(viewOffset?'과거 탐색 중 ('+viewOffset+'개 전)':'최신 구간')+' · 핀치 확대/축소 · 차트 상하·좌우·대각선 이동 · 오른쪽 가격축 확대/축소'}
+}if(chartIndicators.bb)for(let [key,color] of [['upper','#63b6a8'],['lower','#63b6a8'],['mid','#63b6a8']]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=key==='mid'?1.8:2.1;let started=false;bb.forEach((v,i)=>{if(!v)return;let x=(start+i-left+.5)*bw;if(!started){ctx.moveTo(x,y(v[key]));started=true}else ctx.lineTo(x,y(v[key]))});ctx.stroke()}ctx.restore();drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)});ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'1d':86400000}[$('tf').value],stamp=new Date(a[a.length-1].t+(futureCrosshairSlot+1)*ms),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}if(!chartJumpSegment)drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(!chartJumpSegment&&typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);}renderChartTimeAxis(a,left,count,plotW);$('range').textContent='표시 '+data.length+'개 / 전체 '+a.length+'개 캔들'+(viewOffset===0?' · 오른쪽 미래 빈 공간 '+slots+'칸':'')+' · '+(viewOffset?'과거 탐색 중 ('+viewOffset+'개 전)':'최신 구간')+' · 핀치 확대/축소 · 차트 상하·좌우·대각선 이동 · 오른쪽 가격축 확대/축소'}
 let verticalPan=0,levelDragPreview=null;const chart=$('chart');let touchStart=null,holdTimer=null;
 
 /* Grasp the chart / volume divider near the horizontal boundary.
@@ -2440,10 +2547,10 @@ function levelHitAt(clientY,clientX){
   hits.sort((a,b)=>a.dist-b.dist||(b.selected?1:0)-(a.selected?1:0));
   return hits[0]||null;
 }
-function makePinch(e){let a=candles[$('tf').value]||[],rect=chart.getBoundingClientRect(),plotW=Math.max(1,rect.width-80),mid=(e.touches[0].clientX+e.touches[1].clientX)/2-rect.left,ratio=Math.max(0,Math.min(1,mid/plotW)),anchor=visibleWindow(a).left+ratio*viewCount;return {type:'pinch',dx:Math.max(10,Math.abs(e.touches[0].clientX-e.touches[1].clientX)),count:viewCount,anchor,ratio}}
+function makePinch(e){let a=chartViewBars()||[],rect=chart.getBoundingClientRect(),plotW=Math.max(1,rect.width-80),mid=(e.touches[0].clientX+e.touches[1].clientX)/2-rect.left,ratio=Math.max(0,Math.min(1,mid/plotW)),anchor=visibleWindow(a).left+ratio*viewCount;return {type:'pinch',dx:Math.max(10,Math.abs(e.touches[0].clientX-e.touches[1].clientX)),count:viewCount,anchor,ratio}}
 function clearHold(){if(holdTimer!==null){clearTimeout(holdTimer);holdTimer=null}}
-function inspectAt(clientX,clientY){let a=candles[$('tf').value];if(!a?.length)return;let rect=chart.getBoundingClientRect(),plotW=Math.max(1,rect.width-80),{left,count}=visibleWindow(a),index=Math.floor(left+Math.max(0,Math.min(plotW-1,clientX-rect.left))/plotW*count);if(index>=a.length){crosshairIndex=null;futureCrosshairSlot=index-a.length}else{futureCrosshairSlot=null;crosshairIndex=Math.max(0,index)}const scale=chartPriceScale;if(scale){const yy=Math.max(scale.top,Math.min(scale.priceBottom,clientY-rect.top));crosshairPrice=scale.hi-(yy-scale.top)/(scale.priceBottom-scale.top)*(scale.hi-scale.lo)}draw();drawRmi()}
-function crosshairX(){const a=candles[$('tf').value];if(!a?.length)return null;const index=crosshairIndex!==null?crosshairIndex:futureCrosshairSlot!==null?a.length+futureCrosshairSlot:null;if(index===null)return null;const {left,count}=visibleWindow(a),rect=chart.getBoundingClientRect();return rect.left+(index-left+.5)*(rect.width-80)/count}
+function inspectAt(clientX,clientY){let a=chartViewBars();if(!a?.length)return;let rect=chart.getBoundingClientRect(),plotW=Math.max(1,rect.width-80),{left,count}=visibleWindow(a),index=Math.floor(left+Math.max(0,Math.min(plotW-1,clientX-rect.left))/plotW*count);if(index>=a.length){crosshairIndex=null;futureCrosshairSlot=index-a.length}else{futureCrosshairSlot=null;crosshairIndex=Math.max(0,index)}const scale=chartPriceScale;if(scale){const yy=Math.max(scale.top,Math.min(scale.priceBottom,clientY-rect.top));crosshairPrice=scale.hi-(yy-scale.top)/(scale.priceBottom-scale.top)*(scale.hi-scale.lo)}draw();drawRmi()}
+function crosshairX(){const a=chartViewBars();if(!a?.length)return null;const index=crosshairIndex!==null?crosshairIndex:futureCrosshairSlot!==null?a.length+futureCrosshairSlot:null;if(index===null)return null;const {left,count}=visibleWindow(a),rect=chart.getBoundingClientRect();return rect.left+(index-left+.5)*(rect.width-80)/count}
 // Touch interception is capture-phase so the existing chart pan/pinch
 // handlers remain unchanged unless an unambiguous reservation-line tap occurs.
 // Chart reservation line: vertical drag changes price; stationary tap cancels.
@@ -2531,11 +2638,11 @@ chart.addEventListener('contextmenu',e=>e.preventDefault());
 chart.addEventListener('selectstart',e=>e.preventDefault());
 chart.addEventListener('dragstart',e=>e.preventDefault());
 chart.addEventListener('touchstart',e=>{e.preventDefault();clearHold();if(e.touches.length>=2){levelDragPreview=null;touchStart=null;gesture=makePinch(e);suppressTapUntil=Date.now()+1000;return}if(e.touches.length===1){let t=e.touches[0];touchStart={x:t.clientX,y:t.clientY,offset:viewOffset,futureStart:futureSlots-20,pan:verticalPan,dragSpan:chartPriceScale?chartPriceScale.hi-chartPriceScale.lo:0,dragHeight:chartPriceScale?chartPriceScale.priceBottom-chartPriceScale.top:0,moved:false,inspecting:false,axis:t.clientX>=chart.getBoundingClientRect().right-80,zoom:verticalZoom,dragCrosshair:false};gesture={type:touchStart.axis?'axis':'pan'};if(touchStart.axis){suppressTapUntil=Date.now()+1000;return}holdTimer=setTimeout(()=>{holdTimer=null;if(!touchStart||gesture?.type!=='pan'||touchStart.moved)return;const level=levelHitAt(touchStart.y,touchStart.x);if(level){touchStart.levelDragKind=level.kind;touchStart.levelPositionId=level.id;touchStart.levelOriginal=level.price;touchStart.levelStartY=touchStart.y;levelDragPreview={id:level.id,kind:level.kind,price:level.price};touchStart.inspecting=false;suppressTapUntil=Date.now()+1500;if(navigator.vibrate)navigator.vibrate(12);return}const active=crosshairIndex!==null||futureCrosshairSlot!==null;if(!active)inspectAt(touchStart.x,touchStart.y);const scale=chartPriceScale,rect=chart.getBoundingClientRect();touchStart.crosshairAnchorX=crosshairX()??touchStart.x;touchStart.crosshairAnchorY=scale&&crosshairPrice!==null?rect.top+scale.top+(scale.hi-crosshairPrice)/(scale.hi-scale.lo)*(scale.priceBottom-scale.top):touchStart.y;touchStart.inspecting=true;suppressTapUntil=Date.now()+1500;if(navigator.vibrate)navigator.vibrate(12)},350)}},{passive:false});
-chart.addEventListener('touchmove',e=>{e.preventDefault();if(e.touches.length>=2){clearHold();levelDragPreview=null;if(gesture?.type!=='pinch'){gesture=makePinch(e);touchStart=null}let dx=Math.max(10,Math.abs(e.touches[0].clientX-e.touches[1].clientX));viewCount=Math.round(Math.max(20,Math.min(400,gesture.count*gesture.dx/dx)));let a=candles[$('tf').value]||[],n=Math.min(viewCount,a.length),rect=chart.getBoundingClientRect(),plotW=Math.max(1,rect.width-80),mid=(e.touches[0].clientX+e.touches[1].clientX)/2-rect.left,ratio=Math.max(0,Math.min(1,mid/plotW));viewOffset=Math.min(a.length,Math.max(-1000000,a.length-viewCount+visibleFutureSlots(viewCount)+ratio*viewCount-gesture.anchor));suppressTapUntil=Date.now()+1000;draw();drawRmi();return}if(e.touches.length===1&&touchStart){let t=e.touches[0],dx=t.clientX-touchStart.x,dy=t.clientY-touchStart.y;if(touchStart.axis){verticalZoom=Math.max(.001,Math.min(1000,touchStart.zoom*Math.exp((touchStart.y-t.clientY)/170)));touchStart.moved=true;suppressTapUntil=Date.now()+1200;draw();return}if(touchStart.levelDragKind&&levelDragPreview){const scale=chartPriceScale;const deltaPrice=-dy/(scale.priceBottom-scale.top)*(scale.hi-scale.lo);levelDragPreview.price=Math.max(.01,Math.round((touchStart.levelOriginal+deltaPrice)*100)/100);touchStart.levelMoved=touchStart.levelMoved||Math.abs(dy)>3;suppressTapUntil=Date.now()+1500;draw();return}if(touchStart.inspecting){suppressTapUntil=Date.now()+1500;inspectAt(touchStart.crosshairAnchorX+dx,touchStart.crosshairAnchorY+dy);return}if(Math.abs(dx)>9||Math.abs(dy)>12){touchStart.moved=true;clearHold();suppressTapUntil=Date.now()+1000}if(touchStart.moved){
+chart.addEventListener('touchmove',e=>{e.preventDefault();if(e.touches.length>=2){clearHold();levelDragPreview=null;if(gesture?.type!=='pinch'){gesture=makePinch(e);touchStart=null}let dx=Math.max(10,Math.abs(e.touches[0].clientX-e.touches[1].clientX));viewCount=Math.round(Math.max(20,Math.min(400,gesture.count*gesture.dx/dx)));let a=chartViewBars()||[],n=Math.min(viewCount,a.length),rect=chart.getBoundingClientRect(),plotW=Math.max(1,rect.width-80),mid=(e.touches[0].clientX+e.touches[1].clientX)/2-rect.left,ratio=Math.max(0,Math.min(1,mid/plotW));viewOffset=Math.min(a.length,Math.max(-1000000,a.length-viewCount+visibleFutureSlots(viewCount)+ratio*viewCount-gesture.anchor));suppressTapUntil=Date.now()+1000;draw();drawRmi();return}if(e.touches.length===1&&touchStart){let t=e.touches[0],dx=t.clientX-touchStart.x,dy=t.clientY-touchStart.y;if(touchStart.axis){verticalZoom=Math.max(.001,Math.min(1000,touchStart.zoom*Math.exp((touchStart.y-t.clientY)/170)));touchStart.moved=true;suppressTapUntil=Date.now()+1200;draw();return}if(touchStart.levelDragKind&&levelDragPreview){const scale=chartPriceScale;const deltaPrice=-dy/(scale.priceBottom-scale.top)*(scale.hi-scale.lo);levelDragPreview.price=Math.max(.01,Math.round((touchStart.levelOriginal+deltaPrice)*100)/100);touchStart.levelMoved=touchStart.levelMoved||Math.abs(dy)>3;suppressTapUntil=Date.now()+1500;draw();return}if(touchStart.inspecting){suppressTapUntil=Date.now()+1500;inspectAt(touchStart.crosshairAnchorX+dx,touchStart.crosshairAnchorY+dy);return}if(Math.abs(dx)>9||Math.abs(dy)>12){touchStart.moved=true;clearHold();suppressTapUntil=Date.now()+1000}if(touchStart.moved){
   // Allow simultaneous horizontal time panning and vertical price panning.
   // Both offsets use the gesture-start anchors so diagonal dragging stays smooth.
   const width=Math.max(1,chart.getBoundingClientRect().width-80);
-  viewOffset=Math.min((candles[$('tf').value]?.length||0),Math.max(-1000000,touchStart.offset+dx/width*viewCount));
+  viewOffset=Math.min((chartViewBars()?.length||0),Math.max(-1000000,touchStart.offset+dx/width*viewCount));
   const height=Math.max(1,touchStart.dragHeight),span=touchStart.dragSpan;
   if(span>0)verticalPan=touchStart.pan+dy/height*span;
   draw();drawRmi();
@@ -2558,7 +2665,7 @@ chart.addEventListener('touchend',function(e){e.preventDefault();clearHold();if(
 }if(wasPinch||!wasTouch||wasTouch.moved||wasTouch.inspecting)return;if(crosshairIndex!==null||futureCrosshairSlot!==null)hideCrosshair()},{passive:false});
 chart.addEventListener('touchcancel',()=>{clearHold();levelDragPreview=null;gesture=null;touchStart=null;suppressTapUntil=Date.now()+1200;draw()});
 chart.addEventListener('click',e=>{if(Date.now()<suppressTapUntil)return;if(crosshairIndex!==null||futureCrosshairSlot!==null)hideCrosshair()});
-$('zoomIn').onclick=()=>zoomChartKeepingAnchor(viewCount*.75);$('zoomOut').onclick=()=>zoomChartKeepingAnchor(viewCount*1.35);$('latest').onclick=()=>{viewOffset=0;resetStableChartScale();draw();drawRmi()};
+$('zoomIn').onclick=()=>zoomChartKeepingAnchor(viewCount*.75);$('zoomOut').onclick=()=>zoomChartKeepingAnchor(viewCount*1.35);$('latest').onclick=()=>{resetChartTimeJump()};
 const PAPER_SAVE_KEY='btc-paper-trading-state-v1';
 let closedPaperTrades=[],paperStatsBaseBalance=null;
 function paperPatternMiniChart(bars){
@@ -3408,7 +3515,7 @@ $('myFeeLookup').onclick=async()=>{
 $('myApiClear').onclick=()=>{for(const id of ['myBinanceKey','myBinanceSecret'])$(id).value='';authGeneration++;unlockedApiCredentials=null;void deviceVaultRecord('delete').catch(e=>console.warn('기기 저장 잠금 정보 삭제 실패:',e?.name||'error'));clearRealAccount('API 키 잠금 상태 · 조회한 실제 계좌 정보 지움');$('myWsAccountResult').textContent='화면 입력값과 현재 잠금 해제된 키를 지웠어요. 암호화 저장본은 별도 삭제 버튼으로 지울 수 있어요.';};
 
 $('sheetLong').onclick=()=>request('LONG');$('sheetShort').onclick=()=>request('SHORT');for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.addEventListener('change',updateOrderType);$('sheetCancel').onclick=()=>{$('entrySheet').style.display='none'};$('retry').onclick=()=>{savePaperState();const url=new URL(window.location.href);url.searchParams.set('app_refresh',String(Date.now()));window.location.replace(url.toString())};$('demo').onclick=startDemo;
-$('tf').onchange=()=>{viewOffset=0;resetStableChartScale();crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;$('candleTime').textContent='';if($('tf').value==='1d')void loadDailyHistory();render();
+$('tf').onchange=()=>{viewOffset=0;resetStableChartScale();crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;$('candleTime').textContent='';chartJumpSegment=null;if($('tf').value==='1d')void loadDailyHistory();render();
  requestAnimationFrame(()=>{draw();drawRmi()});
 };$('long').onclick=()=>showOrderSheet('LONG');$('short').onclick=()=>showOrderSheet('SHORT');$('close').onclick=()=>{const p=allPaperPositions().find(x=>x.id===selectedPaperPositionId);if(!p)return;const number=hedgePositions[p.side].findIndex(x=>x.id===p.id)+1;if(confirm('가상 '+(p.side==='LONG'?'롱':'숏')+' #'+number+' 포지션 한 개만 현재가로 청산할까요?'))closePositionById(p.id,'선택 포지션 수동 청산')};$('cancel').onclick=()=>{if(!pendingOrders.length)return;if(!confirm('수동 미체결 주문 '+pendingOrders.length+'건을 모두 취소할까요?'))return;const count=pendingOrders.length;pendingOrders=[];add('가상 지정가 미체결 '+count+'건 모두 취소 · 예약 증거금 반환');savePaperState();render()};$('clear').onclick=()=>{logs=[];renderLogs();savePaperState()};
 $('paperStatsReset').onclick=()=>{
@@ -3606,7 +3713,7 @@ function initSignalAlerts(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden){event.preventDefault();close()}});
 })();
 
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();render();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&candles[$('tf').value]?.length>=22)draw()},1000);setInterval(tick,2000);
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartTimeJump();render();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
 setInterval(pollAutoPaperMinute,5000);
 setInterval(()=>{
   if(!autoPendingLimit)return;
