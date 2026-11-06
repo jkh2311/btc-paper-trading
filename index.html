@@ -1465,14 +1465,16 @@ function maybeEvaluateAutoPaperSignals(){
 function drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,bottom,plotW){
   if($('tf').value!=='1m'||!Array.isArray(a)||!a.length)return;
   const markers=new Map();
+  const chartSignals=chartRmiZoneMarkers(a,start,end);
+  const validLongBars=new Set(chartSignals.filter(sig=>sig.side==='LONG').map(sig=>sig.barTime));
   for(const sig of autoSignalHistory){
     if(sig.strategy===AUTO_PAPER_STRATEGY&&sig.barTime>=a[start]?.t&&
-       sig.barTime<=a[end-1]?.t)markers.set(sig.barTime,sig);
+       sig.barTime<=a[end-1]?.t&&
+       (sig.side!=='LONG'||validLongBars.has(sig.barTime)))markers.set(sig.barTime,sig);
   }
-  // Independently display confirmed 1m RMI 85 SHORT / 20 LONG crosses,
-  // regardless of day bias or trading mode. These markers are NOT fills.
-  for(const sig of chartRmiZoneMarkers(a,start,end))
-    markers.set(sig.barTime,sig);
+  // Display the actual confirmed chart SHORT/second-touch LONG crossings.
+  // Do not revive historical LONG markers from the previous 15-only rule.
+  for(const sig of chartSignals)markers.set(sig.barTime,sig);
   if(!markers.size)return;
   const near=[...markers.values()].sort((x,z)=>x.barTime-z.barTime);
   const byTime=new Map();for(let i=start;i<end;i++)byTime.set(a[i].t,i);
