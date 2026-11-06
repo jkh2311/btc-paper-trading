@@ -121,6 +121,8 @@ export function chartRmiLongEvents(scores,times,marketMode){
    touched=false;ready=false;readyAt=-1;
   }
  }
+ events.readyActive=ready;
+ events.readyAt=readyAt;
  return events;
 }
 export function chartSignalFromClosedCandles(candles,{upper=85,lower=20,thirtyMinutes=null,frames=null}={}){
