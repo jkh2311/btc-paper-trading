@@ -1,6 +1,6 @@
 // BTCUSDT USD-M futures 24/7 RMI signal observer. LIVE ORDERS: HARD DISABLED.
 // Node.js 22+ only (native fetch and WebSocket). No trading credentials are used.
-// The PWA chart uses RMI(5,14) confirmed-candle 85-up => SHORT, 15-touch/below => LONG.
+// The PWA chart uses RMI(5,14): SHORT at 85 up; LONG after <=15, >=30, <=15 again.
 // Node 22+ global WebSocket (no third-party dependencies).
 import {createServer} from 'node:http';
 import {mkdir,readFile,rename,writeFile} from 'node:fs/promises';
