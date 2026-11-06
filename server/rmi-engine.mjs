@@ -25,13 +25,32 @@ export function minuteRmiZoneEntry(previous,current,upper=85,lower=15){
  if(previous>lower&&current<=lower)return 'LONG';
  return null;
 }
+// Exactly matches the PWA's confirmed-bar chart LONG retest sequence.
+// First <= lower -> >= 30 recovery -> second <= lower crossing.
+// The original SHORT upward crossing at upper remains unchanged.
+export function chartRmiPatternSignals(scores,{upper=85,lower=15}={}){
+ const sides=new Array(scores.length).fill(null);
+ let firstLow=false,recovered=false;
+ for(let i=1;i<scores.length;i++){
+  const prev=scores[i-1],value=scores[i];
+  if(!Number.isFinite(value))continue;
+  if(firstLow&&value>=30)recovered=true;
+  if(!Number.isFinite(prev))continue;
+  if(prev<upper&&value>=upper)sides[i]='SHORT';
+  if(prev>lower&&value<=lower){
+   if(recovered)sides[i]='LONG';
+   firstLow=true;recovered=false;
+  }
+ }
+ return sides;
+}
 export function chartSignalFromClosedCandles(candles,{upper=85,lower=15}={}){
  if(!Array.isArray(candles)||candles.length<23)return null;
  const latest=candles.at(-1);
  if(!latest||!Number.isFinite(latest.t)||!(Number(latest.c)>0)||!(Number(latest.v)>0))return null;
  const scores=rmiSeries(candles);
  const previous=scores.at(-2),current=scores.at(-1);
- const side=minuteRmiZoneEntry(previous,current,upper,lower);
+ const side=chartRmiPatternSignals(scores,{upper,lower}).at(-1);
  if(!side)return null;
  return {symbol:'BTCUSDT',timeframe:'1m',barTime:latest.t,side,
   close:Number(latest.c),rmiBefore:previous,rmiAfter:current,
