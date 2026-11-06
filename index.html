@@ -1003,7 +1003,7 @@ const AUTO_PAPER_FIELDS={
   autoDailyLossPct:[2,0.5,10],autoCooldownMin:[15,1,240]
 };
 const RMI_SIGNAL_STRATEGIES=['range','bear','bull'];
-let rmiSignalStrategy='range';
+let rmiSignalStrategy='range',rmiStrategyChangedAt=0;
 let autoPaperEnabled=false,autoPaperArmedAt=0,autoSignalHistory=[],autoLastCheckedBar=0,autoLastEntryAt=0,autoLastOrderAt=0,autoPendingLimit=null,autoDailyEntryCounts={};
 function readAutoSetting(id){
   const cfg=AUTO_PAPER_FIELDS[id],n=Number($(id).value);
@@ -1595,11 +1595,13 @@ function drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,bottom,plotW){
   if($('tf').value!=='1m'||!Array.isArray(a)||!a.length)return;
   const markers=new Map();
   const chartSignals=chartRmiZoneMarkers(a,start,end);
-  const validLongBars=new Set(chartSignals.filter(sig=>sig.side==='LONG').map(sig=>sig.barTime));
+  const validSignals=new Set(chartSignals.filter(sig=>sig.side!=='READY')
+    .map(sig=>sig.barTime+':'+sig.side));
   for(const sig of autoSignalHistory){
+    // Never overlay an obsolete SHORT/LONG from another selected strategy.
     if(sig.strategy===AUTO_PAPER_STRATEGY&&sig.barTime>=a[start]?.t&&
        sig.barTime<=a[end-1]?.t&&
-       (sig.side!=='LONG'||validLongBars.has(sig.barTime)))markers.set(sig.barTime,sig);
+       validSignals.has(sig.barTime+':'+sig.side))markers.set(sig.barTime,sig);
   }
   // Restore original v61 confirmed chart SHORT 85 / LONG 20 crosses.
   for(const sig of chartSignals)if(sig.side!=='READY')markers.set(sig.barTime,sig);
@@ -1668,6 +1670,7 @@ function initAutoPaperUi(){
     strategySelect.addEventListener('change',()=>{
       if(!RMI_SIGNAL_STRATEGIES.includes(strategySelect.value))return;
       rmiSignalStrategy=strategySelect.value;
+      rmiStrategyChangedAt=Date.now();
       saveAutoSettings();
       liveRmiObservedBar=confirmedSignalBars('1m',Date.now()-1800).at(-1)?.t||0;
       updateHelp();draw();drawRmi();
@@ -2860,11 +2863,11 @@ function showSignalAlert(side,price,test=false){
 function maybeAlertChartSignal(bar,bars){
   if(!signalAlertEnabled||document.visibilityState!=='visible'||demo)return;
   const now=Date.now(),closedAt=bar.t+60000;
-  if(now-closedAt>45000||now<closedAt)return;
+  if(now-closedAt>45000||now<closedAt||closedAt<=rmiStrategyChangedAt)return;
   const selected=chartRmiZoneMarkers(bars,Math.max(0,bars.length-1),bars.length,now-1800)
     .find(x=>x.barTime===bar.t)?.side;
   if(!selected)return;
-  const key=bar.t+':'+selected;
+  const key=rmiSignalStrategy+':'+bar.t+':'+selected;
   if(signalAlertLastKey===key)return;
   signalAlertLastKey=key;
   try{localStorage.setItem(SIGNAL_ALERT_KEY,JSON.stringify({enabled:true,lastKey:key}))}catch{}
