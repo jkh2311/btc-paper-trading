@@ -9,13 +9,13 @@ test('same 5,14 momentum RMI neutral on unchanged prices',()=>{
  assert.equal(score.at(-1),50);
  assert.equal(chartSignalFromClosedCandles(bars),null);
 });
-test('chart LONG and SHORT are directional 20/85 crossings only',()=>{
- assert.equal(minuteRmiZoneEntry(21,19,85,20),'LONG');
- assert.equal(minuteRmiZoneEntry(84,85,85,20),'SHORT');
- assert.equal(minuteRmiZoneEntry(19,18,85,20),null);
- assert.equal(minuteRmiZoneEntry(85,84,85,20),null);
- assert.equal(minuteRmiZoneEntry(19,85,85,20),'SHORT');
- assert.equal(minuteRmiZoneEntry(NaN,85,85,20),null);
+test('chart LONG and SHORT are directional 15/85 crossings only',()=>{
+ assert.equal(minuteRmiZoneEntry(16,15,85,15),'LONG');
+ assert.equal(minuteRmiZoneEntry(84,85,85,15),'SHORT');
+ assert.equal(minuteRmiZoneEntry(15,14,85,15),null);
+ assert.equal(minuteRmiZoneEntry(85,84,85,15),null);
+ assert.equal(minuteRmiZoneEntry(14,85,85,15),'SHORT');
+ assert.equal(minuteRmiZoneEntry(NaN,85,85,15),null);
 });
 test('no signal on insufficient or invalid latest bars',()=>{
  assert.equal(chartSignalFromClosedCandles([]),null);
