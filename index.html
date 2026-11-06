@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261106-rmi-chart-signal-aligned-v102b"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261106-rmi-long-15-touch-v103"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -408,7 +408,7 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
     <label>1분 상단 시작<input id="autoMinuteHighFrom" type="number" inputmode="decimal" min="70" max="95" step="1" value="85"></label>
     <label>1분 상단 끝<input id="autoMinuteHighTo" type="number" inputmode="decimal" min="75" max="99" step="1" value="90"></label>
     <label>1분 하단 시작<input id="autoMinuteLowFrom" type="number" inputmode="decimal" min="1" max="25" step="1" value="15"></label>
-    <label>1분 하단 끝<input id="autoMinuteLowTo" type="number" inputmode="decimal" min="5" max="30" step="1" value="20"></label>
+    <label>1분 LONG 신호 기준 (≤)<input id="autoMinuteLowTo" type="number" inputmode="decimal" min="5" max="30" step="1" value="15"></label>
    </div>
   </details>
  </section>
@@ -698,7 +698,7 @@ function drawRmi(){
  const a=candles[$('tf').value],cv=$('rmiChart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(52,cv.getBoundingClientRect().height||130),dpr=devicePixelRatio||1;
  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
  const pw=w-80,y=v=>8+(100-v)/100*Math.max(20,h-16);ctx.font='11px sans-serif';
- for(const v of ($('tf').value==='1m'?[15,20,50,85,90]:[30,50,70])){ctx.strokeStyle=v>=70?'#e53935':v<=30?'#4855e5':'#586477';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(0,y(v));ctx.lineTo(pw,y(v));ctx.stroke();ctx.fillStyle='#a4b4c8';ctx.fillText(String(v),pw+7,y(v)+4)}
+ for(const v of ($('tf').value==='1m'?[15,50,85,90]:[30,50,70])){ctx.strokeStyle=v>=70?'#e53935':v<=30?'#4855e5':'#586477';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(0,y(v));ctx.lineTo(pw,y(v));ctx.stroke();ctx.fillStyle='#a4b4c8';ctx.fillText(String(v),pw+7,y(v)+4)}
  ctx.setLineDash([]);
  if(!a||a.length<19){ctx.fillStyle='#a4b4c8';ctx.fillText('RMI 데이터 대기',8,14);return}
  const {start,end,count,left,slots}=visibleWindow(a),values=rmiSeries(a),bw=pw/count;
@@ -889,7 +889,7 @@ const AUTO_PAPER_STRATEGY='rmi-daily-bias-1m-cycle-v3';
 const AUTO_PAPER_FIELDS={
   autoDailyHigh:[70,55,95],autoDailyLow:[30,5,45],
   autoMinuteHighFrom:[85,70,95],autoMinuteHighTo:[90,75,99],
-  autoMinuteLowFrom:[15,1,25],autoMinuteLowTo:[20,5,30],
+  autoMinuteLowFrom:[15,1,25],autoMinuteLowTo:[15,5,30],
   autoMaxChasePct:[0.12,0.03,0.5],autoMaxPositions:[1,1,5],
   autoDailyLossPct:[2,0.5,10],autoCooldownMin:[15,1,240]
 };
@@ -914,6 +914,13 @@ function saveAutoSignals(){
 function restoreAutoPaperSettings(){
   try{
     const o=JSON.parse(localStorage.getItem(AUTO_PAPER_SETTINGS_KEY)||'{}');
+    // v103 migration: previously saved default LONG crossing was 20.
+    // Upgrade only that old default to 15; preserve other explicitly chosen values.
+    if(!o.rmiLong15Migrated){
+      if(o.autoMinuteLowTo===undefined||Number(o.autoMinuteLowTo)===20)o.autoMinuteLowTo=15;
+      o.rmiLong15Migrated=true;
+      localStorage.setItem(AUTO_PAPER_SETTINGS_KEY,JSON.stringify(o));
+    }
     for(const [id,c] of Object.entries(AUTO_PAPER_FIELDS)){
       const n=Number(o[id]);if(Number.isFinite(n)&&n>=c[1]&&n<=c[2])$(id).value=String(n);
     }
