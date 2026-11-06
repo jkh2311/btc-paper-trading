@@ -19,32 +19,30 @@ export function rmiSeries(candles,length=14,momentum=5){
  }
  return out;
 }
-export function minuteRmiZoneEntry(previous,current,upper=85,lower=15){
+export function minuteRmiZoneEntry(previous,current,upper=85,lower=17){
  if(!Number.isFinite(previous)||!Number.isFinite(current))return null;
  if(previous<upper&&current>=upper)return 'SHORT';
  if(previous>lower&&current<=lower)return 'LONG';
  return null;
 }
-// Exactly matches the PWA's confirmed-bar chart LONG retest sequence.
-// First <= lower -> >= 30 recovery -> second <= lower crossing.
-// The original SHORT upward crossing at upper remains unchanged.
-export function chartRmiPatternSignals(scores,{upper=85,lower=15}={}){
+// Matches the PWA's confirmed-bar LONG: <=17 touch, >=25 READY,
+// then downward crossing to <=17 triggers LONG. SHORT unchanged.
+export function chartRmiPatternSignals(scores,{upper=85,lower=17}={}){
  const sides=new Array(scores.length).fill(null);
- let firstLow=false,recovered=false;
+ let touched=false,ready=false;
  for(let i=1;i<scores.length;i++){
   const prev=scores[i-1],value=scores[i];
-  if(!Number.isFinite(value))continue;
-  if(firstLow&&value>=30)recovered=true;
-  if(!Number.isFinite(prev))continue;
+  if(!Number.isFinite(value)||!Number.isFinite(prev))continue;
   if(prev<upper&&value>=upper)sides[i]='SHORT';
-  if(prev>lower&&value<=lower){
-   if(recovered)sides[i]='LONG';
-   firstLow=true;recovered=false;
+  if(!touched&&prev>lower&&value<=lower)touched=true;
+  else if(touched&&!ready&&value>=25){ready=true;sides[i]='READY';}
+  else if(ready&&prev>lower&&value<=lower){
+   sides[i]='LONG';ready=false;touched=true;
   }
  }
  return sides;
 }
-export function chartSignalFromClosedCandles(candles,{upper=85,lower=15}={}){
+export function chartSignalFromClosedCandles(candles,{upper=85,lower=17}={}){
  if(!Array.isArray(candles)||candles.length<23)return null;
  const latest=candles.at(-1);
  if(!latest||!Number.isFinite(latest.t)||!(Number(latest.c)>0)||!(Number(latest.v)>0))return null;
