@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261106-rmi-reference-lines-restored-v144"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-stable-tf-crosshair-aligned-rmi-v145"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -567,6 +567,66 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
  #page-chart .chart-tools button{min-height:26px!important;height:26px!important;padding:2px 4px!important}
  #page-chart .chart-tools{flex-basis:26px!important}
  #page-chart #rmiChart{height:75px!important;min-height:75px!important;max-height:75px!important;flex:0 0 75px!important}
+}
+/* v145: stop the quote/funding text reflow from moving the timeframe
+   control between horizontal and vertical layouts on iPhone. */
+@media(max-width:800px){
+ #page-chart .price-panel{
+   display:grid!important;
+   grid-template-columns:minmax(0,1fr) 82px!important;
+   grid-template-rows:auto!important;
+   align-items:center!important;
+   column-gap:6px!important;
+   width:100%!important;
+ }
+ #page-chart .quote-wrap{
+   display:flex!important;
+   flex-direction:column!important;
+   flex-wrap:nowrap!important;
+   align-items:flex-start!important;
+   justify-content:center!important;
+   width:100%!important;
+   min-width:0!important;
+   gap:2px!important;
+ }
+ #page-chart .quote-wrap .price{
+   display:block!important;
+   max-width:100%!important;
+   width:100%!important;
+   overflow:hidden!important;
+   white-space:nowrap!important;
+   text-overflow:clip!important;
+ }
+ #page-chart .funding{
+   display:block!important;
+   width:100%!important;
+   max-width:100%!important;
+   min-width:0!important;
+   overflow:hidden!important;
+   white-space:nowrap!important;
+   text-overflow:ellipsis!important;
+ }
+ #page-chart .tf-tabs{
+   display:block!important;
+   grid-column:2!important;
+   grid-row:1!important;
+   width:82px!important;
+   height:31px!important;
+   min-width:82px!important;
+   margin:0!important;
+   align-self:center!important;
+ }
+ #page-chart .tf-tabs select{
+   display:block!important;
+   width:82px!important;
+   min-width:82px!important;
+   max-width:82px!important;
+   height:31px!important;
+   min-height:31px!important;
+   margin:0!important;
+   padding:3px 7px!important;
+   font-size:12px!important;
+ }
 }
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
@@ -1218,7 +1278,8 @@ function drawRmi(){
  const a=chartViewBars(),cv=$('rmiChart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(52,cv.getBoundingClientRect().height||84),dpr=devicePixelRatio||1;
  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
- const pw=w-55,split=Math.max(31,Math.round(h*.55)),rmiTop=14,rmiBottom=split-3;
+ // Match the primary candle plot exactly: draw() uses w - 72 - 8.
+ const pw=w-80,split=Math.max(31,Math.round(h*.55)),rmiTop=14,rmiBottom=split-3;
  const yRmi=v=>rmiTop+(100-v)/100*Math.max(12,rmiBottom-rmiTop);
  ctx.font='9px sans-serif';
  // Restore the original one-minute RMI reference levels on every timeframe.
@@ -1265,7 +1326,24 @@ function drawRmi(){
  const futureSelected=futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count;
  if(selected!==null||futureSelected){
   const x=selected!==null?(selected-left+.5)*bw:(a.length+futureCrosshairSlot-left+.5)*bw;
-  ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();ctx.restore();
+  ctx.save();ctx.strokeStyle='#d4dbe7';ctx.lineWidth=1;ctx.setLineDash([6,6]);
+  ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();ctx.setLineDash([]);
+  // Restore the red RMI inspection dot and show values on the three
+  // disparity curves at the exact same selected candle.
+  if(selected!==null){
+   const rmi=values[selected];
+   if(Number.isFinite(rmi)){
+    ctx.beginPath();ctx.arc(x,yRmi(rmi),3.8,0,Math.PI*2);
+    ctx.fillStyle='#f04445';ctx.fill();
+   }
+   for(const [series,color] of [[d200,'#ed303c'],[d50,'#2949ed'],[d20,'#15923b']]){
+    const v=series[selected];if(!Number.isFinite(v))continue;
+    ctx.beginPath();ctx.arc(x,yD(v),3,0,Math.PI*2);
+    ctx.fillStyle=color;ctx.fill();
+    ctx.lineWidth=1;ctx.strokeStyle='#dce4ef';ctx.stroke();
+   }
+  }
+  ctx.restore();
  }
  const displayIndex=selected??(end-1),v=values[displayIndex];
  ctx.fillStyle='#f04445';ctx.font='bold 10px sans-serif';ctx.fillText('RMI '+(Number.isFinite(v)?v.toFixed(1):'--'),8,11);
@@ -1273,6 +1351,55 @@ function drawRmi(){
  ctx.fillStyle='#2949ed';ctx.fillText('50',Math.max(105,pw-69),h-5);
  ctx.fillStyle='#15923b';ctx.fillText('20',Math.max(130,pw-37),h-5);
 }
+// The RMI + disparity pane shares the same candle index, chart width and
+// crosshair as the price panel. Long-press on either indicator to inspect.
+let indicatorInspect=null,indicatorInspectTimer=null;
+function indicatorInspectAt(clientX){
+ const bars=chartViewBars();if(!bars?.length)return;
+ const rect=rmiCanvas.getBoundingClientRect(),plotW=Math.max(1,rect.width-80);
+ const {left,count}=visibleWindow(bars);
+ const x=Math.max(0,Math.min(plotW-1,clientX-rect.left));
+ const index=Math.max(0,Math.floor(left+x/plotW*count));
+ if(index>=bars.length){crosshairIndex=null;futureCrosshairSlot=index-bars.length;}
+ else{crosshairIndex=index;futureCrosshairSlot=null;}
+ crosshairPrice=null;
+ draw();drawRmi();
+}
+rmiCanvas.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ const rect=rmiCanvas.getBoundingClientRect();
+ // Retain the existing right-side RMI height adjustment gesture.
+ if(e.clientX-rect.left>=rect.width-82)return;
+ clearTimeout(indicatorInspectTimer);
+ indicatorInspect={pointerId:e.pointerId,x:e.clientX,y:e.clientY,active:false};
+ indicatorInspectTimer=setTimeout(()=>{
+  indicatorInspectTimer=null;
+  if(!indicatorInspect||indicatorInspect.pointerId!==e.pointerId)return;
+  indicatorInspect.active=true;
+  try{rmiCanvas.setPointerCapture(e.pointerId)}catch(_){}
+  indicatorInspectAt(indicatorInspect.x);
+ },e.pointerType==='mouse'?0:350);
+});
+rmiCanvas.addEventListener('pointermove',e=>{
+ const state=indicatorInspect;if(!state||state.pointerId!==e.pointerId)return;
+ if(!state.active){
+  if(Math.hypot(e.clientX-state.x,e.clientY-state.y)>12){
+   clearTimeout(indicatorInspectTimer);indicatorInspectTimer=null;
+   indicatorInspect=null;
+  }
+  return;
+ }
+ if(e.cancelable)e.preventDefault();
+ indicatorInspectAt(e.clientX);
+});
+function stopIndicatorInspection(e){
+ if(!indicatorInspect||indicatorInspect.pointerId!==e.pointerId)return;
+ clearTimeout(indicatorInspectTimer);indicatorInspectTimer=null;
+ indicatorInspect=null;
+}
+rmiCanvas.addEventListener('pointerup',stopIndicatorInspection);
+rmiCanvas.addEventListener('pointercancel',stopIndicatorInspection);
+rmiCanvas.addEventListener('lostpointercapture',stopIndicatorInspection);
 let convergence=null;
 function detectDailyConvergence(){const all=candles['1d'];convergence=null;if(all&&all.length>=45&&!demo){const a=all.slice(-61,-1),highs=[],lows=[];for(let i=2;i<a.length-2;i++){if(a[i].h>=Math.max(a[i-2].h,a[i-1].h,a[i+1].h,a[i+2].h))highs.push([i,a[i].h]);if(a[i].l<=Math.min(a[i-2].l,a[i-1].l,a[i+1].l,a[i+2].l))lows.push([i,a[i].l])}const fit=arr=>{if(arr.length<3)return null;const mx=arr.reduce((s,v)=>s+v[0],0)/arr.length,my=arr.reduce((s,v)=>s+v[1],0)/arr.length,den=arr.reduce((s,v)=>s+(v[0]-mx)**2,0);if(!den)return null;const slope=arr.reduce((s,v)=>s+(v[0]-mx)*(v[1]-my),0)/den;return {slope,base:my-slope*mx}};const hi=fit(highs),lo=fit(lows);if(hi&&lo&&hi.slope<0&&lo.slope>0){const apex=(lo.base-hi.base)/(hi.slope-lo.slope),now=a.length-1,width=hi.base+hi.slope*now-lo.base-lo.slope*now,days=apex-now;if(days>=1&&days<=35&&width>0&&width/(a.at(-1).c)<.18&&highs.some(v=>v[0]>now-24)&&lows.some(v=>v[0]>now-24)){convergence={hi,lo,apex,days,date:new Date(a[0].t+apex*86400000),origin:a[0].t}}}}const banner=$('convergenceBanner');banner.hidden=!convergence;if(convergence){banner.textContent='⚠ 일봉상 수렴 발생 예상 · 거래 자제 | 예상: '+convergence.date.toLocaleDateString('ko-KR')+' 전후 · 추정치, 방향 미확정';const key='btc-convergence-alert-'+new Date().toISOString().slice(0,10);try{if(document.visibilityState==='visible'&&localStorage.getItem(key)!=='shown'){localStorage.setItem(key,'shown');alert('일봉상 수렴 발생 예상 · 거래 자제\\n예상 수렴일: '+convergence.date.toLocaleDateString('ko-KR')+' 전후\\n실제 돌파 시점과 방향은 예측할 수 없습니다.')}}catch(e){}}}
 // Stable per-side numbering matches the cards in the paper position tab.
