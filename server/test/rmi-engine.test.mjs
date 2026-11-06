@@ -11,7 +11,7 @@ function framesAsOf(asOf,kind='up'){
   const ms=DUR[tf],lastStart=Math.floor(asOf/ms)*ms-ms;
   frames[tf]=Array.from({length:90},(_,i)=>({
    t:lastStart-(89-i)*ms,
-   c:kind==='flat'?80000+(i%5-2)*80:70000+i*75,
+   c:(kind==='flat'||kind==='down'&&tf==='30m')?80000+(i%5-2)*80:70000+i*75,
    v:100
   }));
  }
