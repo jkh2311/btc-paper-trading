@@ -5,6 +5,7 @@ const chart=document.getElementById('chart');
 if(!chart)return;
 const symbol='BTCUSDT',api='https://fapi.binance.com', $=id=>document.getElementById(id);
 let positions=[],algos=[],algoError='',accountAt=0,drag=null,requestBusy=false,readBusy=false,readStamp=0,epoch=0;
+let actionMessage='',actionError=false;
 const num=x=>x===null||x===undefined||x===''?NaN:Number(x);
 const fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:2});
 const hint=document.createElement('div');
@@ -70,10 +71,13 @@ function levels(){
  return list;
 }
 function note(text,warning=false){
+ if(actionMessage&&!warning){hint.textContent=actionMessage;hint.style.color=actionError?'#ff9aaa':'#4ed6a6';hint.style.display='block';return;}
  hint.textContent=text;
- hint.style.color=warning?'#ff9aaa':'';
+ hint.style.color=warning?'#ff9aaa':'#4ed6a6';
  hint.style.display=warning||/변경 요청 중|거래소 변경 확인/.test(text)?'block':'none';
 }
+function actionNotice(text,error=false){actionMessage=text;actionError=error;hint.textContent=text;hint.style.color=error?'#ff9aaa':'#4ed6a6';hint.style.display='block';}
+function openAlgoList(v){return Array.isArray(v)?v:Array.isArray(v?.orders)?v.orders:null;}
 window.btcLiveChartPrices=()=>levels().map(l=>l.price).filter(p=>Number.isFinite(p)&&p>0);
 window.btcDrawLiveLevels=(ctx,scale)=>{
  const all=levels();
@@ -103,12 +107,12 @@ async function readAlgos(){
  readBusy=true;const id=++epoch;
  try{
   const r=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
-  const a=Array.isArray(r)?r:Array.isArray(r?.orders)?r.orders:null;
+  const a=openAlgoList(r);
   if(!a)throw Error('조건부 주문 응답 형식 오류');
   if(id===epoch){algos=a.filter(o=>o.symbol===symbol);algoError='';readStamp=Date.now();
    if(positions.length)note('실전 진입선 / 손절·익절선 · 손절·익절선 길게 누르거나 드래그하여 실제 가격 변경');
    redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));}
- }catch(e){if(id===epoch){algoError=String(e?.message||e);note('⚠ 보호 주문 조회 실패 · '+algoError,true);redraw();}}
+ }catch(e){if(id===epoch){algoError=String(e?.message||e);if(!actionMessage)note('⚠ 보호 주문 조회 실패 · '+algoError,true);redraw();}}
  finally{readBusy=false;}
 }
 document.addEventListener('btc:real-account-updated',e=>{
@@ -124,17 +128,19 @@ document.addEventListener('btc:real-account-cleared',()=>{positions=[];algos=[];
 function scaleNow(){return window.btcLiveScale||null;}
 function touchHit(x,y){
  const scale=scaleNow();if(!scale||!positions.length)return null;
- const rect=chart.getBoundingClientRect(),px=x-rect.left,py=y-rect.top;
+ const rect=chart.getBoundingClientRect(),px=(x-rect.left)*chart.width/rect.width,py=(y-rect.top)*chart.height/rect.height;
  if(px<0||px>scale.plotW||py<scale.top-12||py>scale.priceBottom+12)return null;
  return levels().filter(l=>l.kind!=='entry').map(l=>({l,dist:Math.abs(py-(scale.top+(scale.hi-l.price)/(scale.hi-scale.lo)*(scale.priceBottom-scale.top)))}))
   .filter(x=>x.dist<=17).sort((a,b)=>a.dist-b.dist)[0]?.l||null;
 }
 function priceAt(y){
  const s=scaleNow(),rect=chart.getBoundingClientRect();
- return s?s.hi-(y-rect.top-s.top)/(s.priceBottom-s.top)*(s.hi-s.lo):NaN;
+ const local=(y-rect.top)*chart.height/rect.height;
+ return s?s.hi-(local-s.top)/(s.priceBottom-s.top)*(s.hi-s.lo):NaN;
 }
 async function moveProtection(l,raw){
  if(requestBusy)return;
+ actionMessage='';actionError=false;
  const s=l.side,p=l.p,kind=l.kind,current=getProtection(p,kind);
  const mark=num(p.mark),targetRaw=raw;
  if(!(mark>0&&targetRaw>0))return note('현재 마크가 확인 후 다시 시도하세요',true);
@@ -157,12 +163,13 @@ async function moveProtection(l,raw){
  const validSnapped=s==='LONG'?(kind==='sl'?Number(snapped)<mark:Number(snapped)>mark):(kind==='sl'?Number(snapped)>mark:Number(snapped)<mark);
  if(!validSnapped)return note('호가 단위 반영 후 현재 마크가를 넘습니다. 다른 가격을 선택하세요.',true);
  if(!confirm(s+' '+(kind==='sl'?'손절':'익절')+' 실제 주문 가격을 '+fmt(snapped)+' USDT로 '+(current?'변경':'등록')+'할까요?\n바이낸스 조건부 주문을 실제로 전송합니다.'))return;
- requestBusy=true;note('실제 보호 주문 변경 요청 중…');
+ requestBusy=true;actionNotice('바이낸스 실제 '+(kind==='sl'?'손절':'익절')+' 주문 변경 중 · 거래소 확인 전에는 적용된 것이 아닙니다');
  try{
   const updated=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
-  const currentList=Array.isArray(updated)?updated:updated?.orders;
+  const currentList=openAlgoList(updated);
   if(!Array.isArray(currentList))throw Error('실제 주문 상태 확인 불가');
   const found=currentList.filter(a=>matching(a,p,kind));
+  if(found.length>1)throw Error('동일 방향에 활성 보호 주문이 여러 개 있습니다. 바이낸스에서 확인 후 수정하세요');
   if(current&&(!found.some(a=>String(a.algoId)===String(current.algoId))||found.length!==1))
    throw Error('실제 보호 주문이 변경되었습니다. 중복 주문 방지를 위해 중단합니다');
   if(!current&&found.length)throw Error('다른 보호 주문이 존재합니다. 바이낸스에서 확인하세요');
@@ -171,6 +178,8 @@ async function moveProtection(l,raw){
   const live=currentPositions.find(x=>x?.symbol===symbol&&x.positionSide===p.side&&
    Math.abs(num(x.positionAmt))>0);
   if(!live)throw Error('실제 보유 포지션이 없습니다. 보호 주문 변경을 중단합니다');
+  if(Math.abs(Math.abs(num(live.positionAmt))-Math.abs(num(p.amount)))>1e-8)
+   throw Error('포지션 수량이 바뀌었습니다. 주문을 재조회한 후 다시 수정하세요');
   const liveMark=num(live.markPrice);
   const validNow=s==='LONG'?(kind==='sl'?Number(snapped)<liveMark:Number(snapped)>liveMark):
    (kind==='sl'?Number(snapped)>liveMark:Number(snapped)<liveMark);
@@ -183,16 +192,26 @@ async function moveProtection(l,raw){
   let response=null;
   try{response=await signed('POST','/fapi/v1/algoOrder',req);}catch(e){
    const check=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
-   const arr=Array.isArray(check)?check:check?.orders||[];
+   const arr=openAlgoList(check)||[];
    if(!arr.some(a=>a.clientAlgoId===newId))throw Error('새 보호 주문 등록 불확실: '+e.message);
   }
   const check=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
-  const arr=Array.isArray(check)?check:check?.orders||[];
-  if(!arr.some(a=>a.clientAlgoId===newId))throw Error('새 주문 활성 확인 실패 · 이전 보호 주문을 유지했습니다');
+  const arr=openAlgoList(check);
+  if(!arr||!arr.some(a=>a.clientAlgoId===newId&&matching(a,p,kind)&&
+     Math.abs(num(a.triggerPrice)-Number(snapped))<=Math.max(step/10,1e-8)))
+   throw Error('새 주문 활성/가격 확인 실패 · 기존 보호 주문을 유지했습니다');
   if(current?.algoId)await signed('DELETE','/fapi/v1/algoOrder',{symbol,algoId:String(current.algoId)});
-  note(s+' '+(kind==='sl'?'손절':'익절')+' '+snapped+' USDT 거래소 변경 확인');
-  readStamp=0;await readAlgos();
- }catch(e){note('⚠ 보호 주문 변경 확인 실패: '+String(e?.message||e)+'\n바이낸스 조건부 주문 목록에서 중복 여부를 확인하세요.',true)}
+  // Verify the final exchange state before telling the user that the move worked.
+  const final= openAlgoList(await signed('GET','/fapi/v1/openAlgoOrders',{symbol}));
+  if(!final)throw Error('최종 보호 주문 조회 실패 · 바이낸스에서 확인하세요');
+  const after=final.filter(a=>matching(a,p,kind));
+  if(after.length!==1||after[0].clientAlgoId!==newId||
+     Math.abs(num(after[0].triggerPrice)-Number(snapped))>Math.max(step/10,1e-8))
+   throw Error('최종 주문 상태가 요청과 다릅니다. 중복 또는 미적용 주문을 바이낸스에서 확인하세요');
+  algos=final.filter(a=>a.symbol===symbol);readStamp=Date.now();algoError='';
+  redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));
+  actionNotice('✅ '+s+' '+(kind==='sl'?'손절':'익절')+' '+snapped+' USDT · 바이낸스 주문 변경 확인 완료');
+ }catch(e){actionNotice('⚠ 주문 변경을 확인하지 못했습니다: '+String(e?.message||e)+'\n바이낸스에서 해당 방향의 손절·익절 주문과 중복 여부를 확인해 주세요.',true)}
  finally{requestBusy=false;void readAlgos();}
 }
 function start(x,y){
@@ -210,8 +229,18 @@ function move(y){
 }
 function finish(cancel=false){
  const d=drag;drag=null;redraw();
- if(cancel||!d?.moved||Math.abs(d.price-d.level.price)<.01)return;
- void moveProtection(d.level,d.price);
+ if(cancel||!d)return;
+ if(d.moved&&Math.abs(d.price-d.level.price)>=.01){void moveProtection(d.level,d.price);return;}
+ // A tap opens a precise-price editor; drag still offers direct placement.
+ const requested=prompt(d.level.side+' '+(d.level.kind==='sl'?'손절':'익절')+
+  ' 가격 입력 (USDT) · 바이낸스 실제 조건부 주문을 변경합니다',String(Math.round(d.level.price*10)/10));
+ if(requested===null)return;
+ const cleaned=requested.trim().replace(/,/g,'');
+ if(!/^\d+(?:\.\d+)?$/.test(cleaned)||!(Number(cleaned)>0)){
+  actionNotice('⚠ 손절·익절 가격은 0보다 큰 숫자로 입력하세요',true);return;
+ }
+ if(Math.abs(Number(cleaned)-d.level.price)<.01)return;
+ void moveProtection(d.level,Number(cleaned));
 }
 chart.addEventListener('touchstart',e=>{
  if(e.touches.length!==1||!start(e.touches[0].clientX,e.touches[0].clientY))return;
