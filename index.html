@@ -1041,8 +1041,15 @@ function minuteRmiZoneEntry(previous,current){
 function downtrendBb30mFilter(asOf,thirtyMinutes=candles['30m']){
   const span=1800000;
   if(!Array.isArray(thirtyMinutes))return {blocked:true,reason:'30분봉 데이터 없음'};
-  const closed=thirtyMinutes.filter(b=>b&&Number.isFinite(b.t)&&
-    b.t+span<=asOf&&b.v>0&&b.c>0);
+  // The REST candles are sorted. Binary-search the last confirmed candle;
+  // inspect only 24 bars instead of rescanning 1000 bars for every chart arrow.
+  let left=0,right=thirtyMinutes.length;
+  while(left<right){
+    const mid=(left+right)>>1;
+    if(thirtyMinutes[mid].t+span<=asOf)left=mid+1;else right=mid;
+  }
+  const closed=thirtyMinutes.slice(Math.max(0,left-24),left)
+    .filter(b=>b&&Number.isFinite(b.t)&&b.v>0&&b.c>0);
   if(closed.length<24||asOf-(closed.at(-1).t+span)>span+120000)
     return {blocked:true,reason:'확정된 30분봉 부족/지연'};
   function band(end){
