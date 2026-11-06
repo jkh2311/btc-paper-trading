@@ -29,8 +29,14 @@ export function minuteRmiZoneEntry(previous,current,upper=85,lower=20){
 export function downtrendBb30mFilter(asOf,thirtyMinutes){
  const span=1800000;
  if(!Array.isArray(thirtyMinutes))return {blocked:true,reason:'30m data missing'};
- const closed=thirtyMinutes.filter(b=>b&&Number.isFinite(b.t)&&
-  b.t+span<=asOf&&b.v>0&&b.c>0);
+ // Binance REST candles are chronological; only 24 latest confirmed are needed.
+ let left=0,right=thirtyMinutes.length;
+ while(left<right){
+  const mid=(left+right)>>1;
+  if(thirtyMinutes[mid].t+span<=asOf)left=mid+1;else right=mid;
+ }
+ const closed=thirtyMinutes.slice(Math.max(0,left-24),left)
+  .filter(b=>b&&Number.isFinite(b.t)&&b.v>0&&b.c>0);
  if(closed.length<24||asOf-(closed.at(-1).t+span)>span+120000)
   return {blocked:true,reason:'30m history insufficient/stale'};
  function band(end){
