@@ -19,13 +19,13 @@ export function rmiSeries(candles,length=14,momentum=5){
  }
  return out;
 }
-export function minuteRmiZoneEntry(previous,current,upper=85,lower=20){
+export function minuteRmiZoneEntry(previous,current,upper=85,lower=15){
  if(!Number.isFinite(previous)||!Number.isFinite(current))return null;
  if(previous<upper&&current>=upper)return 'SHORT';
  if(previous>lower&&current<=lower)return 'LONG';
  return null;
 }
-export function chartSignalFromClosedCandles(candles,{upper=85,lower=20}={}){
+export function chartSignalFromClosedCandles(candles,{upper=85,lower=15}={}){
  if(!Array.isArray(candles)||candles.length<23)return null;
  const latest=candles.at(-1);
  if(!latest||!Number.isFinite(latest.t)||!(Number(latest.c)>0)||!(Number(latest.v)>0))return null;
