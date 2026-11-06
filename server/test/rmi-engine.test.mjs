@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {rmiSeries,minuteRmiZoneEntry,chartSignalFromClosedCandles,downtrendBb30mFilter} from '../rmi-engine.mjs';
 
 // Enough completed 30m candles for the LONG filter, ending at a 30m boundary.
-const neutral30m=Array.from({length:55},(_,i)=>({t:i*1800000,c:80000+(i%5-2)*80,v:10}));
+const neutral30m=Array.from({length:55},(_,i)=>({t:(i-53)*1800000,c:80000+(i%5-2)*80,v:10}));
 const bearish30m=neutral30m.map(b=>({...b}));
 for(let i=50;i<55;i++)bearish30m[i].c=80000-(i-49)*1100;
 const filtered30m=()=>bearish30m.slice(0,53);
