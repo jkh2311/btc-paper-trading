@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261106-tv-dark-autofib-all-timeframes-v123"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261106-autofib-265-closes-exact-levels-v124"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -1828,37 +1828,55 @@ function renderChartTimeAxis(bars,left,count,plotW){
 
 // Rolling swing-extrema Fibonacci levels on every selectable timeframe.
 // Not a proprietary TradingView calculation. Always behind existing candles.
+// TradingView FibFib/AutoFib formula: 265-period highest/lowest CLOSE,
+// not candle highs/lows. Level order and colors match the supplied settings.
+// All chart timeframes use their own 265 most recent candles.
 function drawAutoFibChannel(ctx,bars,start,end,left,bw,y,top,bottom,plotW){
   if(!Array.isArray(bars)||end<=start||!Number.isFinite(bw)||bw<=0)return;
-  const lookback=120,ratios=[0,.236,.382,.5,.618,.786,1];
-  const fills=['rgba(118,27,35,.24)','rgba(130,40,42,.17)',
-    'rgba(33,65,101,.15)','rgba(18,77,77,.12)',
-    'rgba(16,112,57,.15)','rgba(19,107,43,.20)'];
-  const strokes=['rgba(163,58,59,.77)','rgba(189,62,58,.63)',
-    'rgba(64,117,206,.75)','rgba(41,82,208,.82)',
-    'rgba(52,164,56,.76)','rgba(74,172,45,.75)',
-    'rgba(33,114,65,.63)'];
+  const fiblength=265;
+  // From highest close (1) to lowest close (0).
+  // 1, 0.764, 0.618, 0.5, 0.382, 0.236, 0
+  const ratios=[0,.236,.382,.5,.618,.764,1];
+  const fills=[
+    'rgba(255,0,0,.12)',     // 1 -> 0.764: red
+    'rgba(51,153,255,.12)',  // 0.764 -> 0.618: sky blue
+    'rgba(0,255,0,.12)',     // 0.618 -> 0.5: lime
+    'rgba(0,255,0,.12)',     // 0.5 -> 0.382: lime
+    'rgba(51,153,255,.12)',  // 0.382 -> 0.236: sky blue
+    'rgba(255,0,0,.12)'      // 0.236 -> 0: red
+  ];
+  const strokes=[
+    '#000000', // 1
+    '#3399ff', // 0.764
+    '#0000ff', // 0.618
+    '#00ff00', // 0.5
+    '#008000', // 0.382
+    '#ff0000', // 0.236
+    '#000000'  // 0
+  ];
   const levels=[];
   for(let i=start;i<end;i++){
-    // Only use past and current candles, never future candles.
-    const from=Math.max(0,i-lookback+1);
-    let hi=-Infinity,lo=Infinity;
+    const from=Math.max(0,i-fiblength+1);
+    let maxClose=-Infinity,minClose=Infinity;
     for(let j=from;j<=i;j++){
-      const c=bars[j];
-      if(Number.isFinite(c?.h))hi=Math.max(hi,c.h);
-      if(Number.isFinite(c?.l))lo=Math.min(lo,c.l);
+      const close=Number(bars[j]?.c);
+      if(!Number.isFinite(close))continue;
+      if(close>maxClose)maxClose=close;
+      if(close<minClose)minClose=close;
     }
-    if(!(hi>lo)||i<20){levels.push(null);continue}
-    levels.push(ratios.map(r=>y(hi-(hi-lo)*r)));
+    if(!(maxClose>minClose)||i<20){levels.push(null);continue}
+    const span=maxClose-minClose;
+    levels.push(ratios.map(r=>y(maxClose-r*span)));
   }
   ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,bottom-top);ctx.clip();
-  // Step-like colored bands beneath candles, volume and all existing signals.
+  // Colored bands behind existing candles, MAs, BB, alerts and order lines.
   for(let k=0;k<levels.length;k++){
     const lv=levels[k];if(!lv)continue;
     const x=(start+k-left)*bw;
     for(let band=0;band<6;band++){
-      const y1=Math.min(lv[band],lv[band+1]),h=Math.abs(lv[band+1]-lv[band]);
-      if(!(h>0))continue;
+      const y1=Math.min(lv[band],lv[band+1]);
+      const h=Math.abs(lv[band+1]-lv[band]);
+      if(h<=0)continue;
       ctx.fillStyle=fills[band];ctx.fillRect(x,y1,bw+.65,h);
     }
   }
@@ -1871,7 +1889,7 @@ function drawAutoFibChannel(ctx,bars,start,end,left,bw,y,top,bottom,plotW){
       else{ctx.lineTo(x,prev);ctx.lineTo(x,yy)}
       ctx.lineTo(x+bw,yy);prev=yy;
     }
-    ctx.strokeStyle=strokes[band];ctx.lineWidth=band===3?1.45:1;ctx.stroke();
+    ctx.strokeStyle=strokes[band];ctx.lineWidth=1;ctx.stroke();
   }
   ctx.restore();
 }
