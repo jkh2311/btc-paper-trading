@@ -654,8 +654,8 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
   .bottom-nav{height:calc(49px + env(safe-area-inset-bottom))!important;padding:1px 2px calc(1px + env(safe-area-inset-bottom))!important}
   .bottom-nav .nav-btn{padding:2px 0!important;gap:1px!important;font-size:9px!important;line-height:1.1!important}
   .bottom-nav .nav-btn span{font-size:17px!important;line-height:18px!important}
-  #tradeBar:not(#expandedChartOverlay #tradeBar){height:52px!important;bottom:calc(49px + env(safe-area-inset-bottom))!important;padding:5px 9px!important}
-  #tradeBar:not(#expandedChartOverlay #tradeBar) button{font-size:14px!important;padding:6px!important}
+  body:not(.chart-focus-mode) #tradeBar{height:52px!important;bottom:calc(49px + env(safe-area-inset-bottom))!important;padding:5px 9px!important}
+  body:not(.chart-focus-mode) #tradeBar button{font-size:14px!important;padding:6px!important}
   main{height:calc(100dvh - 45px - 52px - 49px - env(safe-area-inset-bottom))!important}
 }
 /* Focus portrait: smaller order buttons, shared live PnL row underneath. */
