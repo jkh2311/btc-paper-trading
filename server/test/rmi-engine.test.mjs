@@ -78,3 +78,52 @@ test('confirmed-bar READY and LONG are observer events; no order request',()=>{
  assert.equal(foundLong.orderSent,false);
  assert.equal(foundLong.source,'chart-rmi-zone-cross');
 });
+
+test('READY expires after exactly 40 confirmed 1m candle intervals',()=>{
+ const scores=Array(50).fill(21);
+ scores[0]=40;scores[1]=17;scores[2]=25; // READY at index 2
+ scores[41]=18;scores[42]=17; // index 42: exactly 40m after READY
+ const sides=chartRmiPatternSignals(scores);
+ assert.equal(sides[2],'READY');
+ assert.equal(sides[42],null,'expired READY cannot trigger LONG at 40m');
+ assert.equal(sides.filter(x=>x==='LONG').length,0);
+});
+test('39-minute second 17 touch is still LONG',()=>{
+ const scores=Array(43).fill(21);
+ scores[0]=40;scores[1]=17;scores[2]=25;
+ scores[40]=18;scores[41]=17; // 39m after READY
+ const sides=chartRmiPatternSignals(scores);
+ assert.equal(sides[41],'LONG');
+});
+test('expired READY requires a fresh 17 touch and 25 rebound before next LONG',()=>{
+ const scores=Array(53).fill(21);
+ scores[0]=40;scores[1]=17;scores[2]=25;
+ scores[41]=18;scores[42]=17; // timeout -> first touch of new cycle
+ scores[43]=21;scores[44]=24; // not READY
+ scores[45]=25; // new READY
+ scores[46]=21;scores[47]=17; // valid LONG
+ const sides=chartRmiPatternSignals(scores);
+ assert.equal(sides[42],null);
+ assert.equal(sides[44],null);
+ assert.equal(sides[45],'READY');
+ assert.equal(sides[47],'LONG');
+ assert.equal(sides.filter(x=>x==='LONG').length,1);
+});
+test('real candle timestamps expire READY even if bar count is short',()=>{
+ const scores=[40,17,25,21,18,17,25,20,17];
+ const barTimes=[0,60000,120000,180000,240000,2520000,2580000,2640000,2700000];
+ const sides=chartRmiPatternSignals(scores,{barTimes});
+ assert.equal(sides[2],'READY');
+ assert.equal(sides[5],null,'time gap expired the old READY');
+ assert.equal(sides[6],'READY','fresh >=25 after first new 17 touch');
+ assert.equal(sides[8],'LONG');
+});
+test('SHORT remains unchanged while long READY expires',()=>{
+ const scores=Array(45).fill(50);
+ scores[0]=40;scores[1]=17;scores[2]=25;
+ scores[20]=84;scores[21]=85;
+ scores[42]=18;scores[43]=17;
+ const sides=chartRmiPatternSignals(scores);
+ assert.equal(sides[21],'SHORT');
+ assert.equal(sides[43],null,'long READY expired');
+});
