@@ -1,6 +1,6 @@
 // BTCUSDT USD-M futures 24/7 RMI signal observer. LIVE ORDERS: HARD DISABLED.
 // Node.js 22+ only (native fetch and WebSocket). No trading credentials are used.
-// The PWA chart uses RMI(5,14) confirmed-candle 85-up => SHORT, 20-down => LONG.
+// The PWA chart uses RMI(5,14) confirmed-candle 85-up => SHORT, 15-touch/below => LONG.
 // Node 22+ global WebSocket (no third-party dependencies).
 import {createServer} from 'node:http';
 import {mkdir,readFile,rename,writeFile} from 'node:fs/promises';
@@ -12,7 +12,7 @@ const REST='https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&l
 const WS='wss://fstream.binance.com/market/ws/btcusdt@kline_1m';
 const statePath=resolve(process.env.RMI_STATE_PATH||'./server-data/rmi-state.json');
 const port=Number(process.env.RMI_HEALTH_PORT||8787);
-const upper=Number(process.env.RMI_UPPER||85),lower=Number(process.env.RMI_LOWER||20);
+const upper=Number(process.env.RMI_UPPER||85),lower=Number(process.env.RMI_LOWER||15);
 if(!(upper>=1&&upper<=100&&lower>=0&&lower<upper))throw Error('Invalid RMI threshold');
 if(process.env.RMI_LIVE_TRADING==='true'||process.env.ENABLE_LIVE_ORDERS==='true')
  throw Error('Real trading is not implemented or permitted in this observer. No orders will be sent.');
