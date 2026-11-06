@@ -68,9 +68,12 @@ function ema(values,period){
 }
 export function rmiLongSixTrendUp(asOf,frames={}){
  return TREND_FRAMES.every(tf=>{
-  const duration=FRAME_MS[tf];
-  const a=(frames[tf]||[]).filter(b=>b&&Number.isFinite(b.t)&&
-   b.t+duration<=asOf&&b.v>0&&b.c>0);
+  const duration=FRAME_MS[tf],all=frames[tf]||[];
+  let left=0,right=all.length;
+  while(left<right){const mid=(left+right)>>1;
+   if(all[mid].t+duration<=asOf)left=mid+1;else right=mid;}
+  const a=all.slice(Math.max(0,left-62),left)
+   .filter(b=>b&&Number.isFinite(b.t)&&b.v>0&&b.c>0);
   if(!a.length||asOf-(a.at(-1).t+duration)>duration+120000)return false;
   if(tf==='5m'||tf==='15m'){
    if(a.length<24)return false;
