@@ -162,7 +162,8 @@ async function moveProtection(l,raw){
  if(!(Number(snapped)>0))return;
  const validSnapped=s==='LONG'?(kind==='sl'?Number(snapped)<mark:Number(snapped)>mark):(kind==='sl'?Number(snapped)>mark:Number(snapped)<mark);
  if(!validSnapped)return note('호가 단위 반영 후 현재 마크가를 넘습니다. 다른 가격을 선택하세요.',true);
- if(!confirm(s+' '+(kind==='sl'?'손절':'익절')+' 실제 주문 가격을 '+fmt(snapped)+' USDT로 '+(current?'변경':'등록')+'할까요?\n바이낸스 조건부 주문을 실제로 전송합니다.'))return;
+ if(!confirm(s+' '+(kind==='sl'?'손절':'익절')+' 실제 주문을 '+fmt(snapped)+' USDT로 '+(current?'교체':'등록')+'할까요?\n'+
+  (current?'바이낸스는 기존 전체 청산용 조건부 주문과 새 주문의 중복 등록을 거부합니다. 기존 주문을 취소한 뒤 재등록하므로 잠시 보호 공백이 발생할 수 있습니다. 실패하면 기존 가격 복구를 시도하며, 복구도 실패할 수 있습니다.':'바이낸스 실제 조건부 주문을 전송합니다.')+'\n앱 화면이 아니라 거래소 주문 상태를 반드시 확인하세요.'))return;
  requestBusy=true;actionNotice('바이낸스 실제 '+(kind==='sl'?'손절':'익절')+' 주문 변경 중 · 거래소 확인 전에는 적용된 것이 아닙니다');
  try{
   const updated=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
@@ -188,29 +189,92 @@ async function moveProtection(l,raw){
   const newId='btcp'+(kind==='sl'?'s':'t')+s[0]+Date.now().toString(36);
   const req={algoType:'CONDITIONAL',symbol,side:s==='LONG'?'SELL':'BUY',positionSide:p.side,type,
    closePosition:'true',triggerPrice:snapped,workingType:'MARK_PRICE',clientAlgoId:newId};
-  // Register the replacement before cancelling the old order: avoid an unprotected gap.
-  let response=null;
-  try{response=await signed('POST','/fapi/v1/algoOrder',req);}catch(e){
-   const check=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
-   const arr=openAlgoList(check)||[];
-   if(!arr.some(a=>a.clientAlgoId===newId))throw Error('새 보호 주문 등록 불확실: '+e.message);
+  // Binance -4130 rejects a second GTE closePosition conditional order in
+  // the same direction. No general modify endpoint exists for these Algo orders.
+  // With explicit user consent, cancel the own old order, then place the new one.
+  // The restore path is best effort, never a guarantee of uninterrupted protection.
+  let oldCancelled=false;
+  const activeOrders=()=>signed('GET','/fapi/v1/openAlgoOrders',{symbol}).then(openAlgoList);
+  const isNew=a=>a.clientAlgoId===newId&&matching(a,p,kind)&&
+   Math.abs(num(a.triggerPrice)-Number(snapped))<=Math.max(step/10,1e-8);
+  const oldId=String(current?.algoId||'');
+  const oldPrice=num(current?.triggerPrice);
+  const oldClient=String(current?.clientAlgoId||'');
+  const restoreId='btcpr'+(kind==='sl'?'s':'t')+s[0]+Date.now().toString(36);
+  try{
+   if(current){
+    if(!oldId||!(oldPrice>0)||!oldClient.startsWith('btcp'))
+     throw Error('기존 보호 주문 소유권을 확인할 수 없어 취소하지 않습니다');
+    const beforeCancel=await activeOrders();
+    if(!beforeCancel||beforeCancel.filter(a=>matching(a,p,kind)).length!==1||
+       !beforeCancel.some(a=>String(a.algoId)===oldId))
+     throw Error('기존 보호 주문 정보가 바뀌었습니다. 재조회 후 시도하세요');
+    actionNotice('보호 주문 교체 중 · 기존 주문 취소 후 새 가격 등록 예정');
+    await signed('DELETE','/fapi/v1/algoOrder',{symbol,algoId:oldId});
+    oldCancelled=true;
+    const afterCancel=await activeOrders();
+    if(!afterCancel||afterCancel.some(a=>String(a.algoId)===oldId))
+     throw Error('이전 주문 취소 확인 실패 · 중복 등록하지 않고 중단합니다');
+   }
+   actionNotice('새 '+(kind==='sl'?'손절':'익절')+' 주문 등록 중 · 적용 확인 전');
+   try{await signed('POST','/fapi/v1/algoOrder',req);}
+   catch(issue){
+    // A network timeout can happen after Binance accepted the order.
+    const maybe=await activeOrders().catch(()=>null);
+    if(!maybe||!maybe.some(isNew))
+     throw Error('새 주문 등록 실패: '+String(issue?.message||issue));
+   }
+   const final=await activeOrders();
+   if(!final)throw Error('거래소 최종 조건부 주문 목록 확인 실패');
+   const after=final.filter(a=>matching(a,p,kind));
+   if(after.length!==1||!isNew(after[0]))
+    throw Error('새 조건부 주문이 유일한 활성 주문인지 확인할 수 없습니다');
+   algos=final.filter(a=>a.symbol===symbol);readStamp=Date.now();algoError='';
+   redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));
+   actionNotice('✅ '+s+' '+(kind==='sl'?'손절':'익절')+' '+snapped+' USDT · 거래소 활성 주문 확인 완료');
+  }catch(issue){
+   if(oldCancelled){
+    // Restore only when no replacement/other matching order is active.
+    // Never blindly submit duplicates after ambiguous network failures.
+    let latest=null,restoreError='';
+    try{latest=await activeOrders();}catch(e){restoreError=String(e?.message||e);}
+    if(latest){
+     if(latest.some(isNew)){
+      algos=latest.filter(a=>a.symbol===symbol);readStamp=Date.now();algoError='';
+      redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));
+      actionNotice('✅ 새 주문 '+snapped+' USDT 활성 확인 · 이전 주문은 취소됨');
+      return;
+     }
+     if(latest.filter(a=>matching(a,p,kind)).length===0){
+      // Check the position and the old trigger relative to current MARK_PRICE.
+      try{
+       const fresh=await signed('GET','/fapi/v3/positionRisk',{symbol});
+       const items=Array.isArray(fresh)?fresh:[fresh];
+       const still=items.find(x=>x.symbol===symbol&&x.positionSide===p.side&&Math.abs(num(x.positionAmt))>0);
+       if(!still)throw Error('포지션이 종료되었거나 방향이 바뀌었습니다');
+       const m=num(still.markPrice),allowed=s==='LONG'?
+        (kind==='sl'?oldPrice<m:oldPrice>m):(kind==='sl'?oldPrice>m:oldPrice<m);
+       if(!allowed)throw Error('마크가 변동으로 원래 보호 가격을 다시 등록할 수 없습니다');
+       const backup={...req,triggerPrice:String(oldPrice),clientAlgoId:restoreId,
+        workingType:current.workingType||'MARK_PRICE'};
+       await signed('POST','/fapi/v1/algoOrder',backup);
+      }catch(e){restoreError=String(e?.message||e);}
+      latest=await activeOrders().catch(()=>null);
+     }
+    }
+    const restored=latest?.filter(a=>matching(a,p,kind)).some(a=>
+     Math.abs(num(a.triggerPrice)-oldPrice)<=Math.max(step/10,1e-8));
+    if(restored){
+     algos=latest.filter(a=>a.symbol===symbol);readStamp=Date.now();algoError='';
+     redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));
+     throw Error(String(issue?.message||issue)+' · 기존 '+oldPrice+' USDT 보호 주문 복구 확인');
+    }
+    throw Error('⚠ 보호 주문 공백 가능! 변경 실패: '+String(issue?.message||issue)+
+     (restoreError?' · 복구 실패: '+restoreError:' · 복구 여부 불명')+
+     ' · 바이낸스에서 즉시 손절·익절 주문을 확인하세요');
+   }
+   throw issue;
   }
-  const check=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
-  const arr=openAlgoList(check);
-  if(!arr||!arr.some(a=>a.clientAlgoId===newId&&matching(a,p,kind)&&
-     Math.abs(num(a.triggerPrice)-Number(snapped))<=Math.max(step/10,1e-8)))
-   throw Error('새 주문 활성/가격 확인 실패 · 기존 보호 주문을 유지했습니다');
-  if(current?.algoId)await signed('DELETE','/fapi/v1/algoOrder',{symbol,algoId:String(current.algoId)});
-  // Verify the final exchange state before telling the user that the move worked.
-  const final= openAlgoList(await signed('GET','/fapi/v1/openAlgoOrders',{symbol}));
-  if(!final)throw Error('최종 보호 주문 조회 실패 · 바이낸스에서 확인하세요');
-  const after=final.filter(a=>matching(a,p,kind));
-  if(after.length!==1||after[0].clientAlgoId!==newId||
-     Math.abs(num(after[0].triggerPrice)-Number(snapped))>Math.max(step/10,1e-8))
-   throw Error('최종 주문 상태가 요청과 다릅니다. 중복 또는 미적용 주문을 바이낸스에서 확인하세요');
-  algos=final.filter(a=>a.symbol===symbol);readStamp=Date.now();algoError='';
-  redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));
-  actionNotice('✅ '+s+' '+(kind==='sl'?'손절':'익절')+' '+snapped+' USDT · 바이낸스 주문 변경 확인 완료');
  }catch(e){actionNotice('⚠ 주문 변경을 확인하지 못했습니다: '+String(e?.message||e)+'\n바이낸스에서 해당 방향의 손절·익절 주문과 중복 여부를 확인해 주세요.',true)}
  finally{requestBusy=false;void readAlgos();}
 }
