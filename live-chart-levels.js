@@ -128,14 +128,14 @@ document.addEventListener('btc:real-account-cleared',()=>{positions=[];algos=[];
 function scaleNow(){return window.btcLiveScale||null;}
 function touchHit(x,y){
  const scale=scaleNow();if(!scale||!positions.length)return null;
- const rect=chart.getBoundingClientRect(),px=(x-rect.left)*chart.width/rect.width,py=(y-rect.top)*chart.height/rect.height;
+ const rect=chart.getBoundingClientRect(),px=x-rect.left,py=y-rect.top;
  if(px<0||px>scale.plotW||py<scale.top-12||py>scale.priceBottom+12)return null;
  return levels().filter(l=>l.kind!=='entry').map(l=>({l,dist:Math.abs(py-(scale.top+(scale.hi-l.price)/(scale.hi-scale.lo)*(scale.priceBottom-scale.top)))}))
   .filter(x=>x.dist<=17).sort((a,b)=>a.dist-b.dist)[0]?.l||null;
 }
 function priceAt(y){
  const s=scaleNow(),rect=chart.getBoundingClientRect();
- const local=(y-rect.top)*chart.height/rect.height;
+ const local=y-rect.top;
  return s?s.hi-(local-s.top)/(s.priceBottom-s.top)*(s.hi-s.lo):NaN;
 }
 async function moveProtection(l,raw){
