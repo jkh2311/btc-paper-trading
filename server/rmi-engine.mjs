@@ -19,43 +19,19 @@ export function rmiSeries(candles,length=14,momentum=5){
  }
  return out;
 }
-export function minuteRmiZoneEntry(previous,current,upper=85,lower=17){
+export function minuteRmiZoneEntry(previous,current,upper=85,lower=20){
  if(!Number.isFinite(previous)||!Number.isFinite(current))return null;
  if(previous<upper&&current>=upper)return 'SHORT';
  if(previous>lower&&current<=lower)return 'LONG';
  return null;
 }
-// Matches the PWA's confirmed-bar LONG: <=17 touch, >=25 READY,
-// then downward crossing to <=17 triggers LONG. SHORT unchanged.
-export function chartRmiPatternSignals(scores,{upper=85,lower=17,barTimes=null}={}){
- const sides=new Array(scores.length).fill(null);
- const readyTimeoutMs=40*60*1000;
- let touched=false,ready=false,readyIndex=-1;
- for(let i=1;i<scores.length;i++){
-  const prev=scores[i-1],value=scores[i];
-  if(!Number.isFinite(value)||!Number.isFinite(prev))continue;
-  const elapsed=Array.isArray(barTimes)&&Number.isFinite(barTimes[i])&&
-   Number.isFinite(barTimes[readyIndex])
-   ?barTimes[i]-barTimes[readyIndex]:(i-readyIndex)*60000;
-  if(ready&&elapsed>=readyTimeoutMs){
-   ready=false;touched=false;readyIndex=-1;
-  }
-  if(prev<upper&&value>=upper)sides[i]='SHORT';
-  if(!touched&&prev>lower&&value<=lower)touched=true;
-  else if(touched&&!ready&&value>=25){ready=true;readyIndex=i;sides[i]='READY';}
-  else if(ready&&prev>lower&&value<=lower){
-   sides[i]='LONG';ready=false;readyIndex=-1;touched=true;
-  }
- }
- return sides;
-}
-export function chartSignalFromClosedCandles(candles,{upper=85,lower=17}={}){
+export function chartSignalFromClosedCandles(candles,{upper=85,lower=20}={}){
  if(!Array.isArray(candles)||candles.length<23)return null;
  const latest=candles.at(-1);
  if(!latest||!Number.isFinite(latest.t)||!(Number(latest.c)>0)||!(Number(latest.v)>0))return null;
  const scores=rmiSeries(candles);
  const previous=scores.at(-2),current=scores.at(-1);
- const side=chartRmiPatternSignals(scores,{upper,lower,barTimes:candles.map(b=>b.t)}).at(-1);
+ const side=minuteRmiZoneEntry(previous,current,upper,lower);
  if(!side)return null;
  return {symbol:'BTCUSDT',timeframe:'1m',barTime:latest.t,side,
   close:Number(latest.c),rmiBefore:previous,rmiAfter:current,
