@@ -1093,8 +1093,12 @@ function downtrendBb30mFilter(asOf,thirtyMinutes=candles['30m']){
 const RMI_LONG_TREND_FRAMES=['5m','15m','30m','1h','4h','1d'];
 function rmiLongSixTrendUp(asOf,frames=candles){
   return RMI_LONG_TREND_FRAMES.every(tf=>{
-    const duration=candleDuration[tf],a=(frames[tf]||[]).filter(b=>
-      b&&Number.isFinite(b.t)&&b.t+duration<=asOf&&b.v>0&&b.c>0);
+    const duration=candleDuration[tf],all=frames[tf]||[];
+    let left=0,right=all.length;
+    while(left<right){const mid=(left+right)>>1;
+      if(all[mid].t+duration<=asOf)left=mid+1;else right=mid;}
+    const a=all.slice(Math.max(0,left-62),left)
+      .filter(b=>b&&Number.isFinite(b.t)&&b.v>0&&b.c>0);
     if(!a.length||asOf-(a.at(-1).t+duration)>duration+120000)return false;
     if(tf==='5m'||tf==='15m'){
       if(a.length<24)return false;
@@ -1115,11 +1119,8 @@ function rmiLongSixTrendUp(asOf,frames=candles){
 // Mixed/unknown markets yield no LONG.
 function rmiLongMarketMode(asOf,frames=candles){
   if(rmiLongSixTrendUp(asOf,frames))return 'UP';
-  return downtrendBb30mFilter(asOf,frames['30m']).blocked&&
-    // Missing/stale 30m candles are not equivalent to a bearish pattern.
-    Array.isArray(frames['30m'])&&
-    downtrendBb30mFilter(asOf,frames['30m']).reason==='30분 볼밴 하락 확장'?
-    'DOWN':'WAIT';
+  const bb=downtrendBb30mFilter(asOf,frames['30m']);
+  return bb.blocked&&bb.reason==='30분 볼밴 하락 확장'?'DOWN':'WAIT';
 }
 function chartRmiLongEvents(scores,times,marketMode){
   const events=new Array(scores.length).fill(null);
@@ -1162,8 +1163,9 @@ function chartRmiZoneMarkers(bars,start,end,asOf=Date.now()-1800){
   const cachedModes=new Map(),marketMode=i=>{
     const at=times[i]+60000;
     // No look-ahead. Cache by unique 1m close per pass.
-    if(!cachedModes.has(at))cachedModes.set(at,rmiLongMarketMode(at));
-    return cachedModes.get(at);
+    const key=Math.floor(at/300000);
+    if(!cachedModes.has(key))cachedModes.set(key,rmiLongMarketMode(at));
+    return cachedModes.get(key);
   };
   const longs=chartRmiLongEvents(scores,times,marketMode);
   for(let i=1;i<closed.length;i++){
