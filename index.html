@@ -1166,7 +1166,7 @@ function bullPullbackAt(bars,i){
   const lowerBand=mid20-2*Math.sqrt(variance);
   // Higher short-term average = bullish price structure.
   // Require a genuine dip toward/below the mid-band, not an extended price.
-  return mid20>mid50&&current.c<=mid20*1.0015&&current.c>=lowerBand;
+  return mid20>mid50*1.0005&&current.c<=mid20*1.0015&&current.c>=lowerBand;
 }
 function rmiSelectedStrategyEvents(scores,times,strategy=rmiSignalStrategy,bars=null){
   const events=new Array(scores.length).fill(null);
