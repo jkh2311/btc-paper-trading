@@ -41,6 +41,17 @@ function matching(a,p,kind){
 function getProtection(p,kind){
  return algos.filter(a=>matching(a,p,kind)).sort((a,b)=>Number(b.algoId||0)-Number(a.algoId||0))[0]||null;
 }
+// Read-only active exchange protection levels for the selected position card.
+// Never treat a chart preview line as an actually registered Binance order.
+window.btcRealProtectionSnapshot=position=>{
+ const current=positions.find(p=>p.side===position?.side||
+  p.side==='BOTH'&&position?.side==='BOTH'&&Math.sign(p.amount)===Math.sign(position.amount));
+ if(!current)return {fresh:false,tp:null,sl:null};
+ const fresh=!algoError&&Date.now()-readStamp<16000;
+ if(!fresh)return {fresh:false,tp:null,sl:null};
+ const tp=getProtection(current,'tp'),sl=getProtection(current,'sl');
+ return {fresh:true,tp:tp?num(tp.triggerPrice):null,sl:sl?num(sl.triggerPrice):null};
+};
 function levels(){
  const list=[];
  for(const p of positions){
@@ -96,7 +107,7 @@ async function readAlgos(){
   if(!a)throw Error('조건부 주문 응답 형식 오류');
   if(id===epoch){algos=a.filter(o=>o.symbol===symbol);algoError='';readStamp=Date.now();
    if(positions.length)note('실전 진입선 / 손절·익절선 · 손절·익절선 길게 누르거나 드래그하여 실제 가격 변경');
-   redraw();}
+   redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));}
  }catch(e){if(id===epoch){algoError=String(e?.message||e);note('⚠ 보호 주문 조회 실패 · '+algoError,true);redraw();}}
  finally{readBusy=false;}
 }
@@ -109,7 +120,7 @@ document.addEventListener('btc:real-account-updated',e=>{
  redraw();
  if(Date.now()-readStamp>4500)void readAlgos();
 });
-document.addEventListener('btc:real-account-cleared',()=>{positions=[];algos=[];accountAt=0;redraw();});
+document.addEventListener('btc:real-account-cleared',()=>{positions=[];algos=[];accountAt=0;readStamp=0;redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));});
 function scaleNow(){return window.btcLiveScale||null;}
 function touchHit(x,y){
  const scale=scaleNow();if(!scale||!positions.length)return null;
