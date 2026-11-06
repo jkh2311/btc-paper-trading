@@ -6,7 +6,7 @@
 
 - RMI(모멘텀 5, 길이 14), Wilder 지수 평균, 기존 `index.html`의 `rmiSeries` 계산식과 동일
 - 직전 확정 1분봉 RMI가 85 미만이고 최신 확정봉에서 85 이상이면 **SHORT**
-- 첫 번째 확정 1분봉 RMI 15 이하 터치에는 LONG 없음 → 이후 30 이상 반등 → 다시 15 이하로 내려오는 확정봉에서 **LONG** (30 반등 전 반복 터치에는 신호 없음)
+- 첫 번째 확정 1분봉 RMI 17 이하 터치에는 LONG 없음 → 이후 25 이상 반등 시 **READY(신호준비)** → 다시 17 이하로 내려오는 확정봉에서 **LONG** (25 반등 전에는 LONG 없음)
 - 진행 중인 봉의 신호는 사용하지 않습니다. 기존 차트 화살표처럼 **확정봉 신호**입니다.
 - 바이낸스 USDⓈ-M REST 1분봉으로 시작 데이터 확보, WebSocket 1분봉 **마감(x=true)** 이벤트에서 신호 판단
 - 서버 시작 및 네트워크 재연결 시 과거 신호는 실행하지 않으며, 중복 방지를 위한 최근 봉 시각을 파일에 저장합니다.
@@ -27,7 +27,7 @@ curl http://127.0.0.1:8787/health
 
 응답의 `mode: SIGNAL_OBSERVER` 및 `liveOrders: false`는 의도된 상태입니다. 실제 신호는 터미널의 JSON 로그에서 `event: rmi_chart_signal`로 기록됩니다. 외부에서 건강 상태 API에 접속할 수 없도록 `127.0.0.1`에만 바인딩됩니다.
 
-선택적인 환경변수: `RMI_UPPER=85`, `RMI_LOWER=15`, `RMI_HEALTH_PORT=8787`, `RMI_STATE_PATH=./server-data/rmi-state.json`. 아이폰 앱에서 RMI 상·하단 수치를 변경했다면 서버 설정도 수동으로 일치시켜야 합니다. 기본값은 85/15입니다.
+선택적인 환경변수: `RMI_UPPER=85`, `RMI_LOWER=17`, `RMI_HEALTH_PORT=8787`, `RMI_STATE_PATH=./server-data/rmi-state.json`. 아이폰 앱에서 RMI 상·하단 수치를 변경했다면 서버 설정도 수동으로 일치시켜야 합니다. 기본값은 85/17입니다.
 
 ## 24시간 운영을 위한 다음 단계
 
