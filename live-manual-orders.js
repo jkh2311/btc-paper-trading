@@ -334,8 +334,11 @@ async function enter(side){
    if(!(Number(p)>0))throw Error('지정가 호가 단위 오류');
    order.price=p;order.timeInForce='GTC';
   }
-  const summary=(used+1)+'/'+count+'단계 · '+side+' '+type+' · '+qty+' BTC'+(order.price?' @ '+order.price:'')+' · '+lev+'배 · 예상 증거금 '+fmt(margin)+' USDT\n실제 계좌에 주문하며 손절/익절 보호 주문은 자동 등록되지 않습니다.';
-  if(!confirm('바이낸스 실제 주문을 전송할까요?\n'+summary))return;
+  // The second, explicitly labeled REAL LONG/SHORT entry button submits
+  // immediately after exchange/account/size checks, without a native confirm.
+  // run() already locks both buttons until this request finishes to prevent
+  // accidental double submissions from rapid taps.
+  message('실제 '+(side==='LONG'?'롱':'숏')+' '+type+' 주문 전송 중… · '+qty+' BTC'+(order.price?' @ '+order.price+' USDT':''));
   // Leverage was explicitly applied and verified in Settings. Do not change it during entry.
   lastOrderIssue=true;lastRequest=order.newClientOrderId;
   let response;
