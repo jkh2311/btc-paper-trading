@@ -70,7 +70,15 @@ style.textContent=[
 'body.real-position-ready #paperPositionCard .real-position-row:focus-visible{outline:2px solid #7ca9d3}',
 'body.real-position-ready #paperPositionCard .real-position-row .hedge-position-head{display:flex;align-items:center;gap:8px}',
 'body.real-position-ready #paperPositionCard .real-position-row .real-close-single{margin-left:auto;padding:8px 10px;min-height:34px;font-size:12px;white-space:nowrap}',
-'body.real-position-ready #paperPositionCard .real-position-row .hedge-pnl{font-weight:700}'
+'body.real-position-ready #paperPositionCard .real-position-row .hedge-pnl{font-weight:700}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl>div{border:1px solid #34516e;border-radius:11px;background:#0b1d33;padding:11px 9px;min-width:0}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl small{display:block;font-size:11px;color:#b7cbe2;margin-bottom:7px}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl strong{font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl .tp strong{color:#4ed6a6}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl .sl strong{color:#ff869b}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl .estimate-meta{font-size:10px;line-height:1.45;color:#a0b9d2;margin-top:4px}',
+'body.real-position-ready #paperPositionCard .real-tpsl-disclaimer{font-size:10px;color:#9fb4cc;margin:7px 2px 0}'
 ].join('\n');
 document.head.append(style);
 function normalize(details){
@@ -171,13 +179,34 @@ function render(){
   result.append(make('strong','현재 미실현 손익'));
   const total=make('b',roiLabel(p)+won(p.unrealized),p.unrealized>=0?'paper-stat-profit':'paper-stat-loss');
   result.append(total);
-  summary.append(grid,result);detail.append(summary);
+  summary.append(grid,result);
+  // Only exchange-confirmed TP/SL orders are shown, not unregistered chart preview levels.
+  const protection=window.btcRealProtectionSnapshot?.(p)||{fresh:false,tp:null,sl:null};
+  const tpsl=make('div',undefined,'real-tpsl-pnl');
+  const expected=(kind,price)=>{
+   const isTp=kind==='tp';
+   const box=make('div',undefined,isTp?'tp':'sl');
+   box.append(make('small',isTp?'익절 시 예상 손익':'손절 시 예상 손익'));
+   const valid=protection.fresh&&Number.isFinite(price)&&price>0&&p.entry>0&&size>0;
+   const signedSize=selection==='LONG'?size:-size;
+   const gross=valid?(price-p.entry)*signedSize:NaN;
+   const amt=make('strong',valid?won(gross):'—');
+   box.append(amt);
+   const pct=valid&&margin>0?gross/margin*100:NaN;
+   box.append(make('div',valid?fmt(price,2)+' USDT · '+(pct>=0?'+':'')+pct.toFixed(2)+'%':
+    protection.fresh?'거래소 주문 미등록':'보호 주문 확인 중','estimate-meta'));
+   return box;
+  };
+  tpsl.append(expected('tp',protection.tp),expected('sl',protection.sl));
+  summary.append(tpsl,make('div','실제 등록된 TP/SL 기준 예상 금액 · 체결가 변동 및 수수료·펀딩비 제외','real-tpsl-disclaimer'));
+  detail.append(summary);
  }
  root.append(detail);
  message.textContent=snapshot?'실계좌 조회 '+new Date(snapshot.at).toLocaleTimeString('ko-KR'):
   '실계좌 조회 전';
  renderActualBalanceStrip();
 }
+document.addEventListener('btc:real-protection-updated',()=>{if(snapshot&&selection)render();});
 document.addEventListener('btc:real-account-updated',e=>{
  const next=normalize(e.detail);
  if(!next)return;
