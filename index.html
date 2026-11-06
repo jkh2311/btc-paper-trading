@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261106-sixframe-confirmation-v114"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261106-three-selectable-rmi-signals-v115"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -417,7 +417,7 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
    </div>
   </details>
  </section>
-<div class="chart-panel"><div id="combinedChart"><canvas id="chart"></canvas><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label">RMI (5, 14)</div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
+<div class="chart-panel"><div id="combinedChart"><canvas id="chart"></canvas><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label">RMI (5, 14) <span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
  <div id="candleTime" class="muted candle-info"></div>
  <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button></div>
  <div id="range" style="display:none"></div><div id="chartHint" style="display:none"></div><p id="selected" style="display:none"></p>
@@ -450,6 +450,16 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
 <section class="tab-page" id="page-liquidation"><div class="card liquidation-card"><h2>BTC 청산맵</h2><a class="liq-link" href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" rel="noopener noreferrer">코인글래스 청산맵 열기 ↗</a></div>
 </section>
 <section class="tab-page" id="page-settings">
+<div class="card" id="rmiStrategySettingsCard">
+<h2>1분봉 RMI 신호 전략 선택</h2>
+<label for="rmiSignalStrategy">현재 사용할 전략</label>
+<select id="rmiSignalStrategy" style="width:100%;margin:7px 0 6px">
+<option value="range">① 모의매매(횡보) · LONG 20 / SHORT 85</option>
+<option value="bear">② 하락추세 · LONG 17→25→17 / SHORT 85</option>
+<option value="bull">③ 상승추세 · LONG 85→50 / SHORT 92</option>
+</select>
+<p id="rmiStrategyHelp" class="muted" aria-live="polite">선택한 전략이 차트와 알림에 적용됩니다. 실제 AUTO 주문 OFF.</p>
+</div>
 <div class="card"><h2>🔔 LONG / SHORT 신호 알림</h2><div class="row"><button type="button" id="signalAlertToggle" aria-pressed="false">신호 알림 OFF</button><button type="button" id="signalAlertTest">알림 소리 테스트</button></div><p id="signalAlertStatus" class="muted" role="status" aria-live="polite">알림 상태 확인 중</p></div><div class="card api-panel" id="binanceApiPanel">
 <div class="api-head"><div><h2>바이낸스 계좌</h2><span class="api-caption">BTCUSDT 선물 · 조회 전용</span></div><span class="api-readonly">READ ONLY</span></div>
 <div id="myVaultStatus" class="api-vault-status" role="status">🔒 암호화 저장 상태 확인 중</div>
@@ -794,6 +804,13 @@ function drawRmi(){
  ctx.setLineDash([]);
  if(!a||a.length<19){ctx.fillStyle='#a4b4c8';ctx.fillText('RMI 데이터 대기',8,14);return}
  const {start,end,count,left,slots}=visibleWindow(a),values=rmiSeries(a),bw=pw/count;
+ const readyLabel=$('rmiSignalReadyLabel');
+ if(readyLabel){
+   const asOf=Date.now()-1800,closed=confirmedSignalBars('1m',asOf);
+   const markers=rmiSignalStrategy==='bear'&&closed.length>=23?chartRmiZoneMarkers(closed,0,closed.length,asOf):null;
+   readyLabel.hidden=!(rmiSignalStrategy==='bear'&&$('tf').value==='1m'&&markers?.readyActive===true&&
+     Number.isFinite(markers.readyAt)&&Date.now()-markers.readyAt<40*60000);
+ }
  ctx.strokeStyle='#f04445';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();let started=false;
  for(let i=start;i<end;i++){const v=values[i];if(!Number.isFinite(v))continue;const x=(i-left+.5)*bw;if(!started){ctx.moveTo(x,y(v));started=true}else ctx.lineTo(x,y(v))}
  if(started)ctx.stroke();
@@ -985,6 +1002,8 @@ const AUTO_PAPER_FIELDS={
   autoMaxChasePct:[0.12,0.03,0.5],autoMaxPositions:[1,1,5],
   autoDailyLossPct:[2,0.5,10],autoCooldownMin:[15,1,240]
 };
+const RMI_SIGNAL_STRATEGIES=['range','bear','bull'];
+let rmiSignalStrategy='range';
 let autoPaperEnabled=false,autoPaperArmedAt=0,autoSignalHistory=[],autoLastCheckedBar=0,autoLastEntryAt=0,autoLastOrderAt=0,autoPendingLimit=null,autoDailyEntryCounts={};
 function readAutoSetting(id){
   const cfg=AUTO_PAPER_FIELDS[id],n=Number($(id).value);
@@ -995,7 +1014,7 @@ function saveAutoSettings(){
     const old=JSON.parse(localStorage.getItem(AUTO_PAPER_SETTINGS_KEY)||'{}');
     const previous=old&&typeof old==='object'&&!Array.isArray(old)?old:{};
     localStorage.setItem(AUTO_PAPER_SETTINGS_KEY,JSON.stringify({
-      ...previous,...Object.fromEntries(Object.keys(AUTO_PAPER_FIELDS).map(id=>[id,readAutoSetting(id)])),autoPaperEnabled
+      ...previous,...Object.fromEntries(Object.keys(AUTO_PAPER_FIELDS).map(id=>[id,readAutoSetting(id)])),rmiSignalStrategy,autoPaperEnabled
     }));
   }catch(e){console.warn('자동 모의 설정 저장 실패',e)}
 }
@@ -1023,6 +1042,7 @@ function restoreAutoPaperSettings(){
     for(const [id,c] of Object.entries(AUTO_PAPER_FIELDS)){
       const n=Number(o[id]);if(Number.isFinite(n)&&n>=c[1]&&n<=c[2])$(id).value=String(n);
     }
+    rmiSignalStrategy=RMI_SIGNAL_STRATEGIES.includes(o.rmiSignalStrategy)?o.rmiSignalStrategy:'range';
     const state=JSON.parse(localStorage.getItem(AUTO_PAPER_SIGNALS_KEY)||'{}');
     if(Array.isArray(state.history))autoSignalHistory=state.history.filter(x=>x&&['LONG','SHORT'].includes(x.side)&&Number.isFinite(x.barTime)&&Number.isFinite(x.price)).slice(-100);
     if(Number.isFinite(state.lastEntryAt)&&state.lastEntryAt>0)autoLastEntryAt=state.lastEntryAt;
@@ -1128,15 +1148,47 @@ function minuteRmiZoneEntry(previous,current){
   return null;
 }
 // Chart-only crosses on confirmed exchange candles; never create retroactive orders.
+// Three selectable signal strategies, evaluated on confirmed 1m candles.
+function rmiSelectedStrategyEvents(scores,times,strategy=rmiSignalStrategy){
+  const events=new Array(scores.length).fill(null);
+  let firstLow=false,ready=false,readyAt=-1,upperTouched=false;
+  for(let i=1;i<scores.length;i++){
+    const prev=scores[i-1],now=scores[i],close=times[i]+60000;
+    if(!Number.isFinite(prev)||!Number.isFinite(now))continue;
+    if(strategy==='range'){
+      if(prev<readAutoSetting('autoMinuteHighFrom')&&now>=readAutoSetting('autoMinuteHighFrom'))events[i]='SHORT';
+      else if(prev>readAutoSetting('autoMinuteLowTo')&&now<=readAutoSetting('autoMinuteLowTo'))events[i]='LONG';
+    }else if(strategy==='bear'){
+      // Archived v107: 17 -> 25 READY -> 17; READY expires after 40 minutes.
+      if(ready&&close-readyAt>=40*60000){ready=false;firstLow=false;readyAt=-1;}
+      if(prev<85&&now>=85)events[i]='SHORT';
+      if(!firstLow&&prev>17&&now<=17)firstLow=true;
+      else if(firstLow&&!ready&&now>=25){
+        ready=true;readyAt=close;events[i]='READY';
+      }else if(ready&&prev>17&&now<=17){
+        events[i]='LONG';ready=false;firstLow=true;readyAt=-1;
+      }
+    }else if(strategy==='bull'){
+      // SHORT on upward 92; LONG after a prior 85+ touch and downward 50.
+      if(prev<92&&now>=92)events[i]='SHORT';
+      if(prev<85&&now>=85)upperTouched=true;
+      if(upperTouched&&prev>50&&now<=50){
+        events[i]='LONG';upperTouched=false;
+      }
+    }
+  }
+  events.readyActive=ready;events.readyAt=readyAt;
+  return events;
+}
 function chartRmiZoneMarkers(bars,start,end,asOf=Date.now()-1800){
   if(!Array.isArray(bars)||bars.length<23)return [];
   const closed=bars.filter(b=>b&&Number.isFinite(b.t)&&b.t+60000<=asOf&&b.v>0&&b.c>0);
   if(closed.length<23)return [];
-  const scores=rmiSeries(closed),markers=[];
+  const scores=rmiSeries(closed),events=rmiSelectedStrategyEvents(scores,closed.map(b=>b.t)),markers=[];
+  markers.readyActive=events.readyActive;markers.readyAt=events.readyAt;
   for(let i=1;i<closed.length;i++){
     if(closed[i].t<bars[start]?.t||closed[i].t>bars[end-1]?.t)continue;
-    const side=minuteRmiZoneEntry(scores[i-1],scores[i]);
-    if(side)markers.push({barTime:closed[i].t,side,chartOnly:true});
+    if(events[i])markers.push({barTime:closed[i].t,side:events[i],chartOnly:true});
   }
   return markers;
 }
@@ -1494,14 +1546,13 @@ function maybeEvaluateAutoPaperSignals(){
     if(now-(bar.t+60000)>15000||now-lastTickAt>5000||!wsConnected)return;
     const arrows=chartRmiZoneMarkers(confirmed,Math.max(0,confirmed.length-2),
       confirmed.length,now-1800);
-    const arrow=arrows.find(x=>x.barTime===bar.t);
+    const arrow=arrows.find(x=>x.barTime===bar.t&&x.side!=='READY');
     if(arrow&&arrow.barTime!==liveRmiObservedBar){
       liveRmiObservedBar=arrow.barTime;
       document.dispatchEvent(new CustomEvent('btc:live-rmi-observed',{detail:{
         symbol:'BTCUSDT',barTime:arrow.barTime,side:arrow.side,price:bar.c,
         observedAt:now,source:'chart-rmi-zone-cross',
-        reason:arrow.side==='SHORT'?'1분 RMI 상단 돌파 → 차트 SHORT':
-          '1분 RMI 20 하향 돌파 → 차트 LONG',
+        reason:'RMI 전략 '+rmiSignalStrategy+' · 차트 '+arrow.side,
         orderSent:false
       }}));
     }
@@ -1551,7 +1602,7 @@ function drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,bottom,plotW){
        (sig.side!=='LONG'||validLongBars.has(sig.barTime)))markers.set(sig.barTime,sig);
   }
   // Restore original v61 confirmed chart SHORT 85 / LONG 20 crosses.
-  for(const sig of chartSignals)markers.set(sig.barTime,sig);
+  for(const sig of chartSignals)if(sig.side!=='READY')markers.set(sig.barTime,sig);
   if(!markers.size)return;
   const near=[...markers.values()].sort((x,z)=>x.barTime-z.barTime);
   const byTime=new Map();for(let i=start;i<end;i++)byTime.set(a[i].t,i);
@@ -1603,6 +1654,26 @@ async function pollAutoPaperMinute(){
 }
 function initAutoPaperUi(){
   restoreAutoPaperSettings();
+  const strategySelect=$('rmiSignalStrategy');
+  if(strategySelect){
+    strategySelect.value=rmiSignalStrategy;
+    const help=$('rmiStrategyHelp');
+    const updateHelp=()=>{
+      help.textContent=rmiSignalStrategy==='range'?
+        '모의매매(횡보): RMI 20 하향 터치 LONG / 85 상향 터치 SHORT':
+        rmiSignalStrategy==='bear'?
+        '하락추세: 첫 17 이하 → 25 이상 신호준비(40분) → 다시 17 이하 LONG / SHORT 85':
+        '상승추세: 먼저 RMI 85 이상 터치 → 50 이하 하향 시 LONG / SHORT 92';
+    };
+    strategySelect.addEventListener('change',()=>{
+      if(!RMI_SIGNAL_STRATEGIES.includes(strategySelect.value))return;
+      rmiSignalStrategy=strategySelect.value;
+      saveAutoSettings();
+      liveRmiObservedBar=confirmedSignalBars('1m',Date.now()-1800).at(-1)?.t||0;
+      updateHelp();draw();drawRmi();
+    });
+    updateHelp();
+  }
   // Do not silently fill an obsolete pending order after a restart.
   if(autoPendingLimit)cancelAutoPendingLimit(Date.now()>=autoPendingLimit.expiresAt?
     '5분 미체결 자동 취소':'앱 재실행 · 기존 미체결 주문 취소');
@@ -2797,7 +2868,13 @@ function maybeAlertChartSignal(bar,bars){
   if(signalAlertLastKey===key)return;
   signalAlertLastKey=key;
   try{localStorage.setItem(SIGNAL_ALERT_KEY,JSON.stringify({enabled:true,lastKey:key}))}catch{}
-  showSignalAlert(selected,bar.c);
+  if(selected==='READY'){
+    const el=$('signalAlertToast');if(!el)return;
+    el.textContent='BTCUSDT · 🟡 LONG 신호준비 · 17→25 (40분 유효)';
+    el.style.background='#60512b';el.hidden=false;
+    clearTimeout(signalAlertToastTimer);
+    signalAlertToastTimer=setTimeout(()=>{el.hidden=true},6500);
+  }else showSignalAlert(selected,bar.c);
 }
 function initSignalAlerts(){
   try{
