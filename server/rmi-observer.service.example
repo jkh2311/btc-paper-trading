@@ -1,0 +1,27 @@
+# Example for a VPS running Node.js 22+. Adjust paths and user before enabling.
+# This is an OBSERVER ONLY service: no real trading functionality.
+[Unit]
+Description=BTCUSDT chart-RMI 1m signal observer (NO LIVE ORDERS)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=btc-rmi
+WorkingDirectory=/opt/btc-paper-trading/server
+ExecStart=/usr/bin/node /opt/btc-paper-trading/server/observer.mjs
+Restart=always
+RestartSec=5
+StateDirectory=btc-rmi
+Environment=RMI_STATE_PATH=/var/lib/btc-rmi/rmi-state.json
+Environment=RMI_UPPER=85
+Environment=RMI_LOWER=20
+Environment=RMI_HEALTH_PORT=8787
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/btc-rmi
+
+[Install]
+WantedBy=multi-user.target
