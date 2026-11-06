@@ -1,0 +1,27 @@
+name: RMI server safety checks
+on:
+  push:
+    paths:
+      - 'server/**'
+      - '.github/workflows/rmi-server-check.yml'
+  pull_request:
+    paths:
+      - 'server/**'
+      - '.github/workflows/rmi-server-check.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check server modules syntax
+        run: |
+          node --check server/rmi-engine.mjs
+          node --check server/observer.mjs
+      - name: Run chart-signal regression tests
+        working-directory: server
+        run: npm test
