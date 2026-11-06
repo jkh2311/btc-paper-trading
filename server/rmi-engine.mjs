@@ -27,17 +27,24 @@ export function minuteRmiZoneEntry(previous,current,upper=85,lower=17){
 }
 // Matches the PWA's confirmed-bar LONG: <=17 touch, >=25 READY,
 // then downward crossing to <=17 triggers LONG. SHORT unchanged.
-export function chartRmiPatternSignals(scores,{upper=85,lower=17}={}){
+export function chartRmiPatternSignals(scores,{upper=85,lower=17,barTimes=null}={}){
  const sides=new Array(scores.length).fill(null);
- let touched=false,ready=false;
+ const readyTimeoutMs=40*60*1000;
+ let touched=false,ready=false,readyIndex=-1;
  for(let i=1;i<scores.length;i++){
   const prev=scores[i-1],value=scores[i];
   if(!Number.isFinite(value)||!Number.isFinite(prev))continue;
+  const elapsed=Array.isArray(barTimes)&&Number.isFinite(barTimes[i])&&
+   Number.isFinite(barTimes[readyIndex])
+   ?barTimes[i]-barTimes[readyIndex]:(i-readyIndex)*60000;
+  if(ready&&elapsed>=readyTimeoutMs){
+   ready=false;touched=false;readyIndex=-1;
+  }
   if(prev<upper&&value>=upper)sides[i]='SHORT';
   if(!touched&&prev>lower&&value<=lower)touched=true;
-  else if(touched&&!ready&&value>=25){ready=true;sides[i]='READY';}
+  else if(touched&&!ready&&value>=25){ready=true;readyIndex=i;sides[i]='READY';}
   else if(ready&&prev>lower&&value<=lower){
-   sides[i]='LONG';ready=false;touched=true;
+   sides[i]='LONG';ready=false;readyIndex=-1;touched=true;
   }
  }
  return sides;
@@ -48,7 +55,7 @@ export function chartSignalFromClosedCandles(candles,{upper=85,lower=17}={}){
  if(!latest||!Number.isFinite(latest.t)||!(Number(latest.c)>0)||!(Number(latest.v)>0))return null;
  const scores=rmiSeries(candles);
  const previous=scores.at(-2),current=scores.at(-1);
- const side=chartRmiPatternSignals(scores,{upper,lower}).at(-1);
+ const side=chartRmiPatternSignals(scores,{upper,lower,barTimes:candles.map(b=>b.t)}).at(-1);
  if(!side)return null;
  return {symbol:'BTCUSDT',timeframe:'1m',barTime:latest.t,side,
   close:Number(latest.c),rmiBefore:previous,rmiAfter:current,
