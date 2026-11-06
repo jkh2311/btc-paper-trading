@@ -16,7 +16,7 @@ const upper=Number(process.env.RMI_UPPER||85),lower=Number(process.env.RMI_LOWER
 if(!(upper>=1&&upper<=100&&lower>=0&&lower<upper))throw Error('Invalid RMI threshold');
 if(process.env.RMI_LIVE_TRADING==='true'||process.env.ENABLE_LIVE_ORDERS==='true')
  throw Error('Real trading is not implemented or permitted in this observer. No orders will be sent.');
-let candles=[],seenBar=0,seenSignal=0,connected=false,lastEventAt=0,lastError='',signals=0,starting=true;
+let candles=[],seenBar=0,seenSignal=0,connected=false,lastEventAt=0,lastError='',signals=0;
 let ws=null,retryTimer=null,watchdog=null,stopped=false;
 function log(event,details={}){console.log(JSON.stringify({at:new Date().toISOString(),event,...details}));}
 async function save(){
@@ -67,9 +67,10 @@ async function accept(k){
  const signal=chartSignalFromClosedCandles(candles,{upper,lower});
  seenBar=t;
  // Persist the watermark before emitting so restart cannot re-fire this bar.
- if(signal&&t>seenSignal){seenSignal=t;signals++;}
+ const newSignal=!!signal&&t>seenSignal;
+ if(newSignal){seenSignal=t;signals++;}
  await save();
- if(signal)log('rmi_chart_signal',{...signal,liveOrders:false});
+ if(newSignal)log('rmi_chart_signal',{...signal,liveOrders:false});
 }
 function connect(){
  if(stopped)return;
