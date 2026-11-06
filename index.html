@@ -704,15 +704,12 @@ function drawRmi(){
  const {start,end,count,left,slots}=visibleWindow(a),values=rmiSeries(a),bw=pw/count;
  const readyLabel=$('rmiLongReadyLabel');
  if(readyLabel){
-   let waiting=false,when=0;
+   let waiting=false;
    if($('tf').value==='1m'){
      const asOf=Date.now()-1800,latest=confirmedSignalBars('1m',asOf);
      const markers=chartRmiZoneMarkers(latest,0,latest.length,asOf);
-     for(const m of markers){
-       if(m.side==='READY'){waiting=true;when=m.barTime+60000;}
-       else if(m.side==='LONG')waiting=false;
-     }
-     waiting=waiting&&Date.now()-when<40*60000&&rmiLongMarketMode(asOf)==='DOWN';
+     waiting=markers.readyActive===true&&Number.isFinite(markers.readyAt)&&
+       Date.now()-markers.readyAt<40*60000&&rmiLongMarketMode(asOf)==='DOWN';
    }
    readyLabel.hidden=!waiting;
  }
@@ -1152,6 +1149,8 @@ function chartRmiLongEvents(scores,times,marketMode){
       touched=false;ready=false;readyAt=-1;
     }
   }
+  events.readyActive=ready;
+  events.readyAt=readyAt;
   return events;
 }
 // Chart-only crosses on confirmed exchange candles; never create retroactive orders.
@@ -1168,6 +1167,9 @@ function chartRmiZoneMarkers(bars,start,end,asOf=Date.now()-1800){
     return cachedModes.get(key);
   };
   const longs=chartRmiLongEvents(scores,times,marketMode);
+  // Expose actual finite-state READY (not merely the last historical label).
+  markers.readyActive=longs.readyActive;
+  markers.readyAt=longs.readyAt;
   for(let i=1;i<closed.length;i++){
     if(closed[i].t<bars[start]?.t||closed[i].t>bars[end-1]?.t)continue;
     const isShort=scores[i-1]<readAutoSetting('autoMinuteHighFrom')&&
