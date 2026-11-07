@@ -51,6 +51,9 @@ const style=create('style');style.textContent=`
 `;document.head.append(style);
 let sequence=0,busy=false,controller=null;
 let lastTrades=null,realWallet=NaN;
+// Preserve expanded real fill details across the app's 5-second account refresh.
+// Each item closes only when its own summary is tapped again.
+const openRealCloseDetails=new Set();
 let cumulative=null,cumulativeBusy=false;
 const historyStart=document.createElement('input');
 historyStart.type='date';historyStart.value='2026-11-05';
@@ -210,6 +213,12 @@ async function trades(account,signal){
  return json.map(validateTrade).sort((a,b)=>a.time-b.time||Number(a.id)-Number(b.id));
 }
 function showRows(rows){
+ // Remember native <details> state before replacing refreshed Binance rows.
+ // A toggle event also updates the set immediately after any user tap.
+ for(const node of closed.querySelectorAll('details.live-real-closed[data-real-close-key]')){
+  if(node.open)openRealCloseDetails.add(node.dataset.realCloseKey);
+  else openRealCloseDetails.delete(node.dataset.realCloseKey);
+ }
  lastTrades=rows;
  empty();
  const tradesDesc=create('div','최근 체결 최대 100건 · '+new Date().toLocaleTimeString('ko-KR'),'live-real-history-note');
@@ -240,8 +249,9 @@ function showRows(rows){
  for(const t of candidates){
   const id=t.orderId+'-'+t.positionSide+'-'+t.side;
   const entry=byOrder.get(id)||{id:t.orderId,side:t.side,positionSide:t.positionSide,
-   time:t.time,qty:0,pnl:0,commission:0,otherCommission:false,entryNotional:0,validEntryBasis:true};
+   time:t.time,qty:0,pnl:0,commission:0,otherCommission:false,entryNotional:0,exitNotional:0,validEntryBasis:true};
   entry.qty+=t.qty;entry.pnl+=t.pnl;entry.time=Math.max(entry.time,t.time);
+  entry.exitNotional+=t.price*t.qty;
   // USD-M linear BTCUSDT: realized PnL of a closing fill is
   // (close - entry)*qty for LONG, (entry - close)*qty for SHORT.
   // Derive the cost basis of the closed quantity without guessing
@@ -294,6 +304,13 @@ function showRows(rows){
   const priceReturn=entry.validEntryBasis&&entry.entryNotional>0&&Number.isFinite(factor)?
    netResult*factor/entry.entryNotional*100:NaN;
   const node=create('details',undefined,'paper-closed-item paper-closed-compact live-real-closed');
+  const detailKey=entry.id+'-'+entry.positionSide+'-'+entry.side;
+  node.dataset.realCloseKey=detailKey;
+  node.open=openRealCloseDetails.has(detailKey);
+  node.addEventListener('toggle',()=>{
+   if(node.open)openRealCloseDetails.add(detailKey);
+   else openRealCloseDetails.delete(detailKey);
+  });
   const header=create('summary');
   const side=create('b',direction,'paper-closed-side '+(direction==='롱'?'hedge-long-text':'hedge-short-text'));
   const rate=create('span',Number.isFinite(priceReturn)?
@@ -304,11 +321,13 @@ function showRows(rows){
   const time=create('small',new Date(entry.time).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),'paper-closed-time');
   header.append(side,rate,amount,time);
   const detail=create('div',undefined,'live-real-detail');
-  detail.textContent='주문 #'+entry.id+' · '+fmt(entry.qty,8)+' BTC'+
-   '\n가격 기준 수익률 '+(Number.isFinite(priceReturn)?(priceReturn>=0?'+':'')+priceReturn.toFixed(2)+'%':'계산 불가')+
-   ' (현재 설정 '+factor+'배 기준 추정 · 거래 당시 실제 배율 미확인)\n실현손익 '+won(entry.pnl)+
-   ' · 수수료 '+feeWon(entry.commission,'USDT')+
-   '\n수수료 차감 후 '+won(netResult)+(entry.otherCommission?'\n기타 자산 수수료 별도':'');
+  const avgEntry=entry.validEntryBasis&&entry.qty>0?entry.entryNotional/entry.qty:NaN;
+  const avgExit=entry.qty>0?entry.exitNotional/entry.qty:NaN;
+  detail.textContent='진입가 '+(Number.isFinite(avgEntry)?fmt(avgEntry,2)+' USDT':'확인 불가')+
+   '\n판매가 '+(Number.isFinite(avgExit)?fmt(avgExit,2)+' USDT':'확인 불가')+
+   '\n수익률 '+(Number.isFinite(priceReturn)?(priceReturn>=0?'+':'')+priceReturn.toFixed(2)+'%':'계산 불가')+
+   '\n실현손익 '+won(entry.pnl)+' · 수수료 '+feeWon(entry.commission,'USDT')+
+   '\n수수료 차감 후 '+won(netResult)+(entry.otherCommission?' (기타 자산 수수료 별도)':'');
   node.append(header,detail);closed.append(node);
  }
 }
