@@ -161,6 +161,27 @@ async function currentManualPositions(){
 // sheet. The displayed live quote is separate from the order's LIMIT price.
 // Editing the LIMIT price freezes only that field, not the moving live quote.
 let sheetQuoteGeneration=0,sheetPriceEdited=false,sheetQuoteBusy=false,sheetQuoteLastAt=0;
+let chartLimitPriceMode=false,entrySheetOriginalPosition=null;
+function restoreChartLimitSheet(){
+ const sh=$('entrySheet');if(!sh)return;
+ sh.classList.remove('chart-price-entry-sheet');
+ if(entrySheetOriginalPosition){
+  const {parent,next}=entrySheetOriginalPosition;
+  if(parent?.isConnected)parent.insertBefore(sh,next?.parentNode===parent?next:null);
+  entrySheetOriginalPosition=null;
+ }
+ chartLimitPriceMode=false;
+ for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.disabled=false;
+ if(typeof quoteReset!=='undefined'&&quoteReset)quoteReset.style.display='';
+}
+document.addEventListener('btc:chart-price-limit-entry',e=>{
+ const data=e.detail;
+ if(!data||data.symbol!=='BTCUSDT'||!['LONG','SHORT'].includes(data.side)||
+    !Number.isFinite(data.price)||!(data.price>0)||busy)return;
+ showSheet(data.side,data.price);
+});
+$('sheetCancel')?.addEventListener('click',restoreChartLimitSheet);
+
 let liveQuote={price:NaN,at:0},sheetTick=NaN,sheetTickDigits=1,lastQuotePaint=0;
 const limitInput=$('limitPrice'),sheetPriceHeader=$('sheetPrice');
 const liveQuoteView=document.createElement('div');
@@ -254,23 +275,41 @@ async function updateLimitQuote(force=false){
   }
  }finally{sheetQuoteBusy=false;}
 }
-function showSheet(side){
+function showSheet(side,chartPrice=null){
  if(!credentialsSafe())return;
+ restoreChartLimitSheet();
  const sh=$('entrySheet');if(!sh)return;
+ const chartSelected=Number.isFinite(chartPrice)&&chartPrice>0;
+ if(chartSelected){
+  // Expanded charts live in a separate fullscreen layer. Move the existing
+  // REAL order sheet to document.body so it remains visible in either mode.
+  entrySheetOriginalPosition={parent:sh.parentNode,next:sh.nextSibling};
+  document.body.appendChild(sh);
+  sh.classList.add('chart-price-entry-sheet');
+  chartLimitPriceMode=true;
+  const limit=document.querySelector('input[name="orderType"][value="limit"]');
+  if(limit)limit.checked=true;
+  const market=document.querySelector('input[name="orderType"][value="market"]');
+  if(market)market.disabled=true;
+  quoteReset.style.display='none';
+ }
  sh.style.display='block';
  $('sheetLong').style.display=side==='LONG'?'':'none';
  $('sheetShort').style.display=side==='SHORT'?'':'none';
  $('sheetPrice').textContent='BTCUSDT 실제 '+(side==='LONG'?'롱':'숏')+' 주문';
- $('orderHelp').textContent='실전 주문 · 지정가 / 시장가';
+ $('orderHelp').textContent=chartSelected?
+   '실전 예약 지정가 · Post Only(즉시 체결 방지) · 수량은 설정값으로 계산 · 아래 실제 진입 버튼을 누르면 바이낸스에 전송됩니다.':
+   '실전 주문 · 지정가 / 시장가';
  sh.dataset.realSide=side;
- sheetQuoteGeneration++;sheetPriceEdited=false;sheetQuoteLastAt=0;
- if(limitInput)limitInput.value='';
- quoteState.textContent='최신 지정가 불러오는 중…';
+ sheetQuoteGeneration++;sheetPriceEdited=chartSelected;sheetQuoteLastAt=0;
+ if(limitInput)limitInput.value=chartSelected?chartPrice.toFixed(1):'';
+ quoteState.textContent=chartSelected?'차트에서 선택한 지정가 · 직접 변경 가능 · 시장가 전환 불가':
+   '최신 지정가 불러오는 중…';
  displayLiveQuote();
- void updateLimitQuote();
+ if(!chartSelected)void updateLimitQuote();
 }
 quoteReset.onclick=()=>{
- if(!isSheetOpen())return;
+ if(!isSheetOpen()||chartLimitPriceMode)return;
  sheetPriceEdited=false;sheetQuoteGeneration++;sheetQuoteLastAt=0;
  if(limitInput)limitInput.value='';
  quoteState.textContent='실시간 현재가 다시 적용 중…';
@@ -280,6 +319,7 @@ quoteReset.onclick=()=>{
 for(const radio of document.querySelectorAll('input[name="orderType"]')){
  radio.addEventListener('change',()=>{
   if(!isSheetOpen())return;
+  if(chartLimitPriceMode){document.querySelector('input[name="orderType"][value="limit"]').checked=true;return;}
   displayLiveQuote();
   if(!limitOrderSelected())return;
   sheetQuoteGeneration++;sheetPriceEdited=false;sheetQuoteLastAt=0;
@@ -302,6 +342,7 @@ async function enter(side){
   const type=document.querySelector('input[name="orderType"]:checked')?.value==='market'?'MARKET':'LIMIT';
   const quote=Number(String($('price')?.textContent||'').replace(/[^0-9.]/g,''));
   const price=type==='LIMIT'?Number($('limitPrice').value):quote;
+  if(chartLimitPriceMode&&type!=='LIMIT')throw Error('차트 예약진입은 지정가만 가능합니다.');
   if(!(price>0))throw Error('유효한 현재가/지정가가 필요합니다');
   const lev=val('lev'),count=val('pyramidEntryCount'),stop=val('stop');
   if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
@@ -332,7 +373,7 @@ async function enter(side){
   if(type==='LIMIT'){
    const p=roundDown(price,f.price.tickSize);
    if(!(Number(p)>0))throw Error('지정가 호가 단위 오류');
-   order.price=p;order.timeInForce='GTC';
+   order.price=p;order.timeInForce=chartLimitPriceMode?'GTX':'GTC';
   }
   // The second, explicitly labeled REAL LONG/SHORT entry button submits
   // immediately after exchange/account/size checks, without a native confirm.
@@ -344,6 +385,12 @@ async function enter(side){
   let response;
   try{response=await signed('POST','/fapi/v1/order',order);}
   catch(e){
+   // Binance -5022 is a definitive Post Only rejection (would trade
+   // immediately). Do not mask it as uncertain or retry as market order.
+   if(chartLimitPriceMode&&String(e?.message||'').includes('-5022')){
+    lastOrderIssue=false;
+    throw Error('예약 지정가가 즉시 체결될 수 있어 바이낸스가 거절했습니다(-5022). 다른 가격을 선택하세요.');
+   }
    let known=null;try{known=await signed('GET','/fapi/v1/order',{symbol,origClientOrderId:lastRequest});}catch(_){}
    if(!known)throw Error('주문 전송 결과 불확실 · ID '+lastRequest+' · 바이낸스 주문내역에서 먼저 확인하세요. '+e.message);
    response=known;
