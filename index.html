@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-rmi-disparity-independent-value-axis-v154"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-rmi-clipped-volume-resize-v155"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -944,6 +944,21 @@ body:not(.chart-focus-mode) #page-chart #rmiChart{
  #expandedChartHeader #expandedRmiStrategy{font-size:11px!important}
  #expandedChartOverlay #intradayHistoryJump{top:6px!important;left:7px!important}
 }
+
+/* v155: the RMI legend text is removed, returning its height to the pane.
+   A conditional LONG-ready notification may still overlay the top of RMI. */
+#combinedChart{position:relative}
+#combinedChart>.indicator-label{
+ height:0!important;min-height:0!important;max-height:0!important;
+ padding:0!important;margin:0!important;border:0!important;
+ line-height:0!important;overflow:visible!important;position:relative;z-index:10;
+}
+#combinedChart>.indicator-label #rmiSignalReadyLabel:not([hidden]){
+ position:absolute;top:2px;left:7px;z-index:11;
+ display:inline-block;white-space:nowrap;line-height:13px;
+ background:rgba(10,20,35,.87);padding:1px 3px;border-radius:3px;
+ font-size:10px!important;
+}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -968,7 +983,7 @@ body:not(.chart-focus-mode) #page-chart #rmiChart{
 <div id="chartTimeJumpControls"><strong>날짜·시간으로 차트 이동</strong><span style="font-size:10px;color:#adc0d5">한국시간(KST) 기준 · 선택한 시간봉</span>
 <div class="time-jump-grid"><input id="chartJumpDate" type="date" aria-label="이동할 연도 월 일"><input id="chartJumpTime" type="time" value="12:00" step="60" aria-label="이동할 시간 분"></div>
 <button id="chartJumpGo" type="button">선택 날짜로 이동</button><button id="chartJumpLatest" type="button">최신 차트로 복귀</button>
-<div id="chartTimeJumpStatus" role="status" aria-live="polite"></div></div></div></div></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label">RMI (5, 14) + 이격도 (200 / 50 / 20) <span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
+<div id="chartTimeJumpStatus" role="status" aria-live="polite"></div></div></div></div></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label"><span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
  <div id="candleTime" class="muted candle-info"></div>
  <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button></div>
  <div id="range" style="display:none"></div><div id="chartHint" style="display:none"></div><p id="selected" style="display:none"></p>
@@ -1692,7 +1707,11 @@ function drawRmi(){
   ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(pw,yy);ctx.stroke();
   ctx.fillStyle='#a4b4c8';
   const labelShift=v===90?-7:v===85?5:v===20?-5:v===15?7:0;
-  ctx.fillText(String(v),pw+5,yy+3+labelShift);
+  const labelBaseline=yy+3+labelShift;
+  // Never let axis text from RMI spill across its divider into disparity.
+  if(labelBaseline>=rmiTop+8&&labelBaseline<=rmiBottom-1){
+   ctx.fillText(String(v),pw+5,labelBaseline);
+  }
  }
  ctx.setLineDash([]);ctx.strokeStyle='#718fa9';ctx.lineWidth=1.4;
  // The fixed horizontal divider extends across plot AND the right axes.
@@ -2773,8 +2792,14 @@ function selectedCandleCountdown(now=Date.now()){
 }
 let focusVolumeFraction=.14,focusRmiHeight=80;
 const focusHeightStorageKey='btc-chart-focus-heights-v1';
+const normalVolumeStorageKey='btc-chart-normal-volume-fraction-v155';
+let normalVolumeFraction=.24;
+try{
+ const fraction=Number(localStorage.getItem(normalVolumeStorageKey));
+ if(Number.isFinite(fraction)&&fraction>=.07&&fraction<=.4)normalVolumeFraction=fraction;
+}catch(_){}
 function saveFocusHeights(){try{localStorage.setItem(focusHeightStorageKey,JSON.stringify({vol:Math.round(focusVolumeFraction*100),rmi:focusRmiHeight}))}catch(_){}}
-function drawVolumeDividerGrip(ctx,priceBottom,plotW){if(!document.body.classList.contains('chart-focus-mode'))return;ctx.save();ctx.strokeStyle='#6384a2';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(0,priceBottom);ctx.lineTo(plotW,priceBottom);ctx.stroke();const x=Math.max(4,plotW/2-17);ctx.fillStyle='#213a51';ctx.fillRect(x,priceBottom-6,34,12);ctx.strokeStyle='#b7cfe2';for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(x+10+i*7,priceBottom-3);ctx.lineTo(x+10+i*7,priceBottom+3);ctx.stroke()}ctx.restore()}
+function drawVolumeDividerGrip(ctx,priceBottom,plotW){ctx.save();ctx.strokeStyle='#6384a2';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(0,priceBottom);ctx.lineTo(plotW,priceBottom);ctx.stroke();const x=Math.max(4,plotW/2-17);ctx.fillStyle='#213a51';ctx.fillRect(x,priceBottom-6,34,12);ctx.strokeStyle='#b7cfe2';for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(x+10+i*7,priceBottom-3);ctx.lineTo(x+10+i*7,priceBottom+3);ctx.stroke()}ctx.restore()}
 
 // Fixed time labels follow the visible candle window, panning, and zoom.
 // Exchange timestamps are UTC milliseconds; labels are shown in KST (UTC+9).
@@ -3043,7 +3068,7 @@ function initChartTimeJump(){
  settings.addEventListener('change',sync);sync();
 })();
 window.btcRedrawChart=()=>draw();
-function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-(document.body.classList.contains('chart-focus-mode')?Math.max(31,h*focusVolumeFraction):h*.24)),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
+function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
 if((chartJumpSegment||$('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
    Math.abs(verticalPan)<1e-9&&verticalZoom===1){
   // Past 1m prices may be far from today's fixed live-price scale.
@@ -3121,16 +3146,22 @@ let verticalPan=0,levelDragPreview=null;const chart=$('chart');let touchStart=nu
    still work elsewhere. */
 let focusVolumeDrag=null;
 function focusVolumeDividerHit(x,y){
-  if(!document.body.classList.contains('chart-focus-mode'))return false;
   const rect=chart.getBoundingClientRect(),h=rect.height;
-  const boundary=rect.top+Math.max(42,h-Math.max(31,h*focusVolumeFraction));
+  const fraction=document.body.classList.contains('chart-focus-mode')?
+    focusVolumeFraction:normalVolumeFraction;
+  const boundary=rect.top+Math.max(42,h-Math.max(31,h*fraction));
   return x>=rect.left&&x<=rect.right-76&&Math.abs(y-boundary)<=17;
+}
+function saveVolumeDivider(){
+ if(document.body.classList.contains('chart-focus-mode'))saveVolumeDivider();
+ else try{localStorage.setItem(normalVolumeStorageKey,String(normalVolumeFraction))}catch(_){}
 }
 function setFocusVolumeFromY(clientY){
   const rect=chart.getBoundingClientRect(),h=rect.height;
   if(!(h>100))return;
-  const next=Math.min(.35,Math.max(.07,(rect.bottom-clientY)/h));
-  focusVolumeFraction=next;
+  const next=Math.min(.40,Math.max(.07,(rect.bottom-clientY)/h));
+  if(document.body.classList.contains('chart-focus-mode'))focusVolumeFraction=Math.min(.35,next);
+  else normalVolumeFraction=next;
   draw();
 }
 chart.addEventListener('touchstart',e=>{
@@ -3143,21 +3174,21 @@ chart.addEventListener('touchmove',e=>{
   if(focusVolumeDrag?.type!=='touch')return;
   e.preventDefault();e.stopImmediatePropagation();
   if(e.touches.length===1)setFocusVolumeFromY(e.touches[0].clientY);
-  else{focusVolumeDrag=null;saveFocusHeights()}
+  else{focusVolumeDrag=null;saveVolumeDivider()}
 },{capture:true,passive:false});
 chart.addEventListener('touchend',e=>{
   if(focusVolumeDrag?.type!=='touch')return;
   e.preventDefault();e.stopImmediatePropagation();
-  if(e.touches.length===0){focusVolumeDrag=null;saveFocusHeights()}
+  if(e.touches.length===0){focusVolumeDrag=null;saveVolumeDivider()}
 },{capture:true,passive:false});
 chart.addEventListener('touchcancel',e=>{
-  if(focusVolumeDrag){e.stopImmediatePropagation();focusVolumeDrag=null;saveFocusHeights()}
+  if(focusVolumeDrag){e.stopImmediatePropagation();focusVolumeDrag=null;saveVolumeDivider()}
 },{capture:true});
 chart.addEventListener('mousedown',e=>{
   if(e.button!==0||!focusVolumeDividerHit(e.clientX,e.clientY))return;
   e.preventDefault();e.stopImmediatePropagation();
   const move=ev=>setFocusVolumeFromY(ev.clientY);
-  const up=()=>{window.removeEventListener('mousemove',move);window.removeEventListener('mouseup',up);saveFocusHeights()};
+  const up=()=>{window.removeEventListener('mousemove',move);window.removeEventListener('mouseup',up);saveVolumeDivider()};
   window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
 },true);
 
