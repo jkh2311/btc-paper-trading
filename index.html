@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-chart-footer-focus-fit-v147"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-phone-dense-chart-layout-v148"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -728,6 +728,136 @@ body.real-position-ready #page-position #paperPositionCard>.row{display:none!imp
   }
   body:not(.chart-focus-mode) #page-chart .candle-info{
     display:none!important;
+  }
+}
+
+/* v148: denser portrait-only CHART controls, so the actual candlestick panel
+   expands into saved vertical space. Keep all actions and labels accessible.
+   Does not affect expanded chart, landscape, or trading calculations. */
+@media (max-width:800px) and (orientation:portrait){
+  header.app-header{
+    height:40px!important;min-height:40px!important;
+    padding:2px 7px!important;
+  }
+  header.app-header .brand b{font-size:13px!important}
+  header.app-header .header-actions{gap:3px!important}
+  header.app-header .header-actions .pill{
+    font-size:9px!important;padding:3px 5px!important;
+    line-height:1.1!important;
+  }
+  header.app-header #autoPaperQuickToggle{
+    min-width:0!important;padding:4px 5px!important;
+    font-size:9px!important;line-height:1.1!important;
+    border-radius:8px!important;
+  }
+  header.app-header .header-actions .icon-btn{
+    width:27px!important;height:27px!important;
+    min-width:27px!important;min-height:27px!important;
+    padding:2px!important;font-size:17px!important;
+  }
+  main{height:calc(100dvh - 40px - 46px - 45px - env(safe-area-inset-bottom))!important}
+  body:not(.chart-focus-mode) #page-chart .price-panel{
+    min-height:37px!important;
+    padding:1px 2px!important;
+    gap:3px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .quote-wrap{gap:0!important}
+  body:not(.chart-focus-mode) #page-chart .quote-wrap .price{
+    font-size:clamp(16px,4.5vw,21px)!important;
+    line-height:1.05!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .funding{
+    font-size:9px!important;line-height:1!important;
+    margin:0!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .tf-tabs select{
+    width:71px!important;min-width:71px!important;max-width:71px!important;
+    height:28px!important;min-height:28px!important;
+    padding:2px 4px!important;font-size:11px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .convergence-banner:not([hidden]){
+    padding:1px 3px!important;margin:0!important;
+    font-size:9px!important;line-height:1.1!important;
+    min-height:0!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .daily-volume{
+    min-height:24px!important;padding:3px 7px!important;
+    margin:0 0 1px!important;
+    border-radius:8px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .oi-toolbar{
+    min-height:24px!important;margin:0!important;
+    padding:0!important;gap:4px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .oi-toolbar button{
+    padding:2px 5px!important;font-size:10px!important;
+    min-height:23px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .oi-toolbar span{
+    font-size:10px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .auto-panel{
+    flex:0 0 auto!important;
+    padding:3px 6px!important;margin:1px 0 2px!important;
+    border-radius:8px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .auto-panel-header{
+    min-height:23px!important;gap:3px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .auto-panel-header strong{
+    font-size:10px!important;line-height:1.1!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .market-regime-badge{
+    font-size:9px!important;padding:1px 3px!important;
+    line-height:1.05!important;border-radius:5px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart #autoPaperToggle{
+    min-height:23px!important;padding:2px 5px!important;
+    font-size:10px!important;line-height:1.1!important;
+    border-radius:7px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart #autoPaperSettings:not([open]){
+    margin:0!important;line-height:1!important;
+  }
+  body:not(.chart-focus-mode) #page-chart #autoPaperSettings:not([open]) summary{
+    font-size:9px!important;line-height:1.1!important;
+    padding:1px 0 0!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .chart-tools{
+    min-height:26px!important;margin:auto 0 2px!important;
+    gap:4px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .chart-tools button{
+    height:26px!important;min-height:26px!important;
+    padding:2px 3px!important;font-size:11px!important;
+    border-radius:7px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .account-strip{
+    min-height:41px!important;margin:0 0 2px!important;
+    padding:5px 8px!important;gap:4px!important;
+    border-radius:9px!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .account-strip > div{gap:2px!important}
+  body:not(.chart-focus-mode) #page-chart .account-strip small{
+    font-size:9px!important;line-height:1.1!important;
+  }
+  body:not(.chart-focus-mode) #page-chart .account-strip strong{
+    font-size:12px!important;line-height:1.1!important;
+  }
+  .bottom-nav{
+    height:calc(45px + env(safe-area-inset-bottom))!important;
+    padding:1px 2px calc(1px + env(safe-area-inset-bottom))!important;
+  }
+  .bottom-nav .nav-btn{font-size:9px!important;padding:1px 0!important;gap:0!important}
+  .bottom-nav .nav-btn span{font-size:16px!important;line-height:17px!important}
+  body:not(.chart-focus-mode) #tradeBar{
+    height:46px!important;bottom:calc(45px + env(safe-area-inset-bottom))!important;
+    padding:4px 8px!important;gap:7px!important;
+  }
+  body:not(.chart-focus-mode) #tradeBar button{
+    min-height:0!important;height:38px!important;
+    padding:3px 5px!important;font-size:13px!important;
+    border-radius:8px!important;
   }
 }
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
