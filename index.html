@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-focus-strategy-axis-dock-rmi-resize-v153"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-rmi-disparity-independent-value-axis-v154"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -1568,7 +1568,16 @@ function rmiSeries(a,length=14,momentum=5){
  for(let i=momentum+length;i<a.length;i++){let delta=Number(a[i].c)-Number(a[i-momentum].c);avgGain=(avgGain*(length-1)+Math.max(0,delta))/length;avgLoss=(avgLoss*(length-1)+Math.max(0,-delta))/length;out[i]=score()}
  return out
 }
-let rmiHeightPx=null,rmiAxisDrag=null,rmiSeparationDrag=null;
+let rmiHeightPx=null,rmiAxisDrag=null;
+const rmiValueZoomKey='btc-rmi-axis-value-zoom-v154';
+const disparityValueZoomKey='btc-disparity-axis-value-zoom-v154';
+let rmiValueZoom=1,disparityValueZoom=1;
+try{
+ const a=Number(localStorage.getItem(rmiValueZoomKey));
+ const b=Number(localStorage.getItem(disparityValueZoomKey));
+ if(Number.isFinite(a)&&a>=.35&&a<=8)rmiValueZoom=a;
+ if(Number.isFinite(b)&&b>=.35&&b<=8)disparityValueZoom=b;
+}catch(_){};
 const normalRmiHeightKey='btc-normal-rmi-height-v150';
 const rmiRatioKey='btc-rmi-disparity-ratio-v150';
 let rmiDisparityRatio=.55;
@@ -1585,10 +1594,42 @@ function resizeRmiPanel(height){const panel=$('combinedChart');const available=M
   try{localStorage.setItem(normalRmiHeightKey,String(rmiHeightPx))}catch(_){}
  }
  requestAnimationFrame(()=>{draw();drawRmi()})}
-function rmiAxisStart(e){const rect=rmiCanvas.getBoundingClientRect();const x=e.clientX-rect.left;if(x<rect.width-82)return false;rmiAxisDrag={id:e.pointerId,y:e.clientY,height:rect.height};rmiCanvas.setPointerCapture?.(e.pointerId);return true}
-rmiCanvas.addEventListener('pointerdown',e=>{if(rmiAxisStart(e)){e.preventDefault()} });
-rmiCanvas.addEventListener('pointermove',e=>{if(!rmiAxisDrag||e.pointerId!==rmiAxisDrag.id)return;e.preventDefault();resizeRmiPanel(rmiAxisDrag.height+(rmiAxisDrag.y-e.clientY))});
-for(const event of ['pointerup','pointercancel','lostpointercapture'])rmiCanvas.addEventListener(event,e=>{if(rmiAxisDrag&&e.pointerId===rmiAxisDrag.id)rmiAxisDrag=null});
+// Price-axis-style vertical zoom. The right-side numeric area is NOT a
+// resize handle: upward drag magnifies only that indicator's values.
+function rmiAxisStart(e){
+ if(e.pointerType==='mouse'&&e.button!==0)return false;
+ const rect=rmiCanvas.getBoundingClientRect(),x=e.clientX-rect.left;
+ if(x<rect.width-82)return false;
+ const split=Math.max(31,Math.min(rect.height-23,Math.round(rect.height*rmiDisparityRatio)));
+ const zone=e.clientY-rect.top<split?'rmi':'disparity';
+ rmiAxisDrag={id:e.pointerId,startY:e.clientY,zone,
+  base:zone==='rmi'?rmiValueZoom:disparityValueZoom};
+ try{rmiCanvas.setPointerCapture(e.pointerId)}catch(_){}
+ return true;
+}
+rmiCanvas.addEventListener('pointerdown',e=>{
+ if(!rmiAxisStart(e))return;
+ if(e.cancelable)e.preventDefault();
+ e.stopImmediatePropagation();
+});
+rmiCanvas.addEventListener('pointermove',e=>{
+ if(!rmiAxisDrag||e.pointerId!==rmiAxisDrag.id)return;
+ const factor=Math.exp((rmiAxisDrag.startY-e.clientY)/110);
+ const next=Math.max(.35,Math.min(8,rmiAxisDrag.base*factor));
+ if(rmiAxisDrag.zone==='rmi')rmiValueZoom=next;
+ else disparityValueZoom=next;
+ drawRmi();
+ if(e.cancelable)e.preventDefault();
+ e.stopImmediatePropagation();
+});
+for(const event of ['pointerup','pointercancel','lostpointercapture'])
+ rmiCanvas.addEventListener(event,e=>{
+  if(!rmiAxisDrag||e.pointerId!==rmiAxisDrag.id)return;
+  try{localStorage.setItem(rmiValueZoomKey,String(rmiValueZoom));
+   localStorage.setItem(disparityValueZoomKey,String(disparityValueZoom))}catch(_){}
+  rmiAxisDrag=null;
+  e.stopImmediatePropagation();
+ });
 // The normal chart's formerly hidden RMI divider adjusts total indicator
 // height. Expanded mode retains its existing independent height control.
 (function initNormalRmiDivider(){
@@ -1610,32 +1651,8 @@ for(const event of ['pointerup','pointercancel','lostpointercapture'])rmiCanvas.
   e.preventDefault();resizeRmiPanel(rmiCanvas.getBoundingClientRect().height+(e.key==='ArrowUp'?8:-8));
  });
 })();
-// Internal horizontal line between RMI and disparity: adjust their relative
-// allocation without changing RMI values or signal decisions.
-rmiCanvas.addEventListener('pointerdown',e=>{
- if(e.pointerType==='mouse'&&e.button!==0)return;
- const rect=rmiCanvas.getBoundingClientRect();
- const split=Math.max(31,Math.min(rect.height-23,Math.round(rect.height*rmiDisparityRatio)));
- if(e.clientX-rect.left>=rect.width-82||Math.abs(e.clientY-rect.top-split)>12)return;
- rmiSeparationDrag={id:e.pointerId,startY:e.clientY,split};
- rmiCanvas.setPointerCapture?.(e.pointerId);
- e.preventDefault();e.stopImmediatePropagation();
-});
-rmiCanvas.addEventListener('pointermove',e=>{
- if(!rmiSeparationDrag||e.pointerId!==rmiSeparationDrag.id)return;
- const height=rmiCanvas.getBoundingClientRect().height;
- const split=rmiSeparationDrag.split+(e.clientY-rmiSeparationDrag.startY);
- rmiDisparityRatio=Math.max(.35,Math.min(.74,split/Math.max(1,height)));
- drawRmi();e.preventDefault();e.stopImmediatePropagation();
-});
-for(const type of ['pointerup','pointercancel','lostpointercapture'])
- rmiCanvas.addEventListener(type,e=>{
-  if(rmiSeparationDrag&&e.pointerId===rmiSeparationDrag.id){
-   rmiSeparationDrag=null;
-   try{localStorage.setItem(rmiRatioKey,String(rmiDisparityRatio))}catch(_){}
-   e.stopImmediatePropagation();
-  }
- });
+// The RMI/disparity separator is a full-width, fixed boundary.
+// Individual right-hand numeric axes zoom their own series independently.
 function visibleFutureSlots(count){
  if(document.body.classList.contains('chart-focus-mode'))return Math.min(5,Math.max(2,Math.floor(count*.07)));
  return Math.min(futureSlots,Math.max(4,Math.floor(count*.32)));
@@ -1660,13 +1677,16 @@ function drawRmi(){
  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
  // Match the primary candle plot exactly: draw() uses w - 72 - 8.
  const pw=w-80,split=Math.max(31,Math.min(h-23,Math.round(h*rmiDisparityRatio))),rmiTop=14,rmiBottom=split-3;
- const yRmi=v=>rmiTop+(100-v)/100*Math.max(12,rmiBottom-rmiTop);
+ const rmiCenter=(rmiTop+rmiBottom)/2;
+ const rmiHalfSpan=Math.max(6,(rmiBottom-rmiTop)/2);
+ const yRmi=v=>rmiCenter+(50-v)/50*rmiHalfSpan*rmiValueZoom;
  ctx.font='9px sans-serif';
  // Restore the original one-minute RMI reference levels on every timeframe.
  // Space the closely paired labels apart while retaining their exact line prices.
  const axisLabels=[15,20,50,85,90];
  for(const v of axisLabels){
   const yy=yRmi(v);
+  if(yy<rmiTop||yy>rmiBottom)continue;
   ctx.strokeStyle=v>=85?'#e53935':v<=20?'#4855e5':'#586477';
   ctx.setLineDash([4,4]);
   ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(pw,yy);ctx.stroke();
@@ -1675,9 +1695,8 @@ function drawRmi(){
   ctx.fillText(String(v),pw+5,yy+3+labelShift);
  }
  ctx.setLineDash([]);ctx.strokeStyle='#718fa9';ctx.lineWidth=1.4;
- ctx.beginPath();ctx.moveTo(0,split);ctx.lineTo(pw,split);ctx.stroke();
- ctx.fillStyle='#28425c';ctx.fillRect(Math.max(0,pw/2-17),split-4,34,8);
- ctx.fillStyle='#bfd7ed';for(let n=0;n<3;n++)ctx.fillRect(pw/2-9+n*8,split-2,3,4);
+ // The fixed horizontal divider extends across plot AND the right axes.
+ ctx.beginPath();ctx.moveTo(0,split+.5);ctx.lineTo(w,split+.5);ctx.stroke();
  ctx.lineWidth=1;
  if(!a||a.length<19){ctx.fillStyle='#a4b4c8';ctx.fillText('RMI 데이터 대기',8,12);return}
  const {start,end,count,left}=visibleWindow(a),values=rmiSeries(a),bw=pw/count;
@@ -1697,15 +1716,23 @@ function drawRmi(){
   }
   ctx.stroke();
  }
- trace(values,yRmi,'#f04445',1.6);
+ ctx.save();ctx.beginPath();ctx.rect(0,rmiTop,pw,Math.max(1,rmiBottom-rmiTop));ctx.clip();
+ trace(values,yRmi,'#f04445',1.6);ctx.restore();
  const d200=disparitySeries(a,200),d50=disparitySeries(a,50),d20=disparitySeries(a,20);
  const displayed=[d200,d50,d20].flatMap(s=>s.slice(start,end)).filter(Number.isFinite);
  const amplitude=Math.max(.15,...displayed.map(v=>Math.abs(v)))*1.1;
  const dTop=split+6,dBottom=h-5,dMid=(dTop+dBottom)/2,dRange=Math.max(5,(dBottom-dTop)/2);
- const yD=v=>Math.max(dTop,Math.min(dBottom,dMid-v/amplitude*dRange));
+ const yD=v=>dMid-v/amplitude*dRange*disparityValueZoom;
  ctx.strokeStyle='#596170';ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(0,dMid);ctx.lineTo(pw,dMid);ctx.stroke();ctx.setLineDash([]);
- trace(d200,yD,'#ed303c');trace(d50,yD,'#2949ed');trace(d20,yD,'#15923b');
+ ctx.save();ctx.beginPath();ctx.rect(0,dTop,pw,Math.max(1,dBottom-dTop));ctx.clip();
+ trace(d200,yD,'#ed303c');trace(d50,yD,'#2949ed');trace(d20,yD,'#15923b');ctx.restore();
  ctx.fillStyle='#a4b4c8';ctx.fillText('0',pw+5,dMid+3);
+ // Show a positive/negative disparity scale on its own axis, just like RMI.
+ const disparityAxisValue=amplitude/disparityValueZoom;
+ if(dTop+10<dMid-5){
+  ctx.fillText('+'+disparityAxisValue.toFixed(1)+'%',pw+5,dTop+9);
+  ctx.fillText('-'+disparityAxisValue.toFixed(1)+'%',pw+5,dBottom-2);
+ }
  const selected=crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end?crosshairIndex:null;
  const futureSelected=futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count;
  if(selected!==null||futureSelected){
@@ -1717,12 +1744,17 @@ function drawRmi(){
   if(selected!==null){
    const rmi=values[selected];
    if(Number.isFinite(rmi)){
-    ctx.beginPath();ctx.arc(x,yRmi(rmi),3.8,0,Math.PI*2);
-    ctx.fillStyle='#f04445';ctx.fill();
+    const yy=yRmi(rmi);
+    if(yy>=rmiTop&&yy<=rmiBottom){
+     ctx.beginPath();ctx.arc(x,yy,3.8,0,Math.PI*2);
+     ctx.fillStyle='#f04445';ctx.fill();
+    }
    }
    for(const [series,color] of [[d200,'#ed303c'],[d50,'#2949ed'],[d20,'#15923b']]){
     const v=series[selected];if(!Number.isFinite(v))continue;
-    ctx.beginPath();ctx.arc(x,yD(v),3,0,Math.PI*2);
+    const yy=yD(v);
+    if(yy<dTop||yy>dBottom)continue;
+    ctx.beginPath();ctx.arc(x,yy,3,0,Math.PI*2);
     ctx.fillStyle=color;ctx.fill();
     ctx.lineWidth=1;ctx.strokeStyle='#dce4ef';ctx.stroke();
    }
@@ -1752,7 +1784,7 @@ function indicatorInspectAt(clientX){
 rmiCanvas.addEventListener('pointerdown',e=>{
  if(e.pointerType==='mouse'&&e.button!==0)return;
  const rect=rmiCanvas.getBoundingClientRect();
- // Retain the existing right-side RMI height adjustment gesture.
+ // Right numeric axes control value zoom; normal long-press remains on the plot.
  if(e.clientX-rect.left>=rect.width-82)return;
  clearTimeout(indicatorInspectTimer);
  indicatorInspect={pointerId:e.pointerId,x:e.clientX,y:e.clientY,active:false};
