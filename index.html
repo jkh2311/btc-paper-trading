@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-ai-entry-evaluator-v163"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-ai-entry-price-plan-v164"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -1094,6 +1094,20 @@ body:not(.chart-focus-mode) #page-chart #rmiChart{
 #aiEntryReasons div{margin:2px 0}
 #aiEntrySignal{color:#9bc3ee;margin:7px 0}
 #aiEntryDetails small{display:block;font-size:10px;color:#a6bed8;line-height:1.5}
+
+/* v164 — conditional price targets, kept in the existing expandable AI card. */
+#aiEntryPricePlan{display:grid;grid-template-columns:1fr;gap:7px;margin:9px 0}
+#aiEntryPricePlan .ai-entry-plan{
+ border:1px solid #47617f;border-radius:9px;background:#1b304a;
+ padding:8px 9px;min-width:0
+}
+#aiEntryPricePlan .ai-entry-plan[data-side="LONG"]{border-left:3px solid #36cb9b}
+#aiEntryPricePlan .ai-entry-plan[data-side="SHORT"]{border-left:3px solid #fa728c}
+#aiEntryPricePlan .ai-entry-plan strong{font-size:12px}
+#aiEntryPricePlan .ai-plan-status{font-size:11px;color:#ecca7d;margin:3px 0}
+#aiEntryPricePlan .ai-plan-price{font-size:12px;color:#eef5ff;font-weight:700;overflow-wrap:anywhere}
+#aiEntryPricePlan .ai-plan-row{font-size:11px;color:#c7d9ee;margin:3px 0;overflow-wrap:anywhere}
+#aiEntryPricePlan .ai-plan-trigger{font-size:11px;color:#a9c8ea;line-height:1.5;margin-top:5px}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -1111,9 +1125,13 @@ body:not(.chart-focus-mode) #page-chart #rmiChart{
  <section id="aiEntryDetails" hidden aria-label="AI 진입 타점 분석 상세">
   <div class="ai-entry-panel-title"><strong>AI 진입 타점 평가</strong><button id="aiEntryClose" type="button" aria-label="AI 평가 닫기">✕</button></div>
   <div id="aiEntryDetailScores">분석 대기 중…</div>
+  <div id="aiEntryPricePlan" class="ai-entry-price-plan">
+   <div class="ai-entry-plan" data-side="LONG"><strong>LONG 진입 후보</strong><div id="aiEntryLongPlan">계산 대기 중…</div></div>
+   <div class="ai-entry-plan" data-side="SHORT"><strong>SHORT 진입 후보</strong><div id="aiEntryShortPlan">계산 대기 중…</div></div>
+  </div>
   <div id="aiEntryReasons"></div>
   <div id="aiEntrySignal"></div>
-  <small>확정된 1분봉 기반 규칙형 평가점수(0~100)이며 실제 승률·미래 수익률이 아닙니다. 분석 전용 · 자동 주문 및 신호 기준 변경 없음.</small>
+  <small>최근 확정 1분봉의 지지·저항과 ATR 변동폭으로 산출한 참고용 가격입니다. 예상 체결 시간·수익 또는 승률을 보장하지 않습니다. 반드시 실시간 가격과 수수료·슬리피지를 확인하세요. 분석 전용이며 주문을 실행하지 않습니다.</small>
  </section>
 </div>
 
@@ -1409,6 +1427,80 @@ function evaluateAiEntryTiming(closed,activeStrategy='range'){
  const decision=best<59||Math.abs(long-short)<9?'관망':long>short?'LONG 우세':'SHORT 우세';
  return {long,short,decision,reasons,signal,at:b.t,minute:'1m'};
 }
+// v164 — price-level suggestions are deterministic technical candidates,
+// computed only from confirmed 1m bars; NEVER used in order or alert logic.
+// Entry is a *zone* that requires an additional closed candle confirmation.
+// No claim that the market will visit the levels or that TP will execute.
+function calculateAiPricePlans(bars,assessment){
+ if(!Array.isArray(bars)||bars.length<65||!assessment)return null;
+ const a=bars.slice(-90),last=a.at(-1),price=last.c;
+ const valid=a.every(b=>Number.isFinite(b.t)&&b.o>0&&b.c>0&&b.h>=Math.max(b.o,b.c)&&b.l<=Math.min(b.o,b.c));
+ if(!valid)return null;
+ const previous=a.slice(-25,-1),near=a.slice(-12,-1);
+ const tr=[];
+ for(let i=1;i<a.length;i++){
+  const b=a[i],prev=a[i-1];
+  tr.push(Math.max(b.h-b.l,Math.abs(b.h-prev.c),Math.abs(b.l-prev.c)));
+ }
+ const recentTr=tr.slice(-20),atr=recentTr.reduce((sum,x)=>sum+x,0)/recentTr.length;
+ if(!(atr>0&&Number.isFinite(atr)))return null;
+ const closes=a.slice(-20).map(b=>b.c);
+ const ma20=closes.reduce((sum,x)=>sum+x,0)/closes.length;
+ const low20=Math.min(...previous.map(b=>b.l)),high20=Math.max(...previous.map(b=>b.h));
+ const lowNear=Math.min(...near.map(b=>b.l)),highNear=Math.max(...near.map(b=>b.h));
+ const precision=value=>Math.round(value*10)/10; // BTCUSDT 0.1 display only
+ const safeAtr=Math.max(atr,price*.00008);
+ const support=Math.max(low20,Math.min(lowNear,ma20-safeAtr*.20));
+ const resistance=Math.min(high20,Math.max(highNear,ma20+safeAtr*.20));
+ // Do not move target prices outward solely to fabricate a favorable R:R.
+ // Use prior support/resistance as first targets, mark weak setup as "대기".
+ function sidePlan(side){
+  const isLong=side==='LONG';
+  const reference=isLong?support:resistance;
+  // Candidate on the pullback side of the last close; skip a missing setup.
+  const entry=precision(reference);
+  const zoneWidth=precision(Math.max(.1,safeAtr*.22));
+  const zoneLow=precision(entry-zoneWidth),zoneHigh=precision(entry+zoneWidth);
+  const stop=precision(entry+(isLong?-1:1)*Math.max(safeAtr*.95,price*.00035));
+  const risk=Math.abs(entry-stop);
+  const firstObjective=isLong?Math.max(ma20,resistance):Math.min(ma20,support);
+  const tp1=precision(isLong?Math.min(firstObjective,entry+risk*1.8):
+    Math.max(firstObjective,entry-risk*1.8));
+  const tp2=precision(isLong?Math.min(high20+safeAtr*.45,entry+risk*2.8):
+    Math.max(low20-safeAtr*.45,entry-risk*2.8));
+  const reward=isLong?tp1-entry:entry-tp1,rr=reward/Math.max(.1,risk);
+  const quality=isLong?assessment.long:assessment.short;
+  const trendAgree=assessment.decision===(isLong?'LONG 우세':'SHORT 우세');
+  const tooFar=Math.abs(price-entry)>safeAtr*3.2;
+  const invalidated=isLong?price<stop:price>stop;
+  const validTargets=reward>0&&tp2>0&&(isLong?tp2>tp1:tp2<tp1);
+  let status='관찰';
+  if(invalidated)status='무효 · 손절 가격 이탈';
+  else if(!validTargets||rr<1.15||tooFar||quality<56||!trendAgree)status='대기 · 진입 근거 부족';
+  else status='조건부 후보';
+  const trigger=isLong?'가격이 후보 구간에 접근한 뒤 1분 양봉 확정 및 저점 지지 확인':
+    '가격이 후보 구간에 접근한 뒤 1분 음봉 확정 및 고점 저항 확인';
+  return {side,status,entry,zoneLow,zoneHigh,stop,tp1,tp2,
+   rr:Number.isFinite(rr)?Math.round(rr*100)/100:null,trigger,
+   quality,nearPrice:price,atr:precision(safeAtr)};
+ }
+ return {long:sidePlan('LONG'),short:sidePlan('SHORT'),asOf:last.t};
+}
+function paintAiPricePlan(id,plan){
+ const el=$(id);if(!el)return;
+ if(!plan){el.textContent='확정봉 데이터 대기';return;}
+ const format=x=>Number.isFinite(x)?x.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1}):'—';
+ el.replaceChildren();
+ const make=(cls,value)=>{
+  const div=document.createElement('div');div.className=cls;div.textContent=value;el.appendChild(div);
+ };
+ make('ai-plan-status',plan.status);
+ make('ai-plan-price','진입 후보 '+format(plan.zoneLow)+' ~ '+format(plan.zoneHigh)+' USDT');
+ make('ai-plan-row','중심 '+format(plan.entry)+' · 손절 '+format(plan.stop));
+ make('ai-plan-row','익절 1차 '+format(plan.tp1)+' / 2차 '+format(plan.tp2));
+ make('ai-plan-row','1차 예상 손익비 '+(plan.rr===null?'—':plan.rr.toFixed(2)+':1')+' · 거래비용 제외');
+ make('ai-plan-trigger','조건: '+plan.trigger);
+}
 function paintAiEntryTiming(result){
  const verdict=$('aiEntryVerdict'),scores=$('aiEntryScores'),asOf=$('aiEntryAsOf');
  const details=$('aiEntryDetailScores'),reasons=$('aiEntryReasons'),signal=$('aiEntrySignal');
@@ -1417,6 +1509,7 @@ function paintAiEntryTiming(result){
   verdict.textContent='대기';verdict.dataset.kind='wait';
   scores.textContent='LONG -- · SHORT --';asOf.textContent='확정봉 수집 중 · 상세 ›';
   if(details)details.textContent='거래소 확정봉 데이터를 기다리고 있어요.';
+  paintAiPricePlan('aiEntryLongPlan',null);paintAiPricePlan('aiEntryShortPlan',null);
   if(reasons)reasons.textContent='';if(signal)signal.textContent='';return;
  }
  verdict.textContent=result.decision;
@@ -1427,6 +1520,8 @@ function paintAiEntryTiming(result){
   hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(result.at+60000));
  asOf.textContent=time+' 확정 · 상세 ›';
  if(details)details.textContent='LONG '+result.long+'/100 · SHORT '+result.short+'/100 · '+result.decision;
+ paintAiPricePlan('aiEntryLongPlan',result.pricePlans?.long||null);
+ paintAiPricePlan('aiEntryShortPlan',result.pricePlans?.short||null);
  if(reasons)reasons.replaceChildren(...result.reasons.map(reason=>{
   const div=document.createElement('div');div.textContent='• '+reason;return div;
  }));
@@ -1446,6 +1541,7 @@ async function refreshAiEntryTiming(){
    .filter(b=>Number.isFinite(b.t)&&b.t+60000<=now-1000&&b.c>0&&b.v>=0);
   const selected=$('rmiSignalStrategy')?.value||'range';
   const result=evaluateAiEntryTiming(closed,selected);
+  if(result)result.pricePlans=calculateAiPricePlans(closed,result);
   if(result&&(!aiEntryLast||result.at>=aiEntryLast.at)){
    aiEntryLast=result;paintAiEntryTiming(result);
   }
