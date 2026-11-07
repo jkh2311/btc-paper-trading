@@ -145,21 +145,26 @@ function analyzeLevels(bars,p){
   cl.weight+=w;cl.count++;cl.latest=Math.max(cl.latest,item.at);
  }
  const minPrice=goalPrice(p,5);
- const valid=clusters.filter(x=>sideIsLong?x.price>=minPrice:x.price<=minPrice)
-  .sort((a,b)=>sideIsLong?a.price-b.price:b.price-a.price);
+ const valid=clusters.filter(x=>sideIsLong?
+   x.price>=minPrice&&x.price>last.c:x.price<=minPrice&&x.price<last.c)
+  // Prefer levels touched at least twice, then nearer attainable targets.
+  .sort((a,b)=>((b.count>=2?1:0)-(a.count>=2?1:0))||
+   (sideIsLong?a.price-b.price:b.price-a.price));
  const chosen=[];
  // Prefer price levels with repeated touches; retain nearest distinct candidate levels.
  for(const level of valid){
   const price=snap(level.price),gain=roi(price,p);
   if(gain<4.999||price<=0||chosen.some(c=>Math.abs(c.price-price)<Math.max(tol,atr*.45)))continue;
-  chosen.push({price,roi:gain,source:'저항',hits:level.count,strength:level.weight,kind:'level'});
+  if(!(sideIsLong?price>last.c:price<last.c))continue; // Already passed: cannot offer as a future TP.
+  chosen.push({price,roi:gain,source:sideIsLong?'저항':'지지',hits:level.count,strength:level.weight,kind:'level'});
   if(chosen.length===3)break;
  }
- const goalLevels=[5,8,12,16,20,30];
+ const goalLevels=[5,8,12,16,20,30,40,60,80,100];
  for(const pct of goalLevels){
   if(chosen.length>=3)break;
   const price=goalPrice(p,pct);
-  if(price<=0||roi(price,pct? p:p)<4.999)continue;
+  if(price<=0||roi(price,p)<4.999||
+    !(sideIsLong?price>last.c:price<last.c))continue;
   if(chosen.some(c=>Math.abs(c.price-price)<Math.max(tol,atr*.4)))continue;
   chosen.push({price,roi:roi(price,p),kind:'goal',hits:0,strength:0});
  }
@@ -188,7 +193,8 @@ function paintChoices(p){
   roiValue.textContent='추정 순수익률 +'+item.roi.toFixed(1)+'%';
   const note=document.createElement('span');note.className='ai-tp-origin';
   note.textContent=item.kind==='level'?
-   (p.side==='LONG'?'과거 저항':'과거 지지')+' 부근 · 피벗 '+item.hits+'회 (강도 참고)':
+   (p.side==='LONG'?'과거 저항':'과거 지지')+' 부근 · 피벗 '+item.hits+
+    '회'+(item.hits>=2?' (반복 확인)':' (단일 확인)'):
    '목표 수익률 기준 · 뚜렷한 지지/저항 근거 없음';
   b.append(title,price,roiValue,note);
   b.addEventListener('click',()=>{
