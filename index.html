@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-ai-entry-price-plan-v164"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-ai-entry-annotated-modal-v165"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -1108,6 +1108,47 @@ body:not(.chart-focus-mode) #page-chart #rmiChart{
 #aiEntryPricePlan .ai-plan-price{font-size:12px;color:#eef5ff;font-weight:700;overflow-wrap:anywhere}
 #aiEntryPricePlan .ai-plan-row{font-size:11px;color:#c7d9ee;margin:3px 0;overflow-wrap:anywhere}
 #aiEntryPricePlan .ai-plan-trigger{font-size:11px;color:#a9c8ea;line-height:1.5;margin-top:5px}
+
+/* v165: large annotated fixed modal; only explicit Close button dismisses. */
+body.ai-entry-modal-open{overflow:hidden!important}
+#aiEntryDetails{
+ position:fixed!important;inset:0!important;top:0!important;left:0!important;right:0!important;
+ bottom:0!important;width:100vw!important;height:100dvh!important;max-width:none!important;
+ z-index:100800!important;margin:0!important;border:0!important;border-radius:0!important;
+ background:#0d1b30!important;overflow-y:auto!important;overscroll-behavior:contain!important;
+ padding:calc(14px + env(safe-area-inset-top)) max(13px,env(safe-area-inset-right))
+ calc(18px + env(safe-area-inset-bottom)) max(13px,env(safe-area-inset-left))!important;
+ box-shadow:none!important;
+}
+#aiEntryDetails[hidden]{display:none!important}
+#aiEntryDetails .ai-entry-panel-title{
+ position:sticky;top:calc(-14px - env(safe-area-inset-top));z-index:6;
+ padding:9px 0;background:#0d1b30;border-bottom:1px solid #3b536e;
+ align-items:center!important;
+}
+#aiEntryDetails .ai-entry-panel-title strong{font-size:16px}
+#aiEntryDetails .ai-modal-subtitle{font-size:10px;color:#91abc6}
+#aiEntryClose{min-height:37px!important;padding:7px 11px!important;font-size:13px!important;flex-shrink:0}
+#aiEntryDetails .ai-modal-chart-head{
+ display:flex;align-items:center;justify-content:space-between;gap:8px;margin:11px 0 7px;
+}
+#aiEntryDetails .ai-modal-chart-head strong{font-size:12px}
+#aiEntryDetails .ai-modal-side-tabs{display:flex;gap:5px}
+#aiEntryDetails .ai-modal-side-tabs button{padding:6px 10px;font-size:11px;min-height:31px}
+#aiModalLong[aria-pressed="true"]{background:#13685b;border-color:#45d5b1}
+#aiModalShort[aria-pressed="true"]{background:#823e55;border-color:#ff879e}
+#aiEntryChartCanvas{
+ display:block!important;width:100%!important;height:clamp(270px,40dvh,410px)!important;
+ border:1px solid #304865;border-radius:10px!important;background:#0b1728;
+ touch-action:pan-y!important;min-width:0;
+}
+#aiEntryChartLegend{font-size:10px;color:#a8bfd8;margin-top:5px;line-height:1.5}
+#aiEntryDetails #aiEntryPricePlan{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#aiEntryDetails #aiEntryPricePlan .ai-entry-plan{padding:8px 7px}
+@media(max-width:430px){
+ #aiEntryDetails #aiEntryPricePlan{grid-template-columns:1fr}
+ #aiEntryChartCanvas{height:300px!important}
+}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -1123,8 +1164,11 @@ body:not(.chart-focus-mode) #page-chart #rmiChart{
   <div class="candle-pattern-asof" id="aiEntryAsOf">1분 확정봉 기준 · 눌러서 상세 ›</div>
  </button>
  <section id="aiEntryDetails" hidden aria-label="AI 진입 타점 분석 상세">
-  <div class="ai-entry-panel-title"><strong>AI 진입 타점 평가</strong><button id="aiEntryClose" type="button" aria-label="AI 평가 닫기">✕</button></div>
+  <div class="ai-entry-panel-title"><div><strong>AI 진입 타점 분석</strong><div class="ai-modal-subtitle">최근 확정 1분봉 · 참고용 시나리오</div></div><button id="aiEntryClose" type="button" aria-label="AI 평가 닫기">✕ 닫기</button></div>
   <div id="aiEntryDetailScores">분석 대기 중…</div>
+  <div class="ai-modal-chart-head"><strong>최근 1분봉 차트</strong><div class="ai-modal-side-tabs" role="group" aria-label="표시할 진입 방향"><button type="button" id="aiModalLong" aria-pressed="true">LONG</button><button type="button" id="aiModalShort" aria-pressed="false">SHORT</button></div></div>
+  <canvas id="aiEntryChartCanvas" role="img" aria-label="최근 확정 1분봉 50개와 진입 후보 구간, 손절, 익절 가격 및 설명 화살표"></canvas>
+  <div id="aiEntryChartLegend">캔들 50개 · 진입 후보 구간 / 손절 / 익절 가격 표시</div>
   <div id="aiEntryPricePlan" class="ai-entry-price-plan">
    <div class="ai-entry-plan" data-side="LONG"><strong>LONG 진입 후보</strong><div id="aiEntryLongPlan">계산 대기 중…</div></div>
    <div class="ai-entry-plan" data-side="SHORT"><strong>SHORT 진입 후보</strong><div id="aiEntryShortPlan">계산 대기 중…</div></div>
@@ -1526,6 +1570,7 @@ function paintAiEntryTiming(result){
   const div=document.createElement('div');div.textContent='• '+reason;return div;
  }));
  if(signal)signal.textContent=result.signal;
+ if(!$('aiEntryDetails')?.hidden)requestAnimationFrame(drawAiEntryChart);
 }
 async function refreshAiEntryTiming(){
  if(document.visibilityState==='hidden'||demo||aiEntryBusy)return;
@@ -1541,7 +1586,11 @@ async function refreshAiEntryTiming(){
    .filter(b=>Number.isFinite(b.t)&&b.t+60000<=now-1000&&b.c>0&&b.v>=0);
   const selected=$('rmiSignalStrategy')?.value||'range';
   const result=evaluateAiEntryTiming(closed,selected);
-  if(result)result.pricePlans=calculateAiPricePlans(closed,result);
+  if(result){
+   result.pricePlans=calculateAiPricePlans(closed,result);
+   // Exchange-confirmed bars only. Never mutate the 1m live signal series.
+   aiEntryChartBars=closed.slice(-50).map(bar=>({...bar}));
+  }
   if(result&&(!aiEntryLast||result.at>=aiEntryLast.at)){
    aiEntryLast=result;paintAiEntryTiming(result);
   }
@@ -1550,18 +1599,130 @@ async function refreshAiEntryTiming(){
   if(status)status.textContent=aiEntryLast?'이전 분석 · 갱신 대기':'데이터 조회 대기';
  }finally{aiEntryBusy=false;}
 }
+// v165: visual-only annotated 1m candlestick chart. No order API calls.
+let aiEntryChartBars=[],aiEntryModalSide='LONG';
+function updateAiEntryModalSideButtons(){
+ for(const side of ['LONG','SHORT']){
+  const button=$(side==='LONG'?'aiModalLong':'aiModalShort');
+  if(button)button.setAttribute('aria-pressed',String(side===aiEntryModalSide));
+ }
+}
+function drawAiEntryChart(){
+ const canvas=$('aiEntryChartCanvas');
+ if(!canvas||$('aiEntryDetails')?.hidden)return;
+ const rect=canvas.getBoundingClientRect(),width=Math.floor(rect.width);
+ const height=Math.floor(rect.height);
+ if(width<120||height<140)return;
+ const ratio=Math.min(window.devicePixelRatio||1,2);
+ canvas.width=Math.round(width*ratio);
+ canvas.height=Math.round(height*ratio);
+ const ctx=canvas.getContext('2d');if(!ctx)return;
+ ctx.setTransform(ratio,0,0,ratio,0,0);
+ ctx.clearRect(0,0,width,height);
+ ctx.fillStyle='#0b1728';ctx.fillRect(0,0,width,height);
+ const bars=aiEntryChartBars.slice(-50),plan=aiEntryLast?.pricePlans?.[aiEntryModalSide.toLowerCase()];
+ const plotLeft=9,plotRight=Math.max(100,width-104),plotTop=14,plotBottom=height-35;
+ const plotHeight=plotBottom-plotTop;
+ if(bars.length<10){ctx.fillStyle='#aebdd2';ctx.font='12px sans-serif';ctx.fillText('확정된 1분봉 수집 중…',17,30);return;}
+ const levels=plan?[plan.zoneLow,plan.zoneHigh,plan.stop,plan.tp1,plan.tp2]:[];
+ const low=Math.min(...bars.map(b=>b.l),...levels.filter(Number.isFinite));
+ const high=Math.max(...bars.map(b=>b.h),...levels.filter(Number.isFinite));
+ const pad=Math.max(.1,(high-low)*.10);
+ const min=low-pad,max=high+pad,span=max-min;
+ const py=price=>plotTop+(max-price)/span*plotHeight;
+ const fmt=price=>price.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+ ctx.lineWidth=.8;ctx.strokeStyle='#24354c';ctx.font='10px sans-serif';ctx.textAlign='left';
+ for(let i=0;i<=4;i++){
+  const value=max-i*span/4,y=py(value);
+  ctx.beginPath();ctx.moveTo(plotLeft,y);ctx.lineTo(plotRight,y);ctx.stroke();
+  ctx.fillStyle='#8fa7c1';ctx.fillText(fmt(value),plotRight+4,y+3);
+ }
+ const dx=(plotRight-plotLeft)/bars.length;
+ bars.forEach((b,i)=>{
+  const x=plotLeft+dx*(i+.5),up=b.c>=b.o;
+  ctx.strokeStyle=up?'#28b99a':'#e46379';
+  ctx.fillStyle=up?'#25a98f':'#d95b70';
+  ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x,py(b.h));ctx.lineTo(x,py(b.l));ctx.stroke();
+  const bodyTop=py(Math.max(b.o,b.c)),bodyBottom=py(Math.min(b.o,b.c));
+  ctx.fillRect(x-Math.max(1,dx*.31),bodyTop,Math.max(2,dx*.62),Math.max(1,bodyBottom-bodyTop));
+ });
+ // Semi-transparent candidate zone and annotated horizontal levels.
+ if(plan){
+  const upper=py(plan.zoneHigh),lower=py(plan.zoneLow);
+  ctx.fillStyle=aiEntryModalSide==='LONG'?'rgba(54,206,155,.18)':'rgba(248,112,140,.18)';
+  ctx.fillRect(plotLeft,upper,plotRight-plotLeft,Math.max(2,lower-upper));
+  const lines=[
+   {val:plan.entry,label:'진입',color:'#f1d37b',dash:[5,3]},
+   {val:plan.stop,label:'손절',color:'#ff6378',dash:[]},
+   {val:plan.tp1,label:'익절1',color:'#46d6aa',dash:[]},
+   {val:plan.tp2,label:'익절2',color:'#82c9f4',dash:[3,3]}
+  ];
+  for(const line of lines){
+   if(!Number.isFinite(line.val))continue;
+   const y=py(line.val);
+   ctx.strokeStyle=line.color;ctx.lineWidth=1.2;ctx.setLineDash(line.dash);
+   ctx.beginPath();ctx.moveTo(plotLeft,y);ctx.lineTo(plotRight,y);ctx.stroke();
+   ctx.setLineDash([]);
+   ctx.fillStyle=line.color;ctx.font='bold 10px sans-serif';
+   ctx.fillText(line.label+' '+fmt(line.val),plotRight+4,Math.max(11,Math.min(height-12,y-4)));
+  }
+  // Explanation arrow: reference the actual candidate zone in the plot.
+  const anchorY=py(plan.entry),fromX=plotLeft+dx*(bars.length-7),toX=plotRight-7;
+  ctx.strokeStyle='#f1d37b';ctx.lineWidth=1.5;ctx.setLineDash([2,3]);
+  ctx.beginPath();ctx.moveTo(fromX,Math.max(plotTop+16,anchorY-25));
+  ctx.lineTo(toX,anchorY);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#f1d37b';ctx.beginPath();ctx.moveTo(toX,anchorY);
+  ctx.lineTo(toX-7,anchorY-5);ctx.lineTo(toX-7,anchorY+5);ctx.closePath();ctx.fill();
+  const boxLabel=plan.status.startsWith('조건부')?'진입 확인 대기':'현재 진입 대기';
+  ctx.font='bold 10px sans-serif';ctx.fillStyle='#f1d37b';
+  ctx.fillText(boxLabel,Math.max(12,fromX-62),Math.max(plotTop+12,anchorY-30));
+ }
+ const last=bars.at(-1);
+ const lastY=py(last.c);
+ ctx.strokeStyle='#e7edf7';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+ ctx.beginPath();ctx.moveTo(plotLeft,lastY);ctx.lineTo(plotRight,lastY);ctx.stroke();ctx.setLineDash([]);
+ ctx.fillStyle='#ffffff';ctx.font='bold 10px sans-serif';
+ ctx.fillText('현재 '+fmt(last.c),plotRight+4,Math.max(10,Math.min(height-9,lastY+13)));
+ // Timestamp labels are formatted in KST, matching the app chart.
+ const time=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false});
+ ctx.font='10px sans-serif';ctx.fillStyle='#9db2ca';ctx.textAlign='center';
+ for(const i of [0,Math.floor((bars.length-1)/2),bars.length-1]){
+  ctx.fillText(time.format(new Date(bars[i].t)),plotLeft+dx*(i+.5),height-12);
+ }
+ ctx.textAlign='left';
+}
 function initAiEntryTiming(){
  paintAiEntryTiming(null);
  const toggle=$('aiEntryToggle'),panel=$('aiEntryDetails'),close=$('aiEntryClose');
  if(toggle&&panel){
-  const setOpen=open=>{panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));};
-  toggle.addEventListener('click',e=>{e.stopPropagation();setOpen(panel.hidden);});
-  close?.addEventListener('click',e=>{e.stopPropagation();setOpen(false);});
-  panel.addEventListener('click',e=>e.stopPropagation());
-  document.addEventListener('click',e=>{
-   if(!panel.hidden&&!panel.contains(e.target)&&!toggle.contains(e.target))setOpen(false);
-  });
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)});
+  // Mount outside chart/volume, so no tab overflow or landscape clipping.
+  // Only the explicit Close button can dismiss this modal.
+  document.body.appendChild(panel);
+  panel.setAttribute('role','dialog');
+  panel.setAttribute('aria-modal','true');
+  panel.setAttribute('aria-labelledby','aiEntryModalTitle');
+  const title=panel.querySelector('.ai-entry-panel-title strong');
+  if(title)title.id='aiEntryModalTitle';
+  const setOpen=open=>{
+   panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
+   document.body.classList.toggle('ai-entry-modal-open',open);
+   if(open){
+    if(aiEntryLast)aiEntryModalSide=aiEntryLast.decision==='SHORT 우세'?'SHORT':'LONG';
+    updateAiEntryModalSideButtons();
+    requestAnimationFrame(drawAiEntryChart);
+   }
+  };
+  toggle.addEventListener('click',e=>{e.stopPropagation();setOpen(true);});
+  close?.addEventListener('click',e=>{e.stopPropagation();setOpen(false);toggle.focus();});
+  for(const side of ['LONG','SHORT']){
+   const button=$(side==='LONG'?'aiModalLong':'aiModalShort');
+   button?.addEventListener('click',()=>{
+    aiEntryModalSide=side;updateAiEntryModalSideButtons();drawAiEntryChart();
+   });
+  }
+  // Deliberately no backdrop click or ESC close.
+  window.addEventListener('resize',()=>{if(!panel.hidden)requestAnimationFrame(drawAiEntryChart)});
  }
  const poll=()=>{
   if(demo||document.visibilityState==='hidden')return;
