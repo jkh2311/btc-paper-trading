@@ -308,6 +308,8 @@ function showRows(rows){
   node.dataset.realCloseKey=detailKey;
   node.open=openRealCloseDetails.has(detailKey);
   node.addEventListener('toggle',()=>{
+   // A queued toggle from an old refreshed node must not override new state.
+   if(!node.isConnected)return;
    if(node.open)openRealCloseDetails.add(detailKey);
    else openRealCloseDetails.delete(detailKey);
   });
