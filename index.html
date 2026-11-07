@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-tab-navigation-fix-v149"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261107-focus-strategy-axis-dock-rmi-resize-v150"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -871,6 +871,79 @@ body:not(.chart-focus-mode) #page-chart:not(.active){
     display:flex!important;
   }
 }
+
+/* v150: show the past-history button inside the expanded chart's own corner. */
+#expandedChartOverlay .chart-panel{position:relative!important}
+#expandedChartOverlay #intradayHistoryJump{
+ position:absolute!important;left:8px!important;top:7px!important;
+ z-index:36!important;font-size:11px!important;min-height:27px!important;
+ padding:3px 7px!important;
+}
+#expandedChartOverlay #dailyHistoryJump{display:none!important}
+/* Chart time-axis houses indicator settings on BOTH normal/focus views. */
+#chartTimeAxisRow{
+ position:relative!important;height:24px!important;min-height:24px!important;
+ flex:0 0 24px!important;width:100%!important;
+}
+#chartTimeAxisRow #chartTimeAxis{height:24px!important;min-height:24px!important;width:100%!important;flex:1 1 auto!important}
+#chartTimeAxisRow #chartIndicatorsDock{
+ position:absolute!important;right:4px!important;top:0!important;bottom:auto!important;
+ z-index:48!important;pointer-events:none!important
+}
+#chartTimeAxisRow #chartIndicatorsDock>*{pointer-events:auto!important}
+#chartTimeAxisRow #chartIndicatorToggle{
+ height:23px!important;min-height:23px!important;
+ padding:2px 6px!important;font-size:11px!important;border-radius:6px!important
+}
+#chartTimeAxisRow #chartIndicatorMenu{
+ top:auto!important;bottom:28px!important;right:0!important
+}
+/* Enable the existing main/RMI divider on the normal chart too. */
+body:not(.chart-focus-mode) #page-chart #focusRmiDivider{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ flex:0 0 10px!important;height:10px!important;min-height:10px!important;
+ touch-action:none!important;cursor:ns-resize!important;user-select:none!important;
+ border-top:1px solid #486681!important;border-bottom:1px solid #324b64!important;
+ background:#172a40!important
+}
+body:not(.chart-focus-mode) #page-chart #focusRmiDivider:after{
+ content:'⋯'!important;font-size:14px!important;letter-spacing:3px!important;
+ color:#bdd1e5!important;line-height:7px!important
+}
+body:not(.chart-focus-mode) #page-chart #rmiChart{
+ height:var(--rmi-height,75px)!important;
+ min-height:var(--rmi-height,75px)!important;
+ max-height:var(--rmi-height,75px)!important;
+ flex:0 0 var(--rmi-height,75px)!important;
+}
+/* Focus chart strategy selector replaces the old BTCUSDT/expanded title. */
+#expandedChartHeader .focus-strategy-control{display:block;flex:0 1 153px;min-width:112px;max-width:153px}
+#expandedChartHeader #expandedRmiStrategy{
+ width:100%;height:32px;min-height:32px;
+ background:#1f334d;color:#eff6ff;border:1px solid #637e9c;
+ border-radius:8px;font-size:12px;padding:3px 5px;
+}
+@media (orientation:landscape) and (max-height:700px) and (max-width:1400px){
+ #expandedChartOverlay #expandedChartHeader .focus-strategy-control{
+  display:block!important;position:absolute!important;z-index:50!important;
+  top:3px!important;left:92px!important;max-width:145px!important;width:145px!important
+ }
+ #expandedChartOverlay #expandedRmiStrategy{height:29px!important;min-height:29px!important}
+ #expandedChartOverlay #intradayHistoryJump{top:37px!important;left:5px!important}
+ #expandedChartOverlay #rmiChart{
+  height:var(--focus-rmi-height,56px)!important;
+  min-height:var(--focus-rmi-height,56px)!important;
+  max-height:var(--focus-rmi-height,56px)!important;
+  flex:0 0 var(--focus-rmi-height,56px)!important
+ }
+}
+/* Keep focus chart close and strategy accessible on narrow portrait phones. */
+@media (orientation:portrait) and (max-width:800px){
+ #expandedChartHeader{gap:5px!important;padding:4px 6px!important}
+ #expandedChartHeader .focus-strategy-control{max-width:125px!important;min-width:110px!important}
+ #expandedChartHeader #expandedRmiStrategy{font-size:11px!important}
+ #expandedChartOverlay #intradayHistoryJump{top:6px!important;left:7px!important}
+}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -891,11 +964,11 @@ body:not(.chart-focus-mode) #page-chart:not(.active){
    </div>
   </details>
  </section>
-<div class="chart-panel"><button id="dailyHistoryJump" type="button" title="일봉 2017년 과거 기록 / 최신으로 이동">⟵ 2017</button><button id="intradayHistoryJump" type="button" title="선택한 시간봉의 과거 기록 / 최신으로 이동">⟵ 과거</button><div id="chartIndicatorsDock"><button id="chartIndicatorToggle" type="button" aria-expanded="false" aria-controls="chartIndicatorMenu" aria-label="차트 지표 표시 설정">⚙ 지표</button><div id="chartIndicatorMenu" hidden role="group" aria-label="차트 지표 표시 선택"><strong>차트 지표 표시</strong><label><input type="checkbox" data-chart-indicator="ma5" checked>5 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma10" checked>10 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma40" checked>40 이동평균선 · 흰색</label><label><input type="checkbox" data-chart-indicator="ma60" checked>60 이동평균선 · 파랑</label><label><input type="checkbox" data-chart-indicator="ma90" checked>90 이동평균선 · 하늘색</label><label><input type="checkbox" data-chart-indicator="ma120" checked>120 이동평균선 · 빨강</label><label><input type="checkbox" data-chart-indicator="ma160" checked>160 이동평균선 · 보라</label><label><input type="checkbox" data-chart-indicator="ma200" checked>200 이동평균선 · 주황</label><label><input type="checkbox" data-chart-indicator="bb" checked>볼린저밴드</label><label><input type="checkbox" data-chart-indicator="fib" checked>오토 피보나치</label><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label>
+<div class="chart-panel"><button id="dailyHistoryJump" type="button" title="일봉 2017년 과거 기록 / 최신으로 이동">⟵ 2017</button><button id="intradayHistoryJump" type="button" title="선택한 시간봉의 과거 기록 / 최신으로 이동">⟵ 과거</button></div><div id="combinedChart"><canvas id="chart"></canvas><div id="chartTimeAxisRow"><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="chartIndicatorsDock"><button id="chartIndicatorToggle" type="button" aria-expanded="false" aria-controls="chartIndicatorMenu" aria-label="차트 지표 표시 설정">⚙ 지표</button><div id="chartIndicatorMenu" hidden role="group" aria-label="차트 지표 표시 선택"><strong>차트 지표 표시</strong><label><input type="checkbox" data-chart-indicator="ma5" checked>5 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma10" checked>10 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma40" checked>40 이동평균선 · 흰색</label><label><input type="checkbox" data-chart-indicator="ma60" checked>60 이동평균선 · 파랑</label><label><input type="checkbox" data-chart-indicator="ma90" checked>90 이동평균선 · 하늘색</label><label><input type="checkbox" data-chart-indicator="ma120" checked>120 이동평균선 · 빨강</label><label><input type="checkbox" data-chart-indicator="ma160" checked>160 이동평균선 · 보라</label><label><input type="checkbox" data-chart-indicator="ma200" checked>200 이동평균선 · 주황</label><label><input type="checkbox" data-chart-indicator="bb" checked>볼린저밴드</label><label><input type="checkbox" data-chart-indicator="fib" checked>오토 피보나치</label><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label>
 <div id="chartTimeJumpControls"><strong>날짜·시간으로 차트 이동</strong><span style="font-size:10px;color:#adc0d5">한국시간(KST) 기준 · 선택한 시간봉</span>
 <div class="time-jump-grid"><input id="chartJumpDate" type="date" aria-label="이동할 연도 월 일"><input id="chartJumpTime" type="time" value="12:00" step="60" aria-label="이동할 시간 분"></div>
 <button id="chartJumpGo" type="button">선택 날짜로 이동</button><button id="chartJumpLatest" type="button">최신 차트로 복귀</button>
-<div id="chartTimeJumpStatus" role="status" aria-live="polite"></div></div></div></div><div id="combinedChart"><canvas id="chart"></canvas><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label">RMI (5, 14) + 이격도 (200 / 50 / 20) <span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
+<div id="chartTimeJumpStatus" role="status" aria-live="polite"></div></div></div></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label">RMI (5, 14) + 이격도 (200 / 50 / 20) <span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
  <div id="candleTime" class="muted candle-info"></div>
  <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button></div>
  <div id="range" style="display:none"></div><div id="chartHint" style="display:none"></div><p id="selected" style="display:none"></p>
@@ -978,7 +1051,7 @@ body:not(.chart-focus-mode) #page-chart:not(.active){
 </div></div></div></section>
 </main>
 <div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
-  <div id="expandedChartHeader"><strong>₿ BTCUSDT · 차트 확대</strong><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="1d">일봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
+  <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="1d">일봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
 </div>
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
 <div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button><div class="focus-pnl-strip" id="focusPnlStrip" aria-label="미실현 손익"><span>미실현 손익 (원화 추정)</span><strong id="focusPnlValue">—</strong></div></div>
@@ -1495,13 +1568,74 @@ function rmiSeries(a,length=14,momentum=5){
  for(let i=momentum+length;i<a.length;i++){let delta=Number(a[i].c)-Number(a[i-momentum].c);avgGain=(avgGain*(length-1)+Math.max(0,delta))/length;avgLoss=(avgLoss*(length-1)+Math.max(0,-delta))/length;out[i]=score()}
  return out
 }
-let rmiHeightPx=null,rmiAxisDrag=null;
+let rmiHeightPx=null,rmiAxisDrag=null,rmiSeparationDrag=null;
+const normalRmiHeightKey='btc-normal-rmi-height-v150';
+const rmiRatioKey='btc-rmi-disparity-ratio-v150';
+let rmiDisparityRatio=.55;
+try{
+ const savedHeight=Number(localStorage.getItem(normalRmiHeightKey));
+ if(Number.isFinite(savedHeight)&&savedHeight>=52&&savedHeight<=330)rmiHeightPx=savedHeight;
+ const savedRatio=Number(localStorage.getItem(rmiRatioKey));
+ if(Number.isFinite(savedRatio)&&savedRatio>=.35&&savedRatio<=.74)rmiDisparityRatio=savedRatio;
+}catch(_){};
 const rmiCanvas=$('rmiChart');
-function resizeRmiPanel(height){const panel=$('combinedChart');const available=Math.max(40,panel.getBoundingClientRect().height-90);const max=Math.min(340,available);rmiHeightPx=Math.max(40,Math.min(max,height));rmiCanvas.style.setProperty('--rmi-height',rmiHeightPx+'px');requestAnimationFrame(()=>{draw();drawRmi()})}
+if(Number.isFinite(rmiHeightPx)&&rmiHeightPx>=52)rmiCanvas.style.setProperty('--rmi-height',rmiHeightPx+'px');
+function resizeRmiPanel(height){const panel=$('combinedChart');const available=Math.max(40,panel.getBoundingClientRect().height-90);const max=Math.min(340,available);rmiHeightPx=Math.max(40,Math.min(max,height));rmiCanvas.style.setProperty('--rmi-height',rmiHeightPx+'px');
+ if(!document.body.classList.contains('chart-focus-mode')){
+  try{localStorage.setItem(normalRmiHeightKey,String(rmiHeightPx))}catch(_){}
+ }
+ requestAnimationFrame(()=>{draw();drawRmi()})}
 function rmiAxisStart(e){const rect=rmiCanvas.getBoundingClientRect();const x=e.clientX-rect.left;if(x<rect.width-82)return false;rmiAxisDrag={id:e.pointerId,y:e.clientY,height:rect.height};rmiCanvas.setPointerCapture?.(e.pointerId);return true}
 rmiCanvas.addEventListener('pointerdown',e=>{if(rmiAxisStart(e)){e.preventDefault()} });
 rmiCanvas.addEventListener('pointermove',e=>{if(!rmiAxisDrag||e.pointerId!==rmiAxisDrag.id)return;e.preventDefault();resizeRmiPanel(rmiAxisDrag.height+(rmiAxisDrag.y-e.clientY))});
 for(const event of ['pointerup','pointercancel','lostpointercapture'])rmiCanvas.addEventListener(event,e=>{if(rmiAxisDrag&&e.pointerId===rmiAxisDrag.id)rmiAxisDrag=null});
+// The normal chart's formerly hidden RMI divider adjusts total indicator
+// height. Expanded mode retains its existing independent height control.
+(function initNormalRmiDivider(){
+ const divider=$('focusRmiDivider');if(!divider)return;
+ let drag=null;
+ divider.addEventListener('pointerdown',e=>{
+  if(document.body.classList.contains('chart-focus-mode')||!chartIndicators.rmi)return;
+  drag={id:e.pointerId,startY:e.clientY,height:rmiCanvas.getBoundingClientRect().height};
+  divider.setPointerCapture?.(e.pointerId);e.preventDefault();
+ });
+ divider.addEventListener('pointermove',e=>{
+  if(!drag||e.pointerId!==drag.id)return;
+  resizeRmiPanel(drag.height+drag.startY-e.clientY);e.preventDefault();
+ });
+ for(const type of ['pointerup','pointercancel','lostpointercapture'])
+  divider.addEventListener(type,e=>{if(drag&&e.pointerId===drag.id)drag=null});
+ divider.addEventListener('keydown',e=>{
+  if(document.body.classList.contains('chart-focus-mode')||!['ArrowUp','ArrowDown'].includes(e.key))return;
+  e.preventDefault();resizeRmiPanel(rmiCanvas.getBoundingClientRect().height+(e.key==='ArrowUp'?8:-8));
+ });
+})();
+// Internal horizontal line between RMI and disparity: adjust their relative
+// allocation without changing RMI values or signal decisions.
+rmiCanvas.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ const rect=rmiCanvas.getBoundingClientRect();
+ const split=Math.max(31,Math.min(rect.height-23,Math.round(rect.height*rmiDisparityRatio)));
+ if(e.clientX-rect.left>=rect.width-82||Math.abs(e.clientY-rect.top-split)>12)return;
+ rmiSeparationDrag={id:e.pointerId,startY:e.clientY,split};
+ rmiCanvas.setPointerCapture?.(e.pointerId);
+ e.preventDefault();e.stopImmediatePropagation();
+});
+rmiCanvas.addEventListener('pointermove',e=>{
+ if(!rmiSeparationDrag||e.pointerId!==rmiSeparationDrag.id)return;
+ const height=rmiCanvas.getBoundingClientRect().height;
+ const split=rmiSeparationDrag.split+(e.clientY-rmiSeparationDrag.startY);
+ rmiDisparityRatio=Math.max(.35,Math.min(.74,split/Math.max(1,height)));
+ drawRmi();e.preventDefault();e.stopImmediatePropagation();
+});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])
+ rmiCanvas.addEventListener(type,e=>{
+  if(rmiSeparationDrag&&e.pointerId===rmiSeparationDrag.id){
+   rmiSeparationDrag=null;
+   try{localStorage.setItem(rmiRatioKey,String(rmiDisparityRatio))}catch(_){}
+   e.stopImmediatePropagation();
+  }
+ });
 function visibleFutureSlots(count){
  if(document.body.classList.contains('chart-focus-mode'))return Math.min(5,Math.max(2,Math.floor(count*.07)));
  return Math.min(futureSlots,Math.max(4,Math.floor(count*.32)));
@@ -1525,7 +1659,7 @@ function drawRmi(){
  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
  // Match the primary candle plot exactly: draw() uses w - 72 - 8.
- const pw=w-80,split=Math.max(31,Math.round(h*.55)),rmiTop=14,rmiBottom=split-3;
+ const pw=w-80,split=Math.max(31,Math.min(h-23,Math.round(h*rmiDisparityRatio))),rmiTop=14,rmiBottom=split-3;
  const yRmi=v=>rmiTop+(100-v)/100*Math.max(12,rmiBottom-rmiTop);
  ctx.font='9px sans-serif';
  // Restore the original one-minute RMI reference levels on every timeframe.
@@ -1540,7 +1674,11 @@ function drawRmi(){
   const labelShift=v===90?-7:v===85?5:v===20?-5:v===15?7:0;
   ctx.fillText(String(v),pw+5,yy+3+labelShift);
  }
- ctx.setLineDash([]);ctx.strokeStyle='#343e50';ctx.beginPath();ctx.moveTo(0,split);ctx.lineTo(pw,split);ctx.stroke();
+ ctx.setLineDash([]);ctx.strokeStyle='#718fa9';ctx.lineWidth=1.4;
+ ctx.beginPath();ctx.moveTo(0,split);ctx.lineTo(pw,split);ctx.stroke();
+ ctx.fillStyle='#28425c';ctx.fillRect(Math.max(0,pw/2-17),split-4,34,8);
+ ctx.fillStyle='#bfd7ed';for(let n=0;n<3;n++)ctx.fillRect(pw/2-9+n*8,split-2,3,4);
+ ctx.lineWidth=1;
  if(!a||a.length<19){ctx.fillStyle='#a4b4c8';ctx.fillText('RMI 데이터 대기',8,12);return}
  const {start,end,count,left}=visibleWindow(a),values=rmiSeries(a),bw=pw/count;
  const readyLabel=$('rmiSignalReadyLabel');
@@ -2858,6 +2996,20 @@ function initChartTimeJump(){
  go.addEventListener('click',()=>{void jumpChartToUtc(dateJumpKstMillis(date.value,time.value))});
  $('chartJumpLatest')?.addEventListener('click',resetChartTimeJump);
 }
+// The focus strategy selector mirrors the Settings select; all existing
+// strategy change, persistence, alert and one-minute-only trading rules stay
+// owned by the original rmiSignalStrategy 'change' listener.
+(function initExpandedRmiStrategy(){
+ const focus=$('expandedRmiStrategy'),settings=$('rmiSignalStrategy');
+ if(!focus||!settings)return;
+ function sync(){focus.value=settings.value}
+ focus.addEventListener('change',()=>{
+  if(!['range','bear','bull'].includes(focus.value))return;
+  settings.value=focus.value;
+  settings.dispatchEvent(new Event('change',{bubbles:true}));
+ });
+ settings.addEventListener('change',sync);sync();
+})();
 window.btcRedrawChart=()=>draw();
 function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-(document.body.classList.contains('chart-focus-mode')?Math.max(31,h*focusVolumeFraction):h*.24)),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
 if((chartJumpSegment||$('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
