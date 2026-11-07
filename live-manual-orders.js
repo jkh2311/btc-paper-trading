@@ -520,9 +520,13 @@ async function closeSelected(orderKind='LIMIT'){
       Number(f.price.maxPrice)>0&&Number(price)>Number(f.price.maxPrice))
     throw Error('거래소 지정가 허용 범위를 벗어났습니다');
   }
-  const desc=orderKind==='LIMIT'?'지정가 '+price+' USDT · 미체결 시 대기':'시장가 · 즉시 체결 요청';
-  if(!confirm('BTCUSDT '+selection.side+' 포지션 '+qty+' BTC 전량 청산 주문을 전송할까요?\n'+
-   desc+'\n'+(orderKind==='LIMIT'?'체결 전까지 포지션은 유지됩니다.':'체결가는 현재 가격과 다를 수 있습니다.')))return;
+  // The explicit LIMIT editor's "지정가 청산" action is the final user
+  // approval. No additional browser confirm; keep exchange revalidation,
+  // duplicate-order guard, and the existing run() submission lock.
+  // Preserve an explicit confirm for MARKET close requests.
+  if(orderKind==='MARKET'&&!confirm(
+   'BTCUSDT '+selection.side+' 포지션 '+qty+' BTC 시장가 전량 청산 요청을 전송할까요?\n체결가는 현재 가격과 다를 수 있습니다.'
+  ))return;
 
   // The price dialog may have remained open while the exchange position changed.
   // Check the exact position amount again before submitting a closing order.
