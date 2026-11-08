@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261108-tradingview-30s-chart-v170"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261108-hidden-30s-persistent-collector-v171"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -1150,34 +1150,10 @@ body.ai-entry-modal-open{overflow:hidden!important}
  #aiEntryChartCanvas{height:300px!important}
 }
 
-/* v170: official TradingView 30-second widget replaces native chart ONLY at 30s. */
-#tradingViewThirtyPane{display:none!important}
-#combinedChart.tv-thirty-active>:not(#tradingViewThirtyPane){display:none!important}
-#combinedChart.tv-thirty-active #tradingViewThirtyPane{
- display:flex!important;flex-direction:column!important;flex:1 1 0!important;
- min-height:185px!important;height:100%!important;width:100%!important;overflow:hidden;
- background:#101113!important
-}
-#tradingViewThirtyHost{width:100%;flex:1 1 0;min-height:160px;overflow:hidden}
-#tradingViewThirtyHost.tradingview-widget-container{height:100%!important}
-#tradingViewThirtyHost>.tradingview-widget-container__widget{width:100%!important;height:100%!important}
-#tradingViewThirtyHost iframe{display:block;width:100%!important;height:100%!important;border:0}
-#tradingViewThirtyPane .tv-thirty-footer{
- min-height:20px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:space-between;
- padding:3px 8px;color:#a4bad0;font-size:10px;background:#132038;
-}
-#tradingViewThirtyPane a{color:#8fc1ff;text-decoration:underline;font-size:10px}
-#tvThirtyNotice{font-size:9px;line-height:1.3;color:#aabacf;padding:3px 8px;background:#101a2b}
-#expandedChartOverlay #combinedChart.tv-thirty-active #tradingViewThirtyPane{
- height:100%!important;flex:1 1 0!important;min-height:0!important
-}
-#expandedChartOverlay #combinedChart.tv-thirty-active #tradingViewThirtyHost{
- flex:1 1 0!important;height:auto!important;min-height:80px!important
-}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
- <div class="price-panel"><div class="quote-wrap"><div class="price" id="price">-- USDT</div><div id="funding" class="funding" aria-live="polite">펀딩 조회 중</div></div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="30s">30초</option><option value="1m">1분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="1d">일봉</option></select></div><div id="convergenceBanner" class="convergence-banner" hidden role="status"></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
+ <div class="price-panel"><div class="quote-wrap"><div class="price" id="price">-- USDT</div><div id="funding" class="funding" aria-live="polite">펀딩 조회 중</div></div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="1d">일봉</option></select></div><div id="convergenceBanner" class="convergence-banner" hidden role="status"></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
  <div class="daily-volume" onclick="openVolume30()" id="dailyVolumeTrigger" role="button" tabindex="0" aria-label="최근 30일 일별 BTC 거래량 보기" aria-expanded="false" aria-controls="volume30Overlay">
  <div class="daily-volume-half">
   <div class="daily-volume-top"><span>오늘 거래량</span><strong id="dayVol">조회 중…</strong></div>
@@ -1218,12 +1194,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
    </div>
   </details>
  </section>
-<div class="chart-panel"><button id="chartCrosshairPriceTap" type="button" hidden aria-label="선택한 차트 가격으로 예약 진입 설정"></button><button id="dailyHistoryJump" type="button" title="일봉 2017년 과거 기록 / 최신으로 이동">⟵ 2017</button><button id="intradayHistoryJump" type="button" title="선택한 시간봉의 과거 기록 / 최신으로 이동">⟵ 과거</button><div id="combinedChart"><div id="tradingViewThirtyPane" hidden aria-label="트레이딩뷰 바이낸스 비트코인 무기한 선물 30초봉">
- <div id="tradingViewThirtyHost" class="tradingview-widget-container"></div>
- <div class="tv-thirty-footer"><span>TradingView · BINANCE:BTCUSDT.P · 30초봉</span>
- <a href="https://www.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT.P&interval=30S" target="_blank" rel="noopener noreferrer">원본 차트 열기 ↗</a></div>
- <div id="tvThirtyNotice">트레이딩뷰 30초봉은 계정 요금제·공개 위젯 지원에 따라 제한될 수 있습니다.</div>
- </div><canvas id="chart"></canvas><div id="chartTimeAxisRow"><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="chartIndicatorsDock"><button id="chartIndicatorToggle" type="button" aria-expanded="false" aria-controls="chartIndicatorMenu" aria-label="차트 지표 표시 설정">⚙ 지표</button><div id="chartIndicatorMenu" hidden role="group" aria-label="차트 지표 표시 선택"><strong>차트 지표 표시</strong><label><input type="checkbox" data-chart-indicator="ma5" checked>5 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma10" checked>10 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma40" checked>40 이동평균선 · 흰색</label><label><input type="checkbox" data-chart-indicator="ma60" checked>60 이동평균선 · 파랑</label><label><input type="checkbox" data-chart-indicator="ma90" checked>90 이동평균선 · 하늘색</label><label><input type="checkbox" data-chart-indicator="ma120" checked>120 이동평균선 · 빨강</label><label><input type="checkbox" data-chart-indicator="ma160" checked>160 이동평균선 · 보라</label><label><input type="checkbox" data-chart-indicator="ma200" checked>200 이동평균선 · 주황</label><label><input type="checkbox" data-chart-indicator="bb" checked>볼린저밴드</label><label><input type="checkbox" data-chart-indicator="fib" checked>오토 피보나치</label><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label>
+<div class="chart-panel"><button id="chartCrosshairPriceTap" type="button" hidden aria-label="선택한 차트 가격으로 예약 진입 설정"></button><button id="dailyHistoryJump" type="button" title="일봉 2017년 과거 기록 / 최신으로 이동">⟵ 2017</button><button id="intradayHistoryJump" type="button" title="선택한 시간봉의 과거 기록 / 최신으로 이동">⟵ 과거</button><div id="combinedChart"><canvas id="chart"></canvas><div id="chartTimeAxisRow"><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="chartIndicatorsDock"><button id="chartIndicatorToggle" type="button" aria-expanded="false" aria-controls="chartIndicatorMenu" aria-label="차트 지표 표시 설정">⚙ 지표</button><div id="chartIndicatorMenu" hidden role="group" aria-label="차트 지표 표시 선택"><strong>차트 지표 표시</strong><label><input type="checkbox" data-chart-indicator="ma5" checked>5 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma10" checked>10 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma40" checked>40 이동평균선 · 흰색</label><label><input type="checkbox" data-chart-indicator="ma60" checked>60 이동평균선 · 파랑</label><label><input type="checkbox" data-chart-indicator="ma90" checked>90 이동평균선 · 하늘색</label><label><input type="checkbox" data-chart-indicator="ma120" checked>120 이동평균선 · 빨강</label><label><input type="checkbox" data-chart-indicator="ma160" checked>160 이동평균선 · 보라</label><label><input type="checkbox" data-chart-indicator="ma200" checked>200 이동평균선 · 주황</label><label><input type="checkbox" data-chart-indicator="bb" checked>볼린저밴드</label><label><input type="checkbox" data-chart-indicator="fib" checked>오토 피보나치</label><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label>
 <div id="chartTimeJumpControls"><strong>날짜·시간으로 차트 이동</strong><span style="font-size:10px;color:#adc0d5">한국시간(KST) 기준 · 선택한 시간봉</span>
 <div class="time-jump-grid"><input id="chartJumpDate" type="date" aria-label="이동할 연도 월 일"><input id="chartJumpTime" type="time" value="12:00" step="60" aria-label="이동할 시간 분"></div>
 <button id="chartJumpGo" type="button">선택 날짜로 이동</button><button id="chartJumpLatest" type="button">최신 차트로 복귀</button>
@@ -1310,7 +1281,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
 </div></div></div></section>
 </main>
 <div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
-  <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="30s">30초</option><option value="1m">1분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="1d">일봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
+  <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="1d">일봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
 </div>
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
 <div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button><div class="focus-pnl-strip" id="focusPnlStrip" aria-label="미실현 손익"><span>미실현 손익 (원화 추정)</span><strong id="focusPnlValue">—</strong></div></div>
@@ -1967,7 +1938,7 @@ function updateIntradayHistoryJump(){
     '과거와 최신 차트 사이 이동':'BTCUSDT 선물 '+historyPeriodLabel(tf)+' 과거 '+tf+' 데이터 조회';
 }
 async function loadIntradayHistory(tf){
-  if(demo||tf==='1m'||tf==='30s'||!Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf))return false;
+  if(demo||tf==='1m'||!Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf))return false;
   const source=historySourceTf(tf),duration=candleDuration[source],cutoff=historyCutoff(tf);
   if(historyLoading[tf])return false;
   if(historyReadyUntil[tf]!==undefined&&historyReadyUntil[tf]<=cutoff)return true;
@@ -2043,7 +2014,7 @@ async function tick(){if(demo||priceBusy||(wsConnected&&Date.now()-lastTickAt<30
 let pricePaintTimer=null,chartPaintTimer=null,pricePaintQueued=false,chartPaintQueued=false,latestTradeEventAt=0;
 let lastChartPaintAt=0,lastPricePaintAt=0,connectionWatchdog=null;
 // 10m candles from Binance 5m bars; do not change the 1m signal feed.
-const candleDuration={'30s':30000,'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'1d':86400000};
+const candleDuration={'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'1d':86400000};
 function buildTenMinuteCandles(fiveBars){
   if(!Array.isArray(fiveBars)||!fiveBars.length)return [];
   const result=[];
@@ -2119,13 +2090,67 @@ function scheduleLivePaint(){
     },Math.max(0,250-(Date.now()-lastChartPaintAt)));
   }
 }
-function applyLiveTrade(price,eventTime){
+
+// v171 — chart-hidden BTCUSDT 30-second collection. Live trade OHLCV only.
+// Survives page refresh through bounded device storage; never synthesized
+// from one-minute bars, nor used by RMI strategies, orders, or account APIs.
+const THIRTY_COLLECT_MS=30000,THIRTY_COLLECT_MAX=7200;
+const THIRTY_COLLECT_KEY='btc-futures-30s-trades-history-v171';
+let thirtyCollected=[],thirtyLastSavedAt=0,thirtyLastTradeAt=0;
+function loadThirtyCollected(){
+ try{
+  const stored=JSON.parse(localStorage.getItem(THIRTY_COLLECT_KEY)||'[]');
+  if(Array.isArray(stored)){
+   thirtyCollected=stored.filter(b=>Number.isFinite(b.t)&&b.t%THIRTY_COLLECT_MS===0&&
+    b.o>0&&b.c>0&&b.h>=Math.max(b.o,b.c)&&b.l<=Math.min(b.o,b.c)&&
+    Number.isFinite(b.v)&&b.v>=0)
+    .sort((a,b)=>a.t-b.t).slice(-THIRTY_COLLECT_MAX);
+   thirtyCollected=thirtyCollected.filter((b,i,a)=>i===0||b.t!==a[i-1].t);
+   thirtyLastTradeAt=thirtyCollected.at(-1)?.lastTradeAt||0;
+  }
+ }catch(e){console.warn('30초봉 로컬 기록 불러오기 실패',e);}
+}
+function saveThirtyCollected(){
+ try{
+  localStorage.setItem(THIRTY_COLLECT_KEY,JSON.stringify(thirtyCollected));
+  thirtyLastSavedAt=Date.now();
+ }catch(e){console.warn('30초봉 로컬 저장 실패 (저장공간 확인 필요)',e);}
+}
+function collectThirtyTrade(price,time,quantity=0){
+ if(demo||!Number.isFinite(price)||price<=0||!Number.isFinite(time)||time<=0)return;
+ const t=Math.floor(time/THIRTY_COLLECT_MS)*THIRTY_COLLECT_MS;
+ const lastBar=thirtyCollected.at(-1);
+ if(lastBar&&time<=(lastBar.lastTradeAt||lastBar.t))return;
+ const volume=Number.isFinite(quantity)&&quantity>0?quantity:0;
+ if(lastBar&&t===lastBar.t){
+  lastBar.h=Math.max(lastBar.h,price);
+  lastBar.l=Math.min(lastBar.l,price);
+  lastBar.c=price;
+  lastBar.v+=volume;
+  lastBar.lastTradeAt=time;
+ }else{
+  // Do not make up empty 30-second bars when disconnected or suspended.
+  thirtyCollected.push({t,o:price,h:price,l:price,c:price,v:volume,lastTradeAt:time});
+  if(thirtyCollected.length>THIRTY_COLLECT_MAX)
+   thirtyCollected.splice(0,thirtyCollected.length-THIRTY_COLLECT_MAX);
+  saveThirtyCollected(); // save every completed bucket boundary
+ }
+ thirtyLastTradeAt=time;
+ if(Date.now()-thirtyLastSavedAt>=5000)saveThirtyCollected();
+}
+// Read-only access for future chart/research UI; none is shown at present.
+window.btcThirtySecondHistory=()=>thirtyCollected.map(({t,o,h,l,c,v})=>({t,o,h,l,c,v}));
+loadThirtyCollected();
+window.addEventListener('pagehide',saveThirtyCollected);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveThirtyCollected();});
+function applyLiveTrade(price,eventTime,tradeQuantity=0){
   if(!(price>0)||!Number.isFinite(price))return;
   last=price;lastTickAt=Date.now();latestTradeEventAt=eventTime||Date.now();
   // Share the exact chart WebSocket BTCUSDT trade tick with the open real order sheet.
   if(document.visibilityState==='visible')
    document.dispatchEvent(new CustomEvent('btc:live-trade-price',{detail:{symbol:'BTCUSDT',price,at:lastTickAt}}));
   advanceLiveCandles(price,latestTradeEventAt);
+  collectThirtyTrade(price,latestTradeEventAt,tradeQuantity);
   process();scheduleLivePaint();
 }
 function showMarketConnectionError(message){
@@ -2148,7 +2173,7 @@ function connectWs(){
       try{
         const d=JSON.parse(e.data);
         const p=Number(d.p),time=Number(d.T||d.E)||Date.now();
-        if(p>0)applyLiveTrade(p,time);
+        if(p>0)applyLiveTrade(p,time,Number(d.q)||0);
       }catch(_){}
     };
     ws.onerror=()=>{wsConnected=false;showMarketConnectionError('실시간 시세 연결 오류 · 재접속 중')};
@@ -2271,7 +2296,7 @@ function disparitySeries(bars,length){
  return out;
 }
 function drawRmi(){
- if($('tf').value==='30s'||(!chartIndicators.rmi&&!chartIndicators.disparity))return;
+ if(!chartIndicators.rmi&&!chartIndicators.disparity)return;
  const a=chartViewBars(),cv=$('rmiChart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(52,cv.getBoundingClientRect().height||84),dpr=devicePixelRatio||1;
  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
@@ -3274,7 +3299,7 @@ function drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,bottom,plotW){
   const tf=$('tf').value,markers=new Map();
   // Every interval computes its OWN RMI(5,14) on its own confirmed bars.
   // Markers are visual only; live AUTO guards and 1m alerts remain unchanged.
-  const chartSignals=tf==='30s'?[]:chartRmiZoneMarkers(a,start,end,Date.now()-1800,tf);
+  const chartSignals=chartRmiZoneMarkers(a,start,end,Date.now()-1800,tf);
   if(tf==='1m'){
     const validSignals=new Set(chartSignals.filter(sig=>sig.side!=='READY')
       .map(sig=>sig.barTime+':'+sig.side));
@@ -3593,10 +3618,6 @@ async function jumpChartToUtc(requestedTime){
  if(!Number.isFinite(requestedTime)||requestedTime>Date.now()+60000){
    if(status)status.textContent='유효한 과거 날짜·시간을 선택해 줘.';return;
  }
- if(tf==='30s'){
-  if(status)status.textContent='트레이딩뷰 30초봉의 과거 이동은 해당 위젯 안에서 해 주세요.';
-  return;
- }
  const minimum=tf==='1d'?Date.UTC(2017,7,17):historyCutoff(tf);
  if(requestedTime<minimum){
    if(status)status.textContent=tf==='1d'?'일봉은 2017년 8월 17일부터 볼 수 있어.':
@@ -3723,7 +3744,7 @@ function initChartPriceOrderChoice(){
  }
 }
 window.btcRedrawChart=()=>draw();
-function draw(){if($('tf').value==='30s'){const hit=$('chartCrosshairPriceTap');if(hit)hit.hidden=true;return;}updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<($('tf').value==='30s'?2:22)){ctx.fillStyle='#aab8cd';ctx.fillText($('tf').value==='30s'?'30초봉 실시간 수집 중 · 앱 실행 후 체결가부터 생성':'캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
+function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
 if((chartJumpSegment||$('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
    Math.abs(verticalPan)<1e-9&&verticalZoom===1){
   // Past 1m prices may be far from today's fixed live-price scale.
@@ -5052,43 +5073,4 @@ setInterval(()=>{
 },5000);
 timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),p=Math.max(1000,v.c*(1+(Math.random()-.5)*.001));a.push({t:Date.now(),o:v.c,h:Math.max(p,v.c),l:Math.min(p,v.c),c:p,v:Math.round(30+Math.random()*200)});a.shift()}last=candles['1m'].at(-1).c;process();render()}else refresh()},45000);
 
-// v170: ONLY the selected 30-second interval uses the official hosted
-// TradingView Advanced Chart widget; every other interval stays native.
-// No TradingView data crosses into Binance order/signals or custom canvases.
-(function initTradingViewThirty(){
- const tf=$('tf'),combined=$('combinedChart'),pane=$('tradingViewThirtyPane');
- const host=$('tradingViewThirtyHost'),notice=$('tvThirtyNotice');
- if(!tf||!combined||!pane||!host)return;
- let booted=false;
- function activate(){
-  const on=tf.value==='30s';
-  combined.classList.toggle('tv-thirty-active',on);
-  pane.hidden=!on;
-  // The white chart-price label and its manual order action belong to
-  // native chart only, not to the separately hosted TradingView iframe.
-  const hit=$('chartCrosshairPriceTap');if(hit&&on)hit.hidden=true;
-  if(!on){requestAnimationFrame(()=>{if(tf.value!=='30s'){draw();drawRmi();}});return;}
-  if(booted)return;
-  booted=true;
-  host.replaceChildren();
-  const widget=document.createElement('div');
-  widget.className='tradingview-widget-container__widget';
-  host.appendChild(widget);
-  const script=document.createElement('script');
-  script.async=true;
-  script.src='https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-  script.textContent=JSON.stringify({
-   autosize:true,symbol:'BINANCE:BTCUSDT.P',interval:'30S',
-   timezone:'Asia/Seoul',theme:'dark',style:'1',locale:'kr',
-   enable_publishing:false,allow_symbol_change:false,save_image:false,
-   hide_top_toolbar:false,hide_side_toolbar:true,hide_legend:false,
-   hide_volume:false,calendar:false,withdateranges:false,studies:[]
-  });
-  script.onerror=()=>{if(notice)notice.textContent=
-   '트레이딩뷰 위젯 연결 실패 · 아래 원본 차트 링크로 확인해 주세요.';};
-  host.appendChild(script);
- }
- tf.addEventListener('change',activate);
- activate();
-})();
 </script><script src="./real-position-hedge.js?v=real-98"></script><script src="./live-position-mode-sync.js?v=mode-65"></script><script src="./live-real-history.js?v=real-168"></script><script src="./live-trading-controls.js?v=controls-75"></script><script src="./live-manual-orders.js?v=orders-128"></script><script src="./live-manual-protection.js?v=protection-74b"></script><script src="./live-chart-levels.js?v=levels-100"></script><script src="./ai-position-tp.js?v=tp-167"></script></body></html>
