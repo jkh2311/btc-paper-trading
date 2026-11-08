@@ -3273,7 +3273,7 @@ function drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,bottom,plotW){
   const tf=$('tf').value,markers=new Map();
   // Every interval computes its OWN RMI(5,14) on its own confirmed bars.
   // Markers are visual only; live AUTO guards and 1m alerts remain unchanged.
-  const chartSignals=chartRmiZoneMarkers(a,start,end,Date.now()-1800,tf);
+  const chartSignals=tf==='30s'?[]:chartRmiZoneMarkers(a,start,end,Date.now()-1800,tf);
   if(tf==='1m'){
     const validSignals=new Set(chartSignals.filter(sig=>sig.side!=='READY')
       .map(sig=>sig.barTime+':'+sig.side));
@@ -3591,6 +3591,19 @@ async function jumpChartToUtc(requestedTime){
  if(chartJumpBusy||demo)return;
  if(!Number.isFinite(requestedTime)||requestedTime>Date.now()+60000){
    if(status)status.textContent='유효한 과거 날짜·시간을 선택해 줘.';return;
+ }
+ if(tf==='30s'){
+  // Past 30s bars do not exist in Binance kline REST. Only navigate bars
+  // actually collected from the user's own live trade stream.
+  const collected=candles['30s']||[];
+  if(collected.length<22||requestedTime<collected[0]?.t||
+      requestedTime>collected.at(-1)?.t+30000){
+   if(status)status.textContent='30초봉은 앱 실행 후 수집한 구간만 이동할 수 있어요. 과거 30초봉은 제공되지 않아요.';
+   return;
+  }
+  centerChartOnTimestamp(collected,Math.floor(requestedTime/30000)*30000);
+  if(status)status.textContent='수집된 30초봉 구간으로 이동했어.';
+  return;
  }
  const minimum=tf==='1d'?Date.UTC(2017,7,17):historyCutoff(tf);
  if(requestedTime<minimum){
