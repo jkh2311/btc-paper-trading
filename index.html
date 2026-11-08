@@ -3594,16 +3594,7 @@ async function jumpChartToUtc(requestedTime){
    if(status)status.textContent='유효한 과거 날짜·시간을 선택해 줘.';return;
  }
  if(tf==='30s'){
-  // Past 30s bars do not exist in Binance kline REST. Only navigate bars
-  // actually collected from the user's own live trade stream.
-  const collected=candles['30s']||[];
-  if(collected.length<22||requestedTime<collected[0]?.t||
-      requestedTime>collected.at(-1)?.t+30000){
-   if(status)status.textContent='30초봉은 앱 실행 후 수집한 구간만 이동할 수 있어요. 과거 30초봉은 제공되지 않아요.';
-   return;
-  }
-  centerChartOnTimestamp(collected,Math.floor(requestedTime/30000)*30000);
-  if(status)status.textContent='수집된 30초봉 구간으로 이동했어.';
+  if(status)status.textContent='트레이딩뷰 30초봉의 과거 이동은 해당 위젯 안에서 해 주세요.';
   return;
  }
  const minimum=tf==='1d'?Date.UTC(2017,7,17):historyCutoff(tf);
@@ -3732,7 +3723,7 @@ function initChartPriceOrderChoice(){
  }
 }
 window.btcRedrawChart=()=>draw();
-function draw(){if($('tf').value==='30s')return;updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<($('tf').value==='30s'?2:22)){ctx.fillStyle='#aab8cd';ctx.fillText($('tf').value==='30s'?'30초봉 실시간 수집 중 · 앱 실행 후 체결가부터 생성':'캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
+function draw(){if($('tf').value==='30s'){const hit=$('chartCrosshairPriceTap');if(hit)hit.hidden=true;return;}updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<($('tf').value==='30s'?2:22)){ctx.fillStyle='#aab8cd';ctx.fillText($('tf').value==='30s'?'30초봉 실시간 수집 중 · 앱 실행 후 체결가부터 생성':'캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min(400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
 if((chartJumpSegment||$('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
    Math.abs(verticalPan)<1e-9&&verticalZoom===1){
   // Past 1m prices may be far from today's fixed live-price scale.
@@ -5076,7 +5067,8 @@ timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),
   // The white chart-price label and its manual order action belong to
   // native chart only, not to the separately hosted TradingView iframe.
   const hit=$('chartCrosshairPriceTap');if(hit&&on)hit.hidden=true;
-  if(!on||booted)return;
+  if(!on){requestAnimationFrame(()=>{if(tf.value!=='30s'){draw();drawRmi();}});return;}
+  if(booted)return;
   booted=true;
   host.replaceChildren();
   const widget=document.createElement('div');
