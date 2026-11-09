@@ -129,7 +129,12 @@ async function restoreAlgo(plan,type){
   o.positionSide===plan.positionSide&&(o.orderType||o.type)===type&&
   (o.closePosition===true||o.closePosition==='true'));
  if(current.length>1)throw Error(type+' 보호주문이 중복되어 복구를 중단했어요');
- if(current.length===1)return;
+ if(current.length===1){
+  const target=dec((type==='STOP_MARKET'?plan.originalStop:plan.originalTp).triggerPrice);
+  if(Math.abs(dec(current[0].triggerPrice)-target)>0.11)
+   throw Error(type+' 기존 보호주문 가격이 원래 가격과 달라서 자동 원복을 중단했어요');
+  return;
+ }
  const req=originalPayload(plan,type);
  try{await signed('POST','/fapi/v1/algoOrder',req);}
  catch(err){
@@ -179,6 +184,8 @@ async function apply(){
   const again=await livePosition(p);
   if(Math.abs(again.amount-live.amount)>1e-8)throw Error('확인 도중 포지션 수량이 바뀌어 중단했어요');
   checkTargets(again,v.candidates,f); // profit direction must remain valid at submission
+  if((await openNormal()).some(o=>matching(o,again)&&isOpen(o)))
+   throw Error('최종 확인 후 다른 청산 주문이 추가되어 중단했어요');
   const verified=(await openAlgos());
   if(!verified.some(o=>String(o.algoId)===String(stop.algoId))||
      !verified.some(o=>String(o.algoId)===String(tp.algoId)))
