@@ -5,11 +5,16 @@
 const $=id=>document.getElementById(id),symbol='BTCUSDT',base='https://fapi.binance.com';
 const keyName='btc-manual-stage-ledger-v1';
 const aiSplitKey='btc-ai-three-tp-plans-v1';
-function splitPlan(side){
+function splitPlan(side,p){
  try{
   const all=JSON.parse(localStorage.getItem(aiSplitKey)||'{}');
-  const plan=all[tag()]?.[side];
-  return plan&&['PREPARING','ACTIVE','CANCELLING','ERROR'].includes(plan.state)?plan:null;
+  const plan=all[tag()]?.[side],entry=Number(p?.entryPrice);
+  // Do not let an old closed-position split plan suppress protection for a
+  // new position at a different average entry price.
+  if(!plan||!['PREPARING','ACTIVE','CANCELLING','ERROR'].includes(plan.state)||
+     !(entry>0)||!(Number(plan.entry)>0)||
+     Math.abs(entry-Number(plan.entry))>Math.max(.2,entry*.00005))return null;
+  return plan;
  }catch(_){return null}
 }
 
@@ -80,7 +85,7 @@ async function protect(side,p,info){
     (side==='SHORT'&&!(Number(prices.STOP_MARKET)>mark&&Number(prices.TAKE_PROFIT_MARKET)<mark)))
   throw Error('현재 마크가가 손절/익절 가격을 통과했습니다. 바이낸스에서 포지션 확인 필요');
  const ps=p.positionSide||'BOTH';
- const split=splitPlan(side);
+ const split=splitPlan(side,p);
  let active=(await algos()).filter(o=>isProtection(o,side,ps));
  // The user's explicitly approved three-limit TP plan replaces only the
  // original full-size TP. Keep/recreate STOP_MARKET throughout the plan.
