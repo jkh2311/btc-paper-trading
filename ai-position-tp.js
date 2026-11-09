@@ -64,7 +64,7 @@ panel.innerHTML='<div class="ai-tp-head"><div><strong id="aiTpModalTitle">실전
  '<div id="aiTpStatus">포지션을 선택하면 지지·저항을 분석해요.</div>'+
  '<canvas id="aiTpChart" role="img" aria-label="최근 2시간 1분봉 및 선택 포지션 진입가와 익절 추천선"></canvas>'+
  '<div id="aiTpChartNote">완성된 1분봉과 실제 진입가 · 익절 후보선을 표시합니다.</div>'+
- '<div id="aiTpChoices"></div><div id="aiTpInfo"></div><div id="aiTpRisk"></div>'+
+ '<div id="aiTpChoices"></div><div id="aiTpThreeOrders"></div><div id="aiTpInfo"></div><div id="aiTpRisk"></div>'+
  '<p class="ai-tp-disclaimer">참고용 규칙형 기술적 분석입니다. 실전 주문은 자동 제출되지 않습니다. '+
  '표시한 예상 수익률은 레버리지 기반 가격 변동과 가정한 왕복 거래비용 0.12%(명목가치 기준)를 반영한 추정치이며, '+
  '실제 수수료·슬리피지·펀딩·청산 위험에 따라 달라집니다. 5% 수익이나 익절 체결을 보장하지 않습니다.</p>';
@@ -83,6 +83,14 @@ function positionsFromSnapshot(snapshot){
 function selectedPosition(){
  return active.find(p=>key(p)===selectedKey)||null;
 }
+/* Read-only bridge for the separately confirmed manual 3-part exit orders.
+ * No automated trading occurs in this recommendation module. */
+window.btcAiTpSelectedPlan=()=>{
+ const p=selectedPosition();
+ return p&&analysis?.candidates?.length>=3?
+  {position:{...p},candidates:analysis.candidates.slice(0,3).map(c=>({...c})),at:analysis.at}:null;
+};
+
 function renderSummary(){
  const p=selectedPosition();
  const verdict=$('aiEntryVerdict'),scores=$('aiEntryScores'),asOf=$('aiEntryAsOf');
