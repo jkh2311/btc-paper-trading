@@ -274,10 +274,16 @@ function paint(force=false){
  const help=document.createElement('div');help.className='three-help';
  help.textContent='실제 바이낸스 지정가 익절 주문 3개 · 기존 손절 유지 · 자동 진입 없음. 주문이 미체결될 수 있으며 익절 수익을 보장하지 않습니다.';
  host.append(title,help);
- if(snapshot){
+ if(plan?.prices?.length===3){
+  plan.prices.forEach((price,i)=>{
+   const row=document.createElement('div');row.className='three-row';
+   row.textContent='실제 등록 '+(i+1)+'차 '+[50,30,20][i]+'% · '+fmt(price,1)+
+    ' USDT · '+plan.quantities[i]+' BTC';host.append(row);
+  });
+ }else if(snapshot){
   snapshot.candidates.forEach((c,i)=>{
    const row=document.createElement('div');row.className='three-row';
-   row.textContent=(i+1)+'차 '+[50,30,20][i]+'% · '+fmt(c.price,1)+' USDT'+
+   row.textContent='추천 '+(i+1)+'차 '+[50,30,20][i]+'% · '+fmt(c.price,1)+' USDT'+
     ' · ROI 추정 +'+fmt(c.roi,1)+'%';host.append(row);
   });
  }
