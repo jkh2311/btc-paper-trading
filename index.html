@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261108-remove-30s-v173"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261109-focus-latest-4h-3years-v174"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -1150,6 +1150,27 @@ body.ai-entry-modal-open{overflow:hidden!important}
  #aiEntryChartCanvas{height:300px!important}
 }
 
+
+/* v174 — small persistent latest-candle shortcut beside focus strategy. */
+#expandedChartHeader #expandedChartLatest{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ flex:0 0 auto!important;width:47px!important;min-width:47px!important;
+ height:31px!important;min-height:31px!important;padding:3px 5px!important;
+ margin:0!important;border-radius:7px!important;font-size:11px!important;
+ font-weight:750!important;color:#e7f3ff!important;
+ border:1px solid #567d9e!important;background:#254461!important;
+ white-space:nowrap!important;touch-action:manipulation!important;
+}
+#expandedChartHeader #expandedChartLatest:focus-visible{outline:2px solid #8dc8ff;outline-offset:2px}
+@media (orientation:landscape) and (max-height:700px) and (max-width:1400px){
+ #expandedChartOverlay #expandedChartLatest{
+  position:absolute!important;top:3px!important;left:242px!important;
+  z-index:55!important;width:48px!important;height:29px!important;min-height:29px!important;
+ }
+}
+@media (orientation:portrait) and (max-width:800px){
+ #expandedChartHeader #expandedChartLatest{width:43px!important;min-width:43px!important;font-size:10px!important;height:30px!important;min-height:30px!important}
+}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -1281,7 +1302,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
 </div></div></div></section>
 </main>
 <div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
-  <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="1d">일봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
+  <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><button type="button" id="expandedChartLatest" aria-label="최신 캔들로 이동" title="최신 차트로 이동">최신</button><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="1d">일봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
 </div>
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
 <div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button><div class="focus-pnl-strip" id="focusPnlStrip" aria-label="미실현 손익"><span>미실현 손익 (원화 추정)</span><strong id="focusPnlValue">—</strong></div></div>
@@ -1914,8 +1935,8 @@ function initDailyHistoryJump(){
 // are fetched in 1000-bar pages for the selected interval, never all at once.
 // 10m uses two 5m klines and shares the longer 5m history.
 // Requested historical horizons are independent: 5m 3mo, synthesized 10m
-// 6mo, 15m 6mo, 30m/1h/4h 1yr. Never change 1m trading/signal history.
-const HISTORY_LOOKBACK_MONTHS={'1m':2,'5m':3,'10m':6,'15m':6,'30m':12,'1h':12,'4h':12};
+// 6mo, 15m 6mo, 30m/1h 1yr, 4h 3yr. Never change 1m trading/signal history.
+const HISTORY_LOOKBACK_MONTHS={'1m':2,'5m':3,'10m':6,'15m':6,'30m':12,'1h':12,'4h':36};
 const HISTORY_SOURCE_TF={'10m':'5m'};
 const historyReadyUntil={},historyLoading={},historyRetryAt={};
 function historyCutoff(tf,now=Date.now()){
@@ -1925,7 +1946,7 @@ function historyCutoff(tf,now=Date.now()){
   return Date.UTC(year,month-months,Math.min(date.getUTCDate(),lastDay));
 }
 function historySourceTf(tf){return HISTORY_SOURCE_TF[tf]||tf}
-function historyPeriodLabel(tf){const m=HISTORY_LOOKBACK_MONTHS[tf];return m===12?'1년':m+'개월'}
+function historyPeriodLabel(tf){const m=HISTORY_LOOKBACK_MONTHS[tf];return m===36?'3년':m===12?'1년':m+'개월'}
 function updateIntradayHistoryJump(){
   const button=$('intradayHistoryJump');if(!button)return;
   const tf=$('tf').value,active=Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf);
@@ -4906,6 +4927,7 @@ function initSignalAlerts(){
   const focusTf=$('expandedChartTf'),mainTf=$('tf');
   if(!overlay||!openButton||!closeButton||!panel||!tradeBar||!focusTf||!mainTf)return;
   // Keep one actual timeframe source: the original selector owns the chart data.
+  $('expandedChartLatest')?.addEventListener('click',()=>{resetChartTimeJump();});
   function syncFocusTf(){focusTf.value=mainTf.value;}
   focusTf.addEventListener('change',()=>{
     if(mainTf.value===focusTf.value)return;
