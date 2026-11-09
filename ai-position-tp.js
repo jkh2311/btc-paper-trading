@@ -85,6 +85,7 @@ function selectedPosition(){
 }
 /* Read-only bridge for the separately confirmed manual 3-part exit orders.
  * No automated trading occurs in this recommendation module. */
+window.btcAiTpCurrentPosition=()=>{const p=selectedPosition();return p?{...p}:null;};
 window.btcAiTpSelectedPlan=()=>{
  const p=selectedPosition();
  return p&&analysis?.candidates?.length>=3?
