@@ -4,6 +4,15 @@
 'use strict';
 const $=id=>document.getElementById(id),symbol='BTCUSDT',base='https://fapi.binance.com';
 const keyName='btc-manual-stage-ledger-v1';
+const aiSplitKey='btc-ai-three-tp-plans-v1';
+function splitPlan(side){
+ try{
+  const all=JSON.parse(localStorage.getItem(aiSplitKey)||'{}');
+  const plan=all[tag()]?.[side];
+  return plan&&['PREPARING','ACTIVE','CANCELLING','ERROR'].includes(plan.state)?plan:null;
+ }catch(_){return null}
+}
+
 let busy=false,deviceId='',lastRun=0;
 function tag(){
  const api=getApiCredentials()?.apiKey||'';let h=2166136261;
@@ -71,8 +80,12 @@ async function protect(side,p,info){
     (side==='SHORT'&&!(Number(prices.STOP_MARKET)>mark&&Number(prices.TAKE_PROFIT_MARKET)<mark)))
   throw Error('현재 마크가가 손절/익절 가격을 통과했습니다. 바이낸스에서 포지션 확인 필요');
  const ps=p.positionSide||'BOTH';
+ const split=splitPlan(side);
  let active=(await algos()).filter(o=>isProtection(o,side,ps));
- for(const type of ['STOP_MARKET','TAKE_PROFIT_MARKET']){
+ // The user's explicitly approved three-limit TP plan replaces only the
+ // original full-size TP. Keep/recreate STOP_MARKET throughout the plan.
+ // Never create a competing full-size TP while split order state exists.
+ for(const type of (split?['STOP_MARKET']:['STOP_MARKET','TAKE_PROFIT_MARKET'])){
   if(active.some(o=>(o.orderType||o.type)===type))continue;
   const clientAlgoId='btcp'+(type==='STOP_MARKET'?'s':'t')+side[0]+Date.now().toString(36);
   const payload={algoType:'CONDITIONAL',symbol,side:side==='LONG'?'SELL':'BUY',positionSide:ps,
@@ -86,10 +99,13 @@ async function protect(side,p,info){
   if(!active.some(o=>(o.orderType||o.type)===type))throw Error(type+' 활성 상태 확인 실패');
  }
  if(!active.some(o=>(o.orderType||o.type)==='STOP_MARKET')||
-    !active.some(o=>(o.orderType||o.type)==='TAKE_PROFIT_MARKET'))
-  throw Error('손절·익절 모두 활성 상태 확인 실패');
- note.textContent=side+' 거래소 손절·익절 활성 확인 · SL '+prices.STOP_MARKET+' / TP '+prices.TAKE_PROFIT_MARKET+
- '\n보호 주문은 해당 방향 포지션 전체에 적용 · 시간 청산은 앱 활성 중에만 가능';
+    (!split&&!active.some(o=>(o.orderType||o.type)==='TAKE_PROFIT_MARKET')))
+  throw Error('손절·익절 활성 상태 확인 실패');
+ note.textContent=split?
+  side+' 3분할 익절 관리 중 ('+split.state+') · 기존 손절 유지 · SL '+prices.STOP_MARKET+
+  '\n원래 전량 익절은 분할 주문 적용 중 자동 재등록하지 않습니다.':
+  side+' 거래소 손절·익절 활성 확인 · SL '+prices.STOP_MARKET+' / TP '+prices.TAKE_PROFIT_MARKET+
+  '\n보호 주문은 해당 방향 포지션 전체에 적용 · 시간 청산은 앱 활성 중에만 가능';
 }
 async function closeAtDeadline(side,p,orders,info,dual){
  const qty=Math.abs(Number(p.positionAmt));if(!(qty>0))return;
