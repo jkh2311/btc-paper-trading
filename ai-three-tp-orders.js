@@ -178,6 +178,7 @@ async function apply(){
   // Recheck the exact original position and orders immediately after approval.
   const again=await livePosition(p);
   if(Math.abs(again.amount-live.amount)>1e-8)throw Error('확인 도중 포지션 수량이 바뀌어 중단했어요');
+  checkTargets(again,v.candidates,f); // profit direction must remain valid at submission
   const verified=(await openAlgos());
   if(!verified.some(o=>String(o.algoId)===String(stop.algoId))||
      !verified.some(o=>String(o.algoId)===String(tp.algoId)))
@@ -225,7 +226,7 @@ async function apply(){
 }
 async function cancelAndRestore(){
  if(busy)return;
- const v=planSnapshot(),side=v?.position?.side||window.btcAiTpSelectedPlan?.()?.position?.side;
+ const side=window.btcAiTpCurrentPosition?.()?.side;
  if(!side)return show('취소할 포지션을 AI 익절 창에서 선택하세요');
  let plan=planFor(side);
  if(!plan)return show('이 포지션에는 앱에서 등록한 3분할 주문이 없어요');
@@ -256,7 +257,7 @@ async function cancelAndRestore(){
 }
 function paint(force=false){
  if($('aiEntryDetails')?.hidden)return;
- const snapshot=planSnapshot(),side=snapshot?.position?.side||null;
+ const snapshot=planSnapshot(),side=window.btcAiTpCurrentPosition?.()?.side||null;
  let plan=null;try{if(side)plan=planFor(side)}catch(_){}
  const sig=[side,plan?.state,plan?.ids?.length,snapshot?.candidates?.map(x=>x.price).join(','),busy,feedback].join('|');
  if(!force&&sig===lastUiSignature)return;lastUiSignature=sig;
