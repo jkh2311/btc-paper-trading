@@ -3532,7 +3532,7 @@ function renderChartTimeAxis(bars,left,count,plotW){
  * changes signals, or interacts with order submission.
  */
 let dateRangeMode=false,dateRangePickStage=0,dateRangeAnchor=null,dateRangeSelection=null;
-let dateRangeTouchMoving=false,dateRangeTouchStarted=false,dateRangeMouseDown=false;
+let dateRangeTouchMoving=false,dateRangeTouchStarted=false,dateRangeMouseDown=false,dateRangeWasArmed=false;
 function dateRangeIndexFromX(clientX){
  const bars=chartViewBars(),rect=$('chart').getBoundingClientRect();
  if(!bars?.length)return null;
@@ -3540,6 +3540,11 @@ function dateRangeIndexFromX(clientX){
  const {left,count}=visibleWindow(bars);
  const index=Math.floor(left+x/width*count);
  return Math.min(bars.length-1,Math.max(0,index));
+}
+function dateRangeIndexForTime(bars,time){
+ let lo=0,hi=bars.length;
+ while(lo<hi){const mid=(lo+hi)>>1;if(bars[mid].t<time)lo=mid+1;else hi=mid;}
+ return lo<bars.length&&bars[lo].t===time?lo:-1;
 }
 function dateRangeSummary(bars,a,b){
  if(!bars?.length||a===null||b===null)return null;
@@ -3557,7 +3562,7 @@ function updateDateRangeStatus(){
  const el=$('chartDateRangeStatus');if(!el)return;
  const a=chartViewBars(),sel=dateRangeSelection,active=sel?.tf===$('tf').value;
  if(active){
-  const start=a.findIndex(b=>b.t===sel.start),end=a.findIndex(b=>b.t===sel.end);
+  const start=dateRangeIndexForTime(a,sel.start),end=dateRangeIndexForTime(a,sel.end);
   const summary=dateRangeSummary(a,start<0?null:start,end<0?null:end);
   el.textContent=summary?summary.count+'봉 · '+summary.period+' · 거래량 '+summary.volumeText+' BTC':
    '범위에 해당하는 기록을 현재 차트에서 찾지 못했어';
@@ -3587,7 +3592,7 @@ function initChartDateRangeTool(){
   if(!dateRangeMode||!e.touches.length)return;
   e.preventDefault();e.stopImmediatePropagation();
   if(e.touches.length!==1){dateRangeTouchStarted=false;return;}
-  dateRangeTouchStarted=true;dateRangeTouchMoving=false;
+  dateRangeTouchStarted=true;dateRangeTouchMoving=false;dateRangeWasArmed=dateRangePickStage===1;
   const idx=dateRangeIndexFromX(e.touches[0].clientX);
   if(idx===null)return;
   dateRangePick(idx,false);
@@ -3605,19 +3610,16 @@ function initChartDateRangeTool(){
   e.preventDefault();e.stopImmediatePropagation();
   if(!dateRangeTouchStarted)return;
   const touch=e.changedTouches[0],idx=touch?dateRangeIndexFromX(touch.clientX):null;
-  if(idx!==null)dateRangePick(idx,dateRangeTouchMoving||dateRangePickStage===1&&dateRangeSelection?.start!==dateRangeSelection?.end);
-  // First tap stays armed; second tap or drag completes.
-  if(!dateRangeTouchMoving&&dateRangePickStage===1&&dateRangeSelection?.start===dateRangeSelection?.end){
-   // This is handled by the next tap in the next touchstart.
-  }
-  dateRangeTouchStarted=false;
+  if(idx!==null)dateRangePick(idx,dateRangeTouchMoving||dateRangeWasArmed);
+  // First tap stays armed, the second tap (even the same bar) completes.
+  dateRangeTouchStarted=false;dateRangeWasArmed=false;
  },{capture:true,passive:false});
  canvas.addEventListener('touchcancel',e=>{
   if(dateRangeMode){e.stopImmediatePropagation();dateRangeTouchStarted=false;}
  },{capture:true});
  canvas.addEventListener('mousedown',e=>{
   if(!dateRangeMode||e.button!==0)return;
-  e.preventDefault();e.stopImmediatePropagation();dateRangeMouseDown=true;dateRangeTouchMoving=false;
+  e.preventDefault();e.stopImmediatePropagation();dateRangeMouseDown=true;dateRangeTouchMoving=false;dateRangeWasArmed=dateRangePickStage===1;
   const idx=dateRangeIndexFromX(e.clientX);if(idx!==null)dateRangePick(idx,false);
  },true);
  window.addEventListener('mousemove',e=>{
@@ -3630,7 +3632,8 @@ function initChartDateRangeTool(){
   dateRangeMouseDown=false;
   if(!dateRangeMode)return;
   const idx=dateRangeIndexFromX(e.clientX);
-  if(idx!==null)dateRangePick(idx,dateRangeTouchMoving);
+  if(idx!==null)dateRangePick(idx,dateRangeTouchMoving||dateRangeWasArmed);
+  dateRangeWasArmed=false;
  },true);
  $('tf')?.addEventListener('change',()=>{
   dateRangePickStage=0;dateRangeAnchor=null;updateDateRangeStatus();
@@ -3639,7 +3642,7 @@ function initChartDateRangeTool(){
 }
 function drawChartDateRange(ctx,bars,left,count,plotW,top,bottom){
  const sel=dateRangeSelection;if(!sel||sel.tf!==$('tf').value)return;
- const first=bars.findIndex(b=>b.t===sel.start),last=bars.findIndex(b=>b.t===sel.end);
+ const first=dateRangeIndexForTime(bars,sel.start),last=dateRangeIndexForTime(bars,sel.end);
  if(first<0||last<0)return;
  const stats=dateRangeSummary(bars,first,last);if(!stats)return;
  const bw=plotW/count,raw1=(first-left+.5)*bw,raw2=(last-left+.5)*bw;
