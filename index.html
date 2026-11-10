@@ -3485,6 +3485,7 @@ function updateFib265FutureButton(){
  button.style.display=enabled?'block':'none';
  if(!enabled&&fib265Projection){
   viewCount=fib265Projection.count;
+  viewOffset=0;
   fib265Projection=null;
  }
  button.classList.toggle('is-active',!!fib265Projection&&enabled);
@@ -3718,6 +3719,7 @@ function dateJumpKstMillis(dateText,timeText){
    back.getUTCDate()===day&&back.getUTCHours()===hour&&back.getUTCMinutes()===minute?utc:NaN;
 }
 function resetChartTimeJump(){
+ if(fib265Projection){viewCount=fib265Projection.count;fib265Projection=null;}
  chartJumpSegment=null;viewOffset=0;crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;
  resetStableChartScale();updateIntradayHistoryJump();draw();drawRmi();
  const status=$('chartTimeJumpStatus');if(status)status.textContent='최신 차트로 돌아왔어요.';
