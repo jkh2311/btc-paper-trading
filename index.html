@@ -1,7 +1,18 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-three-minute-three-month-v187"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-drawing-tools-trend-abcde-v188"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
-body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
+body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
+#chartDrawingMenu[hidden]{display:none!important}
+#chartDrawingMenu{position:absolute;left:8px;top:44px;z-index:75;
+ min-width:174px;max-width:min(255px,95%);padding:10px;border:1px solid #6481a1;
+ border-radius:12px;background:rgba(17,33,53,.97);box-shadow:0 7px 22px #000b;
+ color:#ebf4ff;font-size:12px;display:flex;flex-direction:column;gap:6px}
+#chartDrawingMenu strong{font-size:12px;line-height:1.3}
+#chartDrawingMenu button{padding:9px 10px;min-height:36px;text-align:left;
+ background:#263e60;border:1px solid #607c9c;color:#edf7ff;border-radius:8px;
+ font-weight:650;font-size:12px;touch-action:manipulation}
+#chartDrawingMenu button.drawing-delete{background:#603643;border-color:#a76d7d}
+#chartDrawingMenu .drawing-menu-help{line-height:1.4;color:#b9d1e9;font-size:11px}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
 
 /* Fit chart, volume, RMI, tools and balance in one mobile viewport */
 @media(max-width:800px){html,body{height:100%;overflow:hidden}header.app-header{height:52px;min-height:52px;padding:5px 11px;position:relative}header.app-header .brand small{display:none}header.app-header .brand b{font-size:15px}.header-actions .icon-btn{width:31px;height:31px;font-size:19px}main{height:calc(100dvh - 52px - 66px - 72px - env(safe-area-inset-bottom));overflow:hidden;padding:3px 8px 0}#page-chart{height:100%;display:flex;flex-direction:column;min-height:0}#page-chart:not(.active){display:none}.price-panel{padding:1px 3px 3px;flex-shrink:0}.price{font-size:clamp(21px,5.5vw,28px);line-height:1.1;margin:0}.tf-tabs{margin:0 0 4px;flex-shrink:0}.tf-tabs select{padding:5px 10px;font-size:13px;height:33px}.chart-panel{flex:1 1 auto;min-height:120px;display:flex;flex-direction:column}.chart-legend{font-size:10px;padding:3px 8px 1px;flex-shrink:0}#combinedChart{flex:1;min-height:0;display:flex;flex-direction:column}#chart{height:auto!important;flex:1 1 auto;min-height:65px}.indicator-label{font-size:10px;padding:2px 8px 0;flex-shrink:0}#rmiChart{height:clamp(52px,11dvh,90px)!important;flex:0 0 clamp(52px,11dvh,90px)}.chart-tools{margin:4px 0;gap:5px;flex-shrink:0}.chart-tools button{padding:5px 4px;font-size:12px;height:32px}.account-strip{margin-top:2px;padding:7px 10px;flex-shrink:0}.account-strip small{font-size:10px}.account-strip strong{font-size:12px}.candle-info{font-size:10px;max-height:25px;overflow:hidden;flex-shrink:0}.trade-bar{bottom:calc(62px + env(safe-area-inset-bottom));padding:5px 9px;height:66px}.trade-bar button{padding:8px;font-size:15px}.bottom-nav{height:calc(62px + env(safe-area-inset-bottom));padding:3px 3px calc(3px + env(safe-area-inset-bottom))}.nav-btn span{font-size:18px;line-height:19px}.nav-btn{gap:2px;font-size:10px}#page-position,#page-history,#page-settings{height:100%;overflow:auto;padding-bottom:12px}}
@@ -1220,7 +1231,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
    </div>
   </details>
  </section>
-<div class="chart-panel"><button id="chartCrosshairPriceTap" type="button" hidden aria-label="선택한 차트 가격으로 예약 진입 설정"></button><button id="dailyHistoryJump" type="button" title="일봉 2017년 과거 기록 / 최신으로 이동">⟵ 2017</button><button id="intradayHistoryJump" type="button" title="선택한 시간봉의 과거 기록 / 최신으로 이동">⟵ 과거</button><div id="combinedChart"><canvas id="chart"></canvas><div id="chartTimeAxisRow"><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="chartIndicatorsDock"><button id="chartIndicatorToggle" type="button" aria-expanded="false" aria-controls="chartIndicatorMenu" aria-label="차트 지표 표시 설정">⚙ 지표</button><div id="chartIndicatorMenu" hidden role="group" aria-label="차트 지표 표시 선택"><strong>차트 지표 표시</strong><label><input type="checkbox" data-chart-indicator="ma5" checked>5 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma10" checked>10 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma40" checked>40 이동평균선 · 흰색</label><label><input type="checkbox" data-chart-indicator="ma60" checked>60 이동평균선 · 파랑</label><label><input type="checkbox" data-chart-indicator="ma90" checked>90 이동평균선 · 하늘색</label><label><input type="checkbox" data-chart-indicator="ma120" checked>120 이동평균선 · 빨강</label><label><input type="checkbox" data-chart-indicator="ma160" checked>160 이동평균선 · 보라</label><label><input type="checkbox" data-chart-indicator="ma200" checked>200 이동평균선 · 주황</label><label><input type="checkbox" data-chart-indicator="bb" checked>볼린저밴드</label><label><input type="checkbox" data-chart-indicator="fib" checked>오토 피보나치</label><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label>
+<div class="chart-panel"><button id="chartCrosshairPriceTap" type="button" hidden aria-label="선택한 차트 가격으로 예약 진입 설정"></button><button id="dailyHistoryJump" type="button" title="일봉 2017년 과거 기록 / 최신으로 이동">⟵ 2017</button><button id="intradayHistoryJump" type="button" title="선택한 시간봉의 과거 기록 / 최신으로 이동">⟵ 과거</button><div id="combinedChart"><div id="chartDrawingMenu" class="chart-drawing-menu" hidden role="group" aria-label="차트 그리기 메뉴"></div><canvas id="chart"></canvas><div id="chartTimeAxisRow"><div id="chartTimeAxis" role="img" aria-label="차트 시간 눈금 · 한국시간"></div><div id="chartIndicatorsDock"><button id="chartIndicatorToggle" type="button" aria-expanded="false" aria-controls="chartIndicatorMenu" aria-label="차트 지표 표시 설정">⚙ 지표</button><div id="chartIndicatorMenu" hidden role="group" aria-label="차트 지표 표시 선택"><strong>차트 지표 표시</strong><label><input type="checkbox" data-chart-indicator="ma5" checked>5 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma10" checked>10 이동평균선</label><label><input type="checkbox" data-chart-indicator="ma40" checked>40 이동평균선 · 흰색</label><label><input type="checkbox" data-chart-indicator="ma60" checked>60 이동평균선 · 파랑</label><label><input type="checkbox" data-chart-indicator="ma90" checked>90 이동평균선 · 하늘색</label><label><input type="checkbox" data-chart-indicator="ma120" checked>120 이동평균선 · 빨강</label><label><input type="checkbox" data-chart-indicator="ma160" checked>160 이동평균선 · 보라</label><label><input type="checkbox" data-chart-indicator="ma200" checked>200 이동평균선 · 주황</label><label><input type="checkbox" data-chart-indicator="bb" checked>볼린저밴드</label><label><input type="checkbox" data-chart-indicator="fib" checked>오토 피보나치</label><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label>
 <div class="date-range-tools">
  <strong>📐 날짜 범위 선택</strong>
  <label><input id="chartDateRangeTool" type="checkbox">차트에서 날짜 범위 측정</label>
@@ -4307,8 +4318,258 @@ for(let i=0;i<5;i++){let p=lo+(hi-lo)*i,yy=y(p);ctx.beginPath();ctx.moveTo(0,yy)
   if(started)ctx.stroke();
 }if(chartIndicators.bb)for(let [key,color] of [['upper','#63b6a8'],['lower','#63b6a8'],['mid','#63b6a8']]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=key==='mid'?1.8:2.1;let started=false;bb.forEach((v,i)=>{if(!v)return;let x=(start+i-left+.5)*bw;if(!started){ctx.moveTo(x,y(v[key]));started=true}else ctx.lineTo(x,y(v[key]))});ctx.stroke()}ctx.restore();drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)});ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'1d':86400000}[$('tf').value],stamp=new Date(a[a.length-1].t+(futureCrosshairSlot+1)*ms),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}if(!chartJumpSegment)drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(!chartJumpSegment&&typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}syncChartPriceOrderTap(cv,0,NaN,null);const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);syncChartPriceOrderTap(cv,plotW,boxY,crosshairPrice);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);}// Overlay a distinct 265-bars-ahead date ruler when it falls in view.
 drawChartDateRange(ctx,a,left,count,plotW,top,priceBottom);
+drawSavedChartShapes(ctx,a,left,count,plotW,top,priceBottom);
 renderChartTimeAxis(a,left,count,plotW);$('range').textContent='표시 '+data.length+'개 / 전체 '+a.length+'개 캔들'+(viewOffset===0?' · 오른쪽 미래 빈 공간 '+slots+'칸':'')+' · '+(viewOffset?'과거 탐색 중 ('+viewOffset+'개 전)':'최신 구간')+' · 핀치 확대/축소 · 차트 상하·좌우·대각선 이동 · 오른쪽 가격축 확대/축소'}
 let verticalPan=0,levelDragPreview=null;const chart=$('chart');let touchStart=null,holdTimer=null;
+
+/* v188: chart drawings, local to this browser and separated from the Binance
+ * futures order/trigger modules. Capturing on combinedChart's parent before
+ * the canvas prevents level dragging/order interactions while drawing/editing.
+ * Coordinates are candle timestamps + absolute USDT prices, not pixels. */
+const DRAWING_KEY='btc-chart-drawings-v188',DRAWING_MAX=120;
+let drawings=[],drawingTool=null,drawingDraft=[],drawingSelected=null,drawingEditing=false;
+let drawingDrag=null,drawingTouch=null,drawingLastTap=null,drawingMenuOpen=false;
+function drawLoad(){
+ try{
+  const raw=JSON.parse(localStorage.getItem(DRAWING_KEY)||'[]');
+  if(!Array.isArray(raw))return;
+  drawings=raw.filter(v=>v&&typeof v.id==='string'&&
+   ['line','abcde'].includes(v.kind)&&typeof v.tf==='string'&&
+   Array.isArray(v.points)&&v.points.length===(v.kind==='line'?2:5)&&
+   v.points.every(pt=>Number.isFinite(pt.t)&&Number.isFinite(pt.p)&&pt.p>0))
+   .slice(-DRAWING_MAX);
+ }catch(e){console.warn('차트 그리기 기록 읽기 실패',e);}
+}
+function drawSave(){
+ try{localStorage.setItem(DRAWING_KEY,JSON.stringify(drawings.slice(-DRAWING_MAX)));}
+ catch(e){console.warn('차트 그리기 저장 실패',e);}
+}
+drawLoad();
+function drawPricePoint(clientX,clientY){
+ const canvas=$('chart'),rect=canvas.getBoundingClientRect(),scale=chartPriceScale,bars=chartViewBars();
+ if(!scale||!bars?.length)return null;
+ const x=clientX-rect.left,y=clientY-rect.top;
+ if(x<0||x>scale.plotW||y<scale.top||y>scale.priceBottom)return null;
+ const {left,count}=visibleWindow(bars);
+ const index=Math.max(0,Math.floor(left+x/scale.plotW*count));
+ const barTime=dateRangeTimeAtIndex(bars,index);
+ const price=scale.hi-(y-scale.top)/(scale.priceBottom-scale.top)*(scale.hi-scale.lo);
+ if(!Number.isFinite(barTime)||!(price>0))return null;
+ return {t:barTime,p:Number(price.toFixed(2))};
+}
+function drawCanvasCoords(pt,bars,left,count,scale){
+ const index=dateRangeIndexForTime(bars,pt.t);
+ if(index<0)return null;
+ return {x:(index-left+.5)*scale.plotW/count,
+  y:scale.top+(scale.hi-pt.p)/(scale.hi-scale.lo)*(scale.priceBottom-scale.top)};
+}
+function drawingHit(clientX,clientY){
+ const scale=chartPriceScale,bars=chartViewBars(),canvas=$('chart');
+ if(!scale||!bars?.length)return null;
+ const rect=canvas.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top;
+ if(x<0||x>scale.plotW||y<scale.top||y>scale.priceBottom)return null;
+ const {left,count}=visibleWindow(bars);
+ let result=null,best=16;
+ for(let d=drawings.length-1;d>=0;d--){
+  const entry=drawings[d];if(entry.tf!==$('tf').value)continue;
+  const pts=entry.points.map(pt=>drawCanvasCoords(pt,bars,left,count,scale));
+  for(let i=0;i<pts.length;i++)if(pts[i]){
+   const dist=Math.hypot(pts[i].x-x,pts[i].y-y);
+   if(dist<best){best=dist;result={id:entry.id,point:i,dist};}
+  }
+  for(let i=1;i<pts.length;i++){
+   const a=pts[i-1],b=pts[i];if(!a||!b)continue;
+   const dx=b.x-a.x,dy=b.y-a.y,len=dx*dx+dy*dy;
+   if(!len)continue;
+   const u=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/len));
+   const dist=Math.hypot(x-a.x-u*dx,y-a.y-u*dy);
+   if(dist<Math.min(best,9)){best=dist;result={id:entry.id,point:null,dist};}
+  }
+ }
+ return result;
+}
+function drawingMenu(title,options,help=''){
+ const el=$('chartDrawingMenu');if(!el)return;
+ el.replaceChildren();const heading=document.createElement('strong');
+ heading.textContent=title;el.appendChild(heading);
+ if(help){const desc=document.createElement('div');desc.className='drawing-menu-help';desc.textContent=help;el.appendChild(desc)}
+ options.forEach(({label,action,kind})=>{
+  const btn=document.createElement('button');btn.type='button';btn.textContent=label;
+  if(kind==='delete')btn.className='drawing-delete';
+  btn.addEventListener('click',e=>{e.stopPropagation();action()});el.appendChild(btn);
+ });
+ el.hidden=false;drawingMenuOpen=true;
+}
+function drawingCloseMenu(){
+ const el=$('chartDrawingMenu');if(el)el.hidden=true;
+ drawingMenuOpen=false;
+}
+function drawingAbort(){
+ drawingTool=null;drawingDraft=[];drawingDrag=null;drawingEditing=false;drawingSelected=null;
+ drawingCloseMenu();draw();
+}
+function drawingSelect(id){
+ drawingSelected=id;drawingTool=null;drawingDraft=[];drawingEditing=false;
+ const item=drawings.find(x=>x.id===id);
+ if(!item)return drawingAbort();
+ drawingMenu(item.kind==='line'?'추세선':'A·B·C·D·E 패턴',[
+  {label:'✏️ 수정하기 (점을 끌어서 이동)',action:()=>{
+   drawingEditing=true;drawingCloseMenu();draw();
+   drawingMenu('수정 모드',[
+    {label:'수정 완료',action:()=>{drawingEditing=false;drawingCloseMenu();draw();}},
+    {label:'그림 삭제',kind:'delete',action:()=>drawingRemove(id)}
+   ],'차트의 파란 점을 손가락으로 끌어서 수정하고 완료를 눌러 줘.');}},
+  {label:'🗑 삭제하기',kind:'delete',action:()=>drawingRemove(id)},
+  {label:'닫기',action:()=>{drawingCloseMenu();drawingSelected=null;draw();}}
+ ],'그림을 다시 누르면 언제든 이 메뉴를 열 수 있어.');
+ draw();
+}
+function drawingRemove(id){
+ drawings=drawings.filter(x=>x.id!==id);drawSave();drawingAbort();
+}
+function drawingStartTool(kind){
+ drawingTool=kind;drawingDraft=[];drawingSelected=null;drawingEditing=false;
+ drawingCloseMenu();draw();
+ drawingMenu(kind==='line'?'추세선 · 점 1/2':'ABCDE 패턴 · 점 1/5',[
+  {label:'그리기 취소',action:drawingAbort}
+ ],'차트에서 시작점부터 차례대로 터치해 줘.');
+}
+function drawingPick(clientX,clientY){
+ const pt=drawPricePoint(clientX,clientY);if(!pt)return;
+ drawingDraft.push(pt);
+ const target=drawingTool==='line'?2:5;
+ if(drawingDraft.length>=target){
+  const entry={id:'shape-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),
+   tf:$('tf').value,kind:drawingTool,points:drawingDraft.map(v=>({...v}))};
+  drawings.push(entry);if(drawings.length>DRAWING_MAX)drawings.shift();
+  drawSave();drawingSelect(entry.id);return;
+ }
+ drawingMenu((drawingTool==='line'?'추세선':'ABCDE 패턴')+' · 점 '+(drawingDraft.length+1)+'/'+target,[
+  {label:'그리기 취소',action:drawingAbort}
+ ],'다음 '+(drawingTool==='line'?'끝점':'패턴 꼭짓점')+'을 차트에서 터치해 줘.');
+ draw();
+}
+function drawingChooser(){
+ if(dateRangeMode)return; // preserve enabled date range measurement
+ drawingTool=null;drawingDraft=[];drawingEditing=false;drawingSelected=null;
+ drawingMenu('차트 그리기',[
+  {label:'📈 추세선 그리기',action:()=>drawingStartTool('line')},
+  {label:'🔷 A·B·C·D·E 패턴 그리기',action:()=>drawingStartTool('abcde')},
+  {label:'닫기',action:drawingCloseMenu}
+ ],'두 점 또는 A부터 E까지 다섯 점을 순서대로 선택해.');
+ draw();
+}
+function drawSavedChartShapes(ctx,bars,left,count,plotW,top,bottom){
+ if(!bars?.length||!chartPriceScale)return;
+ const scale=chartPriceScale,shapes=drawings.filter(d=>d.tf===$('tf').value);
+ if(!shapes.length&&!drawingDraft.length)return;
+ ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,Math.max(1,bottom-top));ctx.clip();
+ function paint(pts,kind,color,selected,labels){
+  const xy=pts.map(pt=>drawCanvasCoords(pt,bars,left,count,scale));
+  ctx.beginPath();let started=false;
+  for(let i=0;i<xy.length;i++){
+   if(!xy[i])continue;
+   if(!started){ctx.moveTo(xy[i].x,xy[i].y);started=true}
+   else ctx.lineTo(xy[i].x,xy[i].y);
+  }
+  ctx.strokeStyle=color;ctx.lineWidth=selected?2.8:2.2;ctx.setLineDash([]);
+  if(started)ctx.stroke();
+  xy.forEach((v,i)=>{
+   if(!v||v.x<0||v.x>plotW||v.y<top||v.y>bottom)return;
+   ctx.fillStyle='#102b3e';ctx.strokeStyle=color;ctx.lineWidth=2;
+   ctx.beginPath();ctx.arc(v.x,v.y,selected?5.5:3.5,0,Math.PI*2);ctx.fill();ctx.stroke();
+   if(kind==='abcde'){
+    ctx.font='bold 13px sans-serif';ctx.fillStyle='#fbeab3';
+    ctx.fillText('ABCDE'[i],Math.min(plotW-14,v.x+7),Math.max(top+13,v.y-8));
+   }
+  });
+ }
+ for(const d of shapes)paint(d.points,d.kind,d.kind==='abcde'?'#f9cb70':'#4edbff',d.id===drawingSelected);
+ if(drawingDraft.length)paint(drawingDraft,drawingTool,'#8bf8a1',true);
+ ctx.restore();
+}
+function initChartDrawingGestures(){
+ const root=$('combinedChart'),canvas=$('chart');if(!root||!canvas)return;
+ const stop=e=>{e.preventDefault();e.stopImmediatePropagation()};
+ const rectPoint=(e)=>[e.clientX,e.clientY];
+ let mouseDrag=false,mouseMoved=false;
+ root.addEventListener('touchstart',e=>{
+  if(e.target!==canvas||dateRangeMode||e.touches.length!==1)return;
+  const touch=e.touches[0],now=Date.now();
+  const hit=!drawingTool?drawingHit(touch.clientX,touch.clientY):null;
+  const isDouble=!drawingTool&&!drawingEditing&&drawingLastTap&&
+   now-drawingLastTap.t<350&&
+   Math.hypot(touch.clientX-drawingLastTap.x,touch.clientY-drawingLastTap.y)<27;
+  drawingTouch={x:touch.clientX,y:touch.clientY,t:now,moved:false,
+   mode:drawingTool?'place':drawingEditing&&hit?.point!=null&&hit.id===drawingSelected?'edit':
+    hit?'select':isDouble?'double':'idle',hit};
+  if(drawingTouch.mode!=='idle')stop(e);
+  if(drawingTouch.mode==='edit')drawingDrag={id:hit.id,point:hit.point};
+ },{capture:true,passive:false});
+ root.addEventListener('touchmove',e=>{
+  if(!drawingTouch||e.target!==canvas)return;
+  const t=e.touches[0];if(!t)return;
+  if(Math.hypot(t.clientX-drawingTouch.x,t.clientY-drawingTouch.y)>10)drawingTouch.moved=true;
+  if(drawingTouch.mode==='idle')return;
+  stop(e);
+  if(drawingTouch.mode==='edit'&&drawingDrag){
+   const pt=drawPricePoint(t.clientX,t.clientY);
+   const shape=drawings.find(x=>x.id===drawingDrag.id);
+   if(pt&&shape){shape.points[drawingDrag.point]=pt;draw();}
+  }
+ },{capture:true,passive:false});
+ root.addEventListener('touchend',e=>{
+  if(e.target!==canvas||!drawingTouch)return;
+  const event=drawingTouch;drawingTouch=null;
+  const changed=e.changedTouches[0],x=changed?.clientX??event.x,y=changed?.clientY??event.y;
+  if(event.mode!=='idle')stop(e);
+  if(event.mode==='edit'){drawingDrag=null;drawSave();draw();drawingLastTap=null;return}
+  if(event.moved){drawingLastTap=null;return}
+  if(event.mode==='double'){drawingLastTap=null;drawingChooser();return}
+  if(event.mode==='place'){drawingPick(x,y);drawingLastTap=null;return}
+  if(event.mode==='select'){drawingSelect(event.hit.id);drawingLastTap=null;return}
+  // Wait for the second quick tap (normal first tap behavior is preserved).
+  drawingLastTap={t:Date.now(),x,y};
+ },{capture:true,passive:false});
+ root.addEventListener('touchcancel',e=>{
+  if(!drawingTouch||e.target!==canvas)return;
+  if(drawingTouch.mode!=='idle')stop(e);
+  drawingTouch=null;drawingDrag=null;drawingLastTap=null;
+ },{capture:true,passive:false});
+ // Desktop mouse: one click chooses a completed drawing, doubleclick opens tools.
+ root.addEventListener('mousedown',e=>{
+  if(e.target!==canvas||dateRangeMode||e.button!==0)return;
+  const hit=drawingHit(e.clientX,e.clientY);
+  if(drawingTool||hit||drawingEditing){
+   stop(e);mouseDrag=!!(drawingEditing&&hit?.point!=null&&hit.id===drawingSelected);
+   drawingDrag=mouseDrag?{id:hit.id,point:hit.point}:null;
+  }
+ },true);
+ root.addEventListener('mousemove',e=>{
+  if(!mouseDrag||!drawingDrag)return;
+  stop(e);mouseMoved=true;
+  const pt=drawPricePoint(e.clientX,e.clientY),shape=drawings.find(x=>x.id===drawingDrag.id);
+  if(pt&&shape){shape.points[drawingDrag.point]=pt;draw();}
+ },true);
+ root.addEventListener('mouseup',e=>{
+  if(mouseDrag){stop(e);drawSave();mouseDrag=false;drawingDrag=null;mouseMoved=false;}
+ },true);
+ root.addEventListener('click',e=>{
+  if(e.target!==canvas||dateRangeMode)return;
+  if(drawingTool){stop(e);drawingPick(e.clientX,e.clientY);return}
+  const hit=drawingHit(e.clientX,e.clientY);
+  if(hit){stop(e);if(!drawingEditing&&!mouseMoved)drawingSelect(hit.id);}
+ },true);
+ root.addEventListener('dblclick',e=>{
+  if(e.target!==canvas||dateRangeMode)return;
+  stop(e);drawingChooser();
+ },true);
+ $('tf')?.addEventListener('change',()=>{drawingTool=null;drawingDraft=[];
+  drawingSelected=null;drawingEditing=false;drawingCloseMenu();});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')drawingAbort();});
+}
+initChartDrawingGestures();
+
 
 /* Grasp the chart / volume divider near the horizontal boundary.
    Capture first so ordinary candle inspection and order-line dragging
