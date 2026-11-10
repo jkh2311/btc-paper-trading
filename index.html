@@ -3535,6 +3535,16 @@ let dateRangeMode=false,dateRangeStage=0,dateRangeAnchorTime=null,dateRangeSelec
 let dateRangeHolding=false,dateRangeDragging=false,dateRangeHoldTimer=null,dateRangePanTimer=null;
 let dateRangePointerX=0,dateRangePointerY=0,dateRangeStartX=0,dateRangeIsTouch=false;
 const DATE_RANGE_HOLD_MS=500,DATE_RANGE_MAX_FUTURE=10000;
+let dateRangeVolumeCache=null;
+function dateRangeVolumePrefix(bars){
+ const last=bars.at(-1),cached=dateRangeVolumeCache;
+ if(cached?.bars===bars&&cached.length===bars.length&&cached.lastTime===last?.t&&
+    cached.lastVolume===last?.v)return cached.values;
+ const values=new Float64Array(bars.length+1);
+ for(let i=0;i<bars.length;i++)values[i+1]=values[i]+Math.max(0,Number(bars[i].v)||0);
+ dateRangeVolumeCache={bars,length:bars.length,lastTime:last?.t,lastVolume:last?.v,values};
+ return values;
+}
 function dateRangeTimeAtIndex(bars,index){
  if(!bars?.length||!Number.isFinite(index)||index<0)return null;
  if(index<bars.length)return bars[index]?.t??null;
@@ -3565,9 +3575,11 @@ function dateRangeSummary(bars,a,b){
  if(!bars?.length||a===null||b===null||a<0||b<0)return null;
  const low=Math.max(0,Math.min(a,b)),high=Math.max(a,b);
  const count=high-low+1,duration=candleDuration[$('tf').value]||60000;
- let volume=0;
- // Future bars are time-only placeholders; never count invented volume.
- for(let i=low;i<=Math.min(high,bars.length-1);i++)volume+=Math.max(0,Number(bars[i].v)||0);
+ // Future slots have time only; the prefix sum includes actual trades only.
+ // Keep measurement responsive even with ~90k downloaded 1m candles.
+ const prefix=dateRangeVolumePrefix(bars);
+ const volume=low>=bars.length?0:
+  prefix[Math.min(high+1,bars.length)]-prefix[low];
  const future=Math.max(0,high-Math.max(low,bars.length)+1);
  const elapsed=count*duration,days=Math.floor(elapsed/86400000),
   hours=Math.floor(elapsed%86400000/3600000),minutes=Math.floor(elapsed%3600000/60000);
