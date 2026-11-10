@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-ma-forecast-custom-horizon-v191"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-price-wave-forecast-v192"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1250,7 +1250,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
   aria-label="미래 예상 봉 수 직접 입력, 1부터 500" placeholder="예: 120" hidden>
  <div id="maForecastHorizonStatus" class="ma-forecast-horizon-status">현재 20봉 예상</div>
 </div>
-<div class="ma-forecast-hint">최근 20개 확정 봉의 가격 기울기를 연장한 가정값 · 예측은 정확한 미래 가격이 아니며 주문·RMI 신호에 사용하지 않음</div><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label>
+<div class="ma-forecast-hint">최근 20개 확정 봉의 가격 기울기 + 변동폭으로 미래 A·B·C·D·E 예상 가격 패턴을 그림. 같은 예상 가격으로 이평선을 재계산하며, 실제 주문·RMI에는 사용하지 않음</div><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label>
 <div class="date-range-tools">
  <strong>📐 날짜 범위 선택</strong>
  <label><input id="chartDateRangeTool" type="checkbox">차트에서 날짜 범위 측정</label>
@@ -4059,40 +4059,111 @@ const MA_FORECAST_PERIODS=[
  [20,'#b6f266'],[40,'#ffffff'],[60,'#2166ff'],[90,'#69d2ff'],
  [120,'#ff4f50'],[160,'#bf79ff'],[200,'#ff9d43']
 ];
-function projectedMaSeries(bars,horizon,tf,now=Date.now()){
+// v192: A/B/C/D/E zigzag scenario across any chosen horizon (1..500).
+// Synthetic price values live ONLY inside this drawing helper. They must
+// NEVER be appended to candles, RMI series, trade signals or orders.
+function projectedPricePattern(bars,horizon,tf,now=Date.now()){
  if(!Array.isArray(bars)||bars.length<200||horizon<1)return null;
- const duration=candleDuration[tf]||60000;
- const lastIndex=bars.length-1;
- // Ignore the still-open candle when finding a historical trend.
- const finalClosed=bars[lastIndex].t+duration<=now?lastIndex:lastIndex-1;
- if(finalClosed<19)return null;
- const tail=bars.slice(finalClosed-19,finalClosed+1);
- if(tail.length!==20||tail.some((b,i)=>!Number.isFinite(b.c)||
-  i>0&&b.t-tail[i-1].t!==duration))return null;
- const first=tail[0].c,last=tail[19].c,mean=tail.reduce((v,b)=>v+b.c,0)/20;
- let covariance=0;
- for(let i=0;i<20;i++)covariance+=(i-9.5)*(tail[i].c-mean);
- let slope=covariance/665; // sum((i - 9.5)^2), 20 observations
- // Prevent a single abnormal move from producing unbounded projections.
- slope=Math.max(-last*.004,Math.min(last*.004,slope));
- const assumed=[],current=bars[lastIndex].c;
- if(!(current>0))return null;
- for(let k=1;k<=horizon;k++)assumed.push(Math.max(.01,current+slope*k));
+ const duration=candleDuration[tf]||60000,limit=Math.max(1,Math.min(500,Math.floor(horizon)));
+ const final=bars.length-1,last=bars[final],lastClosed=last.t+duration<=now?final:final-1;
+ if(lastClosed<19||!(last.c>0))return null;
+ const recent=bars.slice(lastClosed-19,lastClosed+1);
+ if(recent.length!==20||recent.some((b,i)=>!(b.c>0)||i>0&&b.t-recent[i-1].t!==duration))return null;
+ const mean=recent.reduce((sum,b)=>sum+b.c,0)/20;
+ let cov=0,variance=0;
+ for(let i=0;i<20;i++){
+  cov+=(i-9.5)*(recent[i].c-mean);
+  if(i)variance+=Math.abs(recent[i].c-recent[i-1].c);
+ }
+ const slope=Math.max(-last.c*.004,Math.min(last.c*.004,cov/665));
+ const avgMove=variance/19;
+ // Fixed 5 pivot points divided over the COMPLETE configured horizon.
+ // B and D are pullbacks, while A/C/E trend in the slope direction.
+ // When the slope is near zero, use the recent move's direction as a
+ // deterministic orientation; this is a scenario, not a probability claim.
+ const recentDirection=Math.sign(recent.at(-1).c-recent[0].c)||1;
+ const direction=Math.sign(slope)||recentDirection;
+ const amplitude=Math.min(last.c*.03,Math.max(last.c*.0003,
+  avgMove*Math.sqrt(Math.max(1,limit))*0.85));
+ const nodes=[{step:0,price:last.c,label:'현재'}];
+ const pivotOffsets=[.9,-.65,.85,-.7,0];
+ for(let i=0;i<5;i++){
+  const step=Math.max(1,Math.round(limit*(i+1)/5));
+  const base=last.c+slope*step;
+  const price=Math.max(.01,base+direction*amplitude*pivotOffsets[i]);
+  if(nodes.at(-1).step===step)nodes[nodes.length-1]={step,price,label:'ABCDE'[i]};
+  else nodes.push({step,price,label:'ABCDE'[i]});
+ }
+ const prices=[last.c];
+ for(let i=1;i<=limit;i++){
+  let right=1;
+  while(right<nodes.length-1&&nodes[right].step<i)right++;
+  const a=nodes[right-1],b=nodes[right];
+  const ratio=b.step===a.step?1:(i-a.step)/(b.step-a.step);
+  prices.push(Math.max(.01,a.price+(b.price-a.price)*ratio));
+ }
+ return {prices,nodes,slope,amplitude,duration};
+}
+function projectedMaSeries(bars,horizon,tf,now=Date.now()){
+ const scenario=projectedPricePattern(bars,horizon,tf,now);
+ if(!scenario)return null;
+ const assumed=scenario.prices.slice(1);
  const results=[];
  for(const [period,color] of MA_FORECAST_PERIODS){
   const historical=bars.slice(-period).map(b=>Number(b.c));
   if(historical.length!==period||historical.some(v=>!Number.isFinite(v)||v<=0))continue;
-  let rolling=historical.reduce((sum,v)=>sum+v,0),lastMa=rolling/period;
-  const series=[lastMa];
-  for(let k=0;k<horizon;k++){
-   // Circular rolling window: previous closes are replaced by estimates.
+  let rolling=historical.reduce((sum,v)=>sum+v,0);
+  const values=[rolling/period];
+  for(let k=0;k<assumed.length;k++){
    const outgoing=k<period?historical[k]:assumed[k-period];
    rolling+=assumed[k]-outgoing;
-   series.push(rolling/period);
+   values.push(rolling/period);
   }
-  results.push({period,color,values:series});
+  results.push({period,color,values});
  }
  return results;
+}
+// Display a visually distinct orange wave with 5 price-labelled A-E pivots.
+// Price line and MA dotted lines are derived from the SAME projected closes.
+function drawProjectedPricePattern(ctx,bars,left,count,plotW,top,bottom,y,bw){
+ if(!chartIndicators.maForecast||!bars?.length||count<=0)return;
+ const lastIndex=bars.length-1,available=Math.floor(left+count-1-lastIndex);
+ const horizon=Math.min(maForecastBars,available);
+ if(horizon<1)return;
+ const scenario=projectedPricePattern(bars,horizon,$('tf').value);
+ if(!scenario)return;
+ const toX=step=>(lastIndex+step-left+.5)*bw;
+ ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,Math.max(1,bottom-top));ctx.clip();
+ ctx.lineWidth=2.4;ctx.strokeStyle='#fbbf58';ctx.setLineDash([8,4]);
+ ctx.beginPath();let hasPoint=false;
+ for(let k=0;k<scenario.prices.length;k++){
+  const x=toX(k),yy=y(scenario.prices[k]);
+  if(!Number.isFinite(yy))continue;
+  if(!hasPoint){ctx.moveTo(x,yy);hasPoint=true;}else ctx.lineTo(x,yy);
+ }
+ if(hasPoint)ctx.stroke();
+ ctx.setLineDash([]);
+ const displayed=new Set();
+ for(const node of scenario.nodes){
+  const x=toX(node.step),yy=y(node.price);
+  if(x<0||x>plotW||yy<top||yy>bottom)continue;
+  ctx.fillStyle='#10253e';ctx.strokeStyle='#ffd17c';ctx.lineWidth=1.8;
+  ctx.beginPath();ctx.arc(x,yy,3.7,0,2*Math.PI);ctx.fill();ctx.stroke();
+  if(node.step===0)continue;
+  // Avoid unreadable overlapping labels for tiny forecast horizons.
+  if(displayed.has(node.step))continue;displayed.add(node.step);
+  const label=node.label+' '+Math.round(node.price).toLocaleString('en-US');
+  ctx.font='bold 10px sans-serif';
+  const width=Math.min(plotW-6,ctx.measureText(label).width+9);
+  const bx=Math.max(3,Math.min(plotW-width-3,x-width/2));
+  const by=Math.max(top+3,Math.min(bottom-19,yy+(node.label==='B'||node.label==='D'?9:-24)));
+  ctx.fillStyle='rgba(14,27,43,.92)';ctx.fillRect(bx,by,width,17);
+  ctx.fillStyle='#ffdb94';ctx.fillText(label,bx+4,by+12);
+ }
+ ctx.font='bold 10px sans-serif';
+ ctx.fillStyle='#ffdb94';
+ ctx.fillText('미래 가격 패턴 · 가정',Math.max(5,Math.min(plotW-118,toX(0)+6)),top+12);
+ ctx.restore();
 }
 function drawProjectedMovingAverages(ctx,bars,left,count,plotW,top,bottom,y,bw){
  if(!chartIndicators.maForecast||!bars?.length||!(count>0))return;
@@ -4470,7 +4541,10 @@ for(let i=0;i<5;i++){let p=lo+(hi-lo)*i,yy=y(p);ctx.beginPath();ctx.moveTo(0,yy)
   });
   if(started)ctx.stroke();
 }
-if(chartIndicators.maForecast)drawProjectedMovingAverages(ctx,a,left,count,plotW,top,priceBottom,y,bw);
+if(chartIndicators.maForecast){
+ drawProjectedMovingAverages(ctx,a,left,count,plotW,top,priceBottom,y,bw);
+ drawProjectedPricePattern(ctx,a,left,count,plotW,top,priceBottom,y,bw);
+}
 if(chartIndicators.bb)for(let [key,color] of [['upper','#63b6a8'],['lower','#63b6a8'],['mid','#63b6a8']]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=key==='mid'?1.8:2.1;let started=false;bb.forEach((v,i)=>{if(!v)return;let x=(start+i-left+.5)*bw;if(!started){ctx.moveTo(x,y(v[key]));started=true}else ctx.lineTo(x,y(v[key]))});ctx.stroke()}ctx.restore();drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)});ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'1d':86400000}[$('tf').value],stamp=new Date(a[a.length-1].t+(futureCrosshairSlot+1)*ms),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}if(!chartJumpSegment)drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(!chartJumpSegment&&typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}syncChartPriceOrderTap(cv,0,NaN,null);const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);syncChartPriceOrderTap(cv,plotW,boxY,crosshairPrice);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);}// Overlay a distinct 265-bars-ahead date ruler when it falls in view.
 drawChartDateRange(ctx,a,left,count,plotW,top,priceBottom);
 drawSavedChartShapes(ctx,a,left,count,plotW,top,priceBottom);
