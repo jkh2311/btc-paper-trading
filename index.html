@@ -3568,7 +3568,7 @@ function dateRangeSummary(bars,a,b){
  let volume=0;
  // Future bars are time-only placeholders; never count invented volume.
  for(let i=low;i<=Math.min(high,bars.length-1);i++)volume+=Math.max(0,Number(bars[i].v)||0);
- const future=Math.max(0,high-Math.max(low,bars.length-1));
+ const future=Math.max(0,high-Math.max(low,bars.length)+1);
  const elapsed=count*duration,days=Math.floor(elapsed/86400000),
   hours=Math.floor(elapsed%86400000/3600000),minutes=Math.floor(elapsed%3600000/60000);
  const period=[days?days+'일':'',hours?hours+'시간':'',minutes?minutes+'분':''].filter(Boolean).join(' ')||'1분 미만';
