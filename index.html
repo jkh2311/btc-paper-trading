@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-dynamic-price-waves-v196"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-multicolor-drawings-v197"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -4629,6 +4629,26 @@ let verticalPan=0,levelDragPreview=null;const chart=$('chart');let touchStart=nu
  * the canvas prevents level dragging/order interactions while drawing/editing.
  * Coordinates are candle timestamps + absolute USDT prices, not pixels. */
 const DRAWING_KEY='btc-chart-drawings-v188',DRAWING_MAX=120;
+const DRAWING_PALETTE={
+ abcde:['#f9cb70','#65d9ff','#ff85b9','#a98cff','#73e4a4','#ff986b',
+        '#e5a6ff','#ffdd68','#7caeff','#f58a8a'],
+ line:['#4edbff','#ffba6b','#b18aff','#77e9a4','#ff82aa','#f4db75',
+       '#86a5ff','#f49d8a','#71dce0','#d19afa']
+};
+function drawingDefaultColor(kind,index){
+ const p=DRAWING_PALETTE[kind]||DRAWING_PALETTE.line;
+ return p[index%p.length];
+}
+function drawingNextColor(kind){
+ const palette=DRAWING_PALETTE[kind]||DRAWING_PALETTE.line;
+ const shapes=drawings.filter(d=>d.kind===kind);
+ const previous=shapes.at(-1)?.color;
+ // Prefer an unused color, then the least-used color, avoiding the most
+ // recent one even if many drawings already share the 10-color palette.
+ const choices=palette.filter(c=>c!==previous);
+ return choices.sort((a,b)=>
+  shapes.filter(x=>x.color===a).length-shapes.filter(x=>x.color===b).length)[0]||palette[0];
+}
 let drawings=[],drawingTool=null,drawingDraft=[],drawingSelected=null,drawingEditing=false;
 let drawingDrag=null,drawingTouch=null,drawingLastTap=null,drawingMenuOpen=false;
 function drawLoad(){
@@ -4640,6 +4660,12 @@ function drawLoad(){
    Array.isArray(v.points)&&v.points.length===(v.kind==='line'?2:5)&&
    v.points.every(pt=>Number.isFinite(pt.t)&&Number.isFinite(pt.p)&&pt.p>0))
    .slice(-DRAWING_MAX);
+  const counts={line:0,abcde:0};
+  for(const d of drawings){
+   if(typeof d.color!=='string'||!/^#[0-9a-fA-F]{6}$/.test(d.color))
+    d.color=drawingDefaultColor(d.kind,counts[d.kind]);
+   counts[d.kind]++;
+  }
  }catch(e){console.warn('차트 그리기 기록 읽기 실패',e);}
 }
 function drawSave(){
@@ -4760,7 +4786,8 @@ function drawingPick(clientX,clientY){
  const target=drawingTool==='line'?2:5;
  if(drawingDraft.length>=target){
   const entry={id:'shape-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),
-   tf:$('tf').value,kind:drawingTool,points:drawingDraft.map(v=>({...v}))};
+   tf:$('tf').value,kind:drawingTool,color:drawingNextColor(drawingTool),
+   points:drawingDraft.map(v=>({...v}))};
   drawings.push(entry);if(drawings.length>DRAWING_MAX)drawings.shift();
   drawSave();drawingSelect(entry.id);return;
  }
@@ -4799,13 +4826,14 @@ function drawSavedChartShapes(ctx,bars,left,count,plotW,top,bottom){
    ctx.fillStyle='#102b3e';ctx.strokeStyle=color;ctx.lineWidth=2;
    ctx.beginPath();ctx.arc(v.x,v.y,selected?5.5:3.5,0,Math.PI*2);ctx.fill();ctx.stroke();
    if(kind==='abcde'){
-    ctx.font='bold 13px sans-serif';ctx.fillStyle='#fbeab3';
+    ctx.font='bold 13px sans-serif';ctx.fillStyle=color;
     ctx.fillText('ABCDE'[i],Math.min(plotW-14,v.x+7),Math.max(top+13,v.y-8));
    }
   });
  }
- for(const d of shapes)paint(d.points,d.kind,d.kind==='abcde'?'#f9cb70':'#4edbff',d.id===drawingSelected);
- if(drawingDraft.length)paint(drawingDraft,drawingTool,'#8bf8a1',true);
+ for(const d of shapes)paint(d.points,d.kind,d.color||
+   drawingDefaultColor(d.kind,0),d.id===drawingSelected);
+ if(drawingDraft.length)paint(drawingDraft,drawingTool,drawingNextColor(drawingTool),true);
  ctx.restore();
 }
 function initChartDrawingGestures(){
