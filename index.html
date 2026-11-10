@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-date-range-endpoints-v185"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-continuous-30m-year-v186"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -1969,6 +1969,9 @@ function updateIntradayHistoryJump(){
   if(tf==='1m'){
    button.textContent=loading?'2개월 불러오는 중…':
     viewOffset>0?'최신 ⟶':minuteChartArchive?.length?'2개월 로딩 완료 ✓':'⟵ 2개월 조회';
+  }else if(tf==='30m'){
+   button.textContent=loading?'1년 연결 중…':
+    viewOffset>0?'최신 ⟶':ready?'1년 로딩 완료 ✓':'⟵ 1년 조회';
   }else button.textContent=loading?'과거 로딩 중…':chartJumpSegment?.tf===tf?'최신 ⟶':ready?
     (viewOffset>0?'최신 ⟶':'⟵ '+historyPeriodLabel(tf)):'⟵ '+historyPeriodLabel(tf)+' 조회';
   button.title=loading?'선택한 시간봉의 과거 캔들을 불러오는 중':ready?
@@ -2026,6 +2029,81 @@ async function loadTwoMonthMinuteChart(){
   return false;
  }finally{
   historyLoading['1m']=false;updateIntradayHistoryJump();
+ }
+}
+// 30-minute chart-only, complete one-year snapshot through the CURRENT bar.
+// Download into a temporary array first; never expose partly loaded history
+// or jump to an isolated year-old segment. Live signals/orders keep using
+// their existing data streams and methods.
+async function loadOneYearThirtyMinuteChart(){
+ const tf='30m',duration=1800000;
+ if(demo||historyLoading[tf])return false;
+ const cutoff=Math.floor(historyCutoff(tf)/duration)*duration;
+ const now=Math.floor(Date.now()/duration)*duration;
+ if(historyReadyUntil[tf]!==undefined&&historyReadyUntil[tf]<=cutoff)return true;
+ if(Date.now()-(historyRetryAt[tf]||0)<5000)return false;
+ const live=candles[tf];if(!Array.isArray(live)||live.length<22)return false;
+ historyLoading[tf]=true;historyRetryAt[tf]=Date.now();updateIntradayHistoryJump();
+ const button=$('intradayHistoryJump'),pages=[];
+ for(let cursor=cutoff;cursor<=now;cursor+=1000*duration){
+  pages.push({start:cursor,end:Math.min(now+duration-1,cursor+1000*duration-1)});
+ }
+ const collected=[];
+ try{
+  // Two requests at a time reduce mobile rate-limit failures. Each window
+  // contains no more than 1000 30-minute futures candlesticks.
+  for(let offset=0;offset<pages.length;offset+=2){
+   if(demo)throw Error('데모 전환으로 조회가 중단됐어요');
+   const results=await Promise.all(pages.slice(offset,offset+2).map(async page=>{
+    let lastError;
+    for(let attempt=0;attempt<3;attempt++){
+     try{
+      const url='https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=30m&limit=1000'+
+       '&startTime='+page.start+'&endTime='+page.end;
+      const resp=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+      if(!resp.ok)throw Error('바이낸스 HTTP '+resp.status);
+      const raw=await resp.json();if(!Array.isArray(raw))throw Error('캔들 응답 형식 오류');
+      const bars=raw.map(v=>({t:+v[0],o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:+v[5]}))
+       .filter(b=>Number.isFinite(b.t)&&b.t>=page.start&&b.t<=page.end&&
+        b.c>0&&b.h>=b.l&&b.v>=0);
+      const needed=Math.floor((page.end-page.start+1)/duration);
+      if(bars.length<needed-2)throw Error('누락된 30분봉이 있어 재시도합니다: '+bars.length+'/'+needed);
+      return bars;
+     }catch(e){
+      lastError=e;if(attempt<2)await new Promise(resolve=>setTimeout(resolve,350*(attempt+1)));
+     }
+    }
+    throw lastError||Error('30분봉 조회 실패');
+   }));
+   for(const data of results)collected.push(...data);
+   if(button&&$('tf').value===tf)
+    button.textContent='1년 연결 '+Math.min(offset+2,pages.length)+'/'+pages.length;
+   await new Promise(resolve=>setTimeout(resolve,0));
+  }
+  const ordered=mergeDailyCandles(collected,[]);
+  const expected=Math.floor((now-cutoff)/duration)+1;
+  if(ordered.length<expected-3||ordered[0]?.t>cutoff+duration*2||
+     ordered.at(-1)?.t<now-duration*2)
+   throw Error('1년치 데이터가 완전히 이어지지 않았어요 ('+ordered.length+'/'+expected+'봉)');
+  // Merge the latest Binance/WS data ONLY after successful full history.
+  candles[tf]=mergeDailyCandles(ordered,candles[tf]);
+  historyReadyUntil[tf]=cutoff;
+  if($('tf').value===tf){
+   chartJumpSegment=null;viewOffset=0;
+   crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;
+   resetStableChartScale();draw();drawRmi();
+   const status=$('chartTimeJumpStatus');
+   if(status)status.textContent='30분봉 1년치 연결 완료 · 현재부터 과거 1년까지 좌우로 탐색 가능';
+  }
+  return true;
+ }catch(e){
+  console.warn('30분봉 1년 연속 조회 실패',e);
+  const message='30분봉 1년 조회 실패: '+String(e.message||e)+' · 잠시 후 재시도해 줘.';
+  if(button)button.title=message;
+  const status=$('chartTimeJumpStatus');if(status&&$('tf').value===tf)status.textContent=message;
+  return false;
+ }finally{
+  historyLoading[tf]=false;updateIntradayHistoryJump();
  }
 }
 async function loadIntradayHistory(tf){
@@ -2087,6 +2165,11 @@ function initIntradayHistoryJump(){
    if(tf==='1m'){
     if(viewOffset>0){resetChartTimeJump();return;}
     if(!minuteChartArchive)await loadTwoMonthMinuteChart();
+    return;
+   }
+   if(tf==='30m'){
+    if(viewOffset>0||chartJumpSegment?.tf===tf){resetChartTimeJump();return;}
+    await loadOneYearThirtyMinuteChart();
     return;
    }
    const cutoff=historyCutoff(tf);
