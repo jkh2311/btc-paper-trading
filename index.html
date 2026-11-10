@@ -2008,7 +2008,9 @@ async function loadTwoMonthMinuteChart(){
   return true;
  }catch(e){
   console.warn('1분봉 2개월 연속 이력 조회 실패',e);
-  if(button)button.title='2개월 조회 실패: '+String(e.message||e);
+  const message='2개월 조회 실패: '+String(e.message||e);
+  if(button)button.title=message;
+  const status=$('chartTimeJumpStatus');if(status)status.textContent=message;
   return false;
  }finally{
   historyLoading['1m']=false;updateIntradayHistoryJump();
@@ -2090,7 +2092,7 @@ async function get(tf){let u='https://fapi.binance.com/fapi/v1/klines?symbol=BTC
 async function refresh(){if(working||demo)return;working=true;$('status').textContent='시세 갱신 중…';let out=await Promise.allSettled(tfs.map(get));let ok=0,errors=[];out.forEach((r,i)=>{if(r.status==='fulfilled'){const tf=tfs[i],incoming=r.value,old=candles[tf];if(wsConnected&&old?.length&&incoming?.length){const latest=old[old.length-1],lastIncoming=incoming[incoming.length-1];if(latest.t===lastIncoming.t){lastIncoming.c=latest.c;lastIncoming.h=Math.max(lastIncoming.h,latest.h);lastIncoming.l=Math.min(lastIncoming.l,latest.l)}else if(latest.t>lastIncoming.t&&latest.t-lastIncoming.t<=candleDuration[tf]){incoming.push({...latest});if(incoming.length>1000)incoming.shift()}}candles[tf]=tf==='1m'?mergeMinuteCandles(old,incoming):old?.length&&(tf==='1d'||(Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf)&&old[0].t<incoming[0]?.t))?mergeDailyCandles(old,incoming):incoming;ok++}else errors.push(tfs[i]+': '+String(r.reason.message||r.reason))});syncTenMinuteCandles();syncMinuteChartArchive();if(candles['1m']&&(!lastTickAt||Date.now()-lastTickAt>12000)){last=candles['1m'].at(-1).c;lastTickAt=Date.now()}$('status').textContent='캔들 연결 '+ok+'/'+tfs.length+(errors.length?' · 오류: '+errors.join(' | '):' · 캔들 보정 15초');if(!ok){$('mode').textContent='연결 실패';if(!wsConnected)showMarketConnectionError('캔들 조회 실패 · 연결 상태를 확인하고 다시 시도해 주세요.')}else if(wsConnected)hideMarketConnectionError();working=false;detectDailyConvergence();renderMarketRegimeBadge();process();if(out[tfs.indexOf('1m')]?.status==='fulfilled')maybeEvaluateAutoPaperSignals();
 if(!wsConnected)render();else scheduleLivePaint();
 if(candles['1m']?.length)void loadFiveDayMinuteHistory();if($('tf').value==='1d'&&!dailyHistoryReady)void loadDailyHistory();}
-async function tick(){if(demo||priceBusy||(wsConnected&&Date.now()-lastTickAt<3000))return;priceBusy=true;try{let r=await fetch('https://fapi.binance.com/fapi/v1/ticker/price?symbol=BTCUSDT',{cache:'no-store',signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('HTTP '+r.status);let d=await r.json(),p=Number(d.price);if(!(p>0))throw Error('가격 형식 오류');if(!wsConnected||Date.now()-lastTickAt>3000){last=p;lastTickAt=Date.now();advanceLiveCandles(p,Date.now());syncMinuteChartArchive();process();scheduleLivePaint()}}catch(e){$('status').textContent='가격 갱신 오류: '+e.message+' · 마지막 수신가를 표시 중';if(!wsConnected&&!last)showMarketConnectionError('BTC 시세 조회 실패 · 실시간 연결 재시도 중')}finally{priceBusy=false}}// Binance USD-M Futures raw trade stream; browser receives trades immediately.
+async function tick(){if(demo||priceBusy||(wsConnected&&Date.now()-lastTickAt<3000))return;priceBusy=true;try{let r=await fetch('https://fapi.binance.com/fapi/v1/ticker/price?symbol=BTCUSDT',{cache:'no-store',signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('HTTP '+r.status);let d=await r.json(),p=Number(d.price);if(!(p>0))throw Error('가격 형식 오류');if(!wsConnected||Date.now()-lastTickAt>3000){last=p;lastTickAt=Date.now();advanceLiveCandles(p,Date.now());syncMinuteChartArchive(true);process();scheduleLivePaint()}}catch(e){$('status').textContent='가격 갱신 오류: '+e.message+' · 마지막 수신가를 표시 중';if(!wsConnected&&!last)showMarketConnectionError('BTC 시세 조회 실패 · 실시간 연결 재시도 중')}finally{priceBusy=false}}// Binance USD-M Futures raw trade stream; browser receives trades immediately.
 // DOM/Canvas drawing is throttled separately to avoid blocking iPhone WebSocket processing.
 let pricePaintTimer=null,chartPaintTimer=null,pricePaintQueued=false,chartPaintQueued=false,latestTradeEventAt=0;
 let lastChartPaintAt=0,lastPricePaintAt=0,connectionWatchdog=null;
@@ -2179,7 +2181,7 @@ function applyLiveTrade(price,eventTime){
   if(document.visibilityState==='visible')
    document.dispatchEvent(new CustomEvent('btc:live-trade-price',{detail:{symbol:'BTCUSDT',price,at:lastTickAt}}));
   advanceLiveCandles(price,latestTradeEventAt);
-  syncMinuteChartArchive();
+  syncMinuteChartArchive(true);
   process();scheduleLivePaint();
 }
 function showMarketConnectionError(message){
@@ -3601,13 +3603,13 @@ let chartJumpSegment=null,chartJumpBusy=false;
 // Separate two-month chart archive: the live 1m signal/order feed remains
 // in candles['1m'] with its original five-day cap and behavior.
 let minuteChartArchive=null;
-function syncMinuteChartArchive(){
+function syncMinuteChartArchive(recentOnly=false){
  if(!minuteChartArchive?.length)return;
  const live=candles['1m'];if(!live?.length)return;
  // Only recent minutes need updates; never re-sort the entire two-month
  // history for each WebSocket tick or price redraw.
  const old=minuteChartArchive;
- for(const b of live.slice(-18)){
+ for(const b of live.slice(recentOnly?-1:-18)){
   const last=old.at(-1);
   if(!last||b.t>last.t){old.push({...b});continue;}
   if(b.t===last.t){
