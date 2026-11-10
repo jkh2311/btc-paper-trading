@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-date-range-measurement-v183"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-long-press-future-range-v184"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -1224,7 +1224,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
 <div class="date-range-tools">
  <strong>📐 날짜 범위 선택</strong>
  <label><input id="chartDateRangeTool" type="checkbox">차트에서 날짜 범위 측정</label>
- <div class="date-range-hint">활성화 후 차트의 시작점과 끝점을 차례로 터치하거나 드래그해. 봉 개수·기간·거래량을 표시해.</div>
+ <div class="date-range-hint">차트에서 시작점을 한 번 터치한 다음 끝점을 0.5초 꾹 눌러. 누른 채 드래그하면 범위가 늘어나고, 오른쪽 미래 빈 공간도 선택 가능해.</div>
  <button id="clearChartDateRange" type="button">범위 지우기</button>
  <div id="chartDateRangeStatus" role="status" aria-live="polite"></div>
 </div>
@@ -3527,128 +3527,191 @@ function renderChartTimeAxis(bars,left,count,plotW){
 }
 
 
-/* v183: TradingView-style read-only date range ruler.
- * The tool ONLY inspects actual loaded OHLCV, never creates future bars,
- * changes signals, or interacts with order submission.
+/* v184: read-only date ruler; tap start, LONG-PRESS endpoint (500ms).
+ * Future empty chart slots have inferred TIMES, not invented OHLCV.
+ * Limit auto-pan to keep at least several genuine candles on screen.
  */
-let dateRangeMode=false,dateRangePickStage=0,dateRangeAnchor=null,dateRangeSelection=null;
-let dateRangeTouchMoving=false,dateRangeTouchStarted=false,dateRangeMouseDown=false,dateRangeWasArmed=false;
+let dateRangeMode=false,dateRangeStage=0,dateRangeAnchorTime=null,dateRangeSelection=null;
+let dateRangeHolding=false,dateRangeDragging=false,dateRangeHoldTimer=null,dateRangePanTimer=null;
+let dateRangePointerX=0,dateRangePointerY=0,dateRangeStartX=0,dateRangeIsTouch=false;
+const DATE_RANGE_HOLD_MS=500,DATE_RANGE_MAX_FUTURE=10000;
+function dateRangeTimeAtIndex(bars,index){
+ if(!bars?.length||!Number.isFinite(index)||index<0)return null;
+ if(index<bars.length)return bars[index]?.t??null;
+ const duration=candleDuration[$('tf').value]||60000;
+ return bars.at(-1).t+(index-bars.length+1)*duration;
+}
+function dateRangeIndexForTime(bars,time){
+ if(!bars?.length||!Number.isFinite(time))return -1;
+ const duration=candleDuration[$('tf').value]||60000;
+ if(time>bars.at(-1).t){
+  const steps=(time-bars.at(-1).t)/duration;
+  return Number.isInteger(steps)&&steps>0&&steps<=DATE_RANGE_MAX_FUTURE?
+   bars.length-1+steps:-1;
+ }
+ let lo=0,hi=bars.length;
+ while(lo<hi){const mid=(lo+hi)>>1;if(bars[mid].t<time)lo=mid+1;else hi=mid;}
+ return lo<bars.length&&bars[lo].t===time?lo:-1;
+}
 function dateRangeIndexFromX(clientX){
  const bars=chartViewBars(),rect=$('chart').getBoundingClientRect();
  if(!bars?.length)return null;
  const width=Math.max(1,rect.width-80),x=Math.max(0,Math.min(width-.1,clientX-rect.left));
  const {left,count}=visibleWindow(bars);
- const index=Math.floor(left+x/width*count);
- return Math.min(bars.length-1,Math.max(0,index));
-}
-function dateRangeIndexForTime(bars,time){
- let lo=0,hi=bars.length;
- while(lo<hi){const mid=(lo+hi)>>1;if(bars[mid].t<time)lo=mid+1;else hi=mid;}
- return lo<bars.length&&bars[lo].t===time?lo:-1;
+ const index=Math.max(0,Math.floor(left+x/width*count));
+ return Math.min(bars.length-1+DATE_RANGE_MAX_FUTURE,index);
 }
 function dateRangeSummary(bars,a,b){
- if(!bars?.length||a===null||b===null)return null;
- const low=Math.max(0,Math.min(a,b)),high=Math.min(bars.length-1,Math.max(a,b));
- if(!bars[low]||!bars[high])return null;
+ if(!bars?.length||a===null||b===null||a<0||b<0)return null;
+ const low=Math.max(0,Math.min(a,b)),high=Math.max(a,b);
  const count=high-low+1,duration=candleDuration[$('tf').value]||60000;
  let volume=0;
- for(let i=low;i<=high;i++)volume+=Math.max(0,Number(bars[i].v)||0);
- const ms=count*duration,days=Math.floor(ms/86400000),hours=Math.floor(ms%86400000/3600000),minutes=Math.floor(ms%3600000/60000);
+ // Future bars are time-only placeholders; never count invented volume.
+ for(let i=low;i<=Math.min(high,bars.length-1);i++)volume+=Math.max(0,Number(bars[i].v)||0);
+ const future=Math.max(0,high-Math.max(low,bars.length-1));
+ const elapsed=count*duration,days=Math.floor(elapsed/86400000),
+  hours=Math.floor(elapsed%86400000/3600000),minutes=Math.floor(elapsed%3600000/60000);
  const period=[days?days+'일':'',hours?hours+'시간':'',minutes?minutes+'분':''].filter(Boolean).join(' ')||'1분 미만';
- const volumeText=volume>=1000000?(volume/1000000).toFixed(2)+'M':volume>=1000?(volume/1000).toFixed(2)+'K':volume.toFixed(2);
- return {count,period,volume,volumeText,low,high};
+ const volumeText=volume>=1000000?(volume/1000000).toFixed(2)+'M':
+  volume>=1000?(volume/1000).toFixed(2)+'K':volume.toFixed(2);
+ return {count,period,volume,volumeText,low,high,future};
+}
+function dateRangeResult(){
+ const bars=chartViewBars(),sel=dateRangeSelection;
+ if(!bars?.length||!sel||sel.tf!==$('tf').value)return null;
+ const start=dateRangeIndexForTime(bars,sel.start),end=dateRangeIndexForTime(bars,sel.end);
+ return dateRangeSummary(bars,start,end);
 }
 function updateDateRangeStatus(){
  const el=$('chartDateRangeStatus');if(!el)return;
- const a=chartViewBars(),sel=dateRangeSelection,active=sel?.tf===$('tf').value;
- if(active){
-  const start=dateRangeIndexForTime(a,sel.start),end=dateRangeIndexForTime(a,sel.end);
-  const summary=dateRangeSummary(a,start<0?null:start,end<0?null:end);
-  el.textContent=summary?summary.count+'봉 · '+summary.period+' · 거래량 '+summary.volumeText+' BTC':
-   '범위에 해당하는 기록을 현재 차트에서 찾지 못했어';
- }else el.textContent=dateRangeMode?'차트 시작점 → 끝점 선택':'';
+ const summary=dateRangeResult();
+ if(summary&&dateRangeStage===2){
+  el.textContent=summary.count+'봉 · '+summary.period+' · 실제 거래량 '+summary.volumeText+
+   ' BTC'+(summary.future?' · 미래 '+summary.future+'봉(거래량 없음)':'');
+ }else if(dateRangeMode){
+  el.textContent=dateRangeStage===1?'시작점 선택 완료 → 끝점을 0.5초 꾹 눌러':
+   dateRangeHolding?'길게 누른 채 끝점 위치를 이동할 수 있어':'시작점을 한 번 터치해';
+ }else el.textContent='';
 }
-function dateRangePick(index,finished){
- const bars=chartViewBars();if(index===null||!bars?.[index])return;
- if(dateRangePickStage===0||dateRangePickStage===2){
-  dateRangeAnchor=index;dateRangePickStage=1;
- }
- dateRangeSelection={tf:$('tf').value,start:bars[dateRangeAnchor].t,end:bars[index].t};
- if(finished)dateRangePickStage=2;
+function dateRangeClearTimers(){
+ clearTimeout(dateRangeHoldTimer);clearInterval(dateRangePanTimer);
+ dateRangeHoldTimer=null;dateRangePanTimer=null;
+}
+function dateRangeStop(){
+ dateRangeClearTimers();dateRangeHolding=false;dateRangeDragging=false;
+ dateRangeStage=0;dateRangeAnchorTime=null;dateRangeSelection=null;
  updateDateRangeStatus();draw();
 }
-function dateRangeStop(){dateRangePickStage=0;dateRangeAnchor=null;dateRangeSelection=null;updateDateRangeStatus();draw()}
+function dateRangeStart(clientX,clientY,isTouch){
+ if(!dateRangeMode)return;
+ dateRangeClearTimers();dateRangePointerX=clientX;dateRangePointerY=clientY;
+ dateRangeStartX=clientX;dateRangeIsTouch=isTouch;dateRangeDragging=false;
+ const bars=chartViewBars(),idx=dateRangeIndexFromX(clientX);
+ const time=dateRangeTimeAtIndex(bars,idx);
+ if(time===null)return;
+ if(dateRangeStage!==1){
+  // First tap chooses the anchor but never paints the blue region.
+  dateRangeAnchorTime=time;dateRangeSelection=null;dateRangeStage=1;
+  dateRangeHolding=false;updateDateRangeStatus();draw();return;
+ }
+ // Second tap must be held; a quick tap does NOT show a measurement.
+ dateRangeHolding=false;
+ dateRangeHoldTimer=setTimeout(()=>{
+  if(!dateRangeMode||dateRangeStage!==1)return;
+  dateRangeHolding=true;dateRangeDragging=true;
+  dateRangeExtend(dateRangePointerX);
+  // Keep moving forward while holding near the chart's right edge,
+  // so the user can select future time beyond the initial empty slots.
+  dateRangePanTimer=setInterval(()=>{
+   if(!dateRangeHolding)return;
+   const rect=$('chart').getBoundingClientRect();
+   const width=Math.max(1,rect.width-80),x=dateRangePointerX-rect.left;
+   if(x<width-27||x>width+25)return;
+   const bars=chartViewBars();if(!bars?.length)return;
+   const maxLeft=bars.length-4;
+   const left=visibleWindow(bars).left;
+   if(left>=maxLeft)return;
+   viewOffset=Math.max(-1000000,viewOffset-2);
+   dateRangeExtend(dateRangePointerX);
+  },110);
+ },DATE_RANGE_HOLD_MS);
+}
+function dateRangeExtend(clientX){
+ const bars=chartViewBars(),idx=dateRangeIndexFromX(clientX);
+ const end=dateRangeTimeAtIndex(bars,idx);
+ if(end===null||dateRangeAnchorTime===null)return;
+ dateRangeSelection={tf:$('tf').value,start:dateRangeAnchorTime,end};
+ updateDateRangeStatus();draw();
+}
+function dateRangeMove(clientX,clientY){
+ dateRangePointerX=clientX;dateRangePointerY=clientY;
+ if(!dateRangeMode||dateRangeStage!==1)return;
+ if(!dateRangeHolding){
+  // A drag before the hold duration is just panning intent, NOT a measurement.
+  if(Math.abs(clientX-dateRangeStartX)>14)clearTimeout(dateRangeHoldTimer);
+  return;
+ }
+ dateRangeExtend(clientX);
+}
+function dateRangeFinish(){
+ dateRangeClearTimers();
+ if(dateRangeHolding&&dateRangeSelection){
+  dateRangeStage=2;dateRangeHolding=false;
+ }else dateRangeHolding=false;
+ updateDateRangeStatus();draw();
+}
 function initChartDateRangeTool(){
  const input=$('chartDateRangeTool'),clear=$('clearChartDateRange'),canvas=$('chart');
  if(!input||!clear||!canvas)return;
  input.addEventListener('change',()=>{
-  dateRangeMode=input.checked;dateRangePickStage=0;dateRangeAnchor=null;
+  dateRangeMode=input.checked;dateRangeStop();
   canvas.classList.toggle('date-range-picking',dateRangeMode);
-  updateDateRangeStatus();
  });
  clear.addEventListener('click',e=>{e.preventDefault();dateRangeStop()});
- // Capture before the ordinary pinch, order-level drag, and inspection handlers.
+ // Capturing prevents the chart's order/SL/TP handlers running in measure mode.
  canvas.addEventListener('touchstart',e=>{
-  if(!dateRangeMode||!e.touches.length)return;
-  e.preventDefault();e.stopImmediatePropagation();
-  if(e.touches.length!==1){dateRangeTouchStarted=false;return;}
-  dateRangeTouchStarted=true;dateRangeTouchMoving=false;dateRangeWasArmed=dateRangePickStage===1;
-  const idx=dateRangeIndexFromX(e.touches[0].clientX);
-  if(idx===null)return;
-  dateRangePick(idx,false);
+  if(!dateRangeMode)return;e.preventDefault();e.stopImmediatePropagation();
+  if(e.touches.length!==1){dateRangeClearTimers();return;}
+  const t=e.touches[0];dateRangeStart(t.clientX,t.clientY,true);
  },{capture:true,passive:false});
  canvas.addEventListener('touchmove',e=>{
-  if(!dateRangeMode)return;
-  e.preventDefault();e.stopImmediatePropagation();
-  if(!dateRangeTouchStarted||e.touches.length!==1)return;
-  dateRangeTouchMoving=true;
-  const idx=dateRangeIndexFromX(e.touches[0].clientX);
-  if(idx!==null)dateRangePick(idx,false);
+  if(!dateRangeMode)return;e.preventDefault();e.stopImmediatePropagation();
+  if(e.touches.length!==1){dateRangeClearTimers();return;}
+  const t=e.touches[0];dateRangeMove(t.clientX,t.clientY);
  },{capture:true,passive:false});
  canvas.addEventListener('touchend',e=>{
-  if(!dateRangeMode)return;
-  e.preventDefault();e.stopImmediatePropagation();
-  if(!dateRangeTouchStarted)return;
-  const touch=e.changedTouches[0],idx=touch?dateRangeIndexFromX(touch.clientX):null;
-  if(idx!==null)dateRangePick(idx,dateRangeTouchMoving||dateRangeWasArmed);
-  // First tap stays armed, the second tap (even the same bar) completes.
-  dateRangeTouchStarted=false;dateRangeWasArmed=false;
+  if(!dateRangeMode)return;e.preventDefault();e.stopImmediatePropagation();
+  if(e.touches.length===0){
+   if(dateRangeHolding&&e.changedTouches[0])dateRangeExtend(e.changedTouches[0].clientX);
+   dateRangeFinish();
+  }
  },{capture:true,passive:false});
  canvas.addEventListener('touchcancel',e=>{
-  if(dateRangeMode){e.stopImmediatePropagation();dateRangeTouchStarted=false;}
- },{capture:true});
+  if(dateRangeMode){e.preventDefault();e.stopImmediatePropagation();dateRangeFinish();}
+ },{capture:true,passive:false});
  canvas.addEventListener('mousedown',e=>{
   if(!dateRangeMode||e.button!==0)return;
-  e.preventDefault();e.stopImmediatePropagation();dateRangeMouseDown=true;dateRangeTouchMoving=false;dateRangeWasArmed=dateRangePickStage===1;
-  const idx=dateRangeIndexFromX(e.clientX);if(idx!==null)dateRangePick(idx,false);
+  e.preventDefault();e.stopImmediatePropagation();
+  dateRangeStart(e.clientX,e.clientY,false);
  },true);
  window.addEventListener('mousemove',e=>{
-  if(!dateRangeMode||!dateRangeMouseDown)return;
-  dateRangeTouchMoving=true;const idx=dateRangeIndexFromX(e.clientX);
-  if(idx!==null)dateRangePick(idx,false);
+  if(dateRangeMode&&dateRangeStage===1)dateRangeMove(e.clientX,e.clientY);
  },true);
  window.addEventListener('mouseup',e=>{
-  if(!dateRangeMouseDown)return;
-  dateRangeMouseDown=false;
   if(!dateRangeMode)return;
-  const idx=dateRangeIndexFromX(e.clientX);
-  if(idx!==null)dateRangePick(idx,dateRangeTouchMoving||dateRangeWasArmed);
-  dateRangeWasArmed=false;
+  if(dateRangeHolding)dateRangeExtend(e.clientX);
+  dateRangeFinish();
  },true);
- $('tf')?.addEventListener('change',()=>{
-  dateRangePickStage=0;dateRangeAnchor=null;updateDateRangeStatus();
- });
+ $('tf')?.addEventListener('change',dateRangeStop);
  updateDateRangeStatus();
 }
 function drawChartDateRange(ctx,bars,left,count,plotW,top,bottom){
- const sel=dateRangeSelection;if(!sel||sel.tf!==$('tf').value)return;
- const first=dateRangeIndexForTime(bars,sel.start),last=dateRangeIndexForTime(bars,sel.end);
- if(first<0||last<0)return;
- const stats=dateRangeSummary(bars,first,last);if(!stats)return;
- const bw=plotW/count,raw1=(first-left+.5)*bw,raw2=(last-left+.5)*bw;
- const x1=Math.max(0,Math.min(plotW,Math.min(raw1,raw2)));
- const x2=Math.max(0,Math.min(plotW,Math.max(raw1,raw2)));
- if(x2<0||x1>plotW)return;
+ const summary=dateRangeResult();if(!summary||!dateRangeSelection)return;
+ // Blue region appears only after a successful LONG-PRESS.
+ if(!dateRangeHolding&&dateRangeStage!==2)return;
+ const bw=plotW/count,raw1=(summary.low-left+.5)*bw,raw2=(summary.high-left+.5)*bw;
+ if(raw2<0||raw1>plotW)return;
+ const x1=Math.max(0,Math.min(plotW,raw1)),x2=Math.max(0,Math.min(plotW,raw2));
  ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,Math.max(0,bottom-top));ctx.clip();
  const width=Math.max(1,x2-x1),mid=(x1+x2)/2;
  ctx.fillStyle='rgba(36,94,236,.17)';ctx.fillRect(x1,top+2,width,bottom-top-4);
@@ -3656,10 +3719,10 @@ function drawChartDateRange(ctx,bars,left,count,plotW,top,bottom){
  for(const x of [x1,x2]){ctx.beginPath();ctx.moveTo(x,top+3);ctx.lineTo(x,bottom-2);ctx.stroke();}
  const cy=top+(bottom-top)*.52;
  ctx.beginPath();ctx.moveTo(x1,cy);ctx.lineTo(x2,cy);ctx.stroke();
- ctx.beginPath();ctx.moveTo(x2-Math.min(10,width*.3),cy-6);ctx.lineTo(x2,cy);
- ctx.lineTo(x2-Math.min(10,width*.3),cy+6);ctx.stroke();
- ctx.font='bold 11px sans-serif';const label=stats.count+'봉 · '+stats.period;
- const info='거래량 '+stats.volumeText+' BTC';
+ ctx.beginPath();ctx.moveTo(x2-Math.min(10,width*.3),cy-6);
+ ctx.lineTo(x2,cy);ctx.lineTo(x2-Math.min(10,width*.3),cy+6);ctx.stroke();
+ ctx.font='bold 11px sans-serif';
+ const label=summary.count+'봉 · '+summary.period,info='거래량 '+summary.volumeText+' BTC'+(summary.future?' (미래 '+summary.future+'봉 제외)':'');
  const lw=Math.max(ctx.measureText(label).width,ctx.measureText(info).width)+20;
  const boxW=Math.min(plotW-8,Math.max(115,lw)),boxX=Math.max(4,Math.min(plotW-boxW-4,mid-boxW/2));
  const boxY=Math.max(top+6,Math.min(bottom-47,cy-64));
