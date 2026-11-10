@@ -4191,6 +4191,12 @@ function initChartIndicatorControls(){
     const input=e.target;if(!input.matches('input[data-chart-indicator]'))return;
     const key=input.dataset.chartIndicator;if(!CHART_INDICATOR_KEYS.includes(key))return;
     chartIndicators[key]=input.checked;
+    // The forecast can be configured while off. Turning it on must still
+    // reveal the full saved horizon, not only the old 20 blank chart slots.
+    if(key==='maForecast'&&input.checked){
+      viewCount=Math.max(viewCount,Math.min(600,maForecastBars+40));
+      viewOffset=0;
+    }
     try{localStorage.setItem(chartIndicatorStorageKey,JSON.stringify(chartIndicators))}catch(_){}
     apply();
   });
