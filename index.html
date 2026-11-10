@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-long-press-future-range-v184"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-date-range-endpoints-v185"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{overflow:hidden}#chart{height:390px;border-radius:0}#rmiChart{border-radius:0}.candle-info{min-height:0;margin-top:6px}.candle-info:empty{display:none}.chart-tools{display:flex;gap:7px;margin:9px 0}.chart-tools button{flex:1;padding:9px}.account-strip{display:flex;justify-content:space-between;gap:8px;background:#14233b;border-radius:13px;padding:12px;margin-top:8px}.account-strip>div{display:flex;flex-direction:column;gap:5px}.account-strip small{color:#9db1cb;font-size:11px}.account-strip strong{font-size:14px}.account-strip>div:last-child{text-align:right}.trade-bar{position:fixed;bottom:65px;left:0;right:0;z-index:8;display:flex;gap:10px;padding:9px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));background:#0d1a2e;border-top:1px solid #2d415f}.trade-bar button{flex:1;font-size:16px;font-weight:700;padding:13px}.trade-bar.hidden{display:none}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:flex;background:#0d1a2e;border-top:1px solid #2d415f;padding:5px 3px calc(6px + env(safe-area-inset-bottom))}.nav-btn{flex:1;border:0;background:transparent;color:#92a7c4;padding:4px 1px;display:flex;align-items:center;flex-direction:column;gap:3px;font-size:10px}.nav-btn span{font-size:21px;line-height:22px}.nav-btn.active{color:#8ab9ff}.card{margin:10px 0;padding:14px}.footnote{line-height:1.6}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:370px){.header-actions .pill{display:none}.trade-bar button{padding:11px}.price{font-size:26px}}
@@ -1224,7 +1224,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
 <div class="date-range-tools">
  <strong>📐 날짜 범위 선택</strong>
  <label><input id="chartDateRangeTool" type="checkbox">차트에서 날짜 범위 측정</label>
- <div class="date-range-hint">차트에서 시작점을 한 번 터치한 다음 끝점을 0.5초 꾹 눌러. 누른 채 드래그하면 범위가 늘어나고, 오른쪽 미래 빈 공간도 선택 가능해.</div>
+ <div class="date-range-hint">시작점 한 번 터치 → 날짜·시간 세로선 표시 → 끝점 0.5초 꾹 눌러 범위 확정. 범위 확정 후에도 양쪽 날짜·시간이 표시돼.</div>
  <button id="clearChartDateRange" type="button">범위 지우기</button>
  <div id="chartDateRangeStatus" role="status" aria-live="polite"></div>
 </div>
@@ -3594,16 +3594,23 @@ function dateRangeResult(){
  const start=dateRangeIndexForTime(bars,sel.start),end=dateRangeIndexForTime(bars,sel.end);
  return dateRangeSummary(bars,start,end);
 }
+function dateRangeDateTime(time){
+ if(!Number.isFinite(time))return '시간 확인 불가';
+ return new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',
+  year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',
+  hour12:false}).format(new Date(time));
+}
 function updateDateRangeStatus(){
  const el=$('chartDateRangeStatus');if(!el)return;
- const summary=dateRangeResult();
+ const summary=dateRangeResult(),sel=dateRangeSelection;
  if(summary&&dateRangeStage===2){
-  el.textContent=summary.count+'봉 · '+summary.period+' · 실제 거래량 '+summary.volumeText+
+  el.textContent='시작 '+dateRangeDateTime(sel.start)+'\n끝 '+dateRangeDateTime(sel.end)+
+   '\n'+summary.count+'봉 · '+summary.period+' · 실제 거래량 '+summary.volumeText+
    ' BTC'+(summary.future?' · 미래 '+summary.future+'봉(거래량 없음)':'');
- }else if(dateRangeMode){
-  el.textContent=dateRangeStage===1?'시작점 선택 완료 → 끝점을 0.5초 꾹 눌러':
-   dateRangeHolding?'길게 누른 채 끝점 위치를 이동할 수 있어':'시작점을 한 번 터치해';
- }else el.textContent='';
+ }else if(dateRangeMode&&dateRangeStage===1&&Number.isFinite(dateRangeAnchorTime)){
+  el.textContent='시작 '+dateRangeDateTime(dateRangeAnchorTime)+
+   '\n끝점을 0.5초 꾹 눌러 범위를 확정해';
+ }else el.textContent=dateRangeMode?'시작점을 한 번 터치해':'';
 }
 function dateRangeClearTimers(){
  clearTimeout(dateRangeHoldTimer);clearInterval(dateRangePanTimer);
@@ -3718,30 +3725,65 @@ function initChartDateRangeTool(){
  updateDateRangeStatus();
 }
 function drawChartDateRange(ctx,bars,left,count,plotW,top,bottom){
- const summary=dateRangeResult();if(!summary||!dateRangeSelection)return;
- // Blue region appears only after a successful LONG-PRESS.
- if(!dateRangeHolding&&dateRangeStage!==2)return;
- const bw=plotW/count,raw1=(summary.low-left+.5)*bw,raw2=(summary.high-left+.5)*bw;
- if(raw2<0||raw1>plotW)return;
- const x1=Math.max(0,Math.min(plotW,raw1)),x2=Math.max(0,Math.min(plotW,raw2));
+ if(!bars?.length||(!dateRangeMode&&!dateRangeSelection))return;
+ const px=plotW/count;
+ const anchorIndex=dateRangeIndexForTime(bars,dateRangeAnchorTime);
+ const summary=dateRangeResult();
+ const selection=dateRangeSelection;
+ const showEnd=!!summary&&(dateRangeHolding||dateRangeStage===2);
+ const first=showEnd?summary.low:anchorIndex;
+ const last=showEnd?summary.high:anchorIndex;
+ if(first<0||last<0)return;
+ const rawLeft=(first-left+.5)*px,rawRight=(last-left+.5)*px;
+ // Off-screen range labels never appear pinned misleadingly to an edge.
+ if(rawRight<0||rawLeft>plotW)return;
+ const x1=Math.max(0,Math.min(plotW,rawLeft));
+ const x2=Math.max(0,Math.min(plotW,rawRight));
  ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,Math.max(0,bottom-top));ctx.clip();
- const width=Math.max(1,x2-x1),mid=(x1+x2)/2;
- ctx.fillStyle='rgba(36,94,236,.17)';ctx.fillRect(x1,top+2,width,bottom-top-4);
- ctx.strokeStyle='#3e8aff';ctx.lineWidth=1.8;ctx.setLineDash([]);
- for(const x of [x1,x2]){ctx.beginPath();ctx.moveTo(x,top+3);ctx.lineTo(x,bottom-2);ctx.stroke();}
- const cy=top+(bottom-top)*.52;
- ctx.beginPath();ctx.moveTo(x1,cy);ctx.lineTo(x2,cy);ctx.stroke();
- ctx.beginPath();ctx.moveTo(x2-Math.min(10,width*.3),cy-6);
- ctx.lineTo(x2,cy);ctx.lineTo(x2-Math.min(10,width*.3),cy+6);ctx.stroke();
- ctx.font='bold 11px sans-serif';
- const label=summary.count+'봉 · '+summary.period,info='거래량 '+summary.volumeText+' BTC'+(summary.future?' (미래 '+summary.future+'봉 제외)':'');
- const lw=Math.max(ctx.measureText(label).width,ctx.measureText(info).width)+20;
- const boxW=Math.min(plotW-8,Math.max(115,lw)),boxX=Math.max(4,Math.min(plotW-boxW-4,mid-boxW/2));
- const boxY=Math.max(top+6,Math.min(bottom-47,cy-64));
- ctx.fillStyle='rgba(12,23,39,.93)';ctx.fillRect(boxX,boxY,boxW,40);
- ctx.strokeStyle='#3983ed';ctx.strokeRect(boxX,boxY,boxW,40);
- ctx.fillStyle='#e7f1ff';ctx.fillText(label,boxX+8,boxY+16);
- ctx.font='10px sans-serif';ctx.fillText(info,boxX+8,boxY+32);
+ if(showEnd){
+  // Keep the old TradingView-like blue zone, count and volume box.
+  const width=Math.max(1,x2-x1),mid=(x1+x2)/2;
+  ctx.fillStyle='rgba(36,94,236,.17)';ctx.fillRect(x1,top+2,width,bottom-top-4);
+  ctx.strokeStyle='#3e8aff';ctx.lineWidth=1.8;ctx.setLineDash([]);
+  const cy=top+(bottom-top)*.52;
+  ctx.beginPath();ctx.moveTo(x1,cy);ctx.lineTo(x2,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x2-Math.min(10,width*.3),cy-6);
+  ctx.lineTo(x2,cy);ctx.lineTo(x2-Math.min(10,width*.3),cy+6);ctx.stroke();
+  ctx.font='bold 11px sans-serif';
+  const label=summary.count+'봉 · '+summary.period;
+  const info='거래량 '+summary.volumeText+' BTC'+(summary.future?' (미래 '+summary.future+'봉 제외)':'');
+  const lw=Math.max(ctx.measureText(label).width,ctx.measureText(info).width)+20;
+  const boxW=Math.min(plotW-8,Math.max(115,lw)),boxX=Math.max(4,Math.min(plotW-boxW-4,mid-boxW/2));
+  const boxY=Math.max(top+49,Math.min(bottom-47,cy-40));
+  ctx.fillStyle='rgba(12,23,39,.93)';ctx.fillRect(boxX,boxY,boxW,40);
+  ctx.strokeStyle='#3983ed';ctx.strokeRect(boxX,boxY,boxW,40);
+  ctx.fillStyle='#e7f1ff';ctx.fillText(label,boxX+8,boxY+16);
+  ctx.font='10px sans-serif';ctx.fillText(info,boxX+8,boxY+32);
+ }
+ // Starting on the FIRST tap: immediately show the original crosshair-like
+ // vertical ruler and its full date/time, even without a completed range.
+ // Once finished, keep BOTH start and end rulers visible.
+ const endpoints=showEnd?
+  [{time:selection.start,index:dateRangeIndexForTime(bars,selection.start),name:'시작',color:'#78d7ff'},
+   {time:selection.end,index:dateRangeIndexForTime(bars,selection.end),name:'끝',color:'#ffcd76'}]:
+  [{time:dateRangeAnchorTime,index:anchorIndex,name:'시작',color:'#78d7ff'}];
+ const labelRows=endpoints.length>1&&Math.abs(
+  (endpoints[0].index-endpoints[1].index)*px)<195?2:1;
+ endpoints.forEach((point,i)=>{
+  if(point.index<0)return;
+  const rawX=(point.index-left+.5)*px;
+  if(rawX<0||rawX>plotW)return;
+  ctx.strokeStyle=point.color;ctx.lineWidth=1.5;ctx.setLineDash([5,5]);
+  ctx.beginPath();ctx.moveTo(rawX,top);ctx.lineTo(rawX,bottom);ctx.stroke();
+  ctx.setLineDash([]);ctx.font='bold 10px sans-serif';
+  const caption=point.name+' '+dateRangeDateTime(point.time);
+  const boxW=Math.min(plotW-8,ctx.measureText(caption).width+12);
+  const boxX=Math.max(4,Math.min(plotW-boxW-4,rawX-boxW/2));
+  const boxY=top+5+(labelRows===2?i*26:0);
+  ctx.fillStyle='rgba(15,31,49,.96)';ctx.fillRect(boxX,boxY,boxW,21);
+  ctx.strokeStyle=point.color;ctx.lineWidth=1;ctx.strokeRect(boxX,boxY,boxW,21);
+  ctx.fillStyle=point.color;ctx.fillText(caption,boxX+6,boxY+14);
+ });
  ctx.restore();
 }
 
