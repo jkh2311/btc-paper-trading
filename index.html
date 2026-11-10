@@ -6277,7 +6277,10 @@ function renderState(){
 function normalize(p){
  if(!p)return null;
  const ps=String(p.positionSide||p.side||'BOTH'),amount=Number(p.amount);
- const side=ps==='BOTH'?(amount>0?'LONG':'SHORT'):ps;
+ // The row's explicit LONG/SHORT side must win in one-way BOTH mode:
+ // its display quantity is absolute, whereas exchange snapshots are signed.
+ const direction=['LONG','SHORT'].includes(p.side)?p.side:null;
+ const side=direction|| (ps==='BOTH'?(amount>0?'LONG':'SHORT'):ps);
  return ['LONG','SHORT'].includes(side)&&Number.isFinite(amount)&&Math.abs(amount)>0?
   {side,positionSide:ps,amount:Math.abs(amount),entry:Number(p.entry),mark:Number(p.mark)}:null;
 }
@@ -6417,6 +6420,11 @@ $('btcSwitchArm').addEventListener('click',async()=>{
   if(!profitable(p.side,target,p.entry,p.mark))
    throw Error('지정 가격은 진입가와 현재가보다 익절 방향이어야 합니다');
   const lot=await qtyFilter();exactQty(newQty,lot);
+  // Prevent obvious below-minimum new-position orders before accepting an
+  // armed rule. Binance is still the authority at actual order placement.
+  const minNotional=5;
+  if(newQty*p.mark<minNotional*1.02)
+   throw Error('신규 진입 규모가 최소 명목가치 약 '+minNotional+' USDT보다 작습니다.');
   const r=await risk(),live=findPosition(r,p);
   if(!live||r.dual!==(p.positionSide!=='BOTH'))throw Error('바이낸스 포지션 또는 헤지 모드가 일치하지 않아요');
   const q=Math.abs(Number(live.positionAmt));
