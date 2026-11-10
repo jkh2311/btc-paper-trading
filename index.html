@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-per-candle-price-trend-v195"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261110-dynamic-price-waves-v196"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1251,14 +1251,14 @@ body.ai-entry-modal-open{overflow:hidden!important}
  <div id="maForecastHorizonStatus" class="ma-forecast-horizon-status">현재 20봉 예상</div>
 </div>
 <div class="ma-forecast-horizon">
- <label for="maPricePatternBasis">미래 가격선 예측 기준</label>
- <select id="maPricePatternBasis" aria-label="미래 가격선 예측 기준">
+ <label for="maPricePatternBasis">미래 가격 파동 예측 기준</label>
+ <select id="maPricePatternBasis" aria-label="미래 가격 파동 예측 기준">
   <option value="composite">종합 이평선 기준 (20·40·60·90·120·160·200)</option>
   <option value="ma200">200봉 이평선 기준 (완만한 장기 추세)</option>
  </select>
  <div id="maPricePatternBasisHint" class="ma-forecast-horizon-status">7개 이평선 종합 · 중단기 및 장기 추세 반영</div>
 </div>
-<div class="ma-forecast-hint">설정한 미래 봉 수만큼 한 봉씩 예상 가격을 계산해 연속선으로 연결하고, 이 가격으로 미래 이평선을 계산함. 중앙값이 아니라 이평선 기울기 기반의 가정값이며 주문·RMI에는 사용하지 않음. 200봉은 현재 선택한 시간봉의 200개 캔들을 뜻함.</div><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label>
+<div class="ma-forecast-hint">최근 확정 봉의 종가 변동 패턴과 이평선 기울기로 미래 예상 종가를 그려. 가격 경로의 꺾이는 지점은 A·B·C…로 자동 표시(5개 고정 아님). 예측 이평선은 이 가상 가격으로 계산하며, 주문·RMI에 사용하지 않아.</div><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label>
 <div class="date-range-tools">
  <strong>📐 날짜 범위 선택</strong>
  <label><input id="chartDateRangeTool" type="checkbox">차트에서 날짜 범위 측정</label>
@@ -4126,19 +4126,52 @@ function projectedPricePattern(bars,horizon,tf,now=Date.now()){
   Math.max(-last.c*.001,Math.min(last.c*.001,projectedMaSlope(bars,200,lastClosed))):
   Math.max(-last.c*.004,Math.min(last.c*.004,
    recentSlope*.45+compositeSlope*.55));
- const avgMove=variance/19;
- // Each FUTURE candle gets its own hypothetical close.
- // The long-term 200-bar basis uses a smaller linear slope; the composite
- // basis blends seven SMA slopes with the recent trend. Neither is a median.
- // Clamp extreme total displacement to reduce unbounded extrapolation.
+ // Derive swing variation from the actual 40 most recent confirmed
+ // closing-price changes, detrended by their average. Reuse the pattern as
+ // a hypothetical scenario, not as a forecast with statistical certainty.
+ const history=bars.slice(lastClosed-40,lastClosed+1);
+ if(history.length!==41||history.some((b,i)=>!(b.c>0)||
+  i>0&&b.t-history[i-1].t!==duration))return null;
+ const changes=[];
+ for(let i=1;i<history.length;i++)changes.push(history[i].c-history[i-1].c);
+ const cycle=changes.length;
+ const drift=changes.reduce((a,b)=>a+b,0)/cycle;
+ const variations=changes.map((v,i)=>{
+  const prior=changes[(i+cycle-1)%cycle],next=changes[(i+1)%cycle];
+  return .25*prior+.5*v+.25*next-drift;
+ });
+ const typicalMove=variations.reduce((sum,v)=>sum+Math.abs(v),0)/cycle;
+ const gain=maPricePatternBasis==='ma200'?.20:.8;
  const maxTotal=maPricePatternBasis==='ma200'?.07:.18;
+ const template=[0];
+ for(const change of variations)template.push(template.at(-1)+change);
+ // Centre the repeating 40-bar shape, including the seam between cycles.
+ const residualEnd=template.at(-1);
  const prices=[last.c];
  for(let step=1;step<=limit;step++){
-  const raw=last.c+slope*step;
-  const p=Math.max(last.c*(1-maxTotal),Math.min(last.c*(1+maxTotal),raw));
-  prices.push(Math.max(.01,p));
+  const phase=step%cycle;
+  const swing=(template[phase]-residualEnd*phase/cycle)*gain;
+  const base=last.c+slope*step+swing;
+  prices.push(Math.max(.01,Math.max(last.c*(1-maxTotal),
+   Math.min(last.c*(1+maxTotal),base))));
  }
- return {prices,nodes:[],slope,amplitude:0,duration,basis:maPricePatternBasis};
+ const nodes=[];
+ const minSwing=Math.max(last.c*.00002,typicalMove*gain*.12);
+ let previousTurn=0;
+ function waveLabel(i){
+  let n=i+1,out='';
+  while(n>0){n--;out=String.fromCharCode(65+n%26)+out;n=Math.floor(n/26);}
+  return out;
+ }
+ for(let i=1;i<limit;i++){
+  const a=prices[i]-prices[i-1],b=prices[i+1]-prices[i];
+  if(Math.sign(a)===Math.sign(b)||!a||!b||i-previousTurn<2)continue;
+  if(Math.abs(prices[i]-prices[previousTurn])<minSwing)continue;
+  nodes.push({step:i,price:prices[i],label:waveLabel(nodes.length)});
+  previousTurn=i;
+ }
+ return {prices,nodes,slope,amplitude:typicalMove*gain,
+  duration,basis:maPricePatternBasis};
 }
 function projectedMaSeries(bars,horizon,tf,now=Date.now()){
  const scenario=projectedPricePattern(bars,horizon,tf,now);
@@ -4163,6 +4196,7 @@ function projectedMaSeries(bars,horizon,tf,now=Date.now()){
 // Price line and MA dotted lines are derived from the SAME projected closes.
 // Thin white guide: connect ONE price estimate per future candle.
 // Painted before projected moving averages, keeping their colors clear.
+// Subtle white multi-turn price-wave scenario below forecast MA curves.
 function drawProjectedPricePattern(ctx,bars,left,count,plotW,top,bottom,y,bw){
  if(!chartIndicators.maForecast||!bars?.length||count<=0)return;
  const lastIndex=bars.length-1,available=Math.floor(left+count-1-lastIndex);
@@ -4172,21 +4206,34 @@ function drawProjectedPricePattern(ctx,bars,left,count,plotW,top,bottom,y,bw){
  if(!scenario)return;
  const toX=step=>(lastIndex+step-left+.5)*bw;
  ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,Math.max(1,bottom-top));ctx.clip();
- ctx.lineWidth=1.15;ctx.strokeStyle='rgba(239,246,255,.43)';ctx.setLineDash([3,5]);
+ ctx.lineWidth=1.15;ctx.strokeStyle='rgba(239,246,255,.40)';ctx.setLineDash([4,5]);
  ctx.beginPath();
- for(let step=0;step<scenario.prices.length;step++){
-  const xx=toX(step),yy=y(scenario.prices[step]);
-  if(step===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+ for(let i=0;i<scenario.prices.length;i++){
+  const x=toX(i),yy=y(scenario.prices[i]);
+  if(i===0)ctx.moveTo(x,yy);else ctx.lineTo(x,yy);
  }
  ctx.stroke();ctx.setLineDash([]);
- const lastX=toX(horizon),lastY=y(scenario.prices[horizon]);
- if(lastX>=0&&lastX<=plotW&&lastY>=top&&lastY<=bottom){
-  ctx.fillStyle='rgba(247,250,255,.75)';ctx.beginPath();
-  ctx.arc(lastX,lastY,2.6,0,Math.PI*2);ctx.fill();
+ let lastLabelX=-1000;
+ for(const node of scenario.nodes){
+  const x=toX(node.step),yy=y(node.price);
+  if(x<0||x>plotW||yy<top||yy>bottom)continue;
+  ctx.fillStyle='rgba(14,27,43,.45)';ctx.strokeStyle='rgba(245,248,255,.53)';
+  ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,yy,2.6,0,2*Math.PI);
+  ctx.fill();ctx.stroke();
+  // Small screens: draw all turns but avoid overlapping their price text.
+  if(x-lastLabelX<48)continue;
+  lastLabelX=x;
+  const label=node.label+' '+Math.round(node.price).toLocaleString('en-US');
+  ctx.font='9px sans-serif';
+  const width=Math.min(plotW-6,ctx.measureText(label).width+6);
+  const bx=Math.max(3,Math.min(plotW-width-3,x-width/2));
+  const by=Math.max(top+3,Math.min(bottom-19,yy+(node.step%2?8:-20)));
+  ctx.fillStyle='rgba(14,27,43,.35)';ctx.fillRect(bx,by,width,17);
+  ctx.fillStyle='rgba(245,248,255,.66)';ctx.fillText(label,bx+3,by+12);
  }
- ctx.font='9px sans-serif';ctx.fillStyle='rgba(245,248,255,.58)';
- ctx.fillText(maPricePatternBasis==='ma200'?'미래 가격선 · MA200 기울기':'미래 가격선 · 종합 MA 기울기',
-  Math.max(5,Math.min(plotW-156,toX(0)+6)),top+12);
+ ctx.font='9px sans-serif';ctx.fillStyle='rgba(245,248,255,.56)';
+ ctx.fillText(maPricePatternBasis==='ma200'?'미래 파동 · MA200 가정':'미래 파동 · 종합 MA 가정',
+  Math.max(5,Math.min(plotW-150,toX(0)+6)),top+12);
  ctx.restore();
 }
 function drawProjectedMovingAverages(ctx,bars,left,count,plotW,top,bottom,y,bw){
