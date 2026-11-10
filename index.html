@@ -4492,7 +4492,7 @@ function initChartDrawingGestures(){
  const root=$('combinedChart'),canvas=$('chart');if(!root||!canvas)return;
  const stop=e=>{e.preventDefault();e.stopImmediatePropagation()};
  const rectPoint=(e)=>[e.clientX,e.clientY];
- let mouseDrag=false,mouseMoved=false;
+ let mouseDrag=false,mouseMoved=false,ignoreMouseClick=false;
  root.addEventListener('touchstart',e=>{
   if(e.target!==canvas||dateRangeMode||e.touches.length!==1)return;
   const touch=e.touches[0],now=Date.now();
@@ -4545,17 +4545,18 @@ function initChartDrawingGestures(){
    drawingDrag=mouseDrag?{id:hit.id,point:hit.point}:null;
   }
  },true);
- root.addEventListener('mousemove',e=>{
+ window.addEventListener('mousemove',e=>{
   if(!mouseDrag||!drawingDrag)return;
   stop(e);mouseMoved=true;
   const pt=drawPricePoint(e.clientX,e.clientY),shape=drawings.find(x=>x.id===drawingDrag.id);
   if(pt&&shape){shape.points[drawingDrag.point]=pt;draw();}
  },true);
- root.addEventListener('mouseup',e=>{
-  if(mouseDrag){stop(e);drawSave();mouseDrag=false;drawingDrag=null;mouseMoved=false;}
+ window.addEventListener('mouseup',e=>{
+  if(mouseDrag){stop(e);drawSave();ignoreMouseClick=mouseMoved;mouseDrag=false;drawingDrag=null;mouseMoved=false;}
  },true);
  root.addEventListener('click',e=>{
   if(e.target!==canvas||dateRangeMode)return;
+  if(ignoreMouseClick){ignoreMouseClick=false;stop(e);return;}
   if(drawingTool){stop(e);drawingPick(e.clientX,e.clientY);return}
   const hit=drawingHit(e.clientX,e.clientY);
   if(hit){stop(e);if(!drawingEditing&&!mouseMoved)drawingSelect(hit.id);}
