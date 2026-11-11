@@ -11,7 +11,9 @@ const check=document.createElement('button');check.type='button';check.textConte
 const apply=document.createElement('button');apply.type='button';apply.textContent='선택한 모드 실제 적용';
 const message=document.createElement('p');message.className='muted';
 message.setAttribute('role','status');message.setAttribute('aria-live','polite');
-message.textContent='API 잠금 해제 후 현재 계좌 모드를 확인해 주세요. 변경은 별도 적용 버튼을 눌렀을 때만 이루어집니다.';
+message.textContent='';
+message.style.display='none';
+const showModeMessage=text=>{message.textContent=text;message.style.display=text?'':'none'};
 row.append(check,apply);
 const parent=selector.closest('.card')||selector.parentElement;
 selector.insertAdjacentElement('afterend',row);
