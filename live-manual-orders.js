@@ -436,11 +436,14 @@ function chooseLiveClosePrice(side,qty,initialPrice,tick,digits){
   const now=document.createElement('button');now.type='button';now.textContent='현재가 적용';
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='취소';
   const accept=document.createElement('button');accept.type='button';accept.textContent='지정가 청산 확인';
-  for(const button of [now,cancel,accept])button.style.cssText='flex:1 1 auto;padding:12px 8px;min-height:43px;color:#fff;background:#294363;border:1px solid #4b6b89;border-radius:10px;font-size:13px';
+  const switchAction=document.createElement('button');switchAction.type='button';
+  switchAction.textContent=side==='SHORT'?'청산 및 롱 스위칭 전환':'청산 및 숏 스위칭 전환';
+  for(const button of [now,cancel,accept,switchAction])button.style.cssText='flex:1 1 auto;padding:12px 8px;min-height:43px;color:#fff;background:#294363;border:1px solid #4b6b89;border-radius:10px;font-size:13px';
   accept.style.background='#146753';accept.style.borderColor='#40ad8d';
-  actions.append(now,cancel,accept);
+  switchAction.style.cssText='flex:1 1 100%;padding:12px 8px;min-height:44px;background:#234d72;border:1px solid #5886b2;border-radius:10px;color:#fff;font-size:13px;font-weight:700';
+  actions.append(now,cancel,accept,switchAction);
   const warning=document.createElement('p');
-  warning.textContent='지정가 주문은 즉시 체결되지 않을 수 있으며, 체결 전에는 포지션이 유지됩니다.';
+  warning.textContent='지정가 청산은 거래소 지정가 주문입니다. 스위칭 전환은 별도의 가격 감시 설정을 열며, 조건 충족 시 시장가 청산 후 반대 진입을 시도합니다. 스위칭은 앱이 활성 상태일 때만 감시합니다.';
   warning.style.cssText='font-size:11px;line-height:1.5;color:#b5cbe2;margin:11px 0 0';
   dialog.append(title,quantity,priceBox,label,input,info,actions,warning);
   overlay.append(dialog);document.body.append(overlay);
@@ -464,6 +467,7 @@ function chooseLiveClosePrice(side,qty,initialPrice,tick,digits){
   now.onclick=()=>{if(!(liveQuote.price>0&&Date.now()-liveQuote.at<=3500)){info.textContent='실시간 연결 확인 후 다시 눌러 주세요';return;}edited=false;paint();};
   cancel.onclick=()=>finish(null);
   accept.onclick=()=>{const value=input.value.trim();if(!value){info.textContent='지정가를 입력하세요';return;}finish(value);};
+  switchAction.onclick=()=>{const value=input.value.trim();if(!value){info.textContent='전환 목표 가격을 입력하세요';return;}finish({switchPrice:value});};
   activeCloseEditor={paint};
   if(initialPrice>0)input.value=snap(initialPrice);
   paint();
@@ -507,9 +511,11 @@ async function closeSelected(orderKind='LIMIT'){
    const defaultPrice=proposed>0?(Math.round(proposed/tick)*tick).toFixed(digits):'';
    const typed=await chooseLiveClosePrice(selection.side,qty,Number(defaultPrice),tick,digits);
    if(typed===null)return;
+   const switchRequested=typeof typed==='object'&&typeof typed.switchPrice==='string';
+   const chosenPrice=switchRequested?typed.switchPrice:typed;
    // iOS prompts can include grouping commas and surrounding whitespace.
    // Validate a numeric USDT price, never silently interpret extra text or currency units.
-   const cleanPrice=typed.trim().replace(/,/g,'').replace(/\s+/g,'');
+   const cleanPrice=chosenPrice.trim().replace(/,/g,'').replace(/\s+/g,'');
    if(!/^\d+(?:\.\d+)?$/.test(cleanPrice))
     throw Error('지정가는 숫자로 입력하세요. 예: 79650.5 USDT');
    const n=Number(cleanPrice),steps=Math.round(n/tick);
@@ -519,6 +525,13 @@ async function closeSelected(orderKind='LIMIT'){
    if(Number(f.price.minPrice)>0&&Number(price)<Number(f.price.minPrice)||
       Number(f.price.maxPrice)>0&&Number(price)>Number(f.price.maxPrice))
     throw Error('거래소 지정가 허용 범위를 벗어났습니다');
+   if(switchRequested){
+    if(typeof window.btcOpenSwitch!=='function')
+     throw Error('스위칭 설정 모듈을 확인하지 못했습니다. 주문은 실행되지 않았습니다');
+    // Open the existing live switch setup; do not place a LIMIT close order.
+    window.btcOpenSwitch(selection,Number(price));
+    return;
+   }
   }
   // The explicit LIMIT editor's "지정가 청산" action is the final user
   // approval. No additional browser confirm; keep exchange revalidation,
