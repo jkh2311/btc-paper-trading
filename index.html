@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-settings-compact-v210"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-push-persistent-v211"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -6217,13 +6217,13 @@ async function pollSignalAlertsIndependently(){
 const SIGNAL_PUSH_URL_KEY='btc-rmi-remote-push-url-v204';
 const SIGNAL_PUSH_DEVICE_KEY='btc-rmi-remote-push-device-v208';
 const SIGNAL_PUSH_DEFAULT_URL='https://btcusdt-rmi-push-u5vo.onrender.com';
+const SIGNAL_PUSH_VAULT='btc-push-credentials-v211';
 let signalPushRepairBusy=false,signalPushLastRepair=0;
 function signalPushStatus(message){const el=$('signalPushStatus');if(el)el.textContent=message}
 function signalPushServerUrl(){
- const raw=String($('signalPushServerUrl')?.value||'').trim();
- const url=new URL(raw);
+ const raw=String($('signalPushServerUrl')?.value||'').trim(),url=new URL(raw);
  if(url.protocol!=='https:'||url.username||url.password||url.search||url.hash)
-  throw Error('검색어·로그인 정보가 없는 HTTPS 서버 주소를 입력해 줘.');
+  throw Error('HTTPS 서버 주소를 확인해 줘.');
  return url.href.replace(/\/$/,'');
 }
 function signalPushBase64ToBytes(value){
@@ -6231,15 +6231,61 @@ function signalPushBase64ToBytes(value){
  return Uint8Array.from(binary,ch=>ch.charCodeAt(0));
 }
 function signalPushDevice(){
- try{
-  const item=JSON.parse(localStorage.getItem(SIGNAL_PUSH_DEVICE_KEY)||'null');
-  return item&&typeof item==='object'?item:null;
- }catch(_){return null}
+ try{const x=JSON.parse(localStorage.getItem(SIGNAL_PUSH_DEVICE_KEY)||'null');return x&&typeof x==='object'?x:null}
+ catch(_){return null}
 }
 function saveSignalPushDevice(base,endpoint,proof){
- if(typeof proof!=='string'||!/^[0-9a-f]{64}$/.test(proof))throw Error('서버의 기기 복구 인증 정보를 확인하지 못했어요.');
+ if(typeof proof!=='string'||!/^[0-9a-f]{64}$/.test(proof))return false;
  localStorage.setItem(SIGNAL_PUSH_DEVICE_KEY,JSON.stringify({base,endpoint,recoveryProof:proof,at:Date.now()}));
- localStorage.setItem(SIGNAL_PUSH_URL_KEY,base);
+ localStorage.setItem(SIGNAL_PUSH_URL_KEY,base);return true;
+}
+// This keeps the registration credential on the user's own device only.
+// AES key is non-exportable in IndexedDB. Same-origin script access still
+// remains a security boundary; this is not protection against XSS.
+function signalPushDb(){
+ return new Promise((resolve,reject)=>{
+  if(!window.indexedDB||!crypto?.subtle){reject(Error('기기 암호화 저장 미지원'));return}
+  const req=indexedDB.open(SIGNAL_PUSH_VAULT,1);
+  req.onupgradeneeded=()=>{req.result.createObjectStore('records')};
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error||Error('기기 저장소 오류'));
+ });
+}
+async function signalPushVaultGet(){
+ const db=await signalPushDb();
+ try{
+  return await new Promise((resolve,reject)=>{
+   const tx=db.transaction('records','readonly'),req=tx.objectStore('records').get('device');
+   req.onsuccess=()=>resolve(req.result||null);
+   req.onerror=()=>reject(req.error);
+  });
+ }finally{db.close()}
+}
+async function signalPushVaultSave(base,token){
+ const db=await signalPushDb();
+ try{
+  let key=(await signalPushVaultGetFromDb(db))?.key;
+  if(!key)key=await crypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const encrypted=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(token));
+  await new Promise((resolve,reject)=>{
+   const tx=db.transaction('records','readwrite');
+   tx.objectStore('records').put({base,key,iv:Array.from(iv),encrypted},'device');
+   tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+  });
+ }finally{db.close()}
+}
+function signalPushVaultGetFromDb(db){
+ return new Promise((resolve,reject)=>{
+  const req=db.transaction('records','readonly').objectStore('records').get('device');
+  req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error);
+ });
+}
+async function signalPushVaultToken(base){
+ const record=await signalPushVaultGet();
+ if(!record||record.base!==base||!record.key||!record.encrypted)return null;
+ const raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(record.iv)},record.key,record.encrypted);
+ return new TextDecoder().decode(raw);
 }
 function signalPushPreferences(){
  return {strategy:rmiSignalStrategy,
@@ -6252,95 +6298,114 @@ async function signalPushJson(url,options={}){
  if(!response.ok)throw Error(data.error||'HTTP '+response.status);
  return data;
 }
-async function signalPushConnect(permissionPromise){
- const token=$('signalPushRegisterToken')?.value.trim();
- if(!token)throw Error('최초 연결은 서버 등록 코드를 입력해야 해요.');
- if(!('serviceWorker' in navigator)||!('PushManager' in window))
-  throw Error('Web Push 미지원. iOS 16.4 이상 홈 화면 웹앱인지 확인해 줘.');
- if(await permissionPromise!=='granted')throw Error('아이폰 알림 권한을 허용해 줘.');
- const base=signalPushServerUrl();
- const cfg=await signalPushJson(base+'/config');
- if(!cfg.publicKey)throw Error('푸시 서버 공개키가 없어.');
+async function signalPushSubscription(base,create=false){
  const registered=signalNotificationRegistration||await registerSignalNotificationWorker();
  if(!registered)throw Error('서비스 워커 등록 실패');
  const ready=await navigator.serviceWorker.ready;
- let subscription=await ready.pushManager.getSubscription();
- if(!subscription)subscription=await ready.pushManager.subscribe({
-  userVisibleOnly:true,applicationServerKey:signalPushBase64ToBytes(cfg.publicKey)
- });
+ let sub=await ready.pushManager.getSubscription();
+ if(!sub&&create){
+  const cfg=await signalPushJson(base+'/config');
+  if(!cfg.publicKey)throw Error('푸시 서버 공개키를 확인하지 못했어요.');
+  sub=await ready.pushManager.subscribe({
+   userVisibleOnly:true,applicationServerKey:signalPushBase64ToBytes(cfg.publicKey)
+  });
+ }
+ return sub;
+}
+async function signalPushRegister(base,subscription,auth){
  const data=await signalPushJson(base+'/subscribe',{
   method:'POST',headers:{'Content-Type':'application/json'},
-  body:JSON.stringify({token,subscription:subscription.toJSON(),...signalPushPreferences()})
+  body:JSON.stringify({...auth,subscription:subscription.toJSON(),...signalPushPreferences()})
  });
- if(typeof data.recoveryProof==='string'&&/^[0-9a-f]{64}$/.test(data.recoveryProof)){
-  saveSignalPushDevice(base,subscription.endpoint,data.recoveryProof);
-  $('signalPushRegisterToken').value='';
-  signalPushStatus('✅ 원격 푸시 연결 저장됨 · 앱 재실행 때 자동 복구 확인 (서버 가동 중에 한함)');
- }else{
-  // Old Render deployments accept the registration but have no recovery API.
-  // Do not claim auto-reconnect until the upgraded server is live.
-  try{localStorage.setItem(SIGNAL_PUSH_URL_KEY,base)}catch(_){}
-  signalPushStatus('✅ 서버 등록 수락 · ⚠ Render 이전 버전이라 자동 복구 미지원. 서버 업데이트 후 다시 연결해야 해요.');
- }
+ if(data.recoveryProof)saveSignalPushDevice(base,subscription.endpoint,data.recoveryProof);
+ localStorage.setItem(SIGNAL_PUSH_URL_KEY,base);
+ return data;
+}
+async function signalPushConnect(permissionPromise){
+ const token=$('signalPushRegisterToken')?.value.trim();
+ if(!token)throw Error('최초 연결은 등록 코드를 입력해 줘.');
+ if(!('serviceWorker' in navigator)||!('PushManager' in window))
+  throw Error('iOS 홈 화면 앱에서 Web Push 지원을 확인해 줘.');
+ if(await permissionPromise!=='granted')throw Error('아이폰 알림 권한을 허용해 줘.');
+ const base=signalPushServerUrl(),sub=await signalPushSubscription(base,true);
+ if(!sub)throw Error('기기 푸시 구독 실패');
+ await signalPushRegister(base,sub,{token});
+ let persisted=false;
+ try{await signalPushVaultSave(base,token);persisted=true}catch(e){console.warn('푸시 기기 암호화 저장 실패',e)}
+ $('signalPushRegisterToken').value='';
+ signalPushStatus(persisted?
+  '✅ 원격 푸시 연결됨 · 새로고침/앱 재실행 시 자동 연결':
+  '✅ 서버 등록됨 · 기기 자동 저장 실패. 저장공간 설정을 확인해 줘.');
 }
 async function signalPushAutoRepair(force=false){
  if(signalPushRepairBusy||document.hidden||signalNotificationPermission()!=='granted')return;
  if(!force&&Date.now()-signalPushLastRepair<60000)return;
- const saved=signalPushDevice();
- if(!saved?.base||!saved?.endpoint||!saved?.recoveryProof)return;
  if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
  signalPushLastRepair=Date.now();signalPushRepairBusy=true;
  try{
-  const ready=await navigator.serviceWorker.ready;
-  const subscription=await ready.pushManager.getSubscription();
-  if(!subscription||subscription.endpoint!==saved.endpoint){
-   signalPushStatus('⚠ 아이폰 푸시 구독이 변경되었어요. 등록 코드로 한 번 다시 연결해 줘.');
-   return;
+  const vault=await signalPushVaultGet().catch(()=>null);
+  const saved=signalPushDevice(),base=vault?.base||saved?.base;
+  if(!base)return;
+  let sub=await signalPushSubscription(base,false);
+  if(!sub&&vault)sub=await signalPushSubscription(base,true);
+  if(!sub){signalPushStatus('⚠ 기기 구독 없음 · 최초 연결 필요');return}
+  const auth=saved?.base===base&&saved.endpoint===sub.endpoint&&saved.recoveryProof?
+   {recoveryProof:saved.recoveryProof}:null;
+  let registered=false;
+  if(auth){
+   try{await signalPushRegister(base,sub,auth);registered=true}catch(e){
+    console.warn('기기 복구 인증 재등록 실패, 기기 저장값 확인',e);
+   }
   }
-  const server=await signalPushJson(saved.base+'/health');
-  if(!server.ok)throw Error('서버 상태 확인 실패');
-  const registered=await signalPushJson(saved.base+'/subscribe',{
-   method:'POST',headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({recoveryProof:saved.recoveryProof,subscription:subscription.toJSON(),...signalPushPreferences()})
-  });
-  saveSignalPushDevice(saved.base,saved.endpoint,registered.recoveryProof);
-  signalPushStatus('✅ 원격 푸시 연결 유지 · 기기 구독/서버 등록 자동 확인 완료'+
-   (server.lastCheckError?' · ⚠ 서버 시세 오류: '+server.lastCheckError:''));
- }catch(e){
-  signalPushStatus('⚠ 연결 자동 확인 실패 · '+e.message+' · 다시 열 때 재확인');
- }finally{signalPushRepairBusy=false}
+  if(!registered){
+   const token=await signalPushVaultToken(base).catch(()=>null);
+   if(!token){signalPushStatus('⚠ 기존 기기 인증이 없어 최초 연결이 한 번 필요해요.');return}
+   await signalPushRegister(base,sub,{token});
+  }
+  const health=await signalPushJson(base+'/health').catch(()=>null);
+  signalPushStatus('✅ 원격 푸시 자동 연결 유지'+
+   (health?.lastCheckError?' · ⚠ 시세 서버 오류: '+health.lastCheckError:''));
+ }catch(e){signalPushStatus('⚠ 서버 자동 연결 확인 실패 · '+e.message)}
+ finally{signalPushRepairBusy=false}
 }
 function initSignalRemotePush(){
- try{$('signalPushServerUrl').value=localStorage.getItem(SIGNAL_PUSH_URL_KEY)||SIGNAL_PUSH_DEFAULT_URL}catch(_){$('signalPushServerUrl').value=SIGNAL_PUSH_DEFAULT_URL}
+ try{$('signalPushServerUrl').value=localStorage.getItem(SIGNAL_PUSH_URL_KEY)||SIGNAL_PUSH_DEFAULT_URL}
+ catch(_){$('signalPushServerUrl').value=SIGNAL_PUSH_DEFAULT_URL}
  $('signalPushConnect')?.addEventListener('click',()=>{
-  const permissionPromise=signalNotificationPermission()==='granted'?
+  const permission=signalNotificationPermission()==='granted'?
    Promise.resolve('granted'):requestSignalSystemPermission();
-  signalPushStatus('서버 연결 및 푸시 구독 등록 중…');
-  void signalPushConnect(permissionPromise)
-   .catch(e=>signalPushStatus('❌ 서버 연결 실패 · '+e.message));
+  signalPushStatus('원격 푸시 등록 중…');
+  void signalPushConnect(permission).catch(e=>signalPushStatus('❌ 서버 연결 실패 · '+e.message));
  });
  $('signalPushTest')?.addEventListener('click',()=>{
   void(async()=>{
-   const base=signalPushServerUrl(),token=$('signalPushRegisterToken')?.value.trim();
-   const ready=await navigator.serviceWorker.ready,sub=await ready.pushManager.getSubscription();
-   if(!sub)throw Error('먼저 원격 푸시 연결이 필요해요.');
+   const base=signalPushServerUrl(),sub=await signalPushSubscription(base,false);
+   if(!sub)throw Error('푸시 구독이 없어요.');
    const saved=signalPushDevice();
-   const auth=saved?.base===base&&saved.endpoint===sub.endpoint?
-    {recoveryProof:saved.recoveryProof}:token?{token}:null;
-   if(!auth)throw Error('등록 코드로 원격 푸시를 다시 연결해 줘.');
-   await signalPushJson(base+'/test',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({...auth,endpoint:sub.endpoint})
-   });
-   signalPushStatus('✅ 서버에서 테스트 푸시 전송 · 아이폰 상단 배너 수신을 확인해 줘.');
+   let auth=saved?.base===base&&saved.endpoint===sub.endpoint?
+    {recoveryProof:saved.recoveryProof}:null;
+   if(!auth)auth={token:$('signalPushRegisterToken')?.value.trim()||await signalPushVaultToken(base)};
+   if(!auth?.token&&!auth?.recoveryProof)throw Error('원격 푸시 최초 연결이 필요해요.');
+   try{
+    await signalPushJson(base+'/test',{
+     method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({...auth,endpoint:sub.endpoint})
+    });
+   }catch(e){
+    const token=await signalPushVaultToken(base).catch(()=>null);
+    if(!token||!auth.recoveryProof)throw e;
+    await signalPushRegister(base,sub,{token});
+    await signalPushJson(base+'/test',{
+     method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({token,endpoint:sub.endpoint})
+    });
+   }
+   signalPushStatus('✅ 원격 푸시 테스트 전송 · 아이폰 배너 확인');
   })().catch(e=>signalPushStatus('❌ 원격 푸시 테스트 실패 · '+e.message));
  });
- if(signalPushDevice())signalPushStatus('이전에 연결한 푸시 구독 확인 중…');
- else signalPushStatus('서버 연결 상태 미확인 · 연결 후 복구 지원 여부를 확인해 줘.');
+ signalPushStatus('저장된 원격 푸시 연결 확인 중…');
  setTimeout(()=>{void signalPushAutoRepair(true)},1300);
- document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden)void signalPushAutoRepair();
- });
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)void signalPushAutoRepair()});
  window.addEventListener('online',()=>{void signalPushAutoRepair()});
  setInterval(()=>{if(!document.hidden)void signalPushAutoRepair()},300000);
 }
