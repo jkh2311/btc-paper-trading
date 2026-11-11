@@ -83,9 +83,10 @@ http.createServer(async(req,res)=>{
    // Limit registrations to one private owner, at most five devices.
    const prefs=preferences(body);
    const existing=subscribers.findIndex(x=>x.subscription.endpoint===sub.endpoint);
-   const record={subscription:sub,...prefs,lastBar:0};
+   const record={subscription:sub,...prefs,lastBar:0,lastBar10:0};
    if(existing>=0){
     record.lastBar=subscribers[existing].lastBar;
+    record.lastBar10=subscribers[existing].lastBar10||0;
     subscribers[existing]=record;
    }else{
     if(subscribers.length>=5){respond(res,409,{error:'device limit'});return}
@@ -133,13 +134,13 @@ function rmiSeries(bars,length=14,momentum=5){
 }
 // Mirrors the RMI chart's range/bear/bull signal state machine.
 // Only fully closed candles are sent. Never forward READY as a trade signal.
-function signals(bars,prefs){
+function signals(bars,prefs,minutes=1){
  const scores=rmiSeries(bars),events=Array(bars.length).fill(null);
  const strategy=prefs.strategy,shortThreshold=strategy==='bull'?90:prefs.shortThreshold;
  let firstLow=false,ready=false,readyAt=-1;
  let highBars=0,repeat=false,highReady=0,fired35=false;
  for(let i=1;i<scores.length;i++){
-  const prev=scores[i-1],now=scores[i],close=bars[i].t+60000;
+  const prev=scores[i-1],now=scores[i],close=bars[i].t+minutes*60000;
   if(!Number.isFinite(prev)||!Number.isFinite(now)){
    if(strategy==='bull'){highBars=0;repeat=false}
    continue;
@@ -164,12 +165,30 @@ function signals(bars,prefs){
   if(strategy==='bull'){
    if(now<90){highBars=0;repeat=false}
    else if(prev<90&&now>=90){highBars=1;repeat=false}
-   else if(prev>=90&&bars[i].t-bars[i-1].t===60000&&highBars>0)highBars++;
+   else if(prev>=90&&bars[i].t-bars[i-1].t===minutes*60000&&highBars>0)highBars++;
    else{highBars=0;repeat=false}
    if(highBars>=5&&!repeat){events[i]='SHORT';repeat=true}
   }
  }
  return events;
+}
+// Aggregate exact, aligned 10-minute candles from closed 1-minute futures bars.
+// Do not treat a partial 10-minute bucket as confirmed.
+function tenMinuteBars(minuteBars){
+ const buckets=new Map();
+ for(const b of minuteBars){
+  const t=Math.floor(b.t/600000)*600000;
+  let x=buckets.get(t);
+  if(!x){x={t,c:b.c,v:0,count:0,lastT:0};buckets.set(t,x)}
+  if(b.t!==t+x.count*60000){x.invalid=true}
+  x.c=b.c;x.v+=b.v;x.count++;x.lastT=b.t;
+ }
+ return [...buckets.values()].filter(x=>!x.invalid&&x.count===10&&x.lastT===x.t+540000)
+  .map(({t,c,v})=>({t,c,v}));
+}
+function signalBody(timeframe,price){
+ return timeframe+' RMI 확정 · '+price.toLocaleString('en-US')+' USDT'+
+  '\n포지션 수익률·미실현 손익: 원격 계좌 조회 미연결';
 }
 let lastCheckTime=0,lastCheckError=null,polling=false;
 async function poll(){
@@ -188,26 +207,45 @@ async function poll(){
   const current=bars.at(-1);
   // Reject stale Binance response: never alert on historical candles.
   if(now-current.t-60000>45000)return;
+  const tens=tenMinuteBars(bars);
+  const latest10=tens.at(-1);
   for(const subscriber of [...subscribers]){
-   if(current.t<=subscriber.lastBar)continue;
-   // First monitoring cycle must NOT alert about historical data.
-   if(!subscriber.lastBar){subscriber.lastBar=current.t;save();continue}
-   const event=signals(bars,subscriber).at(-1);
-   // Deduplicate per subscription even when push fails.
-   subscriber.lastBar=current.t;save();
-   if(event!=='LONG'&&event!=='SHORT')continue;
-   try{
-    await webpush.sendNotification(subscriber.subscription,JSON.stringify({
-     title:event==='LONG'?'🟢 BTCUSDT LONG 신호':'🔴 BTCUSDT SHORT 신호',
-     body:'1분봉 확정 RMI · '+current.c.toLocaleString('en-US')+' USDT',
-     tag:'btc-rmi-'+subscriber.strategy+'-'+current.t+'-'+event,
-     side:event,barTime:current.t
-    }),{TTL:75,urgency:'high'});
-    console.log('PUSH',event,new Date(current.t).toISOString());
-   }catch(err){
-    console.warn('Web Push error',err.statusCode||err.message);
-    if(err.statusCode===404||err.statusCode===410){
-     subscribers=subscribers.filter(x=>x!==subscriber);save();
+   const events=[];
+   if(current.t>subscriber.lastBar){
+    const first=!subscriber.lastBar;
+    subscriber.lastBar=current.t;
+    if(!first){
+     const side=signals(bars,subscriber,1).at(-1);
+     if(side==='LONG'||side==='SHORT')events.push({side,minutes:1,bar:current});
+    }
+   }
+   if(latest10&&latest10.t>Number(subscriber.lastBar10||0)){
+    const first=!subscriber.lastBar10;
+    subscriber.lastBar10=latest10.t;
+    // Never notify a historical 10m signal on server startup.
+    const tenClose=latest10.t+600000;
+    if(!first&&now>=tenClose&&now-tenClose<45000){
+     const side=signals(tens,subscriber,10).at(-1);
+     if(side==='LONG'||side==='SHORT')events.push({side,minutes:10,bar:latest10});
+    }
+   }
+   save();
+   for(const {side,minutes,bar} of events){
+    const timeframe=minutes===10?'10분봉':'1분봉';
+    try{
+     await webpush.sendNotification(subscriber.subscription,JSON.stringify({
+      title:(minutes===10?'🔟 10분봉 ':'1분봉 ')+(side==='LONG'?'🟢 LONG 신호':'🔴 SHORT 신호'),
+      body:signalBody(timeframe,bar.c),
+      tag:'btc-rmi-'+minutes+'m-'+subscriber.strategy+'-'+bar.t+'-'+side,
+      side,minutes,barTime:bar.t
+     }),{TTL:75,urgency:'high'});
+     console.log('PUSH',minutes+'m',side,new Date(bar.t).toISOString());
+    }catch(err){
+     console.warn('Web Push error',err.statusCode||err.message);
+     if(err.statusCode===404||err.statusCode===410){
+      subscribers=subscribers.filter(x=>x!==subscriber);save();
+      break;
+     }
     }
    }
   }
