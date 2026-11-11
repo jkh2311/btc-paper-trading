@@ -218,7 +218,7 @@ async function readCurrentPnl(){
   const signed=n=>(n>=0?'+':'')+n.toLocaleString('ko-KR',{maximumFractionDigits:2});
   const side=sides.size===1?[...sides][0]:'LONG/SHORT';
   pnlLastError=null;
-  return {text:'보유 '+side+' · 수익률 '+signed(pct)+'%\\n미실현 손익 '+signed(totalPnl)+' USDT',ok:true};
+  return {text:'보유 '+side+' · 수익률 '+signed(pct)+'%\n미실현 손익 '+signed(totalPnl)+' USDT',ok:true};
  }catch(err){
   pnlLastError=String(err.message||err).slice(0,100);
   return {text:'수익률·미실현 손익: 현재 조회 불가',ok:false};
