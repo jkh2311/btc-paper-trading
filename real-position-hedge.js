@@ -70,6 +70,17 @@ style.textContent=[
 'body.real-position-ready #paperPositionCard .real-position-row:focus-visible{outline:2px solid #7ca9d3}',
 'body.real-position-ready #paperPositionCard .real-position-row .hedge-position-head{display:flex;align-items:center;gap:8px}',
 'body.real-position-ready #paperPositionCard .real-position-row .real-close-single{margin-left:auto;padding:8px 10px;min-height:34px;font-size:12px;white-space:nowrap}',
+'body.real-position-ready #paperPositionCard .real-switch-detail{margin-top:13px;width:100%;padding:12px 9px;font-size:13px;font-weight:700;background:#234d72;border-color:#5886b2}',
+'.real-switch-choice{position:fixed;inset:0;background:#000b;z-index:100000;display:flex;align-items:center;justify-content:center;padding:15px}',
+'.real-switch-choice[hidden]{display:none!important}',
+'.real-switch-choice-dialog{width:min(440px,100%);padding:18px;background:#14243e;border:1px solid #536f90;border-radius:16px;box-shadow:0 15px 60px #000a;color:#e7edf8}',
+'.real-switch-choice-dialog h3{font-size:18px;margin:0 0 10px}',
+'.real-switch-choice-dialog p{font-size:12px;color:#b8cce3;line-height:1.6}',
+'.real-switch-choice-dialog label{display:block;font-size:12px;margin:10px 0 4px}',
+'.real-switch-choice-dialog input{width:100%}',
+'.real-switch-choice-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 8px}',
+'.real-switch-choice-actions button{padding:11px 4px;font-size:12px;white-space:normal}',
+'.real-switch-choice-cancel{width:100%;font-size:12px}',
 'body.real-position-ready #paperPositionCard .real-position-row .hedge-pnl{font-weight:700}',
 'body.real-position-ready #paperPositionCard .real-tpsl-pnl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}',
 'body.real-position-ready #paperPositionCard .real-tpsl-pnl>div{border:1px solid #34516e;border-radius:11px;background:#0b1d33;padding:11px 9px;min-width:0}',
@@ -81,6 +92,50 @@ style.textContent=[
 'body.real-position-ready #paperPositionCard .real-tpsl-disclaimer{font-size:10px;color:#9fb4cc;margin:7px 2px 0}'
 ].join('\n');
 document.head.append(style);
+
+function positionPayload(p,side){
+ return {side,positionSide:p.side,amount:p.amount,entry:p.entry,mark:p.mark,
+  leverage:p.leverage,unrealized:p.unrealized,selectedAt:Date.now(),accountAt:snapshot?.at||0};
+}
+// The existing LIVE switch engine handles Binance writes; this view only requests actions.
+function closeChoice(p,side){
+ const payload=positionPayload(p,side),old=document.getElementById('realSwitchChoice');
+ if(old)old.remove();
+ const overlay=make('div',undefined,'real-switch-choice');
+ overlay.id='realSwitchChoice';
+ const dialog=make('div',undefined,'real-switch-choice-dialog');
+ dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
+ const title=make('h3',side==='SHORT'?'숏 SHORT 포지션 청산 / 롱 전환':'롱 LONG 포지션 청산 / 숏 전환');
+ const desc=make('p',fmt(Math.abs(p.amount),8)+' BTC 보유 · 실제 바이낸스 포지션입니다.');
+ const label=make('label','스위칭 후 신규 진입 수량 (BTC)');
+ const qty=make('input');qty.type='number';qty.min='0.000001';qty.step='0.000001';
+ qty.inputMode='decimal';qty.value=String(Math.abs(p.amount));label.append(qty);
+ const warning=make('p','청산만: 기존 시장가 청산 기능 그대로 사용. 청산 및 스위칭: 기존 포지션 전량 청산 확인 후 반대 방향으로 시장가 신규 진입. 기존 보호주문 취소 가능, 신규 포지션의 손절·익절은 별도로 설정해야 합니다.');
+ const actions=make('div',undefined,'real-switch-choice-actions');
+ const closeOnly=make('button','청산만 하기');closeOnly.type='button';
+ const switchNow=make('button','청산 및 스위칭 전환');switchNow.type='button';
+ switchNow.style.cssText='background:#175a50;border-color:#40af8b';
+ const cancel=make('button','취소','real-switch-choice-cancel');cancel.type='button';
+ const error=make('p');error.setAttribute('role','status');
+ function dismiss(){overlay.remove()}
+ cancel.onclick=dismiss;overlay.onclick=e=>{if(e.target===overlay)dismiss()};
+ closeOnly.onclick=()=>{
+  dismiss();document.dispatchEvent(new CustomEvent('btc:real-position-selected',{detail:payload}));
+  document.dispatchEvent(new CustomEvent('btc:real-close-requested',{detail:payload}));
+ };
+ switchNow.onclick=async()=>{
+  const n=Number(qty.value);
+  if(!(Number.isFinite(n)&&n>0)){error.textContent='신규 BTC 수량을 입력해 주세요.';return}
+  if(typeof window.btcSwitchNow!=='function'){
+   error.textContent='실전 스위칭 모듈을 불러오지 못했어요. 주문은 실행되지 않았습니다.';return;
+  }
+  dismiss();await window.btcSwitchNow(payload,n);
+ };
+ actions.append(closeOnly,switchNow);
+ dialog.append(title,desc,label,warning,actions,cancel,error);overlay.append(dialog);
+ document.body.append(overlay);qty.focus();
+}
+
 function normalize(details){
  if(!details||!Array.isArray(details.positions)||!Number.isFinite(details.at))return null;
  const wallet=number(details.wallet),available=number(details.available);
@@ -127,10 +182,9 @@ function render(){
    closeOne.type='button';
    closeOne.onclick=e=>{
     e.preventDefault();e.stopPropagation();
-    const payload={side,positionSide:p.side,amount:p.amount,entry:p.entry,mark:p.mark,
-      leverage:p.leverage,unrealized:p.unrealized,selectedAt:Date.now(),accountAt:snapshot?.at||0};
-    selection=side;document.dispatchEvent(new CustomEvent('btc:real-position-selected',{detail:payload}));
-    document.dispatchEvent(new CustomEvent('btc:real-close-requested',{detail:payload}));
+    selection=side;
+    document.dispatchEvent(new CustomEvent('btc:real-position-selected',{detail:positionPayload(p,side)}));
+    closeChoice(p,side);
    };
    head.append(name,make('small',fmt(Math.abs(p.amount),8)+' BTC'),closeOne);
    const est=Number.isFinite(p.margin)?fmt(p.margin,3)+' USDT':'—';
@@ -200,6 +254,13 @@ function render(){
   tpsl.append(expected('tp',protection.tp),expected('sl',protection.sl));
   summary.append(tpsl,make('div','실제 등록된 TP/SL 기준 예상 금액 · 체결가 변동 및 수수료·펀딩비 제외','real-tpsl-disclaimer'));
   detail.append(summary);
+  const switchButton=make('button',selection==='SHORT'?'↔ 롱 스위칭 설정':'↔ 숏 스위칭 설정','real-switch-detail');
+  switchButton.type='button';
+  switchButton.onclick=()=>{
+   if(typeof window.btcOpenSwitch!=='function'){alert('스위칭 설정 모듈을 불러오지 못했습니다.');return}
+   window.btcOpenSwitch(positionPayload(p,selection));
+  };
+  detail.append(switchButton);
  }
  root.append(detail);
  message.textContent=snapshot?'실계좌 조회 '+new Date(snapshot.at).toLocaleTimeString('ko-KR'):
