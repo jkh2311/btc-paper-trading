@@ -440,12 +440,9 @@ function chooseLiveClosePrice(side,qty,initialPrice,tick,digits){
   switchAction.textContent=side==='SHORT'?'청산 및 롱 스위칭 전환':'청산 및 숏 스위칭 전환';
   for(const button of [now,cancel,accept,switchAction])button.style.cssText='flex:1 1 auto;padding:12px 8px;min-height:43px;color:#fff;background:#294363;border:1px solid #4b6b89;border-radius:10px;font-size:13px';
   accept.style.background='#146753';accept.style.borderColor='#40ad8d';
-  switchAction.style.cssText='flex:1 1 100%;padding:12px 8px;min-height:44px;background:#234d72;border:1px solid #5886b2;border-radius:10px;color:#fff;font-size:13px;font-weight:700';
+  switchAction.style.cssText='flex:1 1 100%;margin-top:24px;padding:14px 8px;min-height:52px;background:#234d72;border:1px solid #5886b2;border-radius:10px;color:#fff;font-size:13px;font-weight:700';
   actions.append(now,cancel,accept,switchAction);
-  const warning=document.createElement('p');
-  warning.textContent='지정가 청산은 거래소 지정가 주문입니다. 스위칭 전환은 별도의 가격 감시 설정을 열며, 조건 충족 시 시장가 청산 후 반대 진입을 시도합니다. 스위칭은 앱이 활성 상태일 때만 감시합니다.';
-  warning.style.cssText='font-size:11px;line-height:1.5;color:#b5cbe2;margin:11px 0 0';
-  dialog.append(title,quantity,priceBox,label,input,info,actions,warning);
+  dialog.append(title,quantity,priceBox,label,input,info,actions);
   overlay.append(dialog);document.body.append(overlay);
   let edited=false,closed=false;
   const snap=price=>(Math.round(price/tick)*tick).toFixed(digits);
