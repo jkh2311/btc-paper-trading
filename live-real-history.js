@@ -376,7 +376,7 @@ async function run(){
  busy=true;get.disabled=true;if(refresh)refresh.disabled=true;
  const token=++sequence;
  controller?.abort();controller=new AbortController();
- const timeout=setTimeout(()=>controller.abort(),11000);
+ const timeout=setTimeout(()=>controller.abort(),40000);
  status.style.color='';status.textContent='바이낸스 실제 거래 체결 내역 읽는 중…';
  try{
   const list=await trades(account,controller.signal);
