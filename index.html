@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-future-bollinger-band-v201"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-local-lock-alert-best-effort-v202"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1345,7 +1345,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
 </select>
 <p id="rmiStrategyHelp" class="muted" aria-live="polite">선택한 전략이 차트와 알림에 적용됩니다. 실제 AUTO 주문 OFF.</p>
 </div>
-<div class="card"><h2>🔔 LONG / SHORT 신호 알림</h2><div class="row"><button type="button" id="signalAlertToggle" aria-pressed="false">신호 알림 OFF</button><button type="button" id="signalAlertTest">알림 소리 테스트</button></div><p id="signalAlertStatus" class="muted" role="status" aria-live="polite">알림 상태 확인 중</p></div><div class="card api-panel" id="binanceApiPanel">
+<div class="card"><h2>🔔 LONG / SHORT 신호 알림</h2><div class="row"><button type="button" id="signalAlertToggle" aria-pressed="false">신호 알림 OFF</button><button type="button" id="signalAlertTest">알림 소리 테스트</button><button type="button" id="signalSystemTest">아이폰 알림 테스트</button></div><p id="signalAlertStatus" class="muted" role="status" aria-live="polite">알림 상태 확인 중</p><p class="muted" style="font-size:11px">아이폰 잠금 화면에서 수신하려면 홈 화면에 추가한 앱에서 알림을 허용해야 해. 화면이 꺼진 동안 iOS가 웹앱을 중단하면 앱 내부 감시도 중지돼. 24시간 안정적인 알림에는 별도 푸시 발송 서버가 필요해.</p></div><div class="card api-panel" id="binanceApiPanel">
 <div class="api-head"><div><h2>바이낸스 계좌</h2><span class="api-caption">BTCUSDT 선물 · 조회 전용</span></div><span class="api-readonly">READ ONLY</span></div>
 <div id="myVaultStatus" class="api-vault-status" role="status">🔒 암호화 저장 상태 확인 중</div>
 <div class="api-main-actions">
@@ -6072,16 +6072,56 @@ $('autoMarketMode').addEventListener('change',()=>{
 });
 $('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState()});$('marginPct').addEventListener('change',()=>{calc();savePaperState()});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
 
-// Local-only RMI alert: no push subscription, account, or third-party server.
+// Local-only RMI alert. A system notification can be shown while the PWA's
+// JavaScript is running; iOS may suspend it when the screen is locked.
+// This is NOT a remote Web Push subscription or 24-hour background watcher.
 const SIGNAL_ALERT_KEY='btc-paper-local-signal-alert-v1';
 let signalAlertEnabled=false,signalAlertAudio=null,signalAlertLastKey='',signalAlertToastTimer=null;
+let signalNotificationRegistration=null;
+async function registerSignalNotificationWorker(){
+ if(!('serviceWorker' in navigator))return null;
+ try{
+  signalNotificationRegistration=await navigator.serviceWorker.register('./signal-notification-sw.js',{scope:'./'});
+  return signalNotificationRegistration;
+ }catch(e){console.warn('신호 시스템 알림 워커 등록 실패',e);return null}
+}
+function signalNotificationPermission(){
+ return 'Notification' in window?Notification.permission:'unsupported';
+}
+function requestSignalSystemPermission(){
+ // This function MUST run directly from a real button tap. On iOS a Home
+ // Screen PWA is needed for native alerts; browser tabs may not support it.
+ if(!('Notification' in window))return Promise.resolve('unsupported');
+ try{return Promise.resolve(Notification.requestPermission())}
+ catch(e){console.warn('알림 권한 요청 오류',e);return Promise.resolve('unsupported')}
+}
+async function showSignalSystemNotification(side,price,tag='btc-signal'){
+ if(signalNotificationPermission()!=='granted')return false;
+ const title=side==='SHORT'?'🔴 BTCUSDT 숏 신호':'🟢 BTCUSDT 롱 신호';
+ const body='1분봉 RMI 확정봉'+(Number.isFinite(price)&&price>0?' · '+fmt(price)+' USDT':'');
+ try{
+  const reg=signalNotificationRegistration||await registerSignalNotificationWorker();
+  if(reg&&typeof reg.showNotification==='function'){
+   await reg.showNotification(title,{body,tag,renotify:true,icon:'./push-icon.svg',data:{url:'./'}});
+   return true;
+  }
+  // Desktop compatibility only. iOS Home Screen PWA uses registration above.
+  if(typeof Notification==='function'){new Notification(title,{body,tag});return true}
+ }catch(e){console.warn('시스템 알림 표시 실패',e)}
+ return false;
+}
 function renderSignalAlertStatus(extra=''){
   const button=$('signalAlertToggle'),status=$('signalAlertStatus');
   if(!button||!status)return;
   button.textContent=signalAlertEnabled?'🔔 신호 알림 ON':'🔕 신호 알림 OFF';
   button.setAttribute('aria-pressed',String(signalAlertEnabled));
   button.classList.toggle('is-on',signalAlertEnabled);
-  status.textContent=extra||(signalAlertEnabled?'신호 알림 ON · 앱 실행 중':'신호 알림 OFF');
+  const permission=signalNotificationPermission();
+ const detail=permission==='granted'?'시스템 알림 허용':
+  permission==='denied'?'시스템 알림 차단됨':
+  permission==='unsupported'?'시스템 알림 미지원':'시스템 알림 권한 필요';
+ status.textContent=extra||(signalAlertEnabled?'신호 알림 ON · '+detail+' · 화면 꺼짐 시 수신 미보장':
+  '신호 알림 OFF · '+detail);
 }
 function alertAudioContext(){
   if(!signalAlertAudio)signalAlertAudio=new (window.AudioContext||window.webkitAudioContext)();
@@ -6114,7 +6154,7 @@ function showSignalAlert(side,price,test=false){
   playSignalAlertSound(side);
 }
 function maybeAlertChartSignal(bar,bars){
-  if(!signalAlertEnabled||document.visibilityState!=='visible'||demo)return;
+  if(!signalAlertEnabled||demo)return;
   const now=Date.now(),closedAt=bar.t+60000;
   if(now-closedAt>45000||now<closedAt||closedAt<=rmiStrategyChangedAt)return;
   const selected=chartRmiZoneMarkers(bars,Math.max(0,bars.length-1),bars.length,now-1800)
@@ -6132,7 +6172,10 @@ function maybeAlertChartSignal(bar,bars){
     signalAlertToastTimer=setTimeout(()=>{el.hidden=true},6500);
     // The bear strategy's READY (17 -> 25) is an audible alert too.
     playSignalAlertSound('READY');
-  }else showSignalAlert(selected,bar.c);
+  }else{
+   showSignalAlert(selected,bar.c);
+   void showSignalSystemNotification(selected,bar.c,'btc-rmi-'+key);
+  }
 }
 function initSignalAlerts(){
   try{
@@ -6144,6 +6187,11 @@ function initSignalAlerts(){
     signalAlertEnabled=!signalAlertEnabled;
     if(signalAlertEnabled){
       try{void alertAudioContext().resume()}catch(e){console.warn('알림 사운드 활성화 실패',e)}
+      // Ask immediately on the button gesture, not after an async worker call.
+      if(signalNotificationPermission()==='default'){
+       void requestSignalSystemPermission().then(()=>renderSignalAlertStatus());
+      }
+      void registerSignalNotificationWorker();
     }
     try{localStorage.setItem(SIGNAL_ALERT_KEY,JSON.stringify({enabled:signalAlertEnabled,lastKey:signalAlertLastKey}))}catch{}
     renderSignalAlertStatus();
@@ -6153,6 +6201,22 @@ function initSignalAlerts(){
     showSignalAlert('LONG',Number(last)||0,true);
     renderSignalAlertStatus('테스트 소리를 재생했습니다. 들리지 않으면 아이폰 볼륨·무음 모드를 확인하세요.');
   });
+  $('signalSystemTest')?.addEventListener('click',()=>{
+    const permission=signalNotificationPermission();
+    if(permission!=='granted'){
+     // A direct tap is required for iPhone's system permission popup.
+     void requestSignalSystemPermission().then(async granted=>{
+      if(granted==='granted'){
+       const ok=await showSignalSystemNotification('LONG',Number(last)||0,'btc-signal-test');
+       renderSignalAlertStatus(ok?'아이폰 시스템 알림 테스트 발송 · 잠금 화면 수신은 기기에서 확인해 줘.':
+        '알림 권한은 허용됐지만 테스트 표시 실패 · 홈 화면 앱인지 확인해 줘.');
+      }else renderSignalAlertStatus('시스템 알림 권한: '+granted+' · 홈 화면 앱과 알림 설정을 확인해 줘.');
+     });
+    }else void showSignalSystemNotification('LONG',Number(last)||0,'btc-signal-test')
+     .then(ok=>renderSignalAlertStatus(ok?'시스템 알림 테스트 발송 · 잠금 화면에서 확인해 줘.':
+       '시스템 알림 표시 실패 · 홈 화면 앱인지 확인해 줘.'));
+  });
+  void registerSignalNotificationWorker();
   renderSignalAlertStatus();
 }
 
