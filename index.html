@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-history-refresh-v213"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-volume-history-v214"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -91,7 +91,7 @@ html,body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout
   #entrySheet .order-types{margin:4px 0}
   #entrySheet .row button{padding:7px 2px}
 }
-.daily-volume[role="button"]{cursor:pointer;touch-action:manipulation}.daily-volume-hint{font-size:10px;color:#82b7f5;margin-top:3px}.daily-volume:active{border-color:#78b5f5}.volume30-overlay[hidden]{display:none!important}.volume30-overlay{position:fixed!important;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px max(12px,env(safe-area-inset-right)) 12px max(12px,env(safe-area-inset-left));background:rgba(2,8,18,.84)}.volume30-dialog{width:min(720px,100%);max-height:calc(100dvh - 24px);overflow:auto;background:#14243b;border:1px solid #557194;border-radius:16px;padding:14px;box-shadow:0 14px 42px #0008}.volume30-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.volume30-header strong{font-size:16px}.volume30-header small{display:block;margin-top:6px;font-size:11px;color:#98b2ce;line-height:1.4}.volume30-header button{padding:5px 10px;min-width:35px;min-height:34px}.volume30-detail{font-size:14px;font-weight:700;color:#e7f2ff;margin:13px 0 5px;min-height:20px}.volume30-chart-wrap{height:clamp(140px,39dvh,290px);min-height:140px}.volume30-chart-wrap canvas{height:100%;width:100%;touch-action:manipulation;background:#0b1728}.volume30-status{font-size:11px;color:#a0b9d5;line-height:1.5;margin-top:9px}@media (orientation:landscape) and (max-height:520px){.volume30-dialog{padding:9px 12px}.volume30-chart-wrap{height:clamp(110px,40dvh,190px);min-height:110px}.volume30-header strong{font-size:14px}.volume30-detail{margin:5px 0}}.volume30-legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding-top:7px;color:#b9cce2;font-size:11px}.volume30-legend span{display:flex;align-items:center;gap:5px}.volume30-legend i{display:inline-block;width:12px;height:12px;border-radius:2px}.legend-weekend{background:#f05c75}.legend-weekday{background:#4d8fd4}.legend-selected{border:2px solid #ffd36e;background:transparent}.daily-volume{padding:6px 9px!important;margin:0 0 3px!important}.daily-volume-top{font-size:12px!important}.daily-volume-hint{margin-top:2px!important;font-size:11px!important}.daily-volume-note[hidden]{display:none!important}.grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+.daily-volume[role="button"]{cursor:pointer;touch-action:manipulation}.daily-volume-hint{font-size:10px;color:#82b7f5;margin-top:3px}.daily-volume:active{border-color:#78b5f5}.volume30-overlay[hidden]{display:none!important}.volume30-overlay{position:fixed!important;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px max(12px,env(safe-area-inset-right)) 12px max(12px,env(safe-area-inset-left));background:rgba(2,8,18,.84)}.volume30-dialog{width:min(720px,100%);max-height:calc(100dvh - 24px);overflow:auto;background:#14243b;border:1px solid #557194;border-radius:16px;padding:14px;box-shadow:0 14px 42px #0008}.volume30-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.volume30-header strong{font-size:16px}.volume30-header small{display:block;margin-top:6px;font-size:11px;color:#98b2ce;line-height:1.4}.volume30-header button{padding:5px 10px;min-width:35px;min-height:34px}.volume30-detail{font-size:14px;font-weight:700;color:#e7f2ff;margin:13px 0 5px;min-height:20px}.volume30-chart-wrap{height:clamp(140px,39dvh,290px);min-height:140px}.volume30-chart-wrap canvas{height:100%;width:100%;touch-action:pan-y;background:#0b1728;cursor:grab}.volume30-date-tools{display:flex;gap:7px;align-items:center;margin:8px 0 0}.volume30-date-tools button{padding:7px 9px;min-height:33px;font-size:12px;flex:0 0 auto}.volume30-date-tools input{min-width:0;flex:1;background:#294363;color:#e7edf8;border:1px solid #4a6485;border-radius:8px;padding:7px 5px;font-size:12px;min-height:33px}.volume30-status{font-size:11px;color:#a0b9d5;line-height:1.5;margin-top:9px}@media (orientation:landscape) and (max-height:520px){.volume30-dialog{padding:9px 12px}.volume30-chart-wrap{height:clamp(110px,40dvh,190px);min-height:110px}.volume30-header strong{font-size:14px}.volume30-detail{margin:5px 0}}.volume30-legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding-top:7px;color:#b9cce2;font-size:11px}.volume30-legend span{display:flex;align-items:center;gap:5px}.volume30-legend i{display:inline-block;width:12px;height:12px;border-radius:2px}.legend-weekend{background:#f05c75}.legend-weekday{background:#4d8fd4}.legend-selected{border:2px solid #ffd36e;background:transparent}.daily-volume{padding:6px 9px!important;margin:0 0 3px!important}.daily-volume-top{font-size:12px!important}.daily-volume-hint{margin-top:2px!important;font-size:11px!important}.daily-volume-note[hidden]{display:none!important}.grid{grid-template-columns:repeat(6,minmax(0,1fr))}
 /* Clean, dark navy API account card */
 #binanceApiPanel.api-panel{padding:16px!important;border-radius:18px;background:#101e32;border:1px solid #29405d;box-shadow:0 4px 18px rgba(0,0,0,.1)}
 .api-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -1398,7 +1398,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
 <div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button><div class="focus-pnl-strip" id="focusPnlStrip" aria-label="미실현 손익"><span>미실현 손익 (원화 추정)</span><strong id="focusPnlValue">—</strong></div></div>
 <nav class="bottom-nav" aria-label="메뉴"><button class="nav-btn active" data-tab="chart"><span>▥</span>차트</button><button class="nav-btn" data-tab="position"><span>▣</span>포지션</button><button class="nav-btn" data-tab="history"><span>◷</span>거래내역</button><button class="nav-btn" data-tab="liquidation"><span>▤</span>청산맵</button><button class="nav-btn" data-tab="settings"><span>⚙</span>설정</button></nav>
- <div id="volume30Overlay" class="volume30-overlay" hidden role="dialog" aria-modal="true" aria-label="최근 30일 BTC 선물 일별 거래량"><div class="volume30-dialog"><div class="volume30-header"><div><strong>최근 30일 BTC 선물 거래대금</strong><small>바이낸스 BTCUSDT 무기한 선물 · UTC 일별 · 현재 환율로 원화 환산</small></div><button id="volume30Close" type="button" aria-label="닫기">✕</button></div><div class="volume30-detail" id="volume30Detail">일별 거래대금 조회 중…</div><div class="volume30-chart-wrap"><canvas id="volume30Chart" aria-label="최근 30일 일별 거래대금 막대그래프"></canvas></div><div class="volume30-legend"><span><i class="legend-weekend"></i> 토·일요일</span><span><i class="legend-weekday"></i> 평일</span><span><i class="legend-selected"></i> 선택한 날짜</span></div><div id="volume30Status" class="volume30-status">막대를 누르면 날짜와 거래대금을 볼 수 있어요. 오늘은 진행 중인 거래대금입니다.</div></div></div>
+ <div id="volume30Overlay" class="volume30-overlay" hidden role="dialog" aria-modal="true" aria-label="최근 30일 BTC 선물 일별 거래량"><div class="volume30-dialog"><div class="volume30-header"><div><strong>최근 30일 BTC 선물 거래대금</strong><small>바이낸스 BTCUSDT 무기한 선물 · UTC 일별 · 현재 환율로 원화 환산</small></div><button id="volume30Close" type="button" aria-label="닫기">✕</button></div><div class="volume30-detail" id="volume30Detail">일별 거래대금 조회 중…</div><div class="volume30-chart-wrap"><canvas id="volume30Chart" aria-label="일별 거래대금 막대그래프 · 왼쪽으로 밀면 과거 날짜"></canvas></div><div class="volume30-date-tools"><button id="volume30Older" type="button" aria-label="이전 30일">◀ 이전</button><input id="volume30Date" type="date" aria-label="조회할 거래량 날짜"><button id="volume30Newer" type="button" aria-label="다음 30일">다음 ▶</button></div><div class="volume30-legend"><span><i class="legend-weekend"></i> 토·일요일</span><span><i class="legend-weekday"></i> 평일</span><span><i class="legend-selected"></i> 선택한 날짜</span></div><div id="volume30Status" class="volume30-status">막대를 누르면 날짜와 거래대금을 볼 수 있어요. 오늘은 진행 중인 거래대금입니다.</div></div></div>
 <div id="chartPriceOrderChoice" hidden role="dialog" aria-modal="true" aria-labelledby="chartPriceChoiceTitle">
   <div class="chart-price-dialog">
     <strong id="chartPriceChoiceTitle">선택한 가격으로 예약 진입</strong>
@@ -5687,11 +5687,162 @@ let resizeFrame=0;function refreshChartSize(){cancelAnimationFrame(resizeFrame);
 
 
 let volume30Data=[],volume30Busy=false,volume30At=0,volume30Selected=-1;
-function formatVolumeKrw(usdt){const krw=usdt*(Number($('fx').value)||1400);return krw>=1e12?(krw/1e12).toLocaleString('ko-KR',{maximumFractionDigits:2})+'조원':krw>=1e8?(krw/1e8).toLocaleString('ko-KR',{maximumFractionDigits:1})+'억원':Math.round(krw).toLocaleString('ko-KR')+'원'}
-function renderVolume30(){if($('volume30Overlay').hidden)return;const cv=$('volume30Chart'),rect=cv.getBoundingClientRect(),w=Math.max(250,rect.width),h=Math.max(110,rect.height),dpr=window.devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);if(!volume30Data.length){ctx.fillStyle='#a5b9d5';ctx.font='12px sans-serif';ctx.fillText(volume30Busy?'30일 거래량 불러오는 중…':'표시할 거래량 데이터가 없습니다.',12,28);return}const left=10,right=8,top=16,bottom=33,usableW=w-left-right,usableH=h-top-bottom,max=Math.max(1,...volume30Data.map(v=>v.usdt)),barW=usableW/volume30Data.length;for(let k=0;k<4;k++){const y=top+usableH*k/3;ctx.strokeStyle='#273c57';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke()}volume30Data.forEach((v,i)=>{const height=Math.max(1,usableH*v.usdt/max),x=left+i*barW+Math.max(1,barW*.13),width=Math.max(2,barW*.74),y=top+usableH-height;ctx.fillStyle=v.isWeekend?'#f05c75':v.isToday?'#58b9ee':'#4d8fd4';ctx.fillRect(x,y,width,height);if(i===volume30Selected){ctx.strokeStyle='#ffd36e';ctx.lineWidth=2;ctx.strokeRect(x-.8,y-.8,width+1.6,height+1.6)}if(i%5===0||i===volume30Data.length-1){ctx.save();ctx.fillStyle='#a5b9d5';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(v.label,left+(i+.5)*barW,h-12);ctx.restore()}});const chosen=volume30Data[volume30Selected>=0?volume30Selected:volume30Data.length-1];if(chosen)$('volume30Detail').textContent=chosen.fullDate+' ('+chosen.weekday+'요일 · UTC) · '+formatVolumeKrw(chosen.usdt)+(chosen.isToday?' · 오늘 진행 중':'');}
-async function openVolume30(){const el=$('volume30Overlay');el.hidden=false;el.style.display='flex';$('dailyVolumeTrigger').setAttribute('aria-expanded','true');volume30Selected=-1;requestAnimationFrame(renderVolume30);if(volume30Data.length&&Date.now()-volume30At<300000)return;if(volume30Busy)return;volume30Busy=true;$('volume30Status').textContent='일별 거래대금 불러오는 중…';try{const r=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1d&limit=30',{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const raw=await r.json();if(!Array.isArray(raw)||raw.length<1)throw Error('데이터가 없습니다');const utcDay=Math.floor(Date.now()/86400000)*86400000;volume30Data=raw.map(v=>{const t=Number(v[0]);return {usdt:Number(v[7]),label:new Date(t).toISOString().slice(5,10),fullDate:new Date(t).toISOString().slice(0,10),weekday:['일','월','화','수','목','금','토'][new Date(t).getUTCDay()],isWeekend:[0,6].includes(new Date(t).getUTCDay()),isToday:t===utcDay}}).filter(v=>Number.isFinite(v.usdt)&&v.usdt>=0);volume30At=Date.now();volume30Selected=volume30Data.length-1;$('volume30Status').textContent='빨간 막대 = 토·일요일(UTC) · 노란 테두리 = 선택 날짜. 막대를 누르면 날짜·요일·거래대금을 표시해요. 오늘은 진행 중인 값입니다.'}catch(e){$('volume30Status').textContent='일별 거래량 조회 실패: '+e.message+' · 잠시 후 다시 열어주세요.'}finally{volume30Busy=false;requestAnimationFrame(renderVolume30)}}
-function closeVolume30(){$('volume30Overlay').hidden=true;$('volume30Overlay').style.display='none';$('dailyVolumeTrigger').setAttribute('aria-expanded','false')}
-$('dailyVolumeTrigger').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openVolume30()}});$('volume30Close').addEventListener('click',closeVolume30);$('volume30Overlay').addEventListener('click',e=>{if(e.target===$('volume30Overlay'))closeVolume30()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeVolume30()});$('volume30Chart').addEventListener('click',e=>{if(!volume30Data.length)return;const rect=$('volume30Chart').getBoundingClientRect(),ratio=(e.clientX-rect.left-10)/Math.max(1,rect.width-18);volume30Selected=Math.max(0,Math.min(volume30Data.length-1,Math.floor(ratio*volume30Data.length)));renderVolume30()});window.addEventListener('resize',()=>{if(!$('volume30Overlay').hidden)renderVolume30()});
+let volume30Start=0,volume30Gesture=null;
+const VOLUME30_WINDOW=30,VOLUME30_DAY=86400000;
+function formatVolumeKrw(usdt){
+ const krw=usdt*(Number($('fx').value)||1400);
+ return krw>=1e12?(krw/1e12).toLocaleString('ko-KR',{maximumFractionDigits:2})+'조원':
+  krw>=1e8?(krw/1e8).toLocaleString('ko-KR',{maximumFractionDigits:1})+'억원':
+  Math.round(krw).toLocaleString('ko-KR')+'원';
+}
+function volume30View(){
+ return volume30Data.slice(volume30Start,volume30Start+VOLUME30_WINDOW);
+}
+function volume30Clamp(){
+ volume30Start=Math.max(0,Math.min(volume30Start,Math.max(0,volume30Data.length-VOLUME30_WINDOW)));
+}
+function volume30UpdateControls(){
+ const older=$('volume30Older'),newer=$('volume30Newer'),picker=$('volume30Date');
+ older.disabled=!volume30Data.length||volume30Start<=0;
+ newer.disabled=!volume30Data.length||volume30Start>=Math.max(0,volume30Data.length-VOLUME30_WINDOW);
+ if(!volume30Data.length)return;
+ picker.min=volume30Data[0].fullDate;
+ picker.max=volume30Data.at(-1).fullDate;
+ const chosen=volume30Data[volume30Selected]||volume30View().at(-1);
+ if(chosen&&document.activeElement!==picker)picker.value=chosen.fullDate;
+}
+function renderVolume30(){
+ if($('volume30Overlay').hidden)return;
+ volume30Clamp();
+ const cv=$('volume30Chart'),rect=cv.getBoundingClientRect();
+ const w=Math.max(250,rect.width),h=Math.max(110,rect.height),dpr=window.devicePixelRatio||1;
+ cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+ const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+ const view=volume30View();
+ if(!view.length){
+  ctx.fillStyle='#a5b9d5';ctx.font='12px sans-serif';
+  ctx.fillText(volume30Busy?'거래대금 불러오는 중…':'표시할 거래대금 데이터가 없습니다.',12,28);
+  volume30UpdateControls();return;
+ }
+ const left=10,right=8,top=16,bottom=33,usableW=w-left-right,usableH=h-top-bottom;
+ const max=Math.max(1,...view.map(v=>v.usdt)),barW=usableW/view.length;
+ for(let k=0;k<4;k++){
+  const y=top+usableH*k/3;
+  ctx.strokeStyle='#273c57';ctx.lineWidth=1;ctx.beginPath();
+  ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke();
+ }
+ view.forEach((v,i)=>{
+  const height=Math.max(1,usableH*v.usdt/max),x=left+i*barW+Math.max(1,barW*.13);
+  const width=Math.max(2,barW*.74),y=top+usableH-height;
+  ctx.fillStyle=v.isWeekend?'#f05c75':v.isToday?'#58b9ee':'#4d8fd4';
+  ctx.fillRect(x,y,width,height);
+  if(volume30Start+i===volume30Selected){
+   ctx.strokeStyle='#ffd36e';ctx.lineWidth=2;
+   ctx.strokeRect(x-.8,y-.8,width+1.6,height+1.6);
+  }
+  if(i%5===0||i===view.length-1){
+   ctx.save();ctx.fillStyle='#a5b9d5';ctx.font='10px sans-serif';ctx.textAlign='center';
+   ctx.fillText(v.label,left+(i+.5)*barW,h-12);ctx.restore();
+  }
+ });
+ const chosen=volume30Data[volume30Selected]||view.at(-1);
+ if(chosen)$('volume30Detail').textContent=chosen.fullDate+' ('+chosen.weekday+'요일 · UTC) · '+
+  formatVolumeKrw(chosen.usdt)+(chosen.isToday?' · 오늘 진행 중':'');
+ volume30UpdateControls();
+}
+function volume30Shift(days){
+ if(!volume30Data.length)return;
+ const before=volume30Start;
+ // Requested direction: swiping LEFT navigates into the past.
+ volume30Start+=days;
+ volume30Clamp();
+ if(before===volume30Start)return;
+ volume30Selected=Math.min(volume30Data.length-1,volume30Start+VOLUME30_WINDOW-1);
+ renderVolume30();
+}
+function volume30Jump(date){
+ const i=volume30Data.findIndex(x=>x.fullDate===date);
+ if(i<0){$('volume30Status').textContent='선택한 날짜의 거래대금 데이터가 없습니다.';return}
+ volume30Selected=i;
+ volume30Start=Math.max(0,Math.min(i-14,volume30Data.length-VOLUME30_WINDOW));
+ renderVolume30();
+}
+async function openVolume30(){
+ const el=$('volume30Overlay');el.hidden=false;el.style.display='flex';
+ $('dailyVolumeTrigger').setAttribute('aria-expanded','true');
+ volume30Gesture=null;
+ requestAnimationFrame(renderVolume30);
+ if(volume30Data.length&&Date.now()-volume30At<300000)return;
+ if(volume30Busy)return;
+ volume30Busy=true;
+ $('volume30Status').textContent='과거 일별 거래대금 불러오는 중…';
+ try{
+  // One year of UTC daily BTCUSDT USDⓈ-M quote trading turnover.
+  const r=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1d&limit=365',{cache:'no-store'});
+  if(!r.ok)throw Error('HTTP '+r.status);
+  const raw=await r.json();
+  if(!Array.isArray(raw)||!raw.length)throw Error('데이터가 없습니다');
+  const utcDay=Math.floor(Date.now()/VOLUME30_DAY)*VOLUME30_DAY;
+  const mapped=raw.map(v=>{
+   const t=Number(v[0]),usdt=Number(v[7]),d=new Date(t);
+   return {usdt,label:d.toISOString().slice(5,10),fullDate:d.toISOString().slice(0,10),
+    weekday:['일','월','화','수','목','금','토'][d.getUTCDay()],
+    isWeekend:[0,6].includes(d.getUTCDay()),isToday:t===utcDay};
+  }).filter(v=>Number.isFinite(v.usdt)&&v.usdt>=0);
+  if(!mapped.length)throw Error('유효한 거래대금이 없습니다');
+  volume30Data=mapped;volume30At=Date.now();
+  volume30Start=Math.max(0,mapped.length-VOLUME30_WINDOW);
+  volume30Selected=mapped.length-1;
+  $('volume30Status').textContent='왼쪽 밀기: 과거 · 오른쪽 밀기: 최근 · 막대나 날짜를 선택하면 거래대금을 확인할 수 있어요.';
+ }catch(e){
+  $('volume30Status').textContent='과거 거래대금 조회 실패: '+e.message+
+   (volume30Data.length?' · 이전 조회 데이터 유지':'');
+ }finally{volume30Busy=false;requestAnimationFrame(renderVolume30)}
+}
+function closeVolume30(){
+ $('volume30Overlay').hidden=true;$('volume30Overlay').style.display='none';
+ $('dailyVolumeTrigger').setAttribute('aria-expanded','false');
+ volume30Gesture=null;
+}
+$('dailyVolumeTrigger').addEventListener('keydown',e=>{
+ if(e.key==='Enter'||e.key===' '){e.preventDefault();openVolume30()}
+});
+$('volume30Close').addEventListener('click',closeVolume30);
+$('volume30Overlay').addEventListener('click',e=>{
+ if(e.target===$('volume30Overlay'))closeVolume30()
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeVolume30()});
+const volume30Canvas=$('volume30Chart');
+volume30Canvas.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ volume30Gesture={id:e.pointerId,x:e.clientX,y:e.clientY};
+ try{volume30Canvas.setPointerCapture(e.pointerId)}catch(_){}
+});
+volume30Canvas.addEventListener('pointerup',e=>{
+ const g=volume30Gesture;
+ if(!g||g.id!==e.pointerId)return;
+ volume30Gesture=null;
+ const dx=e.clientX-g.x,dy=e.clientY-g.y;
+ if(Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy)*1.15){
+  const days=Math.max(5,Math.min(30,Math.round(Math.abs(dx)/12)));
+  volume30Shift(dx<0?-days:days);
+  return;
+ }
+ if(Math.abs(dx)>12||Math.abs(dy)>12||!volume30Data.length)return;
+ const rect=volume30Canvas.getBoundingClientRect();
+ const ratio=(e.clientX-rect.left-10)/Math.max(1,rect.width-18);
+ const view=volume30View();
+ volume30Selected=Math.max(volume30Start,Math.min(volume30Start+view.length-1,
+  volume30Start+Math.floor(ratio*view.length)));
+ renderVolume30();
+});
+volume30Canvas.addEventListener('pointercancel',()=>{volume30Gesture=null});
+$('volume30Older').addEventListener('click',()=>volume30Shift(-30));
+$('volume30Newer').addEventListener('click',()=>volume30Shift(30));
+$('volume30Date').addEventListener('change',e=>volume30Jump(e.target.value));
+window.addEventListener('resize',()=>{
+ if(!$('volume30Overlay').hidden)renderVolume30();
+});
 let volumeBusy=false,volumeLastAt=0,volumeUsdt=null;
 function renderDailyVolume(){if(!Number.isFinite(volumeUsdt))return;const rate=Number($('fx').value);if(!(rate>0)){$('dayVol').textContent='환율 확인 필요';return}const won=Math.round(volumeUsdt*rate);const eok=won/100000000;const jo=won/1000000000000;$('dayVol').textContent=won>=1000000000000?jo.toLocaleString('ko-KR',{maximumFractionDigits:2})+'조원':won>=100000000?eok.toLocaleString('ko-KR',{maximumFractionDigits:1})+'억원':won.toLocaleString('ko-KR')+'원';$('volDetails').textContent='바이낸스 BTCUSDT 무기한 선물 · UTC 00:00부터 현재까지 누적 · '+Math.round(volumeUsdt).toLocaleString('en-US')+' USDT × '+rate.toLocaleString('ko-KR')+'원/USDT (추정)'}
 async function updateDailyVolume(){if(volumeBusy)return;volumeBusy=true;try{const now=Date.now(),day=86400000,utcStart=Math.floor(now/day)*day;const res=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&startTime='+utcStart+'&endTime='+now+'&limit=1500',{cache:'no-store'});if(!res.ok)throw Error('HTTP '+res.status);const rows=await res.json();if(!Array.isArray(rows)||!rows.length)throw Error('거래량 데이터 없음');const total=rows.reduce((sum,k)=>sum+Number(k[7]||0),0);if(!(total>0))throw Error('오늘 거래량 없음');volumeUsdt=total;volumeLastAt=Date.now();renderDailyVolume()}catch(e){$('volDetails').textContent='거래량 조회 실패: '+e.message+(volumeLastAt?' · 이전 값 유지':'');if(!volumeLastAt)$('dayVol').textContent='조회 실패'}finally{volumeBusy=false}}
