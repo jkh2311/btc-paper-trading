@@ -23,6 +23,7 @@ if(!REGISTER_TOKEN||!PUBLIC||!PRIVATE||SUBJECT==='mailto:admin@example.com'){
 webpush.setVapidDetails(SUBJECT,PUBLIC,PRIVATE);
 
 let subscribers=[];
+let lastPrice=null,lastPriceAt=0,lastPriceError=null,priceBusy=false;
 try{const raw=JSON.parse(fs.readFileSync(SAVE_FILE,'utf8'));if(Array.isArray(raw))subscribers=raw}catch(_){}
 function save(){
  const tmp=SAVE_FILE+'.tmp';
@@ -68,7 +69,7 @@ http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
  if(req.method==='GET'&&url.pathname==='/config'){respond(res,200,{publicKey:PUBLIC});return}
  if(req.method==='GET'&&url.pathname==='/health'){
-  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral'});
+  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',lastPriceAt,lastPriceError,priceAlertSupported:true});
   return;
  }
  if(req.method==='POST'&&url.pathname==='/subscribe'){
@@ -83,10 +84,11 @@ http.createServer(async(req,res)=>{
    // Limit registrations to one private owner, at most five devices.
    const prefs=preferences(body);
    const existing=subscribers.findIndex(x=>x.subscription.endpoint===sub.endpoint);
-   const record={subscription:sub,...prefs,lastBar:0,lastBar10:0};
+   const record={subscription:sub,...prefs,lastBar:0,lastBar10:0,priceAlerts:[]};
    if(existing>=0){
     record.lastBar=subscribers[existing].lastBar;
     record.lastBar10=subscribers[existing].lastBar10||0;
+    record.priceAlerts=Array.isArray(subscribers[existing].priceAlerts)?subscribers[existing].priceAlerts:[];
     subscribers[existing]=record;
    }else{
     if(subscribers.length>=5){respond(res,409,{error:'device limit'});return}
@@ -94,6 +96,32 @@ http.createServer(async(req,res)=>{
    }
    save();respond(res,200,{ok:true,recoveryProof:recoveryProof(sub.endpoint)});
   }catch(e){respond(res,400,{error:'invalid request'})}
+  return;
+ }
+ // Device-scoped alert rules. Never accept unauthenticated modifications.
+ if(req.method==='POST'&&url.pathname==='/price-alerts'){
+  try{
+   const body=await readBody(req);
+   if(!authorized(req,body)){respond(res,403,{error:'registration authentication required'});return}
+   const record=subscribers.find(x=>x.subscription.endpoint===body.endpoint);
+   if(!record){respond(res,404,{error:'device not registered'});return}
+   const input=body.alerts;
+   if(!Array.isArray(input)||input.length>10){respond(res,400,{error:'maximum 10 alerts'});return}
+   const unique=new Set(),previous=new Map((record.priceAlerts||[]).map(x=>[x.id,x]));
+   const rows=[];
+   for(const item of input){
+    const id=String(item?.id||''),target=Number(item?.price);
+    if(!/^[a-zA-Z0-9_-]{8,64}$/.test(id)||unique.has(id)||
+       !Number.isFinite(target)||target<1000||target>10000000){
+     respond(res,400,{error:'invalid price alert'});return;
+    }
+    unique.add(id);
+    const old=previous.get(id);
+    rows.push(old&&old.price===target?old:{id,price:target,status:'armed',created:Date.now()});
+   }
+   record.priceAlerts=rows;save();
+   respond(res,200,{ok:true,alerts:rows.map(x=>({id:x.id,price:x.price,status:x.status}))});
+  }catch(e){respond(res,400,{error:'invalid alert request'})}
   return;
  }
  if(req.method==='POST'&&url.pathname==='/test'){
@@ -292,6 +320,51 @@ async function poll(){
  }catch(e){lastCheckError=String(e.message||e).slice(0,180);console.warn('RMI poll:',lastCheckError)}
  finally{polling=false}
 }
+// Independent price watcher. Alert only when an observed live price crosses
+// a configured level; never fabricate a crossing after a gap or restart.
+async function pollPriceAlerts(){
+ if(priceBusy||!subscribers.some(s=>(s.priceAlerts||[]).some(a=>a.status==='armed')))return;
+ priceBusy=true;
+ try{
+  const response=await fetch('https://fapi.binance.com/fapi/v1/ticker/price?symbol=BTCUSDT',
+   {cache:'no-store',signal:AbortSignal.timeout(6500)});
+  if(!response.ok)throw Error('Binance price HTTP '+response.status);
+  const json=await response.json(),price=Number(json.price),now=Date.now();
+  if(!Number.isFinite(price)||price<=0)throw Error('Invalid BTCUSDT quote');
+  const old=lastPrice,oldTime=lastPriceAt;
+  lastPrice=price;lastPriceAt=now;lastPriceError=null;
+  if(!(old>0&&now-oldTime<20000))return;
+  for(const subscriber of [...subscribers]){
+   for(const alert of subscriber.priceAlerts||[]){
+    if(alert.status!=='armed')continue;
+    const crossed=(old<alert.price&&price>=alert.price)||
+     (old>alert.price&&price<=alert.price);
+    if(!crossed)continue;
+    // Mark the crossing before sending so retries cannot spam duplicates.
+    alert.status='triggered';alert.triggeredAt=now;save();
+    try{
+     await webpush.sendNotification(subscriber.subscription,JSON.stringify({
+      title:'🎯 BTCUSDT 지정가격 도달',
+      body:'설정 '+alert.price.toLocaleString('en-US')+' USDT · 현재 '+price.toLocaleString('en-US')+' USDT',
+      tag:'btc-price-'+alert.id
+     }),{TTL:3600,urgency:'high'});
+     console.log('PRICE ALERT',alert.id,alert.price,price);
+    }catch(e){
+     console.warn('Price Web Push error',e.statusCode||e.message);
+     if(e.statusCode===404||e.statusCode===410){
+      subscribers=subscribers.filter(x=>x!==subscriber);save();break;
+     }
+     // Network/temporary errors remain visible as unconfirmed delivery;
+     // no automatic duplicate resend after an uncertain push response.
+    }
+   }
+  }
+ }catch(e){lastPriceError=String(e.message||e).slice(0,140)}
+ finally{priceBusy=false}
+}
+setInterval(()=>{void pollPriceAlerts()},2500);
+void pollPriceAlerts();
+
 // Poll at 2.5s while process is online. New completed candle is detected
 // on the first fresh REST response; this is NOT a guaranteed 0-second alert.
 setInterval(()=>{void poll()},2500);
