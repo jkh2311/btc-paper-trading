@@ -6,6 +6,7 @@
 const http=require('node:http');
 const fs=require('node:fs');
 const path=require('node:path');
+const crypto=require('node:crypto');
 const webpush=require('web-push');
 
 const PORT=Number(process.env.PORT||8787);
@@ -35,7 +36,18 @@ function respond(res,code,obj){
  'Access-Control-Allow-Methods':'GET, POST, OPTIONS'});
  res.end(JSON.stringify(obj));
 }
-function authorized(req,token){return typeof token==='string'&&token===REGISTER_TOKEN&&req.headers.origin===ORIGIN}
+function recoveryProof(endpoint){
+ return crypto.createHmac('sha256',REGISTER_TOKEN).update('btc-push-device-recovery-v1:'+endpoint).digest('hex');
+}
+function authorized(req,body){
+ if(req.headers.origin!==ORIGIN||!body||typeof body!=='object')return false;
+ if(typeof body.token==='string'&&body.token===REGISTER_TOKEN)return true;
+ const endpoint=body.subscription?.endpoint||body.endpoint;
+ if(typeof endpoint!=='string'||!endpoint.startsWith('https://'))return false;
+ const actual=body.recoveryProof,expected=recoveryProof(endpoint);
+ return typeof actual==='string'&&/^[0-9a-f]{64}$/.test(actual)&&
+  crypto.timingSafeEqual(Buffer.from(actual,'hex'),Buffer.from(expected,'hex'));
+}
 function readBody(req){
  return new Promise((resolve,reject)=>{
   let body='';
@@ -56,13 +68,13 @@ http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
  if(req.method==='GET'&&url.pathname==='/config'){respond(res,200,{publicKey:PUBLIC});return}
  if(req.method==='GET'&&url.pathname==='/health'){
-  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError});
+  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral'});
   return;
  }
  if(req.method==='POST'&&url.pathname==='/subscribe'){
   try{
    const body=await readBody(req);
-   if(!authorized(req,body.token)){respond(res,403,{error:'registration code'});return}
+   if(!authorized(req,body)){respond(res,403,{error:'registration code or device recovery'});return}
    const sub=body.subscription;
    if(!sub||typeof sub.endpoint!=='string'||!sub.endpoint.startsWith('https://')||
       typeof sub.keys?.p256dh!=='string'||typeof sub.keys?.auth!=='string'){
@@ -79,14 +91,14 @@ http.createServer(async(req,res)=>{
     if(subscribers.length>=5){respond(res,409,{error:'device limit'});return}
     subscribers.push(record);
    }
-   save();respond(res,200,{ok:true});
+   save();respond(res,200,{ok:true,recoveryProof:recoveryProof(sub.endpoint)});
   }catch(e){respond(res,400,{error:'invalid request'})}
   return;
  }
  if(req.method==='POST'&&url.pathname==='/test'){
   try{
    const body=await readBody(req);
-   if(!authorized(req,body.token)){respond(res,403,{error:'registration code'});return}
+   if(!authorized(req,body)){respond(res,403,{error:'registration code or device recovery'});return}
    const record=subscribers.find(x=>x.subscription.endpoint===body.endpoint);
    if(!record){respond(res,404,{error:'device not registered'});return}
    await webpush.sendNotification(record.subscription,JSON.stringify({
