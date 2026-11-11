@@ -186,9 +186,47 @@ function tenMinuteBars(minuteBars){
  return [...buckets.values()].filter(x=>!x.invalid&&x.count===10&&x.lastT===x.t+540000)
   .map(({t,c,v})=>({t,c,v}));
 }
-function signalBody(timeframe,price){
+// Optional read-only account snapshot, only when separate READ-ONLY credentials
+// are explicitly configured in Render environment. Never use live-trading credentials.
+const PNL_KEY=process.env.PNL_READONLY_API_KEY||'';
+const PNL_SECRET=process.env.PNL_READONLY_API_SECRET||'';
+let pnlLastError=null;
+async function readCurrentPnl(){
+ if(!PNL_KEY||!PNL_SECRET)return {text:'수익률·미실현 손익: 계좌 조회 미연결',ok:false};
+ try{
+  const query=new URLSearchParams({symbol:'BTCUSDT',recvWindow:'5000',timestamp:String(Date.now())});
+  const sig=crypto.createHmac('sha256',PNL_SECRET).update(query.toString()).digest('hex');
+  query.set('signature',sig);
+  const response=await fetch('https://fapi.binance.com/fapi/v3/positionRisk?'+query,{
+   headers:{'X-MBX-APIKEY':PNL_KEY},signal:AbortSignal.timeout(5500),cache:'no-store'
+  });
+  if(!response.ok)throw Error('Binance HTTP '+response.status);
+  const value=await response.json();
+  const positions=(Array.isArray(value)?value:[value]).filter(p=>p&&p.symbol==='BTCUSDT'&&
+   Number.isFinite(Number(p.positionAmt))&&Math.abs(Number(p.positionAmt))>0);
+  if(!positions.length){pnlLastError=null;return {text:'현재 BTCUSDT 보유 포지션 없음',ok:true}}
+  let totalPnl=0,totalMargin=0;const sides=new Set();
+  for(const p of positions){
+   const amount=Number(p.positionAmt),entry=Number(p.entryPrice),mark=Number(p.markPrice);
+   const lev=Number(p.leverage),pnl=Number(p.unRealizedProfit??p.unrealizedProfit);
+   if(!Number.isFinite(pnl)||!(entry>0&&mark>0&&lev>0))throw Error('Invalid position fields');
+   totalPnl+=pnl;totalMargin+=Math.abs(amount)*entry/lev;
+   sides.add(p.positionSide==='BOTH'?(amount>0?'LONG':'SHORT'):p.positionSide);
+  }
+  if(!(totalMargin>0))throw Error('Invalid position margin');
+  const pct=100*totalPnl/totalMargin;
+  const signed=n=>(n>=0?'+':'')+n.toLocaleString('ko-KR',{maximumFractionDigits:2});
+  const side=sides.size===1?[...sides][0]:'LONG/SHORT';
+  pnlLastError=null;
+  return {text:'보유 '+side+' · 수익률 '+signed(pct)+'%\\n미실현 손익 '+signed(totalPnl)+' USDT',ok:true};
+ }catch(err){
+  pnlLastError=String(err.message||err).slice(0,100);
+  return {text:'수익률·미실현 손익: 현재 조회 불가',ok:false};
+ }
+}
+function signalBody(timeframe,price,pnl){
  return timeframe+' RMI 확정 · '+price.toLocaleString('en-US')+' USDT'+
-  '\n포지션 수익률·미실현 손익: 원격 계좌 조회 미연결';
+  '\n'+pnl.text;
 }
 let lastCheckTime=0,lastCheckError=null,polling=false;
 async function poll(){
@@ -230,12 +268,13 @@ async function poll(){
     }
    }
    save();
+   const pnl=events.length?await readCurrentPnl():null;
    for(const {side,minutes,bar} of events){
     const timeframe=minutes===10?'10분봉':'1분봉';
     try{
      await webpush.sendNotification(subscriber.subscription,JSON.stringify({
       title:(minutes===10?'🔟 10분봉 ':'1분봉 ')+(side==='LONG'?'🟢 LONG 신호':'🔴 SHORT 신호'),
-      body:signalBody(timeframe,bar.c),
+      body:signalBody(timeframe,bar.c,pnl),
       tag:'btc-rmi-'+minutes+'m-'+subscriber.strategy+'-'+bar.t+'-'+side,
       side,minutes,barTime:bar.t
      }),{TTL:75,urgency:'high'});
