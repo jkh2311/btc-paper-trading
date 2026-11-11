@@ -1,12 +1,13 @@
 # Deploy with Render -> New -> Blueprint.
-# IMPORTANT: starter + persistent disk may incur charges; review before approval.
+# FREE TEST ONLY: web services sleep when idle and have ephemeral storage.
+# It cannot guarantee 24/7 minute-by-minute notifications.
 # GitHub Pages cannot run this Web Push sender.
 services:
   - type: web
     name: btcusdt-rmi-push
     runtime: node
     rootDir: push-server
-    plan: starter
+    plan: free
     buildCommand: npm install --omit=dev
     startCommand: npm start
     healthCheckPath: /health
@@ -16,7 +17,7 @@ services:
       - key: APP_ORIGIN
         value: https://jkh2311.github.io
       - key: SUBSCRIPTIONS_FILE
-        value: /var/data/subscribers.json
+        value: /tmp/subscribers.json
       - key: PUSH_REGISTER_TOKEN
         sync: false
       - key: VAPID_PUBLIC_KEY
@@ -25,7 +26,3 @@ services:
         sync: false
       - key: VAPID_SUBJECT
         sync: false
-    disk:
-      name: subscriptions
-      mountPath: /var/data
-      sizeGB: 1
