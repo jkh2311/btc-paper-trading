@@ -198,20 +198,53 @@ function validateTrade(t){
  return {id:String(t.id??''),orderId:String(t.orderId??''),side:t.side,
   positionSide:String(t.positionSide||''),price,qty,pnl,fee,time,feeAsset:String(t.commissionAsset||'')};
 }
-async function trades(account,signal){
- const params=new URLSearchParams({symbol:'BTCUSDT',limit:'100',recvWindow:'5000',timestamp:String(Date.now())});
+// Fetch latest executions FIRST in explicit 24h windows. The old no-time
+// limit:100 query can miss recent closes on high-fill accounts.
+// Split full 1000-fill windows instead of silently truncating them.
+async function signedTradesWindow(account,startTime,endTime,signal){
+ const params=new URLSearchParams({symbol:'BTCUSDT',startTime:String(startTime),
+  endTime:String(endTime),limit:'1000',recvWindow:'5000',timestamp:String(Date.now())});
  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(account.apiSecret),
   {name:'HMAC',hash:'SHA-256'},false,['sign']);
  const signature=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(params.toString()));
  params.set('signature',Array.from(new Uint8Array(signature),x=>x.toString(16).padStart(2,'0')).join(''));
  const response=await fetch('https://fapi.binance.com/fapi/v1/userTrades?'+params.toString(),
-  {method:'GET',mode:'cors',cache:'no-store',credentials:'omit',redirect:'error',headers:{'X-MBX-APIKEY':account.apiKey},signal});
+  {method:'GET',mode:'cors',cache:'no-store',credentials:'omit',redirect:'error',
+   headers:{'X-MBX-APIKEY':account.apiKey},signal});
  if(!response.ok)throw Error('바이낸스 거래내역 조회 HTTP '+response.status);
- const json=await response.json();if(!Array.isArray(json))throw Error('바이낸스 체결 내역 응답 형식 오류');
- if(json.some(t=>t?.symbol!=='BTCUSDT'||!validateTrade(t)))
-  throw Error('체결 데이터 일부를 확인할 수 없어 전체 손익 계산을 중단합니다.');
- return json.map(validateTrade).sort((a,b)=>a.time-b.time||Number(a.id)-Number(b.id));
+ const json=await response.json();
+ if(!Array.isArray(json)||json.some(t=>t?.symbol!=='BTCUSDT'||!validateTrade(t)))
+  throw Error('체결 데이터가 불완전해 조회를 중단했습니다.');
+ return json.map(validateTrade);
 }
+async function trades(account,signal){
+ const end=Date.now(),day=86400000,oldest=end-7*day;
+ const seen=new Map();
+ let requests=0;
+ async function range(from,until){
+  if(signal.aborted)throw Error('조회가 취소되었습니다');
+  if(++requests>48)throw Error('체결이 많아 조회 상한에 도달했습니다. 전체 기록을 확인해 주세요.');
+  const rows=await signedTradesWindow(account,from,until,signal);
+  if(rows.length>=1000){
+   const half=Math.floor((from+until)/2);
+   if(half<=from||half>=until||until-from<60000)
+    throw Error('1분 안에 체결 1000건 이상으로 일부 기록을 확인할 수 없습니다.');
+   // Recent half first so the newest records are considered before old ones.
+   await range(half+1,until);await range(from,half);
+   return;
+  }
+  for(const row of rows)seen.set(row.id,row);
+ }
+ for(let to=end;to>oldest;){
+  const from=Math.max(oldest,to-day+1);
+  await range(from,to);
+  const recent=[...seen.values()].sort((a,b)=>b.time-a.time||Number(b.id)-Number(a.id));
+  if(recent.length>=100)break;
+  to=from-1;
+ }
+ return [...seen.values()].sort((a,b)=>a.time-b.time||Number(a.id)-Number(b.id)).slice(-100);
+}
+
 function showRows(rows){
  // Remember native <details> state before replacing refreshed Binance rows.
  // A toggle event also updates the set immediately after any user tap.
@@ -221,7 +254,8 @@ function showRows(rows){
  }
  lastTrades=rows;
  empty();
- const tradesDesc=create('div','최근 체결 최대 100건 · '+new Date().toLocaleTimeString('ko-KR'),'live-real-history-note');
+ const latest=rows.at(-1)?.time;
+ const tradesDesc=create('div','조회 '+new Date().toLocaleTimeString('ko-KR')+(latest?' · 최근 체결 '+new Date(latest).toLocaleString('ko-KR'):' · 최근 7일 체결 없음')+' · 최대 100건','live-real-history-note');
  pending.replaceChildren(tradesDesc);
  log.replaceChildren();
  if(!rows.length){
@@ -347,7 +381,7 @@ async function run(){
  try{
   const list=await trades(account,controller.signal);
   if(token!==sequence||document.hidden)return;
-  showRows(list);status.textContent='바이낸스 실제 체결 '+list.length+'건 조회 완료 · '+new Date().toLocaleTimeString('ko-KR');
+  showRows(list);status.textContent='조회 완료 '+new Date().toLocaleTimeString('ko-KR')+' · 최신 체결 '+(list.length?new Date(list.at(-1).time).toLocaleString('ko-KR'):'없음')+' · '+list.length+'건';
  }catch(e){
   if(token!==sequence||document.hidden)return;
   empty('조회 실패 · 가상 기록으로 대체하지 않습니다.');
@@ -357,11 +391,22 @@ async function run(){
   clearTimeout(timeout);busy=false;get.disabled=false;if(refresh)refresh.disabled=false;
  }
 }
+let lastRunAt=0;
+const originalRun=run;
+async function runThrottled(){
+ if(busy||Date.now()-lastRunAt<60000)return;
+ lastRunAt=Date.now();
+ await originalRun();
+}
 get.onclick=()=>run();
 if(refresh)refresh.onclick=()=>run();
 if(clear)clear.onclick=()=>{sequence++;controller?.abort();empty('화면에서만 비웠습니다. 실제 거래소 기록은 삭제되지 않습니다.');status.textContent='화면 기록 초기화 · 실제 거래소 데이터는 그대로예요.'};
 const reset=()=>{sequence++;controller?.abort();empty('API 잠금 또는 화면 비활성화 · 다시 조회해 주세요.');status.textContent='실제 거래내역 재조회 필요'};
 document.addEventListener('btc:real-account-cleared',reset);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void runThrottled()});
+document.addEventListener('btc:credentials-unlocked',()=>void runThrottled());
+document.addEventListener('btc:history-auto-refresh',()=>void runThrottled());
+
 document.addEventListener('btc:real-account-updated',e=>{
  const wallet=num(e.detail?.wallet);
  if(Number.isFinite(wallet)&&wallet>0&&wallet!==realWallet){
