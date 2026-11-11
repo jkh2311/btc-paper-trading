@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-price-push-alert-v218"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-indicator-axis-guide-v219"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -2488,6 +2488,7 @@ function rmiSeries(a,length=14,momentum=5){
  return out
 }
 let rmiHeightPx=null,rmiAxisDrag=null;
+let indicatorAxisGuide=null; // {zone, y}: persistent read-only horizontal value guide
 const rmiValueZoomKey='btc-rmi-axis-value-zoom-v154';
 const disparityValueZoomKey='btc-disparity-axis-value-zoom-v154';
 let rmiValueZoom=1,disparityValueZoom=1;
@@ -2523,7 +2524,18 @@ function rmiAxisStart(e){
  const zone=!chartIndicators.rmi?'disparity':!chartIndicators.disparity?'rmi':
   e.clientY-rect.top<split?'rmi':'disparity';
  rmiAxisDrag={id:e.pointerId,startY:e.clientY,zone,
-  base:zone==='rmi'?rmiValueZoom:disparityValueZoom};
+  base:zone==='rmi'?rmiValueZoom:disparityValueZoom,
+  mode:'pending',timer:null};
+ // A hold on the numeric axis inspects its value; an immediate drag
+ // preserves the original indicator-only zoom gesture.
+ const state=rmiAxisDrag;
+ state.timer=setTimeout(()=>{
+  state.timer=null;
+  if(rmiAxisDrag!==state||state.mode!=='pending')return;
+  state.mode='guide';
+  indicatorAxisGuide={zone:state.zone,y:state.startY-rmiCanvas.getBoundingClientRect().top};
+  drawRmi();
+ },e.pointerType==='mouse'?420:480);
  try{rmiCanvas.setPointerCapture(e.pointerId)}catch(_){}
  return true;
 }
@@ -2533,20 +2545,34 @@ rmiCanvas.addEventListener('pointerdown',e=>{
  e.stopImmediatePropagation();
 });
 rmiCanvas.addEventListener('pointermove',e=>{
- if(!rmiAxisDrag||e.pointerId!==rmiAxisDrag.id)return;
- const factor=Math.exp((rmiAxisDrag.startY-e.clientY)/110);
- const next=Math.max(.35,Math.min(8,rmiAxisDrag.base*factor));
- if(rmiAxisDrag.zone==='rmi')rmiValueZoom=next;
- else disparityValueZoom=next;
- drawRmi();
+ const state=rmiAxisDrag;
+ if(!state||e.pointerId!==state.id)return;
+ // Only vertical movement determines hold versus zoom; preserve axis drag.
+ if(state.mode==='pending'&&Math.abs(e.clientY-state.startY)>9){
+  clearTimeout(state.timer);state.timer=null;state.mode='zoom';
+ }
+ if(state.mode==='guide'){
+  indicatorAxisGuide={zone:state.zone,y:e.clientY-rmiCanvas.getBoundingClientRect().top};
+  drawRmi();
+ }else if(state.mode==='zoom'){
+  const factor=Math.exp((state.startY-e.clientY)/110);
+  const next=Math.max(.35,Math.min(8,state.base*factor));
+  if(state.zone==='rmi')rmiValueZoom=next;
+  else disparityValueZoom=next;
+  drawRmi();
+ }
  if(e.cancelable)e.preventDefault();
  e.stopImmediatePropagation();
 });
 for(const event of ['pointerup','pointercancel','lostpointercapture'])
  rmiCanvas.addEventListener(event,e=>{
-  if(!rmiAxisDrag||e.pointerId!==rmiAxisDrag.id)return;
-  try{localStorage.setItem(rmiValueZoomKey,String(rmiValueZoom));
-   localStorage.setItem(disparityValueZoomKey,String(disparityValueZoom))}catch(_){}
+  const state=rmiAxisDrag;
+  if(!state||e.pointerId!==state.id)return;
+  clearTimeout(state.timer);
+  if(state.mode==='zoom'){
+   try{localStorage.setItem(rmiValueZoomKey,String(rmiValueZoom));
+    localStorage.setItem(disparityValueZoomKey,String(disparityValueZoom))}catch(_){}
+  }
   rmiAxisDrag=null;
   e.stopImmediatePropagation();
  });
@@ -2708,6 +2734,32 @@ function drawRmi(){
   ctx.font='9px sans-serif';ctx.fillStyle='#ed303c';ctx.fillText('200',Math.max(70,pw-104),h-5);
   ctx.fillStyle='#2949ed';ctx.fillText('50',Math.max(105,pw-69),h-5);
   ctx.fillStyle='#15923b';ctx.fillText('20',Math.max(130,pw-37),h-5);
+ }
+ // Long-press on the right value axis: a horizontal line crosses just this
+ // indicator, with the exact value at its right-hand end.
+ if(indicatorAxisGuide){
+  const guide=indicatorAxisGuide,zone=guide.zone;
+  const enabled=zone==='rmi'?showRmi:showDisparity;
+  const top=zone==='rmi'?rmiTop:dTop,bottom=zone==='rmi'?rmiBottom:dBottom;
+  if(enabled&&bottom>top){
+   const yy=Math.max(top,Math.min(bottom,guide.y));
+   const value=zone==='rmi'
+    ?50+(rmiCenter-yy)*50/(rmiHalfSpan*rmiValueZoom)
+    :(dMid-yy)*amplitude/(dRange*disparityValueZoom);
+   const display=zone==='rmi'?value.toFixed(1):((value>=0?'+':'')+value.toFixed(2)+'%');
+   const ink=zone==='rmi'?'#ffc857':'#75e4ef';
+   ctx.save();
+   ctx.beginPath();ctx.rect(0,top,w,bottom-top);ctx.clip();
+   ctx.strokeStyle=ink;ctx.lineWidth=1.25;ctx.setLineDash([5,4]);
+   ctx.beginPath();ctx.moveTo(0,yy+.5);ctx.lineTo(pw,yy+.5);ctx.stroke();ctx.setLineDash([]);
+   ctx.font='bold 11px sans-serif';
+   const width=Math.ceil(ctx.measureText(display).width)+9;
+   const labelX=Math.max(pw+2,w-width-2),labelY=Math.max(top,Math.min(bottom-16,yy-8));
+   ctx.fillStyle='#102c42';ctx.fillRect(labelX,labelY,width,16);
+   ctx.strokeStyle=ink;ctx.strokeRect(labelX+.5,labelY+.5,width-1,15);
+   ctx.fillStyle=ink;ctx.fillText(display,labelX+4,labelY+12);
+   ctx.restore();
+  }
  }
 }
 // The RMI + disparity pane shares the same candle index, chart width and
