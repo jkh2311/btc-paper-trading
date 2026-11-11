@@ -44,7 +44,7 @@ async function readCurrent(account){
  if(typeof response?.dualSidePosition!=='boolean')throw Error('바이낸스 포지션 모드 응답을 확인할 수 없습니다.');
  return response.dualSidePosition;
 }
-function status(text,isError=false){message.textContent=text;message.style.color=isError?'#ff9aa7':''}
+function status(text,isError=false){showModeMessage(text);message.style.color=isError?'#ff9aa7':''}
 function setBusy(v){running=v;check.disabled=v;apply.disabled=v}
 function accountOrWarn(){
  const a=creds();
