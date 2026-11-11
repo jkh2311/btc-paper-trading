@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-live-switch-dialog-v206"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261111-switch-apply-cancel-v207"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1308,11 +1308,12 @@ body.ai-entry-modal-open{overflow:hidden!important}
  <input id="btcSwitchNewQty" type="number" inputmode="decimal" step="0.000001" min="0.000001" placeholder="예: 0.001">
  <div id="btcSwitchInfo" class="btc-switch-info">숏 보유 시 롱 전환, 롱 보유 시 숏 전환</div>
  <div class="btc-switch-actions">
-  <button id="btcSwitchArm" type="button">설정 확인 · 실전 감시 시작</button>
-  <button id="btcSwitchStop" type="button">감시 중지</button>
+  <button id="btcSwitchArm" type="button">스위칭 적용</button>
+  <button id="btcSwitchStop" type="button">스위칭 취소</button>
   <button id="btcSwitchDismiss" type="button">닫기</button>
  </div>
  <div id="btcSwitchStatus" role="status" aria-live="polite">조건 없음</div>
+ <p class="btc-switch-info">스위칭 적용 전과 감시 중에는 바이낸스 기존 익절·손절 주문을 변경하지 않습니다. 스위칭 취소는 감시만 해제하고 원래 익절 주문을 그대로 유지합니다. 전환 주문이 시작된 이후에는 자동 복원이 불가능할 수 있습니다.</p>
  <p class="btc-switch-warning">앱 화면이 활성 상태일 때만 감시하며 화면 잠금·백그라운드·앱 종료 시 감시가 중지됩니다. 주문은 거래소에 상주하지 않습니다. 감시 중 가격이 도달해도 거래소에서 기존 포지션·주문을 확인할 수 없으면 실행하지 않습니다. 주문 결과가 불확실하면 자동 재시도하지 않습니다.</p>
 </div>
 <div id="realAccountUpdated" class="real-updated">실제 계좌 정보 미조회 · 자동 실시간 갱신 아님</div>
@@ -6705,9 +6706,14 @@ $('btcSwitchType').addEventListener('change',setMode);
 $('btcSwitchDismiss').addEventListener('click',hideSwitchDialog);
 $('btcSwitchStop').addEventListener('click',()=>{
  if(busy||armed?.state==='EXECUTING'||armed?.state==='REVIEW'){
-  $('btcSwitchStatus').textContent='실전 주문 상태 확인이 먼저 필요해요';return;
+  $('btcSwitchStatus').textContent='실전 주문 처리/확인 중에는 취소할 수 없습니다. 바이낸스에서 상태를 확인해 주세요.';return;
  }
- try{store(null);renderState()}catch(e){$('btcSwitchStatus').textContent=e.message}
+ try{
+  // Prior to execution no TP/SL was modified, so cancelling ONLY the
+  // foreground watcher leaves the existing Binance TP/SL orders unchanged.
+  store(null);renderState();
+  $('btcSwitchStatus').textContent='✅ 스위칭 취소 완료 · 기존 거래소 익절/손절 주문 유지 (감시만 해제)';
+ }catch(e){$('btcSwitchStatus').textContent=e.message}
 });
 $('btcSwitchArm').addEventListener('click',async()=>{
  if(busy)return;busy=true;$('btcSwitchArm').disabled=true;
@@ -6747,7 +6753,7 @@ $('btcSwitchArm').addEventListener('click',async()=>{
    tpId=String(tp[0].algoId);
   }
   const inverse=p.side==='SHORT'?'LONG':'SHORT';
-  if(!confirm('BTCUSDT 실전 자동 스위칭 감시를 시작할까요?\n\n'+p.side+' → '+inverse+
+  if(!confirm('BTCUSDT 실전 스위칭을 적용할까요?\n\n'+p.side+' → '+inverse+
    '\n스위칭 조건: '+(mode==='tp'?'기존 단일 익절라인 ':'직접 지정 가격 ')+fmt(target)+' USDT'+
    '\n기존 보유: '+fmt(q)+' BTC 전량 청산\n신규 '+inverse+': '+fmt(newQty)+' BTC 시장가 진입\n\n'+
    '⚠ 실제 시장가 주문이 제출됩니다. 기존 손절·익절은 취소되며 신규 포지션에 보호주문이 자동 생성되지 않습니다.'+
