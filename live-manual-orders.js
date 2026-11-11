@@ -710,10 +710,9 @@ async function refreshLoop(){
  try{
   $('realAccountRefresh')?.click();
   // Keep calls sequential and skip overlapping requests; app suspension stops timers.
-  {
-   const button=[...document.querySelectorAll('#page-history button')].find(e=>e.textContent.includes('실제 체결 내역 조회'));
-   button?.click();
-  }
+  // Ask the history module to refresh at its own safe interval.
+  // Do not click the manual full-history button every five seconds.
+  document.dispatchEvent(new Event('btc:history-auto-refresh'));
   if(Date.now()-lastOrdersStatus>5000){
    await updateOpenOrders();
    lastOrdersStatus=Date.now();
