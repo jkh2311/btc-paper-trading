@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261112-switch-condition-persist-v226"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261112-monthly-available-ma-forecast-v227"><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTCUSDT 모의매매</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -4289,6 +4289,18 @@ function projectedMaSlope(bars,period,lastClosed){
  // Difference between SMA[t] and SMA[t-1], equal to delta of end / period.
  return (Number(bars[lastClosed].c)-Number(bars[lastClosed-period].c))/period;
 }
+function availableForecastMaPeriods(anchorIndex){
+ return MA_FORECAST_PERIODS.map(([period])=>period)
+  .filter(period=>anchorIndex>=period-1);
+}
+function monthlyForecastReady(bars,anchorIndex){
+ // 41 actual monthly bars give a 40-change price pattern. Never fabricate
+ // 120/160/200-month averages that have not yet formed.
+ return Array.isArray(bars)&&anchorIndex>=40&&availableForecastMaPeriods(anchorIndex).length>0;
+}
+function forecastHistoryIsContinuous(bars,tf){
+ return bars.every((bar,i)=>i===0||bar.t===nextCandleTime(tf,bars[i-1].t));
+}
 // On 1m/3m/5m/10m, live ticks make the latest candle jitter, so forecast
 // price-wave AND all projected MAs use only a CONFIRMED bar. Higher timeframes
 // preserve their original behavior (current bar can affect the forecast).
@@ -4303,14 +4315,17 @@ function forecastLastClosedIndex(bars,tf,now=Date.now()){
 // Synthetic price series is VISUAL ONLY, never appended to market data, RMI,
 // signal engines, paper trading positions or live Binance orders.
 function projectedPricePattern(bars,horizon,tf,now=Date.now()){
- if(!Array.isArray(bars)||bars.length<200||horizon<1)return null;
+ if(!Array.isArray(bars)||horizon<1)return null;
+ const monthly=tf==='1M';
+ if(bars.length<(monthly?41:200))return null;
  const duration=candleDuration[tf]||60000,limit=Math.max(1,Math.min(500,Math.floor(horizon)));
  const lastClosed=forecastLastClosedIndex(bars,tf,now);
- if(lastClosed<200)return null;
+ if(monthly?!monthlyForecastReady(bars,lastClosed):lastClosed<200)return null;
  const last=bars[lastClosed]; // Confirmed close on short TFs, live on other TFs
  if(!(last.c>0))return null;
  const recent=bars.slice(lastClosed-19,lastClosed+1);
- if(recent.length!==20||recent.some((b,i)=>!(b.c>0)||i>0&&b.t-recent[i-1].t!==duration))return null;
+ if(recent.length!==20||recent.some(b=>!(b.c>0))||
+  !forecastHistoryIsContinuous(recent,tf))return null;
  const mean=recent.reduce((sum,b)=>sum+b.c,0)/20;
  let cov=0,variance=0;
  for(let i=0;i<20;i++){
@@ -4322,11 +4337,14 @@ function projectedPricePattern(bars,horizon,tf,now=Date.now()){
  const weights=[7,6,5,4,3,2,1];
  let sumSlope=0,sumWeight=0;
  for(let i=0;i<periods.length;i++){
+  // A missing monthly MA must NOT count as a zero-slope vote.
+  if(monthly&&lastClosed<periods[i])continue;
   const candidate=projectedMaSlope(bars,periods[i],lastClosed);
   sumSlope+=candidate*weights[i];sumWeight+=weights[i];
  }
- const compositeSlope=sumWeight?sumSlope/sumWeight:0;
- const slope=maPricePatternBasis==='ma200'?
+ const compositeSlope=sumWeight?sumSlope/sumWeight:recentSlope;
+ const ma200Usable=lastClosed>=200;
+ const slope=maPricePatternBasis==='ma200'&&(!monthly||ma200Usable)?
   Math.max(-last.c*.001,Math.min(last.c*.001,projectedMaSlope(bars,200,lastClosed))):
   Math.max(-last.c*.004,Math.min(last.c*.004,
    recentSlope*.45+compositeSlope*.55));
@@ -4334,8 +4352,8 @@ function projectedPricePattern(bars,horizon,tf,now=Date.now()){
  // closing-price changes, detrended by their average. Reuse the pattern as
  // a hypothetical scenario, not as a forecast with statistical certainty.
  const history=bars.slice(lastClosed-40,lastClosed+1);
- if(history.length!==41||history.some((b,i)=>!(b.c>0)||
-  i>0&&b.t-history[i-1].t!==duration))return null;
+ if(history.length!==41||history.some(b=>!(b.c>0))||
+  !forecastHistoryIsContinuous(history,tf))return null;
  const changes=[];
  for(let i=1;i<history.length;i++)changes.push(history[i].c-history[i-1].c);
  const cycle=changes.length;
@@ -4409,7 +4427,7 @@ function drawProjectedPricePattern(ctx,bars,left,count,plotW,top,bottom,y,bw){
  const anchorIndex=forecastLastClosedIndex(bars,$('tf').value);
  const available=Math.floor(left+count-1-anchorIndex);
  const horizon=Math.min(maForecastBars,available);
- if(anchorIndex<200||horizon<1)return;
+ if((($('tf').value==='1M')?anchorIndex<40:anchorIndex<200)||horizon<1)return;
  const scenario=projectedPricePattern(bars,horizon,$('tf').value);
  if(!scenario)return;
  const toX=step=>(scenario.anchorIndex+step-left+.5)*bw;
@@ -4440,7 +4458,9 @@ function drawProjectedPricePattern(ctx,bars,left,count,plotW,top,bottom,y,bw){
   ctx.fillStyle='rgba(245,248,255,.66)';ctx.fillText(label,bx+3,by+12);
  }
  ctx.font='9px sans-serif';ctx.fillStyle='rgba(245,248,255,.56)';
- ctx.fillText(maPricePatternBasis==='ma200'?'미래 파동 · MA200 가정':'미래 파동 · 종합 MA 가정',
+ ctx.fillText(maPricePatternBasis==='ma200'?
+   ($('tf').value==='1M'&&scenario.anchorIndex<200?'미래 파동 · 이용가능 MA 가정':'미래 파동 · MA200 가정'):
+   '미래 파동 · 종합 MA 가정',
   Math.max(5,Math.min(plotW-150,toX(0)+6)),top+12);
  ctx.restore();
 }
@@ -4471,7 +4491,7 @@ function drawProjectedBollingerBands(ctx,bars,left,count,plotW,top,bottom,y,bw){
  const anchor=forecastLastClosedIndex(bars,$('tf').value);
  const available=Math.floor(left+count-1-anchor);
  const horizon=Math.min(maForecastBars,available);
- if(anchor<200||horizon<1)return;
+ if((($('tf').value==='1M')?anchor<40:anchor<200)||horizon<1)return;
  const projected=projectedBollingerSeries(bars,horizon,$('tf').value);
  if(!projected?.values?.length)return;
  ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,Math.max(1,bottom-top));ctx.clip();
@@ -4492,7 +4512,7 @@ function drawProjectedMovingAverages(ctx,bars,left,count,plotW,top,bottom,y,bw){
  const anchorIndex=forecastLastClosedIndex(bars,$('tf').value);
  const available=Math.floor(left+count-1-anchorIndex);
  const horizon=Math.min(maForecastBars,available);
- if(anchorIndex<200||horizon<1)return;
+ if((($('tf').value==='1M')?anchorIndex<40:anchorIndex<200)||horizon<1)return;
  const series=projectedMaSeries(bars,horizon,$('tf').value);
  if(!series?.length)return;
  ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,Math.max(1,bottom-top));ctx.clip();
