@@ -76,7 +76,7 @@ let leverageCheckBusy=false;
 async function checkExistingLeverage(){
  if(leverageCheckBusy||leverageBusy||busy)return;
  const a=cred(),expected=val('lev');
- if(!a?.apiKey||!a?.apiSecret||!Number.isInteger(expected)||expected<1||expected>50)return;
+ if(!a?.apiKey||!a?.apiSecret||!Number.isInteger(expected)||expected<1||expected>100)return;
  leverageCheckBusy=true;
  try{
   await verifyLeverage(expected);
@@ -94,7 +94,7 @@ if(leverageButton)leverageButton.onclick=async()=>{
  if(leverageBusy||busy)return;
  const lev=val('lev'),saved=cred();
  if(!saved?.apiKey||!saved?.apiSecret){showLeverageStatus('API 잠금 해제 필요');return;}
- if(!Number.isInteger(lev)||lev<1||lev>50){showLeverageStatus('레버리지는 1~50배로 설정하세요');return;}
+ if(!Number.isInteger(lev)||lev<1||lev>100){showLeverageStatus('레버리지는 1~100배로 설정하세요');return;}
  if(!confirm('바이낸스 BTCUSDT 실제 레버리지를 '+lev+'배로 미리 적용할까요?'))return;
  leverageBusy=true;leverageButton.disabled=true;invalidateLeverage('바이낸스 레버리지 적용 중…');
  try{
