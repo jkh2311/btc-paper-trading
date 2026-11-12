@@ -2386,7 +2386,7 @@ function initIntradayHistoryJump(){
    if(!['1w','1M'].includes(tf)&&!Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf))return;
    if(chartJumpSegment?.tf===tf){resetChartTimeJump();return;}
    if(tf==='1w'||tf==='1M'){
-    if(viewOffset>0){resetChartTimeJump();return}
+    if(viewOffset>0&&fullWeekMonthLoaded[tf]){resetChartTimeJump();return}
     const ok=await loadFullWeekMonthHistory(tf);
     if(!ok||$('tf').value!==tf)return;
     const bars=candles[tf]||[];
