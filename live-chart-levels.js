@@ -78,9 +78,14 @@ function note(text,warning=false){
 }
 function actionNotice(text,error=false){actionMessage=text;actionError=error;hint.textContent=text;hint.style.color=error?'#ff9aaa':'#4ed6a6';hint.style.display='block';}
 function openAlgoList(v){return Array.isArray(v)?v:Array.isArray(v?.orders)?v.orders:null;}
+// Preserve the full live-level snapshot for trading-mode detection. Only
+// filtered display prices affect autoscaling; actual protection is unchanged.
+const chartVisible=kind=>window.btcChartLevelVisible?.(kind)!==false;
 window.btcLiveChartPrices=()=>levels().map(l=>l.price).filter(p=>Number.isFinite(p)&&p>0);
+window.btcVisibleLiveChartPrices=()=>levels().filter(l=>chartVisible(l.kind))
+ .map(l=>l.price).filter(p=>Number.isFinite(p)&&p>0);
 window.btcDrawLiveLevels=(ctx,scale)=>{
- const all=levels();
+ const all=levels().filter(l=>chartVisible(l.kind));
  for(const level of all){
   const price=drag?.level?.p===level.p&&drag.level.kind===level.kind?drag.price:level.price;
   const y=scale.y(price);
@@ -130,7 +135,7 @@ function touchHit(x,y){
  const scale=scaleNow();if(!scale||!positions.length)return null;
  const rect=chart.getBoundingClientRect(),px=x-rect.left,py=y-rect.top;
  if(px<0||px>scale.plotW||py<scale.top-12||py>scale.priceBottom+12)return null;
- return levels().filter(l=>l.kind!=='entry').map(l=>({l,dist:Math.abs(py-(scale.top+(scale.hi-l.price)/(scale.hi-scale.lo)*(scale.priceBottom-scale.top)))}))
+ return levels().filter(l=>l.kind!=='entry'&&chartVisible(l.kind)).map(l=>({l,dist:Math.abs(py-(scale.top+(scale.hi-l.price)/(scale.hi-scale.lo)*(scale.priceBottom-scale.top)))}))
   .filter(x=>x.dist<=17).sort((a,b)=>a.dist-b.dist)[0]?.l||null;
 }
 function priceAt(y){
