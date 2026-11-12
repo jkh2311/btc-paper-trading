@@ -599,6 +599,38 @@ if(historyContent){
  if(oldPending)oldPending.insertAdjacentElement('beforebegin',orderList);
  else historyContent.prepend(orderList);
 }
+// App-only foreground switch watch: show next to the exchange pending orders
+// but NEVER mislabel it as an order accepted by Binance.
+const switchWatchList=document.createElement('div');
+switchWatchList.id='realSwitchWatchPending';
+switchWatchList.style.cssText='margin:8px 0 12px';
+if(historyContent)historyContent.insertBefore(switchWatchList,orderList);
+function renderSwitchWatch(){
+ const p=window.btcLiveSwitchSnapshot?.();
+ switchWatchList.replaceChildren();
+ if(!p)return;
+ const card=document.createElement('div');
+ card.style.cssText='padding:10px 12px;border:1px solid '+(p.state==='ARMED'?'#c4a65e':'#67778f')+';background:#172a3d;border-radius:10px;line-height:1.6';
+ const title=document.createElement('div');
+ title.style.cssText='font-size:13px;font-weight:750;color:'+(p.state==='ARMED'?'#ffd166':'#b5c3d5');
+ title.textContent='↔ 스위칭 감시 '+(p.state==='ARMED'?'적용 중':p.state==='PAUSED'?'중지': '확인 필요')+' · '+p.side+' → '+p.opposite;
+ const details=document.createElement('div');
+ details.style.cssText='font-size:12px;color:#dce6f2;overflow-wrap:anywhere';
+ details.textContent='목표 '+fmt(p.price)+' USDT · 반대방향 신규 '+fmt(p.newQty)+' BTC';
+ const note=document.createElement('div');
+ note.style.cssText='font-size:11px;color:#c6ad7a';
+ note.textContent=p.state==='ARMED'?
+  '앱 내부 가격 감시 · 바이낸스 미체결 주문 아님 · 앱 활성 중에만 작동':
+  '앱 내부 감시 비활성/확인 필요 · 거래소에 예약된 스위칭 주문 없음';
+ card.append(title,details,note);
+ if(p.state!=='ARMED'&&p.message){
+  const status=document.createElement('div');status.style.cssText='font-size:11px;color:#efc9ba';
+  status.textContent=p.message;card.append(status);
+ }
+ switchWatchList.append(card);
+}
+document.addEventListener('btc:live-switch-state',renderSwitchWatch);
+renderSwitchWatch();
 let listedOrders=null,orderListError='',orderCancelBusy=false,orderReadGeneration=0;
 function formatOpenOrder(o){
  const side=o.positionSide==='LONG'?'롱 LONG':o.positionSide==='SHORT'?'숏 SHORT':o.side==='BUY'?'롱 BUY':'숏 SELL';
