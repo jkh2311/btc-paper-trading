@@ -344,10 +344,10 @@ async function enter(side){
   const price=type==='LIMIT'?Number($('limitPrice').value):quote;
   if(chartLimitPriceMode&&type!=='LIMIT')throw Error('차트 예약진입은 지정가만 가능합니다.');
   if(!(price>0))throw Error('유효한 현재가/지정가가 필요합니다');
-  const lev=val('lev'),count=val('pyramidEntryCount'),stop=val('stop');
+  const lev=val('lev'),count=lev>50?7:6,stop=val('stop');
   if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
    throw Error('설정에서 바이낸스 레버리지 적용을 먼저 눌러 확인해 주세요.');
-  if(!Number.isInteger(lev)||lev<1||lev>125||!Number.isInteger(count)||count<1||count>20||!(stop>0&&stop<=10))throw Error('전략 레버리지/단계/손절 설정 확인');
+  if(!Number.isInteger(lev)||lev<1||lev>100||!(stop>0&&stop<=10))throw Error('전략 레버리지/단계/손절 설정 확인');
   const wallet=Number(account.wallet),available=Number(account.available);
   if(!(wallet>0&&available>0))throw Error('주문 가능 증거금 없음');
   const modeSize=$('sizeMode')?.value;
