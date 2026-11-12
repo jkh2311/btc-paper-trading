@@ -115,15 +115,15 @@ if(cancel)cancel.onclick=async()=>{
 const settingsCard=balance?.closest('.card');
 if(settingsCard){
  const button=create('button','실제 계좌 기준 전략 수량 계산');button.type='button';
- const output=create('div','실제 잔고 조회 후 기존 레버리지·6단계·손절·손익비 설정으로 주문 계획을 계산할 수 있어요.','real-strategy-preview');
+ const output=create('div','실제 잔고 조회 후 레버리지별 6·7단계·손절·손익비 설정으로 주문 계획을 계산할 수 있어요.','real-strategy-preview');
  output.setAttribute('role','status');
  settingsCard.append(button,output);
  const plan=()=>{
   if(!fresh(account)||!(account.available>0)){output.textContent='실제 계좌가 최신 상태가 아닙니다. 먼저 바이낸스 잔고를 조회하세요.';return}
-  const lev=value($('lev')?.value),count=value($('pyramidEntryCount')?.value),
+  const lev=value($('lev')?.value),count=lev>50?7:6,
    stop=value($('stop')?.value),rr=value($('rr')?.value),
    price=value(String($('price')?.textContent||'').replace(/[^0-9.]/g,''));
-  if(!(lev>=1&&lev<=125&&Number.isInteger(lev)&&count>=1&&count<=20&&Number.isInteger(count)&&
+  if(!(lev>=1&&lev<=100&&Number.isInteger(lev)&&
     stop>0&&stop<=10&&rr>0&&rr<=10&&price>0)){
    output.textContent='레버리지·진입 개수·손절 거리·손익비·시세를 확인해 주세요.';return;
   }
