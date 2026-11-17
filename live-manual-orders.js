@@ -58,9 +58,16 @@ function marginPyramidAllocation({available,pct,side,dual,live,open,lev,price,lo
  const relevant=live.filter(p=>dual?p.positionSide===side:Number(p.positionAmt)*sign>0);
  let committed=0;
  for(const p of relevant){
-  const qty=Math.abs(Number(p.positionAmt)),entry=Number(p.entryPrice),l=Number(p.leverage);
-  if(!(qty>0&&entry>0&&l>0))throw Error('기존 포지션 증거금 확인 실패 · 주문 미전송');
-  committed+=qty*entry/l;
+  // Binance /fapi/v3/positionRisk intentionally omits 'leverage'.
+  // Use its authoritative positionInitialMargin (mark-price based)
+  // rather than requiring a field that does not exist in V3.
+  const qty=Math.abs(Number(p.positionAmt));
+  const positionMargin=Number(p.positionInitialMargin);
+  if(!(qty>0&&p.positionInitialMargin!==undefined&&
+    p.positionInitialMargin!==null&&p.positionInitialMargin!==''&&
+    Number.isFinite(positionMargin)&&positionMargin>0))
+   throw Error('바이낸스 V3 기존 포지션 positionInitialMargin 누락/비정상 · 주문 미전송');
+  committed+=positionMargin;
  }
  for(const o of open.filter(o=>o.side===direction&&!o.reduceOnly&&!o.closePosition&&
    (dual?o.positionSide===side:o.positionSide==='BOTH'))){
@@ -97,7 +104,12 @@ async function run(fn){
  busy=true;
  if($('entrySheet')?.style.display!=='none')message('실제 계좌 및 주문 조건 확인 중…');
  for(const id of ['sheetLong','sheetShort','close','cancel'])if($(id))$(id).disabled=true;
- try{await fn();}catch(e){message('실제 거래 요청 실패/확인 필요: '+String(e?.message||e)+'\n주문이 불확실하면 바이낸스에서 확인하기 전 같은 주문을 반복하지 마세요.');}
+ try{await fn();}catch(e){
+  const reason=String(e?.message||e);
+  if(reason.includes('주문 미전송')||reason.includes('단계 한도에 도달'))
+   message('실전 주문 전 검사 중단 · 주문 미전송: '+reason);
+  else message('실제 거래 요청 실패/확인 필요: '+reason+'\n주문이 불확실하면 바이낸스에서 확인하기 전 같은 주문을 반복하지 마세요.');
+ }
  finally{busy=false;for(const id of ['sheetLong','sheetShort','cancel'])if($(id))$(id).disabled=false; if($('close'))$('close').disabled=!selected;}
 }
 function updateButtons(){for(const id of ['long','short'])if($(id))$(id).disabled=false;}
