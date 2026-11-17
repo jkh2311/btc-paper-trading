@@ -384,9 +384,9 @@ async function enter(side){
   let qty=roundDown(margin*lev/price,lot.stepSize);
   // An otherwise valid $100-ish account can produce 0.000 BTC when its
   // total risk budget is split across six tiny first stages. For the FIRST
-  // stage only, permit a single exchange-minimum entry WITHIN the original
-  // total planned margin/risk cap and only after an explicit user confirmation.
-  // Never override the full configured budget, available balance or leverage.
+  // stage only, allow a minimum-size entry WITHIN the original total
+  // planned margin/risk cap when the user taps the real entry button.
+  // No separate native confirm; never override risk budget or leverage.
   const belowMinimum=rawQty<minQty||rawQty>Number(lot.maxQty);
   if(belowMinimum){
    if(rawQty>Number(lot.maxQty))throw entryPreflightError('계산 수량 '+qty+' BTC가 바이낸스 최대 주문 수량을 넘었어요.');
@@ -394,13 +394,6 @@ async function enter(side){
    if(used!==0)throw entryPreflightError('추가 진입 단계의 계산 수량 '+qty+' BTC가 최소 '+minQty+' BTC보다 작아요. 기존 포지션을 유지하고 전략의 주문 예산을 확인해 주세요.');
    if(requiredMargin>totalMargin+1e-8||requiredMargin>available*.95+1e-8)
     throw entryPreflightError('총 허용 증거금 '+fmt(totalMargin)+' USDT로는 최소 '+minQty+' BTC (약 '+fmt(requiredMargin)+' USDT 증거금)를 주문할 수 없어요. 잔고 '+fmt(available)+' USDT와 위험/증거금 설정을 확인해 주세요.');
-   const ok=confirm('⚠ 실전 첫 진입 주문 수량 조정 확인\n\n'+
-    '기존 6~7단계 첫 주문: '+qty+' BTC (최소 수량 미달)\n'+
-    '바이낸스 최소 주문: '+minQty+' BTC\n'+
-    '필요 증거금 약 '+fmt(requiredMargin)+' USDT (레버리지 '+lev+'배)\n'+
-    '전략 전체 허용 증거금 '+fmt(totalMargin)+' USDT 이내\n\n'+
-    '첫 단계만 최소 주문 수량으로 조정할까요? 실제 주문이 실행됩니다.');
-   if(!ok){message('최소 수량 조정 취소 · 실제 주문은 전송하지 않았어요.');return;}
    qty=roundDown(minQty,lot.stepSize);
   }
   if(!(Number(qty)>=Number(lot.minQty)&&Number(qty)<=Number(lot.maxQty)&&Number(qty)*price>=f.minNotional))
@@ -420,7 +413,9 @@ async function enter(side){
   // immediately after exchange/account/size checks, without a native confirm.
   // run() already locks both buttons until this request finishes to prevent
   // accidental double submissions from rapid taps.
-  message('실제 '+(side==='LONG'?'롱':'숏')+' '+type+' 주문 전송 중… · '+qty+' BTC'+(order.price?' @ '+order.price+' USDT':''));
+  message('실제 '+(side==='LONG'?'롱':'숏')+' '+type+' 주문 전송 중… · '+qty+' BTC'+
+   (belowMinimum?' (첫 단계 바이낸스 최소수량 자동 적용 · 허용 증거금 이내)':'')+
+   (order.price?' @ '+order.price+' USDT':''));
   // Leverage was explicitly applied and verified in Settings. Do not change it during entry.
   lastOrderIssue=true;lastRequest=order.newClientOrderId;
   let response;
