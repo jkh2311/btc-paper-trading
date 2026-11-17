@@ -259,11 +259,15 @@ function signalBody(timeframe,price,pnl){
   '\n'+pnl.text;
 }
 let lastCheckTime=0,lastCheckError=null,polling=false,lastFailureLogAt=0,signalRetryAfter=0;
-let lastFeedSource=null,binanceLastError=null;
+let lastFeedSource=null,binanceLastError=null,binanceRegionBlockedUntil=0;
 async function readClosedBinanceBars(){
+ // Respect prolonged regional 451 denials rather than retrying every 2.5 sec.
+ if(Date.now()<binanceRegionBlockedUntil)throw Error('Binance 451 · 지역 시세 제한');
  const res=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=500',{
   signal:AbortSignal.timeout(7500),headers:{'cache-control':'no-cache'}});
+ if(res.status===451)binanceRegionBlockedUntil=Date.now()+60000;
  if(!res.ok)throw Error('Binance '+res.status);
+ binanceRegionBlockedUntil=0;
  const raw=await res.json();
  if(!Array.isArray(raw)||raw.length<25)throw Error('Binance 캔들 자료 없음');
  const now=Date.now()-1800;
