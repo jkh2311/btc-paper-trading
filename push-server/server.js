@@ -69,7 +69,7 @@ http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
  if(req.method==='GET'&&url.pathname==='/config'){respond(res,200,{publicKey:PUBLIC});return}
  if(req.method==='GET'&&url.pathname==='/health'){
-  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',serverVersion:'v232',signalFeed:'binance-usdm-BTCUSDT',marketDataWorking:!lastCheckError&&lastCheckTime>0&&Date.now()-lastCheckTime<90000,lastPriceAt,lastPriceError,priceAlertSupported:true});
+  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',lastPriceAt,lastPriceError,priceAlertSupported:true});
   return;
  }
  if(req.method==='POST'&&url.pathname==='/subscribe'){
@@ -256,9 +256,9 @@ function signalBody(timeframe,price,pnl){
  return timeframe+' RMI 확정 · '+price.toLocaleString('en-US')+' USDT'+
   '\n'+pnl.text;
 }
-let lastCheckTime=0,lastCheckError=null,polling=false,lastFailureLogAt=0,signalRetryAfter=0;
+let lastCheckTime=0,lastCheckError=null,polling=false;
 async function poll(){
- if(polling||!subscribers.length||Date.now()<signalRetryAfter)return;
+ if(polling||!subscribers.length)return;
  polling=true;
  try{
   const res=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=500',
@@ -316,14 +316,8 @@ async function poll(){
     }
    }
   }
-  lastCheckTime=Date.now();lastCheckError=null;signalRetryAfter=0;
- }catch(e){
-  lastCheckError=String(e.message||e).slice(0,180);
-  // 451 is a region/policy denial. Do not spam the endpoint or claim
-  // successful signal monitoring while market data cannot be read.
-  signalRetryAfter=Date.now()+(lastCheckError.includes('451')?60000:10000);
-  if(Date.now()-lastFailureLogAt>59000){console.warn('RMI poll:',lastCheckError);lastFailureLogAt=Date.now()}
- }
+  lastCheckTime=Date.now();lastCheckError=null;
+ }catch(e){lastCheckError=String(e.message||e).slice(0,180);console.warn('RMI poll:',lastCheckError)}
  finally{polling=false}
 }
 // Independent price watcher. Alert only when an observed live price crosses
