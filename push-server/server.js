@@ -8,6 +8,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const webpush=require('web-push');
+const paper=require('./paper-auto');
 
 const PORT=Number(process.env.PORT||8787);
 const ORIGIN=process.env.APP_ORIGIN||'https://jkh2311.github.io';
@@ -24,6 +25,7 @@ webpush.setVapidDetails(SUBJECT,PUBLIC,PRIVATE);
 
 let subscribers=[];
 let lastPrice=null,lastPriceAt=0,lastPriceError=null,priceBusy=false;
+let lastObservedClosedBar=0;
 try{const raw=JSON.parse(fs.readFileSync(SAVE_FILE,'utf8'));if(Array.isArray(raw))subscribers=raw}catch(_){}
 function save(){
  const tmp=SAVE_FILE+'.tmp';
@@ -69,7 +71,7 @@ http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
  if(req.method==='GET'&&url.pathname==='/config'){respond(res,200,{publicKey:PUBLIC});return}
  if(req.method==='GET'&&url.pathname==='/health'){
-  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',lastPriceAt,lastPriceError,priceAlertSupported:true});
+  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',lastPriceAt,lastPriceError,priceAlertSupported:true,paperSupported:true,paperLiveOrders:false,paperVersion:'v238'});
   return;
  }
  if(req.method==='POST'&&url.pathname==='/subscribe'){
@@ -84,11 +86,12 @@ http.createServer(async(req,res)=>{
    // Limit registrations to one private owner, at most five devices.
    const prefs=preferences(body);
    const existing=subscribers.findIndex(x=>x.subscription.endpoint===sub.endpoint);
-   const record={subscription:sub,...prefs,lastBar:0,lastBar10:0,priceAlerts:[]};
+   const record={subscription:sub,...prefs,lastBar:0,lastBar10:0,priceAlerts:[],paper:paper.defaults()};
    if(existing>=0){
     record.lastBar=subscribers[existing].lastBar;
     record.lastBar10=subscribers[existing].lastBar10||0;
     record.priceAlerts=Array.isArray(subscribers[existing].priceAlerts)?subscribers[existing].priceAlerts:[];
+    record.paper=paper.hydrate(subscribers[existing].paper);
     subscribers[existing]=record;
    }else{
     if(subscribers.length>=5){respond(res,409,{error:'device limit'});return}
@@ -96,6 +99,23 @@ http.createServer(async(req,res)=>{
    }
    save();respond(res,200,{ok:true,recoveryProof:recoveryProof(sub.endpoint)});
   }catch(e){respond(res,400,{error:'invalid request'})}
+  return;
+ }
+ // Authenticated per-device server PAPER simulation. No Binance API keys
+ // and no live exchange-order endpoint exist in this server.
+ if(req.method==='POST'&&['/paper/status','/paper/config'].includes(url.pathname)){
+  try{
+   const body=await readBody(req);
+   if(!authorized(req,body)){respond(res,403,{error:'기기 인증 필요'});return}
+   const record=subscribers.find(x=>x.subscription.endpoint===body.endpoint);
+   if(!record){respond(res,404,{error:'기기 푸시 구독 없음 · 원격 푸시를 먼저 연결해 주세요'});return}
+   if(url.pathname==='/paper/config'){
+    record.paper=paper.configure(record.paper,body.config,lastObservedClosedBar);
+    save();
+   }
+   respond(res,200,{ok:true,mode:'PAPER_ONLY',source:'Binance BTCUSDT USDT-M Futures',
+    serverFeedError:lastCheckError,state:paper.snapshot(record.paper)});
+  }catch(e){respond(res,400,{error:String(e.message||e).slice(0,160)})}
   return;
  }
  // Device-scoped alert rules. Never accept unauthenticated modifications.
@@ -271,11 +291,18 @@ async function poll(){
     .filter(x=>Number.isFinite(x.t)&&x.c>0&&x.v>0&&x.t+60000<=now);
   if(bars.length<25)return;
   const current=bars.at(-1);
+  lastObservedClosedBar=current.t;
   // Reject stale Binance response: never alert on historical candles.
   if(now-current.t-60000>45000)return;
   const tens=tenMinuteBars(bars);
   const latest10=tens.at(-1);
   for(const subscriber of [...subscribers]){
+   if(subscriber.paper?.enabled){
+    const setting=paper.hydrate(subscriber.paper);
+    const chosen=setting.mode==='follow'?subscriber.strategy:setting.strategy;
+    const pSide=signals(bars,{...subscriber,strategy:chosen},1).at(-1);
+    subscriber.paper=paper.onClosedBar(setting,current,pSide,chosen);
+   }
    const events=[];
    if(current.t>subscriber.lastBar){
     const first=!subscriber.lastBar;
