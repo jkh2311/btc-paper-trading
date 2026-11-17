@@ -8,6 +8,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const webpush=require('web-push');
+const liveGuard=require('./live-auto-guard');
 
 const PORT=Number(process.env.PORT||8787);
 const ORIGIN=process.env.APP_ORIGIN||'https://jkh2311.github.io';
@@ -68,6 +69,10 @@ http.createServer(async(req,res)=>{
  if(req.headers.origin&&req.headers.origin!==ORIGIN){respond(res,403,{error:'origin'});return}
  const url=new URL(req.url,'http://localhost');
  if(req.method==='GET'&&url.pathname==='/config'){respond(res,200,{publicKey:PUBLIC});return}
+ if(req.method==='GET'&&url.pathname==='/live/status'){
+  respond(res,200,{ok:true,...liveGuard.readiness({health:{lastCheckTime,lastCheckError}})});
+  return;
+ }
  if(req.method==='GET'&&url.pathname==='/live/preflight'){
   // Read-only diagnostics. Never accept API keys, enable trading, or place orders.
   const feedOk=!lastCheckError&&lastCheckTime>0&&Date.now()-lastCheckTime<90000;
