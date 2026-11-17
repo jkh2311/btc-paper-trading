@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261117-api-automatic-unlock-fix-v236"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261117-hour-rmi-aggressive-long-v237"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -3353,7 +3353,14 @@ function chartRmiZoneMarkers(bars,start,end,asOf=Date.now()-1800,tf='1m'){
   markers.readyActive=events.readyActive;markers.readyAt=events.readyAt;
   for(let i=1;i<closed.length;i++){
     if(closed[i].t<bars[start]?.t||closed[i].t>bars[end-1]?.t)continue;
-    if(events[i])markers.push({barTime:closed[i].t,side:events[i],chartOnly:true});
+    // ONE-HOUR ONLY: treat the FIRST confirmed RMI(5,14) cross at/below
+    // 2.6 as an aggressive LONG chart label. No automatic orders or
+    // other-timeframe changes. Replace any same-bar normal LONG.
+    const aggressive=tf==='1h'&&Number.isFinite(scores[i-1])&&
+      Number.isFinite(scores[i])&&scores[i-1]>2.6&&scores[i]<=2.6;
+    if(aggressive)markers.push({barTime:closed[i].t,side:'LONG',
+      aggressive:true,rmi:scores[i],chartOnly:true});
+    else if(events[i])markers.push({barTime:closed[i].t,side:events[i],chartOnly:true});
   }
   return markers;
 }
@@ -3779,20 +3786,23 @@ function drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,bottom,plotW){
   ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,bottom-top);ctx.clip();
   for(const sign of near){
     const i=byTime.get(sign.barTime);if(i===undefined)continue;
-    if(i-lastArrow[sign.side]<3)continue; // de-clutter same-side labels only
+    // Do not suppress the extreme 1h signal just because a normal
+    // LONG marker was emitted a candle or two earlier.
+    if(!sign.aggressive&&i-lastArrow[sign.side]<3)continue;
     lastArrow[sign.side]=i;
     const x=(i-left+.5)*bw;
     if(x<0||x>plotW)continue;
-    const candle=a[i],isLong=sign.side==='LONG',color=isLong?'#56e9a4':'#ff829a';
+    const candle=a[i],isLong=sign.side==='LONG',
+      color=sign.aggressive?'#ffd769':isLong?'#56e9a4':'#ff829a';
     const anchor=isLong?y(candle.l)+14:y(candle.h)-14;
     const arrowY=Math.max(top+15,Math.min(bottom-16,anchor));
     ctx.font='bold 15px -apple-system,sans-serif';ctx.textAlign='center';
     ctx.lineWidth=3;ctx.strokeStyle='#0b1728';ctx.strokeText(isLong?'▲':'▼',x,arrowY);
     ctx.fillStyle=color;ctx.fillText(isLong?'▲':'▼',x,arrowY);
-    ctx.font='bold 9px -apple-system,sans-serif';
-    const label=isLong?'LONG':'SHORT';
-    ctx.strokeText(label,x,arrowY+(isLong?11:-11));
-    ctx.fillText(label,x,arrowY+(isLong?11:-11));
+    ctx.font=sign.aggressive?'bold 10px -apple-system,sans-serif':'bold 9px -apple-system,sans-serif';
+    const label=sign.aggressive?'적극롱신호':isLong?'LONG':'SHORT';
+    ctx.strokeText(label,x,arrowY+(isLong?12:-11));
+    ctx.fillText(label,x,arrowY+(isLong?12:-11));
   }
   ctx.restore();
 }
