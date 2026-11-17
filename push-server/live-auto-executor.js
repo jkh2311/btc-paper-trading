@@ -109,7 +109,7 @@ async function executeSignal({side,barTime,markPrice,mode,strategy,environment=p
  // unknown outcomes automatically, including after a server restart.
  if(!await store.claim(id))return {status:'DUPLICATE_IGNORED',id};
  const stage=(phase,details)=>store.stage(id,phase,details);
- let confirmedEntry=null,stopAlgoId=null;
+ let confirmedEntry=null,stopAlgoId=null,takeAlgoId=null;
  try{
   if(await store.recentCount()>6)throw Error('DAILY_SIGNAL_LIMIT');
   const api=exchange.call;
@@ -156,6 +156,7 @@ async function executeSignal({side,barTime,markPrice,mode,strategy,environment=p
    ...protectBase,type:'TAKE_PROFIT_MARKET',triggerPrice:tp,clientAlgoId:'hnt'+id.slice(0,28)
   });
   if(!target?.algoId)throw Error('TAKE_PROFIT_UNCONFIRMED');
+  takeAlgoId=target.algoId;
   await stage('PROTECTED',{side,barTime,clientId,entry,qty:lot,
    stopAlgoId:stopped.algoId,takeAlgoId:target.algoId});
   return {status:'PROTECTED',id,side,qty:lot,entry,stop:sl,take:tp};
@@ -182,9 +183,12 @@ async function executeSignal({side,barTime,markPrice,mode,strategy,environment=p
      if(closed?.status!=='FILLED')throw Error('EMERGENCY_CLOSE_NOT_CONFIRMED');
     }
     emergency='FLAT_CONFIRMED_OR_NO_OPEN_POSITION';
-    if(stopAlgoId){
-     try{await exchange.call('DELETE','/fapi/v1/algoOrder',{symbol:SYM,algoId:String(stopAlgoId)})}
-     catch(e){emergency='FLAT_WITH_POSSIBLE_STALE_STOP_ALGO'}
+    // Cleanup must handle BOTH protection orders, including an exchange-
+    // accepted take-profit order followed by failed database stage update.
+    for(const [name,algoId] of [['STOP',stopAlgoId],['TAKE',takeAlgoId]]){
+     if(!algoId)continue;
+     try{await exchange.call('DELETE','/fapi/v1/algoOrder',{symbol:SYM,algoId:String(algoId)})}
+     catch(e){emergency='FLAT_WITH_POSSIBLE_STALE_'+name+'_ALGO'}
     }
    }catch(e){emergency='EMERGENCY_REVIEW_REQUIRED_'+String(e.message||e).slice(0,100)}
   }
