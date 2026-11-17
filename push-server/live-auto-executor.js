@@ -77,7 +77,15 @@ async function openStore(env=process.env){
  const pool=new Pool({connectionString:env.LIVE_TRADING_DATABASE_URL,max:2,
   ssl:env.LIVE_TRADING_DATABASE_SSL==='true'?{rejectUnauthorized:true}:undefined});
  await pool.query("CREATE TABLE IF NOT EXISTS hanine_live_auto_events (id TEXT PRIMARY KEY, phase TEXT NOT NULL, details JSONB NOT NULL DEFAULT '{}'::jsonb, at TIMESTAMPTZ NOT NULL DEFAULT now())");
+ await pool.query("CREATE TABLE IF NOT EXISTS hanine_live_auto_control (name TEXT PRIMARY KEY, halted BOOLEAN NOT NULL DEFAULT FALSE, reason TEXT, at TIMESTAMPTZ NOT NULL DEFAULT now())");
  return {
+  async isHalted(){
+   const r=await pool.query("SELECT halted FROM hanine_live_auto_control WHERE name='GLOBAL' LIMIT 1");
+   return r.rows[0]?.halted===true;
+  },
+  async halt(reason){
+   await pool.query("INSERT INTO hanine_live_auto_control(name,halted,reason) VALUES('GLOBAL',TRUE,$1) ON CONFLICT(name) DO UPDATE SET halted=TRUE,reason=$1,at=now()",[String(reason).slice(0,200)]);
+  },
   async claim(id){
    const r=await pool.query("INSERT INTO hanine_live_auto_events(id,phase) VALUES($1,'CLAIMED') ON CONFLICT DO NOTHING RETURNING id",[id]);
    return r.rowCount===1;
@@ -104,6 +112,9 @@ async function executeSignal({side,barTime,markPrice,mode,strategy,environment=p
   throw Error('INVALID_EXECUTION_INPUT');
  if(Date.now()-barTime-60000>30000||barTime+60000>Date.now())
   throw Error('STALE_OR_UNCLOSED_SIGNAL');
+ if(typeof store.isHalted!=='function'||typeof store.halt!=='function')
+  throw Error('DURABLE_KILL_SWITCH_UNAVAILABLE');
+ if(await store.isHalted())throw Error('DURABLE_HALT_MANUAL_REVIEW_REQUIRED');
  const id=eventId(mode,strategy,side,barTime);
  // This is a persistent "claim before external effects". Never retry
  // unknown outcomes automatically, including after a server restart.
@@ -191,6 +202,11 @@ async function executeSignal({side,barTime,markPrice,mode,strategy,environment=p
      catch(e){emergency='FLAT_WITH_POSSIBLE_STALE_'+name+'_ALGO'}
     }
    }catch(e){emergency='EMERGENCY_REVIEW_REQUIRED_'+String(e.message||e).slice(0,100)}
+  }
+  // Persist a GLOBAL stop latch before returning. New server instances
+  // cannot resume entries merely because a Render process restarted.
+  try{await store.halt(String(error.message||error))}catch(e){
+   console.error('LIVE AUTO GLOBAL HALT PERSISTENCE FAILED',e?.message);
   }
   try{await stage('REVIEW_REQUIRED',{error:String(error.message||error).slice(0,160),emergency})}
   catch(e){console.error('LIVE AUTO DURABLE REVIEW LOG FAILURE',e?.message)}
