@@ -2871,7 +2871,7 @@ function drawRmi(){
    const items=[[200,d200[offset],'#ed303c'],
     [50,d50[offset],'#5477ff'],[20,d20[offset],'#35cb64']];
    ctx.save();ctx.font='bold 9px sans-serif';ctx.textBaseline='alphabetic';
-   const gap=5,pad=4,lineH=14,chipH=13,available=pw-8;
+   const gap=4,pad=3,lineH=11,chipH=10,available=pw-8;
    let px=5,py=dTop+2;
    for(const [period,val,color] of items){
     const text=period+' '+(Number.isFinite(val)?((val>0?'+':'')+val.toFixed(2)+'%'):'--');
@@ -2879,7 +2879,7 @@ function drawRmi(){
     if(px>5&&px+chipW>available){px=5;py+=lineH;}
     if(py+chipH>dBottom-2)break;
     ctx.fillStyle='rgba(8,18,33,.91)';ctx.fillRect(px,py,chipW,chipH);
-    ctx.fillStyle=color;ctx.fillText(text,px+pad,py+10);
+    ctx.fillStyle=color;ctx.fillText(text,px+pad,py+9);
     px+=chipW+gap;
    }
    const gapText='종합차 '+(Number.isFinite(fullSpread)?fullSpread.toFixed(2)+'%p':'--');
@@ -2888,7 +2888,7 @@ function drawRmi(){
    if(px>5&&px+summaryWidth>available){px=5;py+=lineH;}
    if(py+chipH<=dBottom-2){
     ctx.fillStyle='rgba(8,18,33,.94)';ctx.fillRect(px,py,summaryWidth,chipH);
-    ctx.fillStyle='#ffd978';ctx.fillText(gapText,px+pad,py+10);
+    ctx.fillStyle='#ffd978';ctx.fillText(gapText,px+pad,py+9);
    }
    ctx.restore();
   }
