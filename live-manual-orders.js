@@ -50,10 +50,7 @@ async function run(fn){
  busy=true;
  if($('entrySheet')?.style.display!=='none')message('실제 계좌 및 주문 조건 확인 중…');
  for(const id of ['sheetLong','sheetShort','close','cancel'])if($(id))$(id).disabled=true;
- try{await fn();}catch(e){
-  if(e?.preflight)message('실전 주문 전 수량 확인 · 주문 미전송: '+String(e.message||e));
-  else message('실제 거래 요청 실패/확인 필요: '+String(e?.message||e)+'\n주문이 불확실하면 바이낸스에서 확인하기 전 같은 주문을 반복하지 마세요.');
- }
+ try{await fn();}catch(e){message('실제 거래 요청 실패/확인 필요: '+String(e?.message||e)+'\n주문이 불확실하면 바이낸스에서 확인하기 전 같은 주문을 반복하지 마세요.');}
  finally{busy=false;for(const id of ['sheetLong','sheetShort','cancel'])if($(id))$(id).disabled=false; if($('close'))$('close').disabled=!selected;}
 }
 function updateButtons(){for(const id of ['long','short'])if($(id))$(id).disabled=false;}
