@@ -61,7 +61,8 @@ function clamp(v,def,low,high){const n=Number(v);return Number.isFinite(n)?Math.
 function preferences(obj){
  return {strategy:['range','bear','bull'].includes(obj?.strategy)?obj.strategy:'range',
  shortThreshold:clamp(obj?.shortThreshold,85,70,99),
- longThreshold:clamp(obj?.longThreshold,20,5,30)};
+ longThreshold:clamp(obj?.longThreshold,20,5,30),
+ allowBybitFallback:obj?.allowBybitFallback===true};
 }
 http.createServer(async(req,res)=>{
  if(req.method==='OPTIONS'){respond(res,204,{});return}
@@ -69,7 +70,7 @@ http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
  if(req.method==='GET'&&url.pathname==='/config'){respond(res,200,{publicKey:PUBLIC});return}
  if(req.method==='GET'&&url.pathname==='/health'){
-  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',serverVersion:'v232',signalFeed:'binance-usdm-BTCUSDT',marketDataWorking:!lastCheckError&&lastCheckTime>0&&Date.now()-lastCheckTime<90000,lastPriceAt,lastPriceError,priceAlertSupported:true});
+  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',serverVersion:'v233',signalFeed:lastFeedSource||'unavailable',binanceLastError,marketDataWorking:!lastCheckError&&lastCheckTime>0&&Date.now()-lastCheckTime<90000,bybitFallbackEnabled:subscribers.some(s=>s.allowBybitFallback),lastPriceAt,lastPriceError,priceAlertSupported:true});
   return;
  }
  if(req.method==='POST'&&url.pathname==='/subscribe'){
@@ -84,10 +85,11 @@ http.createServer(async(req,res)=>{
    // Limit registrations to one private owner, at most five devices.
    const prefs=preferences(body);
    const existing=subscribers.findIndex(x=>x.subscription.endpoint===sub.endpoint);
-   const record={subscription:sub,...prefs,lastBar:0,lastBar10:0,priceAlerts:[]};
+   const record={subscription:sub,...prefs,lastBar:0,lastBar10:0,feedSource:null,priceAlerts:[]};
    if(existing>=0){
     record.lastBar=subscribers[existing].lastBar;
     record.lastBar10=subscribers[existing].lastBar10||0;
+    record.feedSource=subscribers[existing].feedSource||null;
     record.priceAlerts=Array.isArray(subscribers[existing].priceAlerts)?subscribers[existing].priceAlerts:[];
     subscribers[existing]=record;
    }else{
@@ -257,25 +259,66 @@ function signalBody(timeframe,price,pnl){
   '\n'+pnl.text;
 }
 let lastCheckTime=0,lastCheckError=null,polling=false,lastFailureLogAt=0,signalRetryAfter=0;
+let lastFeedSource=null,binanceLastError=null;
+async function readClosedBinanceBars(){
+ const res=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=500',{
+  signal:AbortSignal.timeout(7500),headers:{'cache-control':'no-cache'}});
+ if(!res.ok)throw Error('Binance '+res.status);
+ const raw=await res.json();
+ if(!Array.isArray(raw)||raw.length<25)throw Error('Binance 캔들 자료 없음');
+ const now=Date.now()-1800;
+ return raw.map(x=>({t:Number(x[0]),c:Number(x[4]),v:Number(x[5])}))
+  .filter(x=>Number.isFinite(x.t)&&x.c>0&&x.v>0&&x.t+60000<=now);
+}
+// Explicitly opted-in Bybit *linear futures* alternative. Never silently
+// treat it as a Binance candle; alerts carry the provider name.
+async function readClosedBybitBars(){
+ const response=await fetch('https://api.bybit.com/v5/market/kline?category=linear&symbol=BTCUSDT&interval=1&limit=500',{
+  signal:AbortSignal.timeout(7500),headers:{'cache-control':'no-cache'}});
+ if(!response.ok)throw Error('Bybit '+response.status);
+ const payload=await response.json();
+ if(payload?.retCode!==0||!Array.isArray(payload?.result?.list)||payload.result.list.length<25)
+  throw Error('Bybit 응답 '+(payload?.retCode??'invalid'));
+ const now=Date.now()-1800;
+ return payload.result.list.map(x=>({t:Number(x[0]),c:Number(x[4]),v:Number(x[5])}))
+  .filter(x=>Number.isFinite(x.t)&&x.c>0&&x.v>0&&x.t+60000<=now)
+  .sort((a,b)=>a.t-b.t);
+}
+function validateSignalBars(bars){
+ if(bars.length<25)throw Error('확정된 1분봉 자료 부족');
+ const now=Date.now()-1800,current=bars.at(-1);
+ if(now-current.t-60000>45000)throw Error('시세 자료 갱신 지연');
+ for(let i=1;i<bars.length;i++)if(bars[i].t!==bars[i-1].t+60000)
+  throw Error('1분봉 연속성 오류');
+ return bars;
+}
 async function poll(){
  if(polling||!subscribers.length||Date.now()<signalRetryAfter)return;
  polling=true;
  try{
-  const res=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=500',
-    {signal:AbortSignal.timeout(7500),headers:{'cache-control':'no-cache'}});
-  if(!res.ok)throw new Error('Binance '+res.status);
-  const raw=await res.json();
-  if(!Array.isArray(raw)||raw.length<25)throw new Error('Insufficient candles');
-  const now=Date.now()-1800;
-  const bars=raw.map(x=>({t:Number(x[0]),c:Number(x[4]),v:Number(x[5])}))
-    .filter(x=>Number.isFinite(x.t)&&x.c>0&&x.v>0&&x.t+60000<=now);
-  if(bars.length<25)return;
-  const current=bars.at(-1);
-  // Reject stale Binance response: never alert on historical candles.
-  if(now-current.t-60000>45000)return;
+  let bars,feed='binance-usdm-BTCUSDT';
+  try{
+   bars=validateSignalBars(await readClosedBinanceBars());
+   binanceLastError=null;
+  }catch(binanceError){
+   binanceLastError=String(binanceError.message||binanceError);
+   if(!subscribers.some(s=>s.allowBybitFallback))throw binanceError;
+   // Only users who explicitly opt in can receive Bybit-based alerts.
+   bars=validateSignalBars(await readClosedBybitBars());
+   feed='bybit-linear-BTCUSDT';
+  }
+  const now=Date.now()-1800,current=bars.at(-1);
+  lastFeedSource=feed;
   const tens=tenMinuteBars(bars);
   const latest10=tens.at(-1);
   for(const subscriber of [...subscribers]){
+   if(feed==='bybit-linear-BTCUSDT'&&!subscriber.allowBybitFallback)continue;
+   if(subscriber.feedSource!==feed){
+    subscriber.feedSource=feed;subscriber.lastBar=current.t;
+    subscriber.lastBar10=latest10?.t||0;save();
+    // A feed switch is never treated as a fresh signal event.
+    continue;
+   }
    const events=[];
    if(current.t>subscriber.lastBar){
     const first=!subscriber.lastBar;
@@ -301,9 +344,10 @@ async function poll(){
     const timeframe=minutes===10?'10분봉':'1분봉';
     try{
      await webpush.sendNotification(subscriber.subscription,JSON.stringify({
-      title:(minutes===10?'🔟 10분봉 ':'1분봉 ')+(side==='LONG'?'🟢 LONG 신호':'🔴 SHORT 신호'),
-      body:signalBody(timeframe,bar.c,pnl),
-      tag:'btc-rmi-'+minutes+'m-'+subscriber.strategy+'-'+bar.t+'-'+side,
+      title:(feed==='bybit-linear-BTCUSDT'?'[바이비트 선물 기준] ':'[바이낸스 선물 기준] ')+
+       (minutes===10?'🔟 10분봉 ':'1분봉 ')+(side==='LONG'?'🟢 LONG 신호':'🔴 SHORT 신호'),
+      body:signalBody(timeframe,bar.c,pnl)+(feed==='bybit-linear-BTCUSDT'?'\n바이낸스와 신호가 다를 수 있습니다.':''),
+      tag:'btc-rmi-'+feed+'-'+minutes+'m-'+subscriber.strategy+'-'+bar.t+'-'+side,
       side,minutes,barTime:bar.t
      }),{TTL:75,urgency:'high'});
      console.log('PUSH',minutes+'m',side,new Date(bar.t).toISOString());
