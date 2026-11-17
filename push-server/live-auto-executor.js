@@ -83,7 +83,7 @@ async function openStore(env=process.env){
    return r.rowCount===1;
   },
   async stage(id,phase,details={}){
-   await pool.query("UPDATE hanine_live_auto_events SET phase=$2,details=$3::jsonb WHERE id=$1",
+   await pool.query("UPDATE hanine_live_auto_events SET phase=$2,details=details||$3::jsonb WHERE id=$1",
     [id,phase,JSON.stringify(details)]);
   },
   async recentCount(){
@@ -109,6 +109,7 @@ async function executeSignal({side,barTime,markPrice,mode,strategy,environment=p
  // unknown outcomes automatically, including after a server restart.
  if(!await store.claim(id))return {status:'DUPLICATE_IGNORED',id};
  const stage=(phase,details)=>store.stage(id,phase,details);
+ let confirmedEntry=null,stopAlgoId=null;
  try{
   if(await store.recentCount()>6)throw Error('DAILY_SIGNAL_LIMIT');
   const api=exchange.call;
@@ -138,7 +139,8 @@ async function executeSignal({side,barTime,markPrice,mode,strategy,environment=p
   if(placed?.status!=='FILLED')throw Error('ENTRY_NOT_CONFIRMED_CHECK_CLIENT_ORDER_ID');
   const entry=Number(placed.avgPrice);
   if(!(entry>0))throw Error('INVALID_FILL_PRICE');
-  await stage('ENTRY_FILLED',{side,barTime,clientId,entry,qty:lot});
+  confirmedEntry={side,barTime,clientId,entry,qty:lot};
+  await stage('ENTRY_FILLED',confirmedEntry);
   const sl=priceString(buy?entry*(1-cfg.stopPct/100):entry*(1+cfg.stopPct/100),tick);
   const tp=priceString(buy?entry*(1+cfg.takePct/100):entry*(1-cfg.takePct/100),tick);
   const protectBase={algoType:'CONDITIONAL',symbol:SYM,side:exitSide,
@@ -148,7 +150,8 @@ async function executeSignal({side,barTime,markPrice,mode,strategy,environment=p
    ...protectBase,type:'STOP_MARKET',triggerPrice:sl,clientAlgoId:'hns'+id.slice(0,28)
   });
   if(!stopped?.algoId)throw Error('STOP_ORDER_UNCONFIRMED');
-  await stage('STOP_SET',{side,barTime,clientId,entry,qty:lot,stopAlgoId:stopped.algoId});
+  stopAlgoId=stopped.algoId;
+  await stage('STOP_SET',{side,barTime,clientId,entry,qty:lot,stopAlgoId});
   const target=await api('POST','/fapi/v1/algoOrder',{
    ...protectBase,type:'TAKE_PROFIT_MARKET',triggerPrice:tp,clientAlgoId:'hnt'+id.slice(0,28)
   });
@@ -157,9 +160,36 @@ async function executeSignal({side,barTime,markPrice,mode,strategy,environment=p
    stopAlgoId:stopped.algoId,takeAlgoId:target.algoId});
   return {status:'PROTECTED',id,side,qty:lot,entry,stop:sl,take:tp};
  }catch(error){
-  // Do not blindly resubmit entry or issue an unverified reverse trade.
-  // The stage remains in durable DB for explicit manual reconciliation.
-  await stage('REVIEW_REQUIRED',{error:String(error.message||error).slice(0,160)});
+  // An exchange-confirmed entry without completed stop/take protection must
+  // be flattened rather than left knowingly unprotected. A failed/unknown
+  // entry response is NEVER retried: the fill outcome may be unknown.
+  let emergency='NOT_ATTEMPTED';
+  if(confirmedEntry){
+   try{
+    const open=await exchange.call('GET','/fapi/v3/positionRisk',{symbol:SYM});
+    const active=Array.isArray(open)?open.filter(p=>Math.abs(Number(p.positionAmt))>0):[];
+    if(active.length>1)throw Error('MULTIPLE_POSITIONS_MANUAL_REVIEW');
+    if(active.length===1){
+     const p=active[0],amount=Number(p.positionAmt);
+     if(!(amount*(side==='LONG'?1:-1)>0))throw Error('POSITION_SIDE_MISMATCH');
+     const emergencyId='hne'+id.slice(0,28);
+     await stage('EMERGENCY_CLOSE_PENDING',{emergencyId});
+     const closed=await exchange.call('POST','/fapi/v1/order',{
+      symbol:SYM,side:side==='LONG'?'SELL':'BUY',positionSide:'BOTH',
+      type:'MARKET',reduceOnly:'true',quantity:String(Math.abs(amount)),
+      newOrderRespType:'RESULT',newClientOrderId:emergencyId
+     });
+     if(closed?.status!=='FILLED')throw Error('EMERGENCY_CLOSE_NOT_CONFIRMED');
+    }
+    emergency='FLAT_CONFIRMED_OR_NO_OPEN_POSITION';
+    if(stopAlgoId){
+     try{await exchange.call('DELETE','/fapi/v1/algoOrder',{symbol:SYM,algoId:String(stopAlgoId)})}
+     catch(e){emergency='FLAT_WITH_POSSIBLE_STALE_STOP_ALGO'}
+    }
+   }catch(e){emergency='EMERGENCY_REVIEW_REQUIRED_'+String(e.message||e).slice(0,100)}
+  }
+  try{await stage('REVIEW_REQUIRED',{error:String(error.message||error).slice(0,160),emergency})}
+  catch(e){console.error('LIVE AUTO DURABLE REVIEW LOG FAILURE',e?.message)}
   throw error;
  }
 }
