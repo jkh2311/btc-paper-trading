@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261116-cme-gap-chart-v231"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261117-api-backup-push-health-v232"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1400,7 +1400,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
 <details id="myApiManage" class="api-details"><summary>API 키 관리 <span aria-hidden="true">⌄</span></summary>
 <div class="api-detail-body">
 <label for="myVaultPassword">잠금 비밀번호</label><input type="password" id="myVaultPassword" autocomplete="off" placeholder="저장된 키 잠금 해제 / 새 저장용">
-<div class="row"><button id="myVaultUnlock" type="button">잠금 해제</button><button id="myVaultSave" type="button">암호화 저장</button></div>
+<div class="row"><button id="myVaultUnlock" type="button">잠금 해제</button><button id="myVaultSave" type="button">암호화 저장</button></div><div class="row"><button id="myVaultBackup" type="button">API 암호화 백업</button><button id="myVaultImportBtn" type="button">백업 복원</button><input id="myVaultImportFile" type="file" accept=".json,application/json" hidden></div>
 <label for="myBinanceKey">API Key</label><input type="password" id="myBinanceKey" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 API Key">
 <label for="myBinanceSecret">Secret Key</label><input type="password" id="myBinanceSecret" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="바이낸스 Secret Key">
 <div class="api-secondary-actions"><button id="myWsPublic" type="button">바이낸스 통신 확인</button><button id="myApiClear" type="button">입력 지우기</button><button id="myVaultDelete" type="button">저장 키 삭제</button><button id="myFeeForget" type="button">수수료 기록 삭제</button></div>
@@ -6215,6 +6215,51 @@ $('myVaultUnlock').onclick=async()=>{
   }catch(_){showVaultStatus('잠금 해제 실패 · 비밀번호가 다르거나 저장 데이터가 손상되었어요.')}
   finally{$('myVaultPassword').value='';b.disabled=false}
 };
+// Portable encrypted backup. This exports ONLY the existing PBKDF2/AES-GCM
+// ciphertext, never API Key or Secret plaintext; the original >=12-character
+// vault password remains required on every new device/app installation.
+function validateEncryptedVault(raw){
+ if(!raw||raw.v!==1||typeof raw.salt!=='string'||typeof raw.iv!=='string'||
+  typeof raw.data!=='string'||raw.data.length>16000||raw.salt.length>200||raw.iv.length>200)
+  throw Error('암호화 API 백업 파일 형식 오류');
+ const salt=fromBase64(raw.salt),iv=fromBase64(raw.iv),payload=fromBase64(raw.data);
+ if(salt.length!==16||iv.length!==12||payload.length<32||payload.length>10000)
+  throw Error('암호화 API 백업 내용 오류');
+ return {v:1,salt:raw.salt,iv:raw.iv,data:raw.data};
+}
+$('myVaultBackup').onclick=()=>{
+ try{
+  const stored=localStorage.getItem(apiVaultStorageKey);
+  if(!stored)throw Error('이 앱에 저장된 API 키가 없어요. 먼저 암호화 저장해 줘.');
+  const backup=validateEncryptedVault(JSON.parse(stored));
+  const blob=new Blob([JSON.stringify({kind:'hanine-binance-api-vault',...backup},null,2)],
+   {type:'application/json'});
+  const url=URL.createObjectURL(blob),anchor=document.createElement('a');
+  anchor.href=url;anchor.download='hanine-encrypted-api-backup.json';
+  document.body.append(anchor);anchor.click();anchor.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+  showVaultStatus('✅ 비밀번호로 암호화된 백업 파일 생성 · 아이폰 파일 앱에 안전하게 보관해 줘');
+ }catch(e){showVaultStatus('백업 실패 · '+e.message)}
+};
+$('myVaultImportBtn').onclick=()=>{$('myVaultImportFile').click()};
+$('myVaultImportFile').addEventListener('change',async event=>{
+ const file=event.target.files?.[0];event.target.value='';if(!file)return;
+ try{
+  if(file.size>20000)throw Error('백업 파일 크기가 올바르지 않아요.');
+  const parsed=JSON.parse(await file.text());
+  if(parsed.kind!=='hanine-binance-api-vault')throw Error('한이네프로그램 API 백업만 복구할 수 있어요.');
+  const vault=validateEncryptedVault(parsed);
+  if(localStorage.getItem(apiVaultStorageKey)&&
+   !confirm('현재 암호화 저장된 API 키가 있어요. 복원 파일로 교체할까요? 먼저 기존 키를 백업하는 것이 안전해요.'))return;
+  authGeneration++;
+  localStorage.setItem(apiVaultStorageKey,JSON.stringify(vault));
+  unlockedApiCredentials=null;
+  try{await deviceVaultRecord('delete')}catch(e){console.warn('새 기기 키 복원 후 이전 자동해제 정보 정리 실패',e?.name)}
+  clearRealAccount('암호화 API 백업 복원 · 기존 비밀번호로 잠금 해제 필요');
+  for(const id of ['myBinanceKey','myBinanceSecret','myVaultPassword'])$(id).value='';
+  showVaultStatus('✅ 암호화 백업 복원 완료 · 기존 잠금 비밀번호로 잠금 해제해 줘');
+ }catch(e){showVaultStatus('백업 복원 실패 · '+(e?.message||'파일 오류'))}
+});
 $('myVaultDelete').onclick=async()=>{
   authGeneration++;
   localStorage.removeItem(apiVaultStorageKey);unlockedApiCredentials=null;
