@@ -165,7 +165,7 @@ async function usedManualStages(side,dual){
   const data=stageRecords();data[side]=retained;
   try{const all=JSON.parse(localStorage.getItem(stageLedgerKey)||'{}');all[stageAccountId()]=data;localStorage.setItem(stageLedgerKey,JSON.stringify(all));}catch(_){}
  }
- return Math.max(position?1:0,retained.length)+external;
+ return {used:Math.max(position?1:0,retained.length)+external,live,open};
 }
 async function currentManualPositions(){
  const data=await signed('GET','/fapi/v3/positionRisk',{symbol});
@@ -374,7 +374,8 @@ async function enter(side){
   else throw Error('주문 규모 계산 방식 확인');
   totalMargin=Math.min(totalMargin,available*.95);
   // One order is one pyramid stage; repeated manual entries are explicitly separate orders.
-  const used=await usedManualStages(side,dual);
+  const stageState=await usedManualStages(side,dual);
+  const {used,live,open}=stageState;
   if(used>=count)throw Error('실계좌 보유/미체결 기준 '+count+'단계 한도에 도달했습니다.');
   const weights=Array.from({length:count},(_,i)=>1+i*.2);
   const margin=totalMargin*weights[used]/weights.slice(used).reduce((a,b)=>a+b,0);
@@ -382,24 +383,42 @@ async function enter(side){
   const minQty=minimumCompliantQty(price,lot,f.minNotional);
   const rawQty=Number(roundDown(margin*lev/price,lot.stepSize));
   let qty=roundDown(margin*lev/price,lot.stepSize);
-  // An otherwise valid $100-ish account can produce 0.000 BTC when its
-  // total risk budget is split across six tiny first stages. For the FIRST
-  // stage only, allow a minimum-size entry WITHIN the original total
-  // planned margin/risk cap when the user taps the real entry button.
-  // No separate native confirm; never override risk budget or leverage.
+  // Small accounts frequently have an otherwise valid available balance,
+  // but each split pyramid stage rounds below the Binance BTC step size.
+  // When a stage is too small, permit only the exchange minimum, PROVIDED
+  // existing directional exposure + pending entries + this order fit
+  // within the total configured margin cap. No increase in risk settings.
+  const relevantPositions=live.filter(p=>dual?p.positionSide===side:
+   p.positionSide==='BOTH'&&Number(p.positionAmt)*(side==='LONG'?1:-1)>0);
+  const relevantOrders=open.filter(o=>dual?o.positionSide===side:
+   o.positionSide==='BOTH'&&o.side===(side==='LONG'?'BUY':'SELL'));
+  const existingMargin=relevantPositions.reduce((sum,p)=>{
+   const amt=Math.abs(Number(p.positionAmt)),entry=Number(p.entryPrice),positionLev=Number(p.leverage);
+   if(!(amt>0&&entry>0&&positionLev>0))throw entryPreflightError('기존 포지션 실제 수량·레버리지 확인 실패 · 주문 미전송');
+   return sum+amt*entry/positionLev;
+  },0);
+  const pendingMargin=relevantOrders.reduce((sum,o)=>{
+   const remaining=Number(o.origQty)-Number(o.executedQty||0);
+   const px=Number(o.price),orderLev=lev;
+   if(!(remaining>=0&&Number.isFinite(remaining)))throw entryPreflightError('미체결 주문의 잔여 수량 확인 실패 · 주문 미전송');
+   if(remaining===0)return sum;
+   if(!(px>0))throw entryPreflightError('미체결 주문의 기준가격 확인 불가 · 주문 미전송');
+   return sum+remaining*px/orderLev;
+  },0);
+  const reservedMargin=existingMargin+pendingMargin;
   const belowMinimum=rawQty<minQty||rawQty>Number(lot.maxQty);
   if(belowMinimum){
    if(rawQty>Number(lot.maxQty))throw entryPreflightError('계산 수량 '+qty+' BTC가 바이낸스 최대 주문 수량을 넘었어요.');
    const requiredMargin=minQty*price/lev;
-   if(used!==0)throw entryPreflightError('추가 진입 단계의 계산 수량 '+qty+' BTC가 최소 '+minQty+' BTC보다 작아요. 기존 포지션을 유지하고 전략의 주문 예산을 확인해 주세요.');
-   if(requiredMargin>totalMargin+1e-8||requiredMargin>available*.95+1e-8)
-    throw entryPreflightError('총 허용 증거금 '+fmt(totalMargin)+' USDT로는 최소 '+minQty+' BTC (약 '+fmt(requiredMargin)+' USDT 증거금)를 주문할 수 없어요. 잔고 '+fmt(available)+' USDT와 위험/증거금 설정을 확인해 주세요.');
+   if(reservedMargin+requiredMargin>totalMargin+1e-8||requiredMargin>available*.95+1e-8)
+    throw entryPreflightError('단계 '+(used+1)+' 최소 주문 '+minQty+' BTC에 증거금 약 '+fmt(requiredMargin)+' USDT 필요 · 기존 포지션/미체결 약 '+fmt(reservedMargin)+' USDT + 신규 합계가 전략 전체 허용 '+fmt(totalMargin)+' USDT를 초과해 주문 미전송. (사용가능 '+fmt(available)+' USDT)');
+
    qty=roundDown(minQty,lot.stepSize);
   }
   if(!(Number(qty)>=Number(lot.minQty)&&Number(qty)<=Number(lot.maxQty)&&Number(qty)*price>=f.minNotional))
    throw entryPreflightError('주문 수량 검증 실패: '+qty+' BTC · 최소 '+minQty+' BTC. 주문 미전송');
-  if(Number(qty)*price/lev>totalMargin+1e-8)
-   throw entryPreflightError('주문 증거금이 설정한 전체 위험/증거금 예산을 초과해 주문 중단');
+  if(reservedMargin+Number(qty)*price/lev>totalMargin+1e-8)
+   throw entryPreflightError('기존 진입/미체결 '+fmt(reservedMargin)+' USDT 포함 주문 증거금이 설정한 전체 위험/증거금 예산 '+fmt(totalMargin)+' USDT를 초과해 주문 중단');
   const existing=account.positions.find(p=>p.side===(dual?side:'BOTH')&&Math.abs(Number(p.amount))>0);
   if(existing&&Number(existing.leverage)!==lev)throw Error('실제 기존 포지션 레버리지와 설정값 불일치. 바이낸스 레버리지를 확인하세요.');
   const order={symbol,side:side==='LONG'?'BUY':'SELL',positionSide:dual?side:'BOTH',type,quantity:qty,newOrderRespType:'RESULT',
@@ -414,7 +433,7 @@ async function enter(side){
   // run() already locks both buttons until this request finishes to prevent
   // accidental double submissions from rapid taps.
   message('실제 '+(side==='LONG'?'롱':'숏')+' '+type+' 주문 전송 중… · '+qty+' BTC'+
-   (belowMinimum?' (첫 단계 바이낸스 최소수량 자동 적용 · 허용 증거금 이내)':'')+
+   (belowMinimum?' (바이낸스 최소수량 자동 적용 · 기존 진입 포함 예산 검증)':'')+
    (order.price?' @ '+order.price+' USDT':''));
   // Leverage was explicitly applied and verified in Settings. Do not change it during entry.
   lastOrderIssue=true;lastRequest=order.newClientOrderId;
