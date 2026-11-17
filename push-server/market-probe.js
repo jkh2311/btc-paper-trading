@@ -23,7 +23,10 @@ async function check(){
  }catch(e){
   last={...last,checkedAt:new Date().toISOString(),ok:false,httpStatus:null,
    error:e?.name==='TimeoutError'?'Binance request timeout':'Binance connection error'};
- }finally{checking=false}
+ }finally{
+  checking=false;
+  console.info('BINANCE_MARKET_PROBE',JSON.stringify({region:last.region,httpStatus:last.httpStatus,ok:last.ok,error:last.error,checkedAt:last.checkedAt}));
+ }
 }
 const server=http.createServer((req,res)=>{
  const url=new URL(req.url,'http://localhost');
