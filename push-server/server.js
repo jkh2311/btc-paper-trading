@@ -9,6 +9,7 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const webpush=require('web-push');
 const liveGuard=require('./live-auto-guard');
+const liveExec=require('./live-auto-executor');
 
 const PORT=Number(process.env.PORT||8787);
 const ORIGIN=process.env.APP_ORIGIN||'https://jkh2311.github.io';
@@ -25,6 +26,7 @@ webpush.setVapidDetails(SUBJECT,PUBLIC,PRIVATE);
 
 let subscribers=[];
 let lastPrice=null,lastPriceAt=0,lastPriceError=null,priceBusy=false;
+let liveSignalBar=0,liveBusy=false,liveLastError=null,liveLastResult=null;
 try{const raw=JSON.parse(fs.readFileSync(SAVE_FILE,'utf8'));if(Array.isArray(raw))subscribers=raw}catch(_){}
 function save(){
  const tmp=SAVE_FILE+'.tmp';
@@ -70,23 +72,22 @@ http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
  if(req.method==='GET'&&url.pathname==='/config'){respond(res,200,{publicKey:PUBLIC});return}
  if(req.method==='GET'&&url.pathname==='/live/status'){
-  respond(res,200,{ok:true,...liveGuard.readiness({health:{lastCheckTime,lastCheckError}})});
+  respond(res,200,{ok:true,...liveGuard.readiness({health:{lastCheckTime,lastCheckError}}),liveExecution:liveExec.settings(),liveLastError,liveLastResult});
   return;
  }
  if(req.method==='GET'&&url.pathname==='/live/preflight'){
-  // Read-only diagnostics. Never accept API keys, enable trading, or place orders.
+  // Read-only status. Trading is armed only by separate Render secrets,
+  // persistent database and explicit server-side consent; never by a link.
   const feedOk=!lastCheckError&&lastCheckTime>0&&Date.now()-lastCheckTime<90000;
-  const keysConfigured=Boolean(process.env.BINANCE_LIVE_API_KEY&&process.env.BINANCE_LIVE_API_SECRET);
-  respond(res,200,{ok:true,mode:'LIVE_LOCKED',source:'Binance BTCUSDT USDT-M Futures',
-   liveOrderEndpointExists:false,liveTradingEnabled:false,feedHealthy:feedOk,
-   lastFeedError:lastCheckError,keysConfigured,
-   blockers:[
-    ...(!feedOk?['바이낸스 선물 시세 연결 미확인 또는 차단']:[]),
-    ...(!keysConfigured?['서버 전용 거래 API 인증 설정 없음']:[]),
-    '중복 주문 방지 및 주문/체결 영구 저장소 없음',
-    '거래소 손절·익절 보호주문 검증 미완료',
-    '실주문 실행기는 아직 비활성화됨'
-   ]});return;
+  const cfg=liveExec.settings();
+  const blockers=[...cfg.errors,...(!feedOk?['바이낸스 선물 시세 연결 미확인 또는 차단']:[])];
+  respond(res,200,{ok:true,mode:blockers.length?'LIVE_LOCKED':'LIVE_READY',
+   source:'Binance BTCUSDT USDT-M Futures',liveOrderEndpointExists:true,
+   liveTradingEnabled:blockers.length===0,feedHealthy:feedOk,
+   lastFeedError:lastCheckError,keysConfigured:cfg.credentialsPresent,
+   modeChoice:cfg.mode,strategy:cfg.strategy,orderNotionalUsdt:cfg.riskValid?cfg.notional:null,
+   riskConfigured:cfg.riskValid,serverOrderStatus:liveLastResult,
+   serverOrderError:liveLastError,blockers});return;
  }
  if(req.method==='GET'&&url.pathname==='/health'){
   respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',lastPriceAt,lastPriceError,priceAlertSupported:true});
@@ -337,8 +338,50 @@ async function poll(){
    }
   }
   lastCheckTime=Date.now();lastCheckError=null;
+  // Fire-and-forget only after a validated, fresh, fully closed Binance bar.
+  // runLiveExecution itself holds the persistent duplicate-claim check.
+  void pollLiveExecution(bars,current);
  }catch(e){lastCheckError=String(e.message||e).slice(0,180);console.warn('RMI poll:',lastCheckError)}
  finally{polling=false}
+}
+// Fully isolated server-side LIVE automation. A read-only push registration
+// cannot arm this. All trading credentials/settings must be configured through
+// Render secrets, with a separate persistent Postgres database.
+async function pollLiveExecution(bars,current){
+ const cfg=liveExec.settings();
+ if(cfg.errors.length||liveBusy)return;
+ if(!lastCheckTime||Date.now()-lastCheckTime>90000||lastCheckError)return;
+ if(!current||!Number.isFinite(current.t))return;
+ if(!liveSignalBar){liveSignalBar=current.t;return;} // no historical entry on boot
+ if(current.t<=liveSignalBar)return;
+ liveSignalBar=current.t;
+ if(Date.now()-current.t-60000>30000)return;
+ const owner=subscribers[0];
+ if(!owner||cfg.mode==='follow'&&subscribers.length!==1){
+  liveLastError='FOLLOW 모드는 단일 푸시 기기 등록이 필요';return;
+ }
+ const strategy=cfg.mode==='follow'?owner.strategy:cfg.strategy;
+ const side=signals(bars,{...owner,strategy},1).at(-1);
+ if(side!=='LONG'&&side!=='SHORT')return;
+ liveBusy=true;
+ let store=null;
+ try{
+  store=await liveExec.openStore();
+  liveLastResult=await liveExec.executeSignal({
+   side,barTime:current.t,markPrice:current.c,mode:cfg.mode,
+   strategy,exchange:liveExec.client(),store
+  });
+  liveLastError=null;
+  console.info('LIVE AUTO RESULT',liveLastResult?.status,liveLastResult?.id);
+ }catch(e){
+  liveLastError=String(e.message||e).slice(0,170);
+  console.error('LIVE AUTO HALTED - manual review required:',liveLastError);
+  // Unknown order or protection state: never retry automatically.
+  process.env.LIVE_AUTO_ENABLED='false';
+ }finally{
+  try{await store?.close()}catch(_){}
+  liveBusy=false;
+ }
 }
 // Independent price watcher. Alert only when an observed live price crosses
 // a configured level; never fabricate a crossing after a gap or restart.
