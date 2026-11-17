@@ -279,7 +279,10 @@ function signalBody(timeframe,price,pnl){
 }
 let lastCheckTime=0,lastCheckError=null,polling=false;
 async function poll(){
- if(polling||!subscribers.length)return;
+ // Strategy-based live monitoring does not require an iPhone push subscription.
+ // Follow mode remains restricted to exactly one registered device.
+ const liveCfg=liveExec.settings();
+ if(polling||(!subscribers.length&&liveCfg.errors.length))return;
  polling=true;
  try{
   const res=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=500',
@@ -357,11 +360,16 @@ async function pollLiveExecution(bars,current){
  liveSignalBar=current.t;
  if(Date.now()-current.t-60000>30000)return;
  const owner=subscribers[0];
- if(!owner||cfg.mode==='follow'&&subscribers.length!==1){
+ if(cfg.mode==='follow'&&subscribers.length!==1){
   liveLastError='FOLLOW 모드는 단일 푸시 기기 등록이 필요';return;
  }
  const strategy=cfg.mode==='follow'?owner.strategy:cfg.strategy;
- const side=signals(bars,{...owner,strategy},1).at(-1);
+ // Dedicated strategy mode must match the application's base RMI thresholds,
+ // even when no iPhone is subscribed. Never source trade settings from users.
+ const signalPrefs=cfg.mode==='follow'?
+  {strategy,shortThreshold:owner.shortThreshold,longThreshold:owner.longThreshold}:
+  {strategy,shortThreshold:85,longThreshold:20};
+ const side=signals(bars,signalPrefs,1).at(-1);
  if(side!=='LONG'&&side!=='SHORT')return;
  liveBusy=true;
  let store=null;
