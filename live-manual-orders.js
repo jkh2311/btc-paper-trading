@@ -45,12 +45,29 @@ async function filters(){
  return {lot,market:market&&Number(market.stepSize)>0?market:lot,price,minNotional:Number(notional?.notional||notional?.minNotional||100)};
 }
 function roundDown(n,step){const s=String(step),digits=s.includes('.')?s.split('.')[1].length:0;return (Math.floor((n+1e-12)/Number(step))*Number(step)).toFixed(Math.min(digits,8));}
+function minimumCompliantQty(price,lot,minNotional){
+ const step=Number(lot?.stepSize),min=Number(lot?.minQty),max=Number(lot?.maxQty);
+ if(!(price>0&&step>0&&min>0&&max>=min&&minNotional>0))throw Error('바이낸스 거래 수량 규칙 확인 실패');
+ // Round UP to the exchange step and retain a 1% notional price cushion.
+ const required=Math.max(min,minNotional*1.01/price);
+ const units=Math.ceil(required/step-1e-9);
+ const digits=Math.min(8,(String(lot.stepSize).split('.')[1]||'').length);
+ const qty=Number((units*step).toFixed(digits));
+ if(!(qty>=min&&qty<=max&&qty*price>=minNotional))throw Error('바이낸스 최소 주문 수량 계산 불가');
+ return qty;
+}
+function entryPreflightError(text){
+ const e=Error(text);e.preflight=true;return e;
+}
 async function run(fn){
  if(busy)return;
  busy=true;
  if($('entrySheet')?.style.display!=='none')message('실제 계좌 및 주문 조건 확인 중…');
  for(const id of ['sheetLong','sheetShort','close','cancel'])if($(id))$(id).disabled=true;
- try{await fn();}catch(e){message('실제 거래 요청 실패/확인 필요: '+String(e?.message||e)+'\n주문이 불확실하면 바이낸스에서 확인하기 전 같은 주문을 반복하지 마세요.');}
+ try{await fn();}catch(e){
+  if(e?.preflight)message('실전 주문 전 수량 확인 · 주문 미전송: '+String(e.message||e));
+  else message('실제 거래 요청 실패/확인 필요: '+String(e?.message||e)+'\n주문이 불확실하면 바이낸스에서 확인하기 전 같은 주문을 반복하지 마세요.');
+ }
  finally{busy=false;for(const id of ['sheetLong','sheetShort','cancel'])if($(id))$(id).disabled=false; if($('close'))$('close').disabled=!selected;}
 }
 function updateButtons(){for(const id of ['long','short'])if($(id))$(id).disabled=false;}
@@ -357,15 +374,39 @@ async function enter(side){
   else throw Error('주문 규모 계산 방식 확인');
   totalMargin=Math.min(totalMargin,available*.95);
   // One order is one pyramid stage; repeated manual entries are explicitly separate orders.
-  const weight=1,weightSum=Array.from({length:count},(_,i)=>1+i*.2).reduce((a,b)=>a+b,0);
   const used=await usedManualStages(side,dual);
   if(used>=count)throw Error('실계좌 보유/미체결 기준 '+count+'단계 한도에 도달했습니다.');
   const weights=Array.from({length:count},(_,i)=>1+i*.2);
   const margin=totalMargin*weights[used]/weights.slice(used).reduce((a,b)=>a+b,0);
   const lot=type==='MARKET'?f.market:f.lot;
-  const qty=roundDown(margin*lev/price,lot.stepSize);
-  if(!(Number(qty)>=Number(lot.minQty)&&Number(qty)<=Number(lot.maxQty)))throw Error('바이낸스 최소/최대 주문 수량 불충족: '+qty+' BTC');
-  if(Number(qty)*price<f.minNotional)throw Error('최소 주문금액 미달: '+fmt(Number(qty)*price)+' USDT');
+  const minQty=minimumCompliantQty(price,lot,f.minNotional);
+  const rawQty=Number(roundDown(margin*lev/price,lot.stepSize));
+  let qty=roundDown(margin*lev/price,lot.stepSize);
+  // An otherwise valid $100-ish account can produce 0.000 BTC when its
+  // total risk budget is split across six tiny first stages. For the FIRST
+  // stage only, permit a single exchange-minimum entry WITHIN the original
+  // total planned margin/risk cap and only after an explicit user confirmation.
+  // Never override the full configured budget, available balance or leverage.
+  const belowMinimum=rawQty<minQty||rawQty>Number(lot.maxQty);
+  if(belowMinimum){
+   if(rawQty>Number(lot.maxQty))throw entryPreflightError('계산 수량 '+qty+' BTC가 바이낸스 최대 주문 수량을 넘었어요.');
+   const requiredMargin=minQty*price/lev;
+   if(used!==0)throw entryPreflightError('추가 진입 단계의 계산 수량 '+qty+' BTC가 최소 '+minQty+' BTC보다 작아요. 기존 포지션을 유지하고 전략의 주문 예산을 확인해 주세요.');
+   if(requiredMargin>totalMargin+1e-8||requiredMargin>available*.95+1e-8)
+    throw entryPreflightError('총 허용 증거금 '+fmt(totalMargin)+' USDT로는 최소 '+minQty+' BTC (약 '+fmt(requiredMargin)+' USDT 증거금)를 주문할 수 없어요. 잔고 '+fmt(available)+' USDT와 위험/증거금 설정을 확인해 주세요.');
+   const ok=confirm('⚠ 실전 첫 진입 주문 수량 조정 확인\n\n'+
+    '기존 6~7단계 첫 주문: '+qty+' BTC (최소 수량 미달)\n'+
+    '바이낸스 최소 주문: '+minQty+' BTC\n'+
+    '필요 증거금 약 '+fmt(requiredMargin)+' USDT (레버리지 '+lev+'배)\n'+
+    '전략 전체 허용 증거금 '+fmt(totalMargin)+' USDT 이내\n\n'+
+    '첫 단계만 최소 주문 수량으로 조정할까요? 실제 주문이 실행됩니다.');
+   if(!ok){message('최소 수량 조정 취소 · 실제 주문은 전송하지 않았어요.');return;}
+   qty=roundDown(minQty,lot.stepSize);
+  }
+  if(!(Number(qty)>=Number(lot.minQty)&&Number(qty)<=Number(lot.maxQty)&&Number(qty)*price>=f.minNotional))
+   throw entryPreflightError('주문 수량 검증 실패: '+qty+' BTC · 최소 '+minQty+' BTC. 주문 미전송');
+  if(Number(qty)*price/lev>totalMargin+1e-8)
+   throw entryPreflightError('주문 증거금이 설정한 전체 위험/증거금 예산을 초과해 주문 중단');
   const existing=account.positions.find(p=>p.side===(dual?side:'BOTH')&&Math.abs(Number(p.amount))>0);
   if(existing&&Number(existing.leverage)!==lev)throw Error('실제 기존 포지션 레버리지와 설정값 불일치. 바이낸스 레버리지를 확인하세요.');
   const order={symbol,side:side==='LONG'?'BUY':'SELL',positionSide:dual?side:'BOTH',type,quantity:qty,newOrderRespType:'RESULT',
