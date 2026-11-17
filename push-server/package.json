@@ -2,9 +2,17 @@
   "name": "btc-rmi-push-server",
   "version": "1.0.0",
   "private": true,
-  "description": "Always-on BTCUSDT closed 1m RMI Web Push sender (read-only)",
+  "description": "Binance BTCUSDT RMI alerts plus separately gated server-side LIVE auto trading",
   "main": "server.js",
-  "scripts": {"start": "node server.js", "keys": "web-push generate-vapid-keys"},
-  "engines": {"node": ">=20"},
-  "dependencies": {"web-push": "^3.6.7"}
+  "scripts": {
+    "start": "node server.js",
+    "keys": "web-push generate-vapid-keys"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7",
+    "pg": "^8.13.1"
+  }
 }
