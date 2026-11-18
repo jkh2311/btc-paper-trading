@@ -126,7 +126,8 @@
  let cachedKey='',cached=null;
  function cachedAnalysis(bars){
   const n=Date.now();
-  const last=bars?.at(-1),key=[bars?.length,last?.t,last?.c,Math.floor(n/DAY)].join('|');
+  const lastClosed=[...(bars||[])].reverse().find(x=>Number(x?.t)+DAY<=n);
+  const key=[bars?.length,bars?.[0]?.t,lastClosed?.t,lastClosed?.c,Math.floor(n/DAY)].join('|');
   if(key!==cachedKey){cached=analyze(bars,n);cachedKey=key}
   return cached;
  }
@@ -200,8 +201,13 @@
  const control=document.getElementById('dailyConvergenceToggle');
  control?.addEventListener('change',()=>{
   try{localStorage.setItem('hanine-daily-bb-convergence-v251',control.checked?'1':'0')}catch(_){}
+  if(!control.checked){
+   const status=document.getElementById('dailyConvergenceStatus');
+   if(status)status.textContent='꺼짐 · 기존 차트와 매매 신호 그대로 유지';
+  }
   window.btcDailyConvergenceForecast.refresh();
  });
  try{if(control)control.checked=localStorage.getItem('hanine-daily-bb-convergence-v251')==='1'}
  catch(_){}
+ if(control?.checked)window.btcDailyConvergenceForecast.refresh();
 })();
