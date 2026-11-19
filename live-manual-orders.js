@@ -179,9 +179,13 @@ function stageRecords(){
  try{const all=JSON.parse(localStorage.getItem(stageLedgerKey)||'{}');return all[stageAccountId()]||{LONG:[],SHORT:[]};}
  catch(_){return {LONG:[],SHORT:[]};}
 }
-function saveStageRecord(side,order){
+function saveStageRecord(side,order,protection=null){
  const all=stageRecords(),entries=Array.isArray(all[side])?all[side]:[];
- entries.push({id:String(order.orderId),time:Date.now(),stop:Number($('stop').value),rr:Number($('rr').value),hold:Number($('hold').value)});all[side]=entries.slice(-20);
+ entries.push({id:String(order.orderId),time:Date.now(),stop:Number(protection?.slPercent||$('stop').value),
+  rr:Number($('rr').value),hold:Number($('hold').value),
+  ...(protection?{tpPrice:Number(protection.tpPrice),slPrice:Number(protection.slPrice),
+   reservationPrice:Number(order.price),tpPercent:Number(protection.tpPercent),
+   slPercent:Number(protection.slPercent)}:{})});all[side]=entries.slice(-20);
  try{const base=JSON.parse(localStorage.getItem(stageLedgerKey)||'{}');base[stageAccountId()]=all;localStorage.setItem(stageLedgerKey,JSON.stringify(base));}
  catch(_){}
 }
@@ -220,7 +224,11 @@ async function currentManualPositions(){
 // sheet. The displayed live quote is separate from the order's LIMIT price.
 // Editing the LIMIT price freezes only that field, not the moving live quote.
 let sheetQuoteGeneration=0,sheetPriceEdited=false,sheetQuoteBusy=false,sheetQuoteLastAt=0;
-let chartLimitPriceMode=false,entrySheetOriginalPosition=null;
+let chartLimitPriceMode=false,entrySheetOriginalPosition=null,chartProtectionPlan=null;
+const reservationProtectionLabel=document.createElement('div');
+reservationProtectionLabel.id='realReservationProtectionPreview';
+reservationProtectionLabel.style.cssText='display:none;margin:7px 0 10px;padding:10px;border:1px solid #3c708b;background:#0b253a;border-radius:9px;font-size:12px;line-height:1.6;color:#b7e9d8';
+$('sheetPrice')?.insertAdjacentElement('afterend',reservationProtectionLabel);
 function restoreChartLimitSheet(){
  const sh=$('entrySheet');if(!sh)return;
  sh.classList.remove('chart-price-entry-sheet');
@@ -229,7 +237,7 @@ function restoreChartLimitSheet(){
   if(parent?.isConnected)parent.insertBefore(sh,next?.parentNode===parent?next:null);
   entrySheetOriginalPosition=null;
  }
- chartLimitPriceMode=false;
+ chartLimitPriceMode=false;chartProtectionPlan=null;reservationProtectionLabel.style.display='none';
  for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.disabled=false;
  if(typeof quoteReset!=='undefined'&&quoteReset)quoteReset.style.display='';
 }
@@ -238,6 +246,18 @@ document.addEventListener('btc:chart-price-limit-entry',e=>{
  if(!data||data.symbol!=='BTCUSDT'||!['LONG','SHORT'].includes(data.side)||
     !Number.isFinite(data.price)||!(data.price>0)||busy)return;
  showSheet(data.side,data.price);
+ // Store targets only after the order sheet was successfully opened.
+ if(chartLimitPriceMode){
+  const pp={tpPrice:Number(data.tpPrice),slPrice:Number(data.slPrice),
+   tpPercent:Number(data.tpPercent),slPercent:Number(data.slPercent),side:data.side};
+  if([pp.tpPrice,pp.slPrice,pp.tpPercent,pp.slPercent].every(v=>Number.isFinite(v)&&v>0)){
+   chartProtectionPlan=pp;
+   reservationProtectionLabel.style.display='block';
+   reservationProtectionLabel.textContent='예약 '+data.side+' · 익절 '+pp.tpPrice.toFixed(1)+
+    ' USDT ('+pp.tpPercent.toFixed(2)+'%) / 손절 '+pp.slPrice.toFixed(1)+
+    ' USDT ('+pp.slPercent.toFixed(2)+'%). 체결 이후 보호 주문 등록은 앱 연결 상태에서 확인이 필요합니다.';
+  }
+ }
 });
 $('sheetCancel')?.addEventListener('click',restoreChartLimitSheet);
 
@@ -403,7 +423,11 @@ async function enter(side){
   const price=type==='LIMIT'?Number($('limitPrice').value):quote;
   if(chartLimitPriceMode&&type!=='LIMIT')throw Error('차트 예약진입은 지정가만 가능합니다.');
   if(!(price>0))throw Error('유효한 현재가/지정가가 필요합니다');
-  const lev=val('lev'),count=Number($('pyramidEntryCount')?.value),stop=val('stop');
+  const plan=chartLimitPriceMode?chartProtectionPlan:null;
+  if(chartLimitPriceMode&&!plan)throw Error('예약진입 익절·손절 목표가가 누락됐습니다. 주문 미전송');
+  if(plan&&plan.side!==side)throw Error('예약진입 방향이 바뀌었습니다. 주문 미전송');
+  const lev=val('lev'),count=Number($('pyramidEntryCount')?.value),
+   stop=plan?Number(plan.slPercent):val('stop');
   if(!Number.isInteger(count)||count<1||count>7)
    throw Error('진입 단계는 설정에서 1~7단계 중 선택해 주세요. 주문 미전송');
   if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
@@ -439,6 +463,22 @@ async function enter(side){
    if(!(Number(p)>0))throw Error('지정가 호가 단위 오류');
    order.price=p;order.timeInForce=chartLimitPriceMode?'GTX':'GTC';
   }
+  let protection=null;
+  if(plan){
+   const basePrice=Number(order.price);
+   const tick=Number(f.price.tickSize);
+   if(!(tick>0))throw Error('보호주문 가격 단위 조회 실패. 주문 미전송');
+   const up=side==='LONG';
+   const tp=basePrice*(1+(up?1:-1)*plan.tpPercent/100);
+   const sl=basePrice*(1+(up?-1:1)*plan.slPercent/100);
+   const snapped=v=>Number((Math.round(v/tick)*tick).toFixed(8));
+   const tpPrice=snapped(tp),slPrice=snapped(sl);
+   if(!(tpPrice>0&&slPrice>0&&plan.tpPercent>0&&plan.tpPercent<=99&&
+    plan.slPercent>=.05&&plan.slPercent<=10&&
+    (up?tpPrice>basePrice&&slPrice<basePrice:tpPrice<basePrice&&slPrice>basePrice)))
+    throw Error('예약 TP/SL 가격 또는 손절 허용 범위(0.05~10%)가 올바르지 않습니다. 주문 미전송');
+   protection={...plan,tpPrice,slPrice};
+  }
   // The second, explicitly labeled REAL LONG/SHORT entry button submits
   // immediately after exchange/account/size checks, without a native confirm.
   // run() already locks both buttons until this request finishes to prevent
@@ -462,8 +502,12 @@ async function enter(side){
    response=known;
   }
   lastOrderIssue=false;
-  if(response?.orderId&& !['REJECTED','CANCELED','EXPIRED'].includes(response.status))saveStageRecord(side,response);
-  message('실제 주문 확인 · #'+response.orderId+' · '+response.status+' · 체결 '+(response.executedQty||'0')+' BTC\n보호 주문은 자동 등록되지 않습니다.');
+  if(response?.orderId&& !['REJECTED','CANCELED','EXPIRED'].includes(response.status))saveStageRecord(side,response,protection);
+  message('실제 주문 확인 · #'+response.orderId+' · '+response.status+
+   ' · 체결 '+(response.executedQty||'0')+' BTC\n'+
+   (protection?'예약 익절 '+protection.tpPrice+' / 손절 '+protection.slPrice+
+    ' USDT · 체결 후 앱이 보호주문 등록을 확인해야 합니다. 미체결 중에는 보호주문 없음.':
+    '보호 주문은 자동 등록되지 않습니다.'));
   if($('realAccountRefresh'))$('realAccountRefresh').click();
   void updateOpenOrders();
   if($('paperStatsReset')){/* no paper statistics mutation */}
