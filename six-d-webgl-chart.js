@@ -172,4 +172,8 @@ void main(){
    const v=Number(value);if(!Number.isFinite(v))return;
    azimuth=Math.max(8,Math.min(60,v));window.btcRedrawChart?.();
   }};
+ // The initial app chart can render before this deferred renderer loads.
+ // Refresh once after the module is ready so saved 6D mode shows real meshes.
+ if(window.btcCandleDimensionMode?.()==='6d')
+  window.requestAnimationFrame?.(()=>window.btcRedrawChart?.());
 })();
