@@ -148,10 +148,17 @@ function closeChoice(p,side){
   // The balance-sized quantity is a clearly labelled preview only.
   // Execution ALWAYS recomputes quantity from Binance after full close.
   const leverage=Number(p.leverage);
-  const balanceGuess=Number(snapshot?.available)+Number(p.unrealized);
+  // The futures wallet includes margin committed to the existing
+  // position. Free available margin alone understates post-close capacity.
+  // Only confirmed post-close availableBalance sets the actual order size.
+  const wallet=Number(snapshot?.wallet);
+  const projectedClosePnl=(entry-Number(p.entry))*(newSide==='LONG'?-1:1)*Number(p.amount);
+  // p is the OLD position. Opposite of newSide determines close PnL sign.
+  const walletAfterClose=wallet+projectedClosePnl;
   const refQty=useBalance?
-   (Number.isFinite(balanceGuess)&&balanceGuess>0&&leverage>0?
-    balanceGuess*Math.min(Number(percent.value)/100,.95)*leverage/(entry*1.01):NaN):
+   (Number.isFinite(wallet)&&wallet>0&&Number.isFinite(walletAfterClose)&&
+    walletAfterClose>0&&leverage>0?
+    walletAfterClose*Math.min(Number(percent.value)/100,.95)*leverage/(entry*1.01):NaN):
    amount;
   const f=x=>(x>=0?'+':'')+fmt(x,2)+' USDT';
   if(!(refQty>0)){
@@ -164,7 +171,8 @@ function closeChoice(p,side){
   estimate.textContent='새 '+newSide+' 예상 진입가 '+entry.toFixed(1)+' USDT\n'+
    '익절 '+t.toFixed(1)+' → 예상 이익 '+f(gain)+' · '+won(gain)+'\n'+
    '손절 '+st.toFixed(1)+' → 예상 손실 '+f(loss)+' · '+won(loss)+'\n'+
-   (useBalance?'청산 후 잔고 추정 기준 약 ':'선택된 주문 수량 ')+fmt(refQty,6)+' BTC\n'+
+   (useBalance?'선물 지갑 '+fmt(wallet,2)+' + 청산 예상 손익 '+fmt(projectedClosePnl,2)+
+     ' = 추정 '+fmt(walletAfterClose,2)+' USDT\n청산 후 예상 수량 약 ':'선택된 주문 수량 ')+fmt(refQty,6)+' BTC\n'+
    '수수료·펀딩비 제외 / 실제 체결가·수량에 따라 달라집니다.';
   estimate.style.color='#def4ec';return true;
  }
