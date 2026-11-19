@@ -214,12 +214,12 @@ function editRealProtection(p,side,kind){
   apply.disabled=!allowed||!live.fresh;
   return {price,allowed};
  }
- let closed=false;
- function dismiss(){if(closed)return;closed=true;overlay.remove();document.removeEventListener('keydown',keyHandler,true);}
- const keyHandler=e=>{if(e.key==='Escape'&&!apply.disabled){e.preventDefault();dismiss()}};
+ let closed=false,sending=false;
+ function dismiss(){if(closed||sending)return;closed=true;overlay.remove();document.removeEventListener('keydown',keyHandler,true);}
+ const keyHandler=e=>{if(e.key==='Escape'&&!sending){e.preventDefault();dismiss()}};
  document.addEventListener('keydown',keyHandler,true);
  cancel.onclick=dismiss;
- overlay.onclick=e=>{if(e.target===overlay&&!apply.disabled)dismiss();};
+ overlay.onclick=e=>{if(e.target===overlay&&!sending)dismiss();};
  input.addEventListener('input',compute);
  apply.onclick=async()=>{
   const {price,allowed}=compute();
@@ -227,7 +227,7 @@ function editRealProtection(p,side,kind){
   if(typeof window.btcRequestRealProtectionChange!=='function'){
    error.textContent='거래소 보호 주문 변경 모듈을 사용할 수 없습니다.';return;
   }
-  apply.disabled=true;cancel.disabled=true;input.disabled=true;
+  sending=true;apply.disabled=true;cancel.disabled=true;input.disabled=true;
   error.style.color='#bdd4ed';
   error.textContent='바이낸스 실전 보호 주문 변경 및 확인 중…';
   let response;
@@ -235,6 +235,7 @@ function editRealProtection(p,side,kind){
    side,positionSide:p.side,amount:p.amount,kind,price
   });}catch(e){response={ok:false,message:String(e?.message||e)};}
   if(closed)return;
+  sending=false;
   if(response?.ok){dismiss();render();return;}
   error.style.color='#ffb3bc';
   error.textContent=response?.message||'바이낸스 주문 상태를 확인한 후 다시 시도하세요.';
