@@ -98,6 +98,19 @@ async function protect(side,p,info){
  const ps=p.positionSide||'BOTH';
  const split=splitPlan(side,p);
  let active=(await algos()).filter(o=>isProtection(o,side,ps));
+ if(custom){
+  // Respect existing exchange protective orders. Do not silently override
+  // an existing stop or TP when pyramid entries have conflicting targets.
+  for(const [kind,wanted] of [['STOP_MARKET',prices.STOP_MARKET],
+   ['TAKE_PROFIT_MARKET',prices.TAKE_PROFIT_MARKET]]){
+   if(split&&kind==='TAKE_PROFIT_MARKET')continue;
+   const existing=active.find(o=>(o.orderType||o.type)===kind);
+   const actual=Number(existing?.triggerPrice);
+   if(existing&&Number.isFinite(actual)&&Math.abs(actual-Number(wanted))>
+      Math.max(Number(priceFilter.tickSize)*.5,1e-6))
+    throw Error('기존 바이낸스 '+kind+' 주문 '+actual+' USDT가 이미 활성화되어 있습니다. 새로운 예약 목표 '+wanted+'로 자동 교체하지 않았습니다. 계좌에서 직접 확인해 주세요.');
+  }
+ }
  // The user's explicitly approved three-limit TP plan replaces only the
  // original full-size TP. Keep/recreate STOP_MARKET throughout the plan.
  // Never create a competing full-size TP while split order state exists.
@@ -114,19 +127,7 @@ async function protect(side,p,info){
   active=(await algos()).filter(o=>isProtection(o,side,ps));
   if(!active.some(o=>(o.orderType||o.type)===type))throw Error(type+' 활성 상태 확인 실패');
  }
- if(custom){
-  // Respect existing exchange protective orders. Do not silently override
-  // an existing stop or TP when pyramid entries have conflicting targets.
-  for(const [kind,wanted] of [['STOP_MARKET',prices.STOP_MARKET],
-   ['TAKE_PROFIT_MARKET',prices.TAKE_PROFIT_MARKET]]){
-   if(split&&kind==='TAKE_PROFIT_MARKET')continue;
-   const existing=active.find(o=>(o.orderType||o.type)===kind);
-   const actual=Number(existing?.triggerPrice);
-   if(existing&&Number.isFinite(actual)&&Math.abs(actual-Number(wanted))>
-      Math.max(Number(priceFilter.tickSize)*.5,1e-6))
-    throw Error('기존 바이낸스 '+kind+' 주문 '+actual+' USDT가 이미 활성화되어 있습니다. 새로운 예약 목표 '+wanted+'로 자동 교체하지 않았습니다. 계좌에서 직접 확인해 주세요.');
-  }
- }
+
  if(!active.some(o=>(o.orderType||o.type)==='STOP_MARKET')||
     (!split&&!active.some(o=>(o.orderType||o.type)==='TAKE_PROFIT_MARKET')))
   throw Error('손절·익절 활성 상태 확인 실패');
