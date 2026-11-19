@@ -149,14 +149,18 @@
   el.textContent=rows.join('\n');
  }
  function render(ctx,{bars,tf,left,count,bw,y,top,bottom,plotW}){
-  if(!document.getElementById('dailyConvergenceToggle')?.checked)return;
+  // In 6D, show the same historical daily analogue paths without requiring
+  // the independent daily-convergence checkbox to be toggled.
+  const standalone=!!document.getElementById('dailyConvergenceToggle')?.checked;
+  const sixD=window.btcCandleDimensionMode?.()==='6d';
+  if(!standalone&&!sixD)return;
   if(tf!=='1d'){
    const el=document.getElementById('dailyConvergenceStatus');
    if(el)el.textContent='일봉에서만 경로 표시 · 시간봉을 일봉으로 바꿔 주세요';
    return;
   }
   const result=cachedAnalysis(bars);
-  summary(result);
+  if(standalone)summary(result);
   if(!result?.ready)return;
   // Draw only future paths and genuine historical box levels; no synthetic
   // candle insertion, no auto orders. Keep all chart price scaling untouched.
