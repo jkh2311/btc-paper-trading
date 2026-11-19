@@ -427,7 +427,7 @@ async function enter(side){
   if(chartLimitPriceMode&&!plan)throw Error('예약진입 익절·손절 목표가가 누락됐습니다. 주문 미전송');
   if(plan&&plan.side!==side)throw Error('예약진입 방향이 바뀌었습니다. 주문 미전송');
   const lev=val('lev'),count=Number($('pyramidEntryCount')?.value),
-   stop=plan?Number(plan.slPercent):val('stop');
+   stop=plan?Math.abs(price-Number(plan.slPrice))/price*100:val('stop');
   if(!Number.isInteger(count)||count<1||count>7)
    throw Error('진입 단계는 설정에서 1~7단계 중 선택해 주세요. 주문 미전송');
   if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
@@ -469,15 +469,17 @@ async function enter(side){
    const tick=Number(f.price.tickSize);
    if(!(tick>0))throw Error('보호주문 가격 단위 조회 실패. 주문 미전송');
    const up=side==='LONG';
-   const tp=basePrice*(1+(up?1:-1)*plan.tpPercent/100);
-   const sl=basePrice*(1+(up?-1:1)*plan.slPercent/100);
+   // Absolute user-entered protection prices stay fixed even when the
+   // limit-entry price is edited in the final order sheet.
    const snapped=v=>Number((Math.round(v/tick)*tick).toFixed(8));
-   const tpPrice=snapped(tp),slPrice=snapped(sl);
-   if(!(tpPrice>0&&slPrice>0&&plan.tpPercent>0&&plan.tpPercent<=99&&
-    plan.slPercent>=.05&&plan.slPercent<=10&&
+   const tpPrice=snapped(plan.tpPrice),slPrice=snapped(plan.slPrice);
+   const tpPercent=Math.abs(tpPrice/basePrice-1)*100;
+   const slPercent=Math.abs(slPrice/basePrice-1)*100;
+   if(!(tpPrice>0&&slPrice>0&&tpPercent>0&&tpPercent<=99&&
+    slPercent>=.05&&slPercent<=10&&
     (up?tpPrice>basePrice&&slPrice<basePrice:tpPrice<basePrice&&slPrice>basePrice)))
-    throw Error('예약 TP/SL 가격 또는 손절 허용 범위(0.05~10%)가 올바르지 않습니다. 주문 미전송');
-   protection={...plan,tpPrice,slPrice};
+    throw Error('수정한 예약 진입가 기준 TP/SL 방향 또는 손절 비율(0.05~10%)이 잘못됐습니다. 주문 미전송');
+   protection={...plan,tpPrice,slPrice,tpPercent,slPercent};
   }
   // The second, explicitly labeled REAL LONG/SHORT entry button submits
   // immediately after exchange/account/size checks, without a native confirm.
