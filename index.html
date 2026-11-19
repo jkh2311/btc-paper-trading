@@ -8043,6 +8043,90 @@ async function preflight(p){
  return {r,pos,protection,lot,old:exactQty(p.oldQty,lot),
   next:p.qtyMode==='balance'?null:exactQty(p.newQty,lot)};
 }
+
+async function limitSwitchRules(target){
+ const data=await fetch(BASE+'/fapi/v1/exchangeInfo?symbol='+SYM,
+  {cache:'no-store'}).then(async res=>{
+   if(!res.ok)throw Error('지정가 거래소 필터 조회 실패');return res.json();
+  });
+ const symbol=data.symbols?.find(x=>x.symbol===SYM);
+ const tick=Number(symbol?.filters?.find(x=>x.filterType==='PRICE_FILTER')?.tickSize);
+ const lot=symbol?.filters?.find(x=>x.filterType==='LOT_SIZE');
+ if(!(tick>0&&Number(lot?.stepSize)>0))throw Error('지정가 호가 또는 주문 수량 단위를 확인하지 못했습니다.');
+ const steps=Math.round(target/tick);
+ if(!(Number.isFinite(target)&&target>0&&steps>0&&
+  Math.abs(target-steps*tick)<Math.max(1e-8,tick*.00001)))
+  throw Error('스위칭 가격은 바이낸스 지정가 호가 단위에 맞게 입력하세요.');
+ const digits=Math.min(8,(String(symbol.filters.find(x=>x.filterType==='PRICE_FILTER').tickSize).split('.')[1]||'').length);
+ return {lot,price:(steps*tick).toFixed(digits)};
+}
+async function limitSwitchFillPending(plan){
+ const phase=plan.state;
+ if(!['CLOSE_PENDING','OPEN_PENDING'].includes(phase))return;
+ const id=phase==='CLOSE_PENDING'?plan.closeId:plan.openId;
+ if(!id)throw Error('지정가 주문 ID 누락 · 바이낸스 주문 상태 직접 확인 필요');
+ const order=await orderResult(id);
+ if(['CANCELED','EXPIRED','REJECTED','EXPIRED_IN_MATCH'].includes(order.status))
+  throw Error((phase==='CLOSE_PENDING'?'기존 포지션 청산':'반대 포지션 진입')+
+   ' 지정가 주문 '+order.status+' · 부분체결 가능. 수동 확인 필요');
+ if(!['NEW','PARTIALLY_FILLED','FILLED'].includes(order.status))
+  throw Error('지정가 주문 상태 '+String(order.status)+' 확인 필요');
+ if(order.status!=='FILLED'){
+  // A limit order remains on Binance even when the phone suspends this page.
+  // Never submit an opposite order while the close is partly/unfilled.
+  store({...armed,state:phase,message:(phase==='CLOSE_PENDING'?'기존 청산':'반대 진입')+
+   ' 지정가 '+order.status+' · 체결 '+fmt(order.executedQty)+' / '+fmt(order.origQty)+' BTC · 바이낸스 미체결 주문 확인'});
+  renderState();return;
+ }
+ if(phase==='OPEN_PENDING'){
+  const opposite=plan.side==='LONG'?'SHORT':'LONG';
+  const live=await risk();
+  if(!findPosition(live,{side:opposite}))
+   throw Error('반대 지정가 체결은 확인했으나 신규 포지션 조회 실패');
+  store({...armed,state:'DONE',message:'지정가 스위칭 완료 · 신규 '+fmt(plan.newQty)+
+   ' BTC · 새로운 손절·익절은 직접 설정하세요'});
+  renderState();$('realAccountRefresh')?.click();return;
+ }
+ const flat=await risk();
+ if(flat.rows.some(x=>Math.abs(Number(x.positionAmt))>1e-8))
+  throw Error('청산 지정가 주문 전량 체결 이후에도 포지션이 남아 있습니다. 수동 확인 필요');
+ // Commit state BEFORE entering this asynchronous exchange-write phase.
+ // A crash or timeout requires manual review instead of duplicate reentry.
+ store({...armed,state:'EXECUTING',message:'지정가 전량 청산 확인 · 반대 지정가 준비 중'});
+ renderState();
+ const rules=await limitSwitchRules(Number(plan.price));
+ let balanceSizing=null;
+ if(plan.qtyMode==='balance'){
+  balanceSizing=await afterCloseSize(balanceSwitchPercent(plan.balancePct),rules.lot);
+ }
+ const next=balanceSizing?.quantity||exactQty(Number(plan.newQty),rules.lot);
+ if(!(Number(next)>0))throw Error('청산 후 지정가 신규 진입 수량 확인 실패');
+ const verify=await risk();
+ if(verify.rows.some(x=>Math.abs(Number(x.positionAmt))>1e-8))
+  throw Error('신규 지정가 주문 전 포지션 변동 감지 · 주문 중단');
+ if(document.hidden)throw Error('화면 비활성 · 반대 지정가 자동 전송 중단');
+ const side=plan.side==='LONG'?'SELL':'BUY';
+ const opposite=plan.side==='LONG'?'SHORT':'LONG';
+ const openId='btcswopen'+Date.now().toString(36);
+ store({...armed,state:'EXECUTING',openId,newQty:Number(next),
+  message:'반대 '+opposite+' 지정가 '+rules.price+' USDT 전송 중 · '+next+' BTC'});
+ const req={symbol:SYM,side,positionSide:flat.dual?opposite:'BOTH',type:'LIMIT',
+  timeInForce:'GTC',price:rules.price,quantity:next,newClientOrderId:openId};
+ await signed('POST','/fapi/v1/order',req);
+ store({...armed,state:'OPEN_PENDING',message:'반대 '+opposite+' 지정가 '+rules.price+' USDT 체결 대기'});
+ renderState();
+ const last=await orderResult(openId);
+ if(last.status==='FILLED')await limitSwitchFillPending({...armed,state:'OPEN_PENDING'});
+}
+async function pollLimitSwitch(){
+ if(busy||checking||document.hidden||!['CLOSE_PENDING','OPEN_PENDING'].includes(armed?.state))return;
+ checking=true;
+ try{await limitSwitchFillPending(armed);}
+ catch(e){review('지정가 스위칭 거래소 확인 실패: '+String(e?.message||e)+
+  '\\n미체결·부분체결 주문이 남아 있을 수 있으므로 바이낸스에서 확인하세요.');}
+ finally{checking=false}
+}
+
 async function execute(plan){
  if(busy||!armed||armed.id!==plan.id||armed.state!=='ARMED'||document.hidden)return;
  busy=true;store({...plan,state:'EXECUTING',message:'거래소 확인 및 청산 처리 중'});renderState();
@@ -8060,6 +8144,19 @@ async function execute(plan){
    throw Error('보호주문 취소 도중 포지션 수량이 변경됨');
   const side=plan.side==='LONG'?'SELL':'BUY';
   const closeId='btcswclose'+Date.now().toString(36);
+  if(plan.executionMode==='LIMIT'){
+   const rules=await limitSwitchRules(Number(plan.price));
+   const closeQty=exactQty(Number(prep.old),rules.lot);
+   store({...armed,closeId,message:'기존 포지션 지정가 청산 '+rules.price+' USDT 전송 중'});
+   const closing={symbol:SYM,side,positionSide:plan.positionSide,type:'LIMIT',
+    timeInForce:'GTC',price:rules.price,quantity:closeQty,newClientOrderId:closeId};
+   if(plan.positionSide==='BOTH')closing.reduceOnly='true';
+   await signed('POST','/fapi/v1/order',closing);
+   store({...armed,state:'CLOSE_PENDING',message:'기존 포지션 지정가 청산 '+rules.price+' USDT 체결 대기'});
+   renderState();
+   await limitSwitchFillPending({...armed,state:'CLOSE_PENDING'});
+   return;
+  }
   store({...armed,closeId,message:'기존 포지션 시장가 청산 중'});
   const closing={symbol:SYM,side,positionSide:plan.positionSide,type:'MARKET',
    quantity:prep.old,newClientOrderId:closeId};
@@ -8102,6 +8199,9 @@ async function execute(plan){
  finally{busy=false}
 }
 async function probe(){
+ if(armed?.state==='CLOSE_PENDING'||armed?.state==='OPEN_PENDING'){
+  void pollLimitSwitch();return;
+ }
  if(busy||checking||document.hidden||armed?.state!=='ARMED')return;
  const id=accountId();if(!id||!snapshot||Date.now()-snapshot.at>15000)return;
  checking=true;
@@ -8140,7 +8240,7 @@ document.addEventListener('visibilitychange',()=>{
   if(!document.hidden)$('realAccountRefresh')?.click();
  }
 });
-setInterval(()=>{if(armed?.state==='ARMED')void probe()},3000);
+setInterval(()=>{if(['ARMED','CLOSE_PENDING','OPEN_PENDING'].includes(armed?.state))void probe()},3000);
 resumeState();renderState();
 })();
 
