@@ -6009,9 +6009,13 @@ function request(side){
     const order=pendingOrderSnapshot(side,price);
     if(order&&chartReservedProtectionDraft?.side===side){
      const c=chartReservedProtectionDraft;
-     const tp=priceFromDraftAtEntry(c,'tp',price),sl=priceFromDraftAtEntry(c,'sl',price);
-     if(!(tp>0&&sl>0)){alert('익절·손절 가격 설정을 확인하세요.');return;}
-     order.tpPrice=tp;order.slPrice=sl;order.stopPct=Math.abs(price-sl)/price;
+     const tp=Number(c.tpPrice),sl=Number(c.slPrice);
+     const tpPct=Math.abs(tp-price)/price*100,slPct=Math.abs(sl-price)/price*100;
+     if(!(tp>0&&sl>0&&tpPct>0&&tpPct<=99&&slPct>=.05&&slPct<=10&&
+       (side==='LONG'?tp>price&&sl<price:tp<price&&sl>price))){
+      alert('수정한 예약 진입가 기준 익절·손절 방향이나 손절 범위(0.05~10%)가 잘못됐어요.');return;
+     }
+     order.tpPrice=tp;order.slPrice=sl;order.stopPct=slPct/100;
     }
     if(!order){alert('수동 피라미드 한도 또는 사용 가능한 증거금이 부족해요.');return}
     if(!(order.rr>=1&&order.hold>0)){alert('익절/유지 시간 설정을 확인해 주세요.');return}
