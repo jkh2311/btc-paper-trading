@@ -7998,7 +7998,7 @@ window.btcSwitchNow=async(raw,newQuantity)=>{
    positionSide:p.positionSide,entry:Number(live.entryPrice),oldQty:originalQty,
    newQty:useBalance?originalQty:Number(exact),qtyMode:useBalance?'balance':'quantity',
    balancePct:useBalance?pct:null,type:'immediate',price:0,tpId:null,
-   targets:desired,
+   switchBasis:price,targets:desired,
    created:Date.now(),message:'즉시 실행 준비'};
   store(plan);renderState();
   await execute(plan);
@@ -8101,7 +8101,8 @@ async function preflight(p){
  if(!p.targets||!(Number(p.targets.tp)>0&&Number(p.targets.sl)>0))
   throw Error('새 포지션 TP/SL이 누락되어 기존 포지션을 청산하지 않았습니다. 다시 스위칭을 설정해 주세요.');
  const expected=p.side==='LONG'?'SHORT':'LONG';
- const basis=Number(p.price)>0?Number(p.price):Number(p.entry);
+ const basis=Number(p.price)>0?Number(p.price):
+  Number(p.switchBasis)>0?Number(p.switchBasis):Number(p.entry);
  if(!(basis>0&&(expected==='LONG'?
    p.targets.tp>basis&&p.targets.sl<basis:
    p.targets.tp<basis&&p.targets.sl>basis)))
