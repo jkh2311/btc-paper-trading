@@ -129,6 +129,35 @@ function closeChoice(p,side){
  const qty=make('input');qty.type='number';qty.min='0.000001';qty.step='0.000001';
  qty.inputMode='decimal';qty.value=String(Math.abs(p.amount));label.append(qty);
  const balanceHelp=make('p','기존 포지션 전량 청산·체결 확인 후 확정 수익이 포함된 실제 바이낸스 사용 가능 잔고를 재조회합니다. 최대 95% 증거금을 사용하고 수량은 그때 계산합니다.');
+ const newSide=side==='LONG'?'SHORT':'LONG',basis=Number(p.mark)>0?Number(p.mark):Number(p.entry);
+ const tpLabel=make('label','스위칭 후 '+newSide+' 익절 목표가 (USDT)');
+ const tp=make('input');tp.type='number';tp.inputMode='decimal';tp.min='0.1';tp.step='0.1';
+ tp.value=(basis*(newSide==='LONG'?1.02:.98)).toFixed(1);tpLabel.append(tp);
+ const slLabel=make('label','스위칭 후 '+newSide+' 손절 목표가 (USDT)');
+ const sl=make('input');sl.type='number';sl.inputMode='decimal';sl.min='0.1';sl.step='0.1';
+ sl.value=(basis*(newSide==='LONG'?.99:1.01)).toFixed(1);slLabel.append(sl);
+ const estimate=make('div');estimate.style.cssText='margin-top:9px;padding:10px;background:#0a2238;border:1px solid #446987;border-radius:10px;color:#e0efff;white-space:pre-line;font-size:12px;line-height:1.65';
+ function showEstimate(){
+  const t=Number(tp.value),st=Number(sl.value),entry=basis;
+  if(!(t>0&&st>0&&(newSide==='LONG'?t>entry&&st<entry:t<entry&&st>entry))){
+   estimate.textContent='⚠ '+newSide+' 포지션 기준 익절·손절 방향을 확인하세요';
+   estimate.style.color='#ffbac2';return false;
+  }
+  const useBalance=mode.value==='balance',amount=Number(qty.value);
+  const signed=newSide==='LONG'?1:-1;
+  const gain=(t-entry)*signed,loss=(st-entry)*signed;
+  const f=x=>(x>=0?'+':'')+x.toFixed(2)+' USDT';
+  estimate.textContent='예상 진입가 '+entry.toFixed(1)+' USDT (실제 체결가와 다름)\n'+
+   '익절 '+t.toFixed(1)+' → 예상 이익 '+
+   (useBalance?f(gain)+' / BTC':f(gain*amount))+'\n'+
+   '손절 '+st.toFixed(1)+' → 예상 손실 '+
+   (useBalance?f(loss)+' / BTC':f(loss*amount))+
+   (useBalance?'\n청산 후 실제 잔고·레버리지 기준으로 수량이 결정됩니다.':'');
+  estimate.style.color='#def4ec';return true;
+ }
+ for(const el of [tp,sl,qty,mode,percent])el.addEventListener('input',showEstimate);
+ for(const el of [mode,percent])el.addEventListener('change',showEstimate);
+ showEstimate();
  function updateMode(){
   const useBalance=mode.value==='balance';
   percentLabel.hidden=!useBalance;percentLabel.style.display=useBalance?'block':'none';
@@ -136,7 +165,7 @@ function closeChoice(p,side){
   label.hidden=useBalance;label.style.display=useBalance?'none':'block';
  }
  mode.addEventListener('change',updateMode);updateMode();
- const warning=make('p','청산만: 기존 시장가 청산 기능 그대로 사용. 청산 및 스위칭: 기존 포지션 전량 청산 확인 후 반대 방향으로 시장가 신규 진입. 기존 보호주문 취소 가능, 신규 포지션의 손절·익절은 별도로 설정해야 합니다.');
+ const warning=make('p','청산만: 기존 시장가 청산 그대로. 청산 및 스위칭: 기존 포지션 전량 청산 확인 후 반대 방향 시장가 신규 진입, 이후 설정한 TP/SL을 바이낸스에 등록·확인합니다. 실전 보호주문은 앱 연결 중에만 등록할 수 있어요.');
  const actions=make('div',undefined,'real-switch-choice-actions');
  const closeOnly=make('button','청산만 하기');closeOnly.type='button';
  const switchNow=make('button','청산 및 스위칭 전환');switchNow.type='button';
@@ -158,13 +187,17 @@ function closeChoice(p,side){
   if(useBalance&&!(Number.isInteger(pct)&&pct>=10&&pct<=100&&pct%10===0)){
    error.textContent='잔고 사용 비율을 10~100% 중에서 선택해 주세요.';return;
   }
+  if(!showEstimate()){error.textContent='신규 포지션 익절·손절 방향을 확인해 주세요.';return;}
   if(typeof window.btcSwitchNow!=='function'){
    error.textContent='실전 스위칭 모듈을 불러오지 못했어요. 주문은 실행되지 않았습니다.';return;
   }
-  dismiss();await window.btcSwitchNow(payload,useBalance?{mode:'balance',percent:pct}:n);
+  dismiss();await window.btcSwitchNow(payload,{
+   mode:useBalance?'balance':'quantity',percent:pct,quantity:n,
+   tp:Number(tp.value),sl:Number(sl.value)
+  });
  };
  actions.append(closeOnly,switchNow);
- dialog.append(title,desc,modeLabel,percentLabel,balanceHelp,label,warning,actions,cancel,error);
+ dialog.append(title,desc,modeLabel,percentLabel,balanceHelp,label,tpLabel,slLabel,estimate,warning,actions,cancel,error);
  overlay.append(dialog);document.body.append(overlay);
  if(mode.value==='quantity')qty.focus();
 }
