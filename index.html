@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261119-candle-dimension-modes-v252"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261119-cylindrical-candles-v253"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -4925,53 +4925,76 @@ function initCandleDimensionMode(){
  });
 }
 function drawDimensionCandle(ctx,v,x,bw,y){
- const up=Number(v.c)>=Number(v.o);
+ const up=Number(v.c)>=Number(v.o),mode=candleDimensionMode;
  const main=up?'#26a69a':'#ef5350';
- const front=up?'#22b8a2':'#f25260',side=up?'#12665f':'#8e273b';
- const cap=up?'#72e1c8':'#ff99a2';
  const width=Math.max(1,Math.min(bw*.66,bw-1));
  const yt=Math.min(y(v.o),y(v.c)),height=Math.max(1,Math.abs(y(v.o)-y(v.c)));
  const wickHigh=y(v.h),wickLow=y(v.l);
- const mode=candleDimensionMode;
+ // The 2D mode is pixel-identical to the original chart.
  if(mode==='2d'||width<2.2){
   ctx.fillStyle=ctx.strokeStyle=main;ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(Math.round(x)+.5,wickHigh);
   ctx.lineTo(Math.round(x)+.5,wickLow);ctx.stroke();
   ctx.fillRect(x-width/2,yt,width,height);return;
  }
+ // Cylindrical body: the elliptical caps lie INSIDE the exact OHLC y range,
+ // so both the upper and lower extremities still reflect the real prices.
  const deep=mode==='3d';
- // Extrude OHLC body in a fixed oblique 3D projection. The front face
- // remains at the exact OHLC y-coordinates and the wick remains at x.
- const dx=Math.min(deep?8:3.5,width*(deep?.46:.21));
- const dy=-dx*(deep?.74:.48);
  const left=x-width/2,right=x+width/2;
+ const ry=Math.max(.3,Math.min(width*(deep?.29:.19),height*.32,deep?4.8:2.7));
+ const topCenter=yt+ry,bottomCenter=yt+height-ry;
+ const topLight=up?(deep?'#91efe0':'#65d8cb'):(deep?'#ffa4a7':'#ff858d');
+ const shadeLeft=up?(deep?'#095850':'#12786e'):(deep?'#802137':'#a72e41');
+ const highlight=up?(deep?'#5be2cb':'#35c3ac'):(deep?'#ff7d8d':'#f75d6b');
+ const shadeRight=up?(deep?'#0c7165':'#19877b'):(deep?'#9a2639':'#c1384d');
  ctx.save();
- if(deep){ctx.shadowColor=up?'rgba(23,190,177,.33)':'rgba(253,89,107,.30)';
-  ctx.shadowBlur=Math.min(8,dx*1.3);}
- // Rear wick establishes depth without shifting the original OHLC scale.
- ctx.strokeStyle=deep?side:main;ctx.lineWidth=deep?1.2:1;
- ctx.beginPath();ctx.moveTo(x+dx,wickHigh+dy);
- ctx.lineTo(x+dx,wickLow+dy);ctx.stroke();
- ctx.shadowBlur=0;
- ctx.fillStyle=side;
- ctx.beginPath();ctx.moveTo(right,yt);ctx.lineTo(right+dx,yt+dy);
- ctx.lineTo(right+dx,yt+height+dy);ctx.lineTo(right,yt+height);
- ctx.closePath();ctx.fill();
- const gradient=ctx.createLinearGradient(left,yt,right,yt);
- gradient.addColorStop(0,deep?(up?'#0e736d':'#a72b41'):main);
- gradient.addColorStop(.52,front);
- gradient.addColorStop(1,deep?cap:front);
- ctx.fillStyle=gradient;ctx.fillRect(left,yt,width,height);
- // Upper cap is intentionally small on 2.5D and visibly deep on 3D.
- ctx.fillStyle=cap;ctx.beginPath();ctx.moveTo(left,yt);
- ctx.lineTo(left+dx,yt+dy);ctx.lineTo(right+dx,yt+dy);
- ctx.lineTo(right,yt);ctx.closePath();ctx.fill();
- ctx.strokeStyle=deep?'rgba(236,249,253,.53)':'rgba(231,250,250,.20)';
- ctx.lineWidth=deep?.9:.55;ctx.strokeRect(left+.3,yt+.3,Math.max(.3,width-.6),Math.max(.3,height-.6));
- // Front wick remains at its accurate position even on bullish/doji bars.
- ctx.strokeStyle=main;ctx.lineWidth=deep?1.55:1;
+ // Wick is behind the cylinder, not falsely shifted into future candles.
+ ctx.strokeStyle=deep?(up?'#58d9c2':'#ff8795'):main;
+ ctx.lineWidth=deep?1.4:1;
  ctx.beginPath();ctx.moveTo(Math.round(x)+.5,wickHigh);
  ctx.lineTo(Math.round(x)+.5,wickLow);ctx.stroke();
+ // True smoothly curved cylinder silhouette (no rectangular side faces).
+ const shape=()=>{
+  ctx.beginPath();
+  ctx.moveTo(left,topCenter);
+  ctx.bezierCurveTo(left,yt+ry*.42,x-width*.24,yt,right,topCenter);
+  ctx.lineTo(right,bottomCenter);
+  ctx.bezierCurveTo(right,yt+height-ry*.42,x+width*.24,yt+height,left,bottomCenter);
+  ctx.closePath();
+ };
+ shape();
+ const surface=ctx.createLinearGradient(left,0,right,0);
+ surface.addColorStop(0,shadeLeft);
+ surface.addColorStop(.24,up?'#20a897':'#e34759');
+ surface.addColorStop(.48,highlight);
+ surface.addColorStop(.73,up?'#27bba9':'#e94b5d');
+ surface.addColorStop(1,shadeRight);
+ ctx.fillStyle=surface;ctx.fill();
+ // Soft curvature follows the body; highlights stay restrained.
+ if(width>=4.5&&height>=3){
+  ctx.save();shape();ctx.clip();
+  const gleam=ctx.createLinearGradient(left,0,right,0);
+  gleam.addColorStop(0,'rgba(255,255,255,0)');
+  gleam.addColorStop(.36,deep?'rgba(255,255,255,.13)':'rgba(255,255,255,.08)');
+  gleam.addColorStop(.48,deep?'rgba(255,255,255,.20)':'rgba(255,255,255,.10)');
+  gleam.addColorStop(.62,'rgba(255,255,255,0)');
+  ctx.fillStyle=gleam;ctx.fillRect(left,yt,width,height);
+  ctx.restore();
+ }
+ // Upper oval cap; no bevelled rectangular top or skewed rear wick.
+ ctx.beginPath();ctx.ellipse(x,topCenter,width/2,ry,0,0,Math.PI*2);
+ const capFill=ctx.createLinearGradient(left,yt,right,yt+ry);
+ capFill.addColorStop(0,shadeLeft);capFill.addColorStop(.48,topLight);
+ capFill.addColorStop(1,shadeRight);
+ ctx.fillStyle=capFill;ctx.fill();
+ ctx.strokeStyle=deep?'rgba(217,249,249,.40)':'rgba(210,249,243,.22)';
+ ctx.lineWidth=deep?.85:.5;ctx.stroke();
+ // A faint lower rim rounds off the bottom without appearing detached.
+ if(height>ry*2+1.5&&width>=3){
+  ctx.beginPath();ctx.ellipse(x,bottomCenter,width/2,ry,0,0,Math.PI);
+  ctx.strokeStyle=deep?'rgba(8,24,33,.33)':'rgba(8,24,33,.20)';
+  ctx.lineWidth=deep?.8:.5;ctx.stroke();
+ }
  ctx.restore();
 }
 window.btcRedrawChart=()=>draw();
