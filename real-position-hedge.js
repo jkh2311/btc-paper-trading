@@ -85,7 +85,9 @@ style.textContent=[
 '.real-switch-choice-cancel{width:100%;font-size:12px}',
 'body.real-position-ready #paperPositionCard .real-position-row .hedge-pnl{font-weight:700}',
 'body.real-position-ready #paperPositionCard .real-tpsl-pnl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}',
-'body.real-position-ready #paperPositionCard .real-tpsl-pnl>div{border:1px solid #34516e;border-radius:11px;background:#0b1d33;padding:11px 9px;min-width:0}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl>div{border:1px solid #34516e;border-radius:11px;background:#0b1d33;padding:11px 9px;min-width:0;cursor:pointer;transition:border-color .15s,background .15s}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl>div:focus-visible{outline:2px solid #85d9ef;outline-offset:2px}',
+'body.real-position-ready #paperPositionCard .real-tpsl-pnl>div:active{background:#1b3451;border-color:#6cadd4}',
 'body.real-position-ready #paperPositionCard .real-tpsl-pnl small{display:block;font-size:11px;color:#b7cbe2;margin-bottom:7px}',
 'body.real-position-ready #paperPositionCard .real-tpsl-pnl strong{font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap}',
 'body.real-position-ready #paperPositionCard .real-tpsl-pnl .tp strong{color:#4ed6a6}',
@@ -148,6 +150,99 @@ function normalize(details){
   liquidation:number(p.liquidation),margin:number(p.margin)
  })).filter(p=>cleanSide(p)&&Number.isFinite(p.amount)&&Math.abs(p.amount)>1e-12);
  return {at:details.at,wallet,available,margin,positions};
+}
+// Clicking a TP/SL estimate opens a price editor. Actual exchange levels are
+// NEVER changed locally: the shared chart-protection engine must confirm them.
+function editRealProtection(p,side,kind){
+ const isTp=kind==='tp',name=isTp?'익절':'손절';
+ const live=window.btcRealProtectionSnapshot?.(p)||{fresh:false};
+ const current=isTp?live.tp:live.sl;
+ const size=Math.abs(p.amount),signedSize=side==='LONG'?size:-size;
+ const margin=Number.isFinite(p.margin)&&p.margin>0?p.margin:
+  p.entry>0&&p.leverage>0?size*p.entry/p.leverage:NaN;
+ const old=document.getElementById('realProtectionPriceEditor');
+ if(old)old.remove();
+ const overlay=make('div');overlay.id='realProtectionPriceEditor';
+ overlay.style.cssText='position:fixed;inset:0;z-index:100005;background:rgba(2,10,21,.82);display:flex;align-items:center;justify-content:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom))';
+ const dialog=make('div');dialog.setAttribute('role','dialog');
+ dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label',side+' '+name+' 목표가 수정');
+ dialog.style.cssText='width:min(100%,440px);max-height:88dvh;overflow-y:auto;padding:19px;background:#14243e;border:1px solid #587894;border-radius:17px;color:#e7edf8;box-shadow:0 14px 60px #000b';
+ const title=make('h3',side+' '+name+' 목표 가격 변경');
+ title.style.cssText='font-size:19px;margin:0 0 9px';
+ const meta=make('p','포지션 '+fmt(size,8)+' BTC · 진입가 '+fmt(p.entry,2)+' USDT');
+ meta.style.cssText='font-size:12px;line-height:1.6;color:#bdd0e5;margin:0 0 9px';
+ const currentLabel=make('p',live.fresh?
+  (Number.isFinite(current)&&current>0?'바이낸스 현재 등록 가격 '+fmt(current,2)+' USDT':'거래소 보호 주문 미등록 · 신규 등록'):
+  '바이낸스 보호 주문 최신 조회 필요 · 확인 전 변경 불가');
+ currentLabel.style.cssText='font-size:12px;color:#c8d9ed;line-height:1.5;margin:0 0 13px';
+ const label=make('label',name+' 목표 가격 (USDT)');
+ label.style.cssText='display:block;font-size:13px;margin-bottom:8px;color:#b9cce4';
+ const input=make('input');input.type='text';input.inputMode='decimal';
+ input.autocomplete='off';input.value=Number.isFinite(current)&&current>0?String(current):'';
+ input.placeholder='예: 63600.1';
+ input.style.cssText='width:100%;min-height:52px;padding:12px 13px;background:#2b4262;color:white;border:1px solid #7892b2;border-radius:10px;font-size:21px;box-sizing:border-box;font-variant-numeric:tabular-nums';
+ label.append(input);
+ const projection=make('div');
+ projection.style.cssText='padding:12px;margin:13px 0;border:1px solid #3e5876;border-radius:11px;background:#0b2038;line-height:1.7;font-size:13px';
+ const warning=make('p','미리보기는 예상값입니다. 실제 변경은 바이낸스에서 확인된 뒤 차트와 손익 카드에 적용됩니다. 기존 조건부 주문 교체 시 잠시 보호 공백이 생길 수 있습니다.');
+ warning.style.cssText='font-size:11px;line-height:1.65;color:#e2c69b;margin:8px 0 14px';
+ const error=make('p');error.setAttribute('role','status');
+ error.style.cssText='min-height:20px;font-size:12px;white-space:pre-line;color:#ffb3bc;line-height:1.5';
+ const buttons=make('div');buttons.style.cssText='display:flex;gap:10px';
+ const cancel=make('button','취소');cancel.type='button';
+ const apply=make('button','바이낸스 '+name+' 가격 변경');apply.type='button';
+ for(const b of [cancel,apply])b.style.cssText='flex:1;min-height:48px;padding:9px;border:1px solid #6786a6;background:#294363;color:white;border-radius:10px;font-size:13px';
+ apply.style.background='#126d60';apply.style.borderColor='#55c8ab';
+ function compute(){
+  const value=input.value.trim().replace(/,/g,'');
+  const valid=/^\d+(?:\.\d+)?$/.test(value)&&Number(value)>0;
+  const price=valid?Number(value):NaN;
+  const mark=Number(p.mark);
+  const allowed=valid&&mark>0&&(side==='LONG'?
+    (isTp?price>mark:price<mark):(isTp?price<mark:price>mark));
+  const gross=valid&&(price-p.entry)*signedSize;
+  const pct=valid&&margin>0?gross/margin*100:NaN;
+  projection.textContent=valid?
+   '변경 시 예상 '+name+' 손익: '+won(gross)+'\n'+fmt(price,2)+' USDT · '+
+   (Number.isFinite(pct)?(pct>=0?'+':'')+pct.toFixed(2)+'%':'수익률 확인 중')+
+   '\n현재 마크가 '+fmt(mark,2)+' USDT':
+   '변경할 목표 가격을 입력하면 예상 손익이 표시됩니다.';
+  projection.style.whiteSpace='pre-line';
+  if(!valid&&value)error.textContent='가격은 0보다 큰 숫자로 입력하세요';
+  else if(valid&&!allowed)error.textContent='현재 마크가 기준으로 '+name+' 방향이 올바르지 않습니다';
+  else error.textContent='';
+  apply.disabled=!allowed||!live.fresh;
+  return {price,allowed};
+ }
+ let closed=false;
+ function dismiss(){if(closed)return;closed=true;overlay.remove();document.removeEventListener('keydown',keyHandler,true);}
+ const keyHandler=e=>{if(e.key==='Escape'&&!apply.disabled){e.preventDefault();dismiss()}};
+ document.addEventListener('keydown',keyHandler,true);
+ cancel.onclick=dismiss;
+ overlay.onclick=e=>{if(e.target===overlay&&!apply.disabled)dismiss();};
+ input.addEventListener('input',compute);
+ apply.onclick=async()=>{
+  const {price,allowed}=compute();
+  if(!allowed||!live.fresh)return;
+  if(typeof window.btcRequestRealProtectionChange!=='function'){
+   error.textContent='거래소 보호 주문 변경 모듈을 사용할 수 없습니다.';return;
+  }
+  apply.disabled=true;cancel.disabled=true;input.disabled=true;
+  error.style.color='#bdd4ed';
+  error.textContent='바이낸스 실전 보호 주문 변경 및 확인 중…';
+  let response;
+  try{response=await window.btcRequestRealProtectionChange({
+   side,positionSide:p.side,amount:p.amount,kind,price
+  });}catch(e){response={ok:false,message:String(e?.message||e)};}
+  if(closed)return;
+  if(response?.ok){dismiss();render();return;}
+  error.style.color='#ffb3bc';
+  error.textContent=response?.message||'바이낸스 주문 상태를 확인한 후 다시 시도하세요.';
+  input.disabled=false;cancel.disabled=false;compute();
+ };
+ dialog.append(title,meta,currentLabel,label,projection,warning,error,buttons);
+ buttons.append(cancel,apply);
+ overlay.append(dialog);document.body.append(overlay);compute();input.focus();
 }
 function render(){
  root.replaceChildren();
@@ -251,6 +346,11 @@ function render(){
    const pct=valid&&margin>0?gross/margin*100:NaN;
    box.append(make('div',valid?fmt(price,2)+' USDT · '+(pct>=0?'+':'')+pct.toFixed(2)+'%':
     protection.fresh?'거래소 주문 미등록':'보호 주문 확인 중','estimate-meta'));
+   box.setAttribute('role','button');box.setAttribute('tabindex','0');
+   box.setAttribute('aria-label',(isTp?'익절':'손절')+' 목표 가격 변경');
+   box.setAttribute('title','눌러서 실제 바이낸스 '+(isTp?'익절':'손절')+' 가격 변경');
+   box.onclick=e=>{e.stopPropagation();editRealProtection(p,selection,kind);};
+   box.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();box.click();}};
    return box;
   };
   tpsl.append(expected('tp',protection.tp),expected('sl',protection.sl));
