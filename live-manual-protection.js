@@ -76,11 +76,22 @@ async function protect(side,p,info){
  const ex=await fetch(base+'/fapi/v1/exchangeInfo?symbol='+symbol,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('거래소 필터 조회 실패');return r.json()});
  const priceFilter=ex.symbols?.[0]?.filters?.find(f=>f.filterType==='PRICE_FILTER');
  if(!priceFilter?.tickSize)throw Error('호가 단위 확인 실패');
- const d=stop/100,sl=entry*(side==='LONG'?1-d:1+d),tp=entry*(side==='LONG'?1+d*rr:1-d*rr);
+ const d=stop/100;
+ // A user-chosen reservation price is an absolute exchange target after fill.
+ // Ordinary entries retain the established stop-percent / risk-reward defaults.
+ const custom=Number(info.tpPrice)>0&&Number(info.slPrice)>0;
+ const sl=custom?Number(info.slPrice):entry*(side==='LONG'?1-d:1+d);
+ const tp=custom?Number(info.tpPrice):entry*(side==='LONG'?1+d*rr:1-d*rr);
+ if(custom&&!(side==='LONG'?sl<entry&&tp>entry:sl>entry&&tp<entry))
+  throw Error('예약 진입 보호가가 실제 포지션 평균 진입가 기준 올바르지 않습니다. 자동 보호 등록 중단 · 바이낸스 주문 확인 필요');
  const prices={
   STOP_MARKET:tick(sl,priceFilter.tickSize,side==='SHORT'),
   TAKE_PROFIT_MARKET:tick(tp,priceFilter.tickSize,side==='LONG')
  };
+ if(custom&&!(side==='LONG'?
+  Number(prices.STOP_MARKET)<entry&&Number(prices.TAKE_PROFIT_MARKET)>entry:
+  Number(prices.STOP_MARKET)>entry&&Number(prices.TAKE_PROFIT_MARKET)<entry))
+  throw Error('바이낸스 호가 단위 반영 후 예약 TP/SL이 진입가를 넘어섰습니다. 보호 주문 미등록');
  if((side==='LONG'&&!(Number(prices.STOP_MARKET)<mark&&Number(prices.TAKE_PROFIT_MARKET)>mark))||
     (side==='SHORT'&&!(Number(prices.STOP_MARKET)>mark&&Number(prices.TAKE_PROFIT_MARKET)<mark)))
   throw Error('현재 마크가가 손절/익절 가격을 통과했습니다. 바이낸스에서 포지션 확인 필요');
@@ -102,6 +113,19 @@ async function protect(side,p,info){
   }
   active=(await algos()).filter(o=>isProtection(o,side,ps));
   if(!active.some(o=>(o.orderType||o.type)===type))throw Error(type+' 활성 상태 확인 실패');
+ }
+ if(custom){
+  // Respect existing exchange protective orders. Do not silently override
+  // an existing stop or TP when pyramid entries have conflicting targets.
+  for(const [kind,wanted] of [['STOP_MARKET',prices.STOP_MARKET],
+   ['TAKE_PROFIT_MARKET',prices.TAKE_PROFIT_MARKET]]){
+   if(split&&kind==='TAKE_PROFIT_MARKET')continue;
+   const existing=active.find(o=>(o.orderType||o.type)===kind);
+   const actual=Number(existing?.triggerPrice);
+   if(existing&&Number.isFinite(actual)&&Math.abs(actual-Number(wanted))>
+      Math.max(Number(priceFilter.tickSize)*.5,1e-6))
+    throw Error('기존 바이낸스 '+kind+' 주문 '+actual+' USDT가 이미 활성화되어 있습니다. 새로운 예약 목표 '+wanted+'로 자동 교체하지 않았습니다. 계좌에서 직접 확인해 주세요.');
+  }
  }
  if(!active.some(o=>(o.orderType||o.type)==='STOP_MARKET')||
     (!split&&!active.some(o=>(o.orderType||o.type)==='TAKE_PROFIT_MARKET')))
