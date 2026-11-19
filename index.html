@@ -8130,6 +8130,84 @@ async function limitSwitchRules(target){
  const digits=Math.min(8,(String(symbol.filters.find(x=>x.filterType==='PRICE_FILTER').tickSize).split('.')[1]||'').length);
  return {lot,price:(steps*tick).toFixed(digits)};
 }
+// Reversal protection is a separate, verified exchange-write phase.
+// Never report DONE until both STOP_MARKET and TAKE_PROFIT_MARKET are active.
+async function installSwitchProtection(plan,opposite,actualPosition){
+ if(!plan.targets)throw Error('새 포지션 익절·손절 가격 누락 · 거래소 직접 확인 필요');
+ if(document.hidden)throw Error('신규 포지션 체결 후 화면이 비활성화됐습니다. 바이낸스 보호주문 직접 확인 필요');
+ const entry=Number(actualPosition?.entryPrice),mark=Number(actualPosition?.markPrice);
+ const tp=Number(plan.targets.tp),sl=Number(plan.targets.sl);
+ if(!(entry>0&&mark>0&&tp>0&&sl>0))
+  throw Error('신규 포지션 실체결가·마크가·보호가격 확인 실패');
+ const long=opposite==='LONG';
+ if(!(long?tp>entry&&sl<entry&&tp>mark&&sl<mark:
+    tp<entry&&sl>entry&&tp<mark&&sl>mark))
+  throw Error('새 포지션 평균 진입가/마크가 기준 TP·SL 보호 방향 불일치 · 실제 바이낸스에서 즉시 보호 확인 필요');
+ const res=await fetch(BASE+'/fapi/v1/exchangeInfo?symbol='+SYM,{cache:'no-store'});
+ if(!res.ok)throw Error('보호주문 가격 단위 조회 실패');
+ const data=await res.json();
+ const tick=Number(data.symbols?.find(x=>x.symbol===SYM)?.filters?.find(f=>f.filterType==='PRICE_FILTER')?.tickSize);
+ if(!(tick>0))throw Error('거래소 TP·SL 호가 단위 확인 실패');
+ const snap=p=>Number((Math.round(p/tick)*tick).toFixed(8));
+ const tpPrice=snap(tp),slPrice=snap(sl);
+ if(!(long?tpPrice>entry&&slPrice<entry&&tpPrice>mark&&slPrice<mark:
+    tpPrice<entry&&slPrice>entry&&tpPrice<mark&&slPrice>mark))
+  throw Error('TP·SL 호가 반올림 후 트리거 조건 불일치');
+ const ps=actualPosition.positionSide;
+ if(!['BOTH','LONG','SHORT'].includes(ps))
+  throw Error('신규 포지션 방향을 확인하지 못했습니다');
+ const exit=long?'SELL':'BUY';
+ const match=o=>o.symbol===SYM&&o.positionSide===ps&&o.side===exit&&
+  (o.closePosition===true||o.closePosition==='true')&&
+  ['STOP_MARKET','TAKE_PROFIT_MARKET'].includes(o.orderType||o.type);
+ let current=await algos();
+ if(current.some(o=>!match(o)))
+  throw Error('다른 미확인 조건부 주문이 있어 TP·SL 등록을 중단했습니다');
+ const desired=[['STOP_MARKET',slPrice],['TAKE_PROFIT_MARKET',tpPrice]];
+ const equals=(order,type,value)=>order&&(order.orderType||order.type)===type&&
+  Math.abs(Number(order.triggerPrice)-value)<=Math.max(tick*.1,1e-6);
+ for(const [type,value] of desired){
+  const matching=current.filter(match);
+  const same=matching.find(o=>equals(o,type,value));
+  if(same)continue;
+  if(matching.some(o=>(o.orderType||o.type)===type))
+   throw Error('이미 다른 '+type+' 주문이 등록되어 있습니다. 덮어쓰지 않고 중단합니다');
+  const clientAlgoId='btcswp'+(type==='STOP_MARKET'?'s':'t')+
+   Date.now().toString(36);
+  const fields={algoType:'CONDITIONAL',symbol:SYM,side:exit,positionSide:ps,
+   type,closePosition:'true',triggerPrice:String(value),
+   workingType:'MARK_PRICE',clientAlgoId};
+  try{await signed('POST','/fapi/v1/algoOrder',fields)}
+  catch(err){
+   // A timeout may mean the exchange DID register the order.
+   current=await algos();
+   if(!current.filter(match).find(o=>equals(o,type,value)))
+    throw Error(type+' 주문 요청 실패 또는 불확실: '+String(err?.message||err));
+  }
+  current=await algos();
+  if(!current.filter(match).find(o=>equals(o,type,value)))
+   throw Error(type+' 활성 등록 확인 실패');
+ }
+ current=await algos();
+ if(desired.some(([type,value])=>!current.filter(match).find(o=>equals(o,type,value))))
+  throw Error('새 스위칭 포지션 TP/SL 두 주문의 활성 상태 확인 실패');
+ return {tp:tpPrice,sl:slPrice,entry,qty:Math.abs(Number(actualPosition.positionAmt))};
+}
+async function finalizeSwitchProtection(plan,opposite){
+ // Once the opposite side was filled, persist a fail-closed state BEFORE
+ // doing more network writes. App suspension will require manual review.
+ store({...armed,state:'EXECUTING',message:'신규 포지션 체결 확인 · 보호주문 등록/검증 중'});
+ renderState();
+ const live=await risk(),p=findPosition(live,{side:opposite});
+ if(!p||Math.abs(Number(p.positionAmt))<=0)
+  throw Error('실제 신규 포지션이 조회되지 않아 보호주문을 등록하지 않았습니다');
+ const result=await installSwitchProtection(plan,opposite,p);
+ store({...armed,state:'DONE',message:plan.side+' → '+opposite+
+  ' 신규 '+fmt(result.qty)+' BTC · TP '+fmt(result.tp)+' / SL '+fmt(result.sl)+
+  ' USDT · 바이낸스 보호주문 활성 확인'});
+ renderState();$('realAccountRefresh')?.click();
+ return result;
+}
 async function limitSwitchFillPending(plan){
  const phase=plan.state;
  if(!['CLOSE_PENDING','OPEN_PENDING'].includes(phase))return;
@@ -8153,9 +8231,7 @@ async function limitSwitchFillPending(plan){
   const live=await risk();
   if(!findPosition(live,{side:opposite}))
    throw Error('반대 지정가 체결은 확인했으나 신규 포지션 조회 실패');
-  store({...armed,state:'DONE',message:'지정가 스위칭 완료 · 신규 '+fmt(plan.newQty)+
-   ' BTC · 새로운 손절·익절은 직접 설정하세요'});
-  renderState();$('realAccountRefresh')?.click();return;
+  await finalizeSwitchProtection(plan,opposite);return;
  }
  const flat=await risk();
  if(flat.rows.some(x=>Math.abs(Number(x.positionAmt))>1e-8))
@@ -8264,10 +8340,8 @@ async function execute(plan){
   if(opened.status!=='FILLED')throw Error('반대 포지션 체결 확인 실패: '+opened.status);
   const verify=await risk();
   if(!findPosition(verify,{side:opposite}))throw Error('반대 포지션 조회 확인 실패');
-  store({...armed,state:'DONE',newQty:Number(nextQty),message:plan.side+' → '+opposite+' · 신규 '+fmt(nextQty)+
-   ' BTC\n새 포지션의 손절·익절은 직접 설정해 주세요.'});
-  renderState();$('realAccountRefresh')?.click();
-  alert('실전 스위칭 완료\n'+armed.message);
+  await finalizeSwitchProtection(plan,opposite);
+  alert('실전 스위칭·보호주문 활성 확인\n'+armed.message);
  }catch(e){review(e.message+'\n보호주문 취소·청산·신규 주문이 일부 진행되었을 수 있습니다.')}
  finally{busy=false}
 }
