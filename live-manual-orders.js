@@ -483,8 +483,31 @@ function chooseLiveClosePrice(side,qty,initialPrice,tick,digits){
   dialog.style.cssText='background:#14243e;color:#e7edf8;border:1px solid #456280;border-radius:18px;padding:18px;width:min(100%,440px);max-height:90dvh;overflow-y:auto;box-shadow:0 15px 70px #0009;font-family:-apple-system,BlinkMacSystemFont,sans-serif';
   const title=document.createElement('strong');title.textContent='BTCUSDT '+side+' 지정가 청산';
   title.style.cssText='font-size:19px;display:block;margin-bottom:7px';
-  const quantity=document.createElement('p');quantity.textContent='선택 포지션 '+qty+' BTC · 전량 지정가 청산';
-  quantity.style.cssText='font-size:13px;color:#aac0d9;margin:0 0 15px';
+  const quantity=document.createElement('p');quantity.textContent='선택 포지션 '+qty+' BTC · 100% 지정가 청산';
+  quantity.style.cssText='font-size:13px;color:#aac0d9;margin:0 0 10px';
+  const percentLabel=document.createElement('label');
+  percentLabel.textContent='지정가 청산 비중 (보유 포지션 기준)';
+  percentLabel.style.cssText='display:block;font-size:13px;color:#b7cce4;margin-bottom:7px';
+  const percentSelect=document.createElement('select');
+  percentSelect.setAttribute('aria-label','지정가 청산 포지션 비중');
+  percentSelect.style.cssText='width:100%;min-height:45px;border-radius:11px;background:#294364;color:#fff;border:1px solid #6281a4;padding:9px 12px;font-size:16px;margin-bottom:5px';
+  for(const pct of [100,10,20,30,40,50,60,70,80,90]){
+   const opt=document.createElement('option');opt.value=String(pct);
+   opt.textContent=pct===100?'100% · 전량 청산':pct+'% · 부분 청산';
+   percentSelect.append(opt);
+  }
+  percentSelect.value='100';
+  const percentHint=document.createElement('div');
+  percentHint.style.cssText='font-size:12px;color:#a8dacf;line-height:1.5;margin-bottom:14px';
+  const updatePercent=()=>{
+   const pct=Number(percentSelect.value);
+   quantity.textContent='선택 포지션 '+qty+' BTC · '+pct+'% 지정가 청산';
+   const rough=Number(qty)*pct/100;
+   percentHint.textContent='선택 비중 '+pct+'% · 약 '+rough.toLocaleString('ko-KR',{maximumFractionDigits:8})+
+    ' BTC 청산 (바이낸스 수량 단위에 맞춰 내림, 잔여 포지션 유지)';
+  };
+  percentSelect.addEventListener('change',updatePercent);
+  updatePercent();
   const priceBox=document.createElement('div');
   priceBox.style.cssText='background:#0b1b30;border:1px solid #36506d;border-radius:12px;padding:13px 15px;margin-bottom:12px';
   const caption=document.createElement('div');caption.textContent='실시간 현재가 · 바이낸스 체결가';
@@ -508,7 +531,7 @@ function chooseLiveClosePrice(side,qty,initialPrice,tick,digits){
   accept.style.background='#146753';accept.style.borderColor='#40ad8d';
   switchAction.style.cssText='flex:1 1 100%;margin-top:24px;padding:14px 8px;min-height:52px;background:#234d72;border:1px solid #5886b2;border-radius:10px;color:#fff;font-size:13px;font-weight:700';
   actions.append(now,cancel,accept,switchAction);
-  dialog.append(title,quantity,priceBox,label,input,info,actions);
+  dialog.append(title,quantity,percentLabel,percentSelect,percentHint,priceBox,label,input,info,actions);
   overlay.append(dialog);document.body.append(overlay);
   let edited=false,closed=false;
   const snap=price=>(Math.round(price/tick)*tick).toFixed(digits);
@@ -529,7 +552,8 @@ function chooseLiveClosePrice(side,qty,initialPrice,tick,digits){
   input.addEventListener('input',()=>{edited=true;info.textContent='입력한 지정가 고정 · 실시간 현재가는 계속 표시';});
   now.onclick=()=>{if(!(liveQuote.price>0&&Date.now()-liveQuote.at<=3500)){info.textContent='실시간 연결 확인 후 다시 눌러 주세요';return;}edited=false;paint();};
   cancel.onclick=()=>finish(null);
-  accept.onclick=()=>{const value=input.value.trim();if(!value){info.textContent='지정가를 입력하세요';return;}finish(value);};
+  accept.onclick=()=>{const value=input.value.trim();if(!value){info.textContent='지정가를 입력하세요';return;}
+   finish({price:value,percent:Number(percentSelect.value)});};
   switchAction.onclick=()=>{const value=input.value.trim();if(!value){info.textContent='전환 목표 가격을 입력하세요';return;}finish({switchPrice:value});};
   activeCloseEditor={paint};
   if(initialPrice>0)input.value=snap(initialPrice);
@@ -551,6 +575,7 @@ async function closeSelected(orderKind='LIMIT'){
   if((selection.side==='LONG')!==isLong)throw Error('선택 포지션 방향이 달라졌습니다.');
   const f=await filters(),lot=orderKind==='LIMIT'?f.lot:f.market;
   const qty=roundDown(Math.abs(amount),lot.stepSize);
+  let closeQuantity=qty,closePercent=100;
   if(!(Number(qty)>0&&Math.abs(Number(qty)-Math.abs(amount))<1e-8))
    throw Error('청산 수량 필터 불일치 · 바이낸스에서 수량 확인');
 
@@ -575,7 +600,21 @@ async function closeSelected(orderKind='LIMIT'){
    const typed=await chooseLiveClosePrice(selection.side,qty,Number(defaultPrice),tick,digits);
    if(typed===null)return;
    const switchRequested=typeof typed==='object'&&typeof typed.switchPrice==='string';
-   const chosenPrice=switchRequested?typed.switchPrice:typed;
+   const chosenPrice=switchRequested?typed.switchPrice:
+    typeof typed==='object'&&typeof typed.price==='string'?typed.price:typed;
+   if(!switchRequested){
+    const percentage=typeof typed==='object'?Number(typed.percent):100;
+    if(!Number.isInteger(percentage)||percentage<10||percentage>100||percentage%10!==0)
+     throw Error('청산 비중은 10% 단위로 10~100% 중에서 선택하세요');
+    closePercent=percentage;
+    if(closePercent<100){
+     closeQuantity=roundDown(Math.abs(amount)*closePercent/100,lot.stepSize);
+     if(!(Number(closeQuantity)>0&&Number(closeQuantity)>=Number(lot.minQty)&&
+       Number(closeQuantity)<=Number(lot.maxQty)))
+      throw Error('선택한 '+closePercent+'%는 바이낸스 최소 청산 수량 '+
+       lot.minQty+' BTC보다 작거나 허용 수량을 초과합니다. 비중을 높여 주세요.');
+    }
+   }
    // iOS prompts can include grouping commas and surrounding whitespace.
    // Validate a numeric USDT price, never silently interpret extra text or currency units.
    const cleanPrice=chosenPrice.trim().replace(/,/g,'').replace(/\s+/g,'');
@@ -611,8 +650,13 @@ async function closeSelected(orderKind='LIMIT'){
   const finalPosition=finalRows.find(x=>x.symbol===symbol&&x.positionSide===positionSide&&Math.abs(Number(x.positionAmt))>0);
   if(!finalPosition||Math.abs(Math.abs(Number(finalPosition.positionAmt))-Number(qty))>1e-8)
    throw Error('청산창을 여는 동안 보유 수량이 바뀌었습니다. 다시 조회 후 시도하세요.');
+  if(!(Number(closeQuantity)>0&&Number(closeQuantity)<=Math.abs(Number(finalPosition.positionAmt))+1e-8))
+   throw Error('청산 비중 수량이 현재 포지션을 초과합니다. 주문을 보내지 않았습니다.');
+  if(orderKind==='LIMIT'&&closePercent<100&&Number(closeQuantity)*Number(price)<f.minNotional)
+   throw Error('부분 청산 주문금액이 거래소 최소 주문금액 '+fmt(f.minNotional)+
+    ' USDT 미만입니다. 비중을 높여 주세요.');
   const id='btcClose'+Date.now()+Math.floor(Math.random()*10000);
-  const order={symbol,side:exitSide,positionSide,type:orderKind,quantity:qty,
+  const order={symbol,side:exitSide,positionSide,type:orderKind,quantity:closeQuantity,
    newClientOrderId:id,newOrderRespType:'RESULT'};
   if(!dual)order.reduceOnly='true';
   if(orderKind==='LIMIT'){order.price=price;order.timeInForce='GTC';}
@@ -623,8 +667,8 @@ async function closeSelected(orderKind='LIMIT'){
    catch(_){throw Error('청산 주문 응답 미확정 · 바이낸스에서 ID '+id+'를 확인하세요. '+e.message);}
   }
   const status=String(res?.status||'UNKNOWN'),filled=Number(res?.executedQty||0);
-  message((orderKind==='LIMIT'?'지정가':'시장가')+' 청산 주문 #'+res.orderId+' · '+status+
-    ' · 체결 '+(Number.isFinite(filled)?filled:0)+' / '+qty+' BTC\n'+
+  message((orderKind==='LIMIT'?'지정가 '+closePercent+'%':'시장가 전량')+' 청산 주문 #'+res.orderId+' · '+status+
+    ' · 체결 '+(Number.isFinite(filled)?filled:0)+' / '+closeQuantity+' BTC\n'+
     (status==='FILLED'?'체결 보고됨 · 잔여 포지션 재조회':
      orderKind==='LIMIT'?'미체결/부분체결 시 거래내역에서 대기 주문을 확인하거나 개별 취소하세요.':
      '체결 상태 및 잔여 포지션을 다시 확인하세요.'));
