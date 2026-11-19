@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261119-editable-real-tpsl-v257"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261119-reservation-tpsl-v258"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1451,6 +1451,19 @@ body.ai-entry-modal-open{overflow:hidden!important}
     <div class="chart-price-choice-actions">
       <button type="button" id="chartPriceChoiceLong" class="buy">롱 예약진입</button>
       <button type="button" id="chartPriceChoiceShort" class="sell">숏 예약진입</button>
+    </div>
+    <div id="chartReservedProtection" hidden style="margin:12px 0;padding:12px;border:1px solid #4e7594;border-radius:12px;background:#0e263e">
+      <strong id="chartReservedProtectionSide" style="display:block;margin-bottom:7px">예약 진입 보호가격 설정</strong>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,95px);gap:7px;align-items:center;font-size:12px;color:#c5d7e9;margin-bottom:4px">
+        <label for="chartReservedTpPrice">익절 목표 가격 (USDT)</label><label for="chartReservedTpPercent">익절 변동률 (%)</label>
+        <input id="chartReservedTpPrice" type="text" inputmode="decimal" autocomplete="off" aria-label="익절 목표 가격 USDT" style="width:100%;min-width:0;padding:10px 7px;background:#294363;color:white;border:1px solid #6884a2;border-radius:8px">
+        <input id="chartReservedTpPercent" type="number" min="0.01" max="99" step="0.1" inputmode="decimal" aria-label="익절 변동률 퍼센트" style="width:100%;min-width:0;padding:10px 7px;background:#294363;color:white;border:1px solid #6884a2;border-radius:8px">
+        <label for="chartReservedSlPrice">손절 목표 가격 (USDT)</label><label for="chartReservedSlPercent">손절 변동률 (%)</label>
+        <input id="chartReservedSlPrice" type="text" inputmode="decimal" autocomplete="off" aria-label="손절 목표 가격 USDT" style="width:100%;min-width:0;padding:10px 7px;background:#294363;color:white;border:1px solid #6884a2;border-radius:8px">
+        <input id="chartReservedSlPercent" type="number" min="0.01" max="99" step="0.1" inputmode="decimal" aria-label="손절 변동률 퍼센트" style="width:100%;min-width:0;padding:10px 7px;background:#294363;color:white;border:1px solid #6884a2;border-radius:8px">
+      </div>
+      <div id="chartReservedProtectionHelp" role="status" style="font-size:11px;line-height:1.55;color:#b7e0d6;margin-top:9px">익절·손절 가격 또는 %를 입력하면 서로 연동돼요.</div>
+      <button id="chartReservedProtectionConfirm" type="button" style="width:100%;min-height:42px;margin-top:9px;background:#126b58;color:white;border:1px solid #42af94;border-radius:9px">보호가격 확인 후 주문창으로</button>
     </div>
     <button type="button" id="chartPriceChoiceCancel">취소</button>
   </div>
@@ -4875,14 +4888,72 @@ function syncChartPriceOrderTap(canvas,plotW,labelY,price){
    {maximumFractionDigits:2})+' USDT 가격에 예약진입 설정');
  button.hidden=false;
 }
+function priceFromDraftAtEntry(draft,kind,entry){
+ const p=Number(kind==='tp'?draft.tpPercent:draft.slPercent);
+ const rise=(draft.side==='LONG')===(kind==='tp');
+ return Number((entry*(1+(rise?1:-1)*p/100)).toFixed(1));
+}
+// Chart-reservation protection draft is visual until the *separate*
+// order sheet is explicitly submitted. Does not place exchange orders.
+let chartReservedProtectionDraft=null;
 function initChartPriceOrderChoice(){
  const tap=$('chartCrosshairPriceTap'),dialog=$('chartPriceOrderChoice');
  if(!tap||!dialog)return;
- const close=()=>{dialog.hidden=true;chartPriceChoice=null};
+ const panel=$('chartReservedProtection'),helper=$('chartReservedProtectionHelp');
+ const confirmButton=$('chartReservedProtectionConfirm');
+ const tpPrice=$('chartReservedTpPrice'),slPrice=$('chartReservedSlPrice');
+ const tpPercent=$('chartReservedTpPercent'),slPercent=$('chartReservedSlPercent');
+ const close=()=>{dialog.hidden=true;chartPriceChoice=null;panel.hidden=true;chartReservedProtectionDraft=null;};
+ const priceNumber=v=>{
+  const t=String(v||'').trim().replace(/,/g,'');
+  return /^\d+(?:\.\d+)?$/.test(t)?Number(t):NaN;
+ };
+ function priceFromPercent(side,kind,pct,entry){
+  const rising=(side==='LONG')===(kind==='tp');
+  return entry*(1+(rising?1:-1)*pct/100);
+ }
+ function pctFromPrice(side,kind,price,entry){
+  const rising=(side==='LONG')===(kind==='tp');
+  return (rising?(price/entry-1):(1-price/entry))*100;
+ }
+ function validate(){
+  if(!chartPriceChoice?.side)return null;
+  const {price:entry,side}=chartPriceChoice;
+  const tp=priceNumber(tpPrice.value),sl=priceNumber(slPrice.value);
+  const tpPct=pctFromPrice(side,'tp',tp,entry),slPct=pctFromPrice(side,'sl',sl,entry);
+  if(!(tp>0&&sl>0&&Number.isFinite(tpPct)&&Number.isFinite(slPct)&&tpPct>0&&slPct>0&&tpPct<=99&&slPct<=99)){
+   helper.textContent='가격 방향 확인: 롱 익절은 진입가 위·손절은 아래 / 숏 익절은 아래·손절은 위. 0~99% 사이에서 설정하세요.';
+   helper.style.color='#ffb2ad';confirmButton.disabled=true;return null;
+  }
+  const draft={side,entryPrice:entry,tpPrice:tp,slPrice:sl,tpPercent:tpPct,slPercent:slPct};
+  helper.textContent='예약 '+side+' '+entry.toFixed(1)+' · 익절 '+tp.toFixed(1)+
+   ' ('+tpPct.toFixed(2)+'%) · 손절 '+sl.toFixed(1)+' ('+slPct.toFixed(2)+'%)';
+  helper.style.color='#9de4c9';confirmButton.disabled=false;
+  return draft;
+ }
+ function syncPrice(kind){
+  if(!chartPriceChoice?.side)return;
+  const source=kind==='tp'?tpPrice:slPrice,target=kind==='tp'?tpPercent:slPercent;
+  const price=priceNumber(source.value),pct=pctFromPrice(chartPriceChoice.side,kind,price,chartPriceChoice.price);
+  target.value=Number.isFinite(pct)&&pct>0?String(Number(pct.toFixed(3))):'';
+  validate();
+ }
+ function syncPercent(kind){
+  if(!chartPriceChoice?.side)return;
+  const source=kind==='tp'?tpPercent:slPercent,target=kind==='tp'?tpPrice:slPrice;
+  const pct=Number(source.value);
+  target.value=pct>0&&pct<=99?priceFromPercent(chartPriceChoice.side,kind,pct,chartPriceChoice.price).toFixed(1):'';
+  validate();
+ }
+ tpPrice.addEventListener('input',()=>syncPrice('tp'));
+ slPrice.addEventListener('input',()=>syncPrice('sl'));
+ tpPercent.addEventListener('input',()=>syncPercent('tp'));
+ slPercent.addEventListener('input',()=>syncPercent('sl'));
  tap.addEventListener('click',e=>{
   e.stopPropagation();
   if(!(Number.isFinite(crosshairPrice)&&crosshairPrice>0))return;
-  chartPriceChoice={price:Math.round(crosshairPrice*10)/10};
+  chartPriceChoice={price:Math.round(crosshairPrice*10)/10,side:null};
+  chartReservedProtectionDraft=null;panel.hidden=true;
   $('chartPriceChoiceValue').textContent=chartPriceChoice.price.toLocaleString('ko-KR',
    {minimumFractionDigits:1,maximumFractionDigits:1})+' USDT';
   dialog.hidden=false;
@@ -4893,22 +4964,37 @@ function initChartPriceOrderChoice(){
  for(const [id,side] of [['chartPriceChoiceLong','LONG'],['chartPriceChoiceShort','SHORT']]){
   $(id).addEventListener('click',()=>{
    if(!chartPriceChoice)return;
-   const price=chartPriceChoice.price;
-   close();
-   if(demo){
-    showOrderSheet(side);
-    if($('entrySheet').style.display==='block'){
-     document.querySelector('input[name="orderType"][value="limit"]').checked=true;
-     $('limitPrice').value=price.toFixed(1);
-     $('orderHelp').textContent='가상 지정가 예약 · 선택 가격 '+price.toFixed(1)+' USDT';
-    }
-   }else{
-    document.dispatchEvent(new CustomEvent('btc:chart-price-limit-entry',{
-      detail:{symbol:'BTCUSDT',side,price}
-    }));
-   }
+   chartPriceChoice.side=side;panel.hidden=false;
+   $('chartReservedProtectionSide').textContent=(side==='LONG'?'롱':'숏')+' 예약진입 · 익절/손절 설정';
+   const stop=Math.max(.05,Math.min(10,Number($('stop')?.value)||1));
+   const rr=Math.max(1,Number($('rr')?.value)||2);
+   tpPercent.value=String(Number((stop*rr).toFixed(2)));
+   slPercent.value=String(Number(stop.toFixed(2)));
+   syncPercent('tp');syncPercent('sl');
+   panel.scrollIntoView?.({block:'nearest',behavior:'smooth'});
   });
  }
+ confirmButton.addEventListener('click',()=>{
+  const protection=validate();if(!protection)return;
+  const {side,entryPrice:price}=protection;
+  // Preserve draft beyond closing the popup, then pass it explicitly
+  // to the real manual order sheet or paper pending-order workflow.
+  close();chartReservedProtectionDraft=protection;
+  if(demo){
+   showOrderSheet(side);
+   if($('entrySheet').style.display==='block'){
+    document.querySelector('input[name="orderType"][value="limit"]').checked=true;
+    $('limitPrice').value=price.toFixed(1);
+    $('orderHelp').textContent='가상 지정가 예약 · 익절 '+protection.tpPrice.toFixed(1)+
+     ' / 손절 '+protection.slPrice.toFixed(1)+' USDT · 실제 주문 아님';
+   }
+  }else{
+   document.dispatchEvent(new CustomEvent('btc:chart-price-limit-entry',{
+    detail:{symbol:'BTCUSDT',side,price,tpPrice:protection.tpPrice,slPrice:protection.slPrice,
+      tpPercent:protection.tpPercent,slPercent:protection.slPercent}
+   }));
+  }
+ });
 }
 // Presentation-only candle modes: market values and all order/signal inputs stay unchanged.
 const CANDLE_DIMENSION_KEY='hanine-candle-dimension-mode-v252';
@@ -5890,8 +5976,10 @@ function openTrade(side,entry,reserved=null){
   const notional=reserved?intended:Math.min(intended,free*lev);
   if(!(notional>.01)||!Number.isFinite(notional)){if(!reserved)alert('사용 가능한 가상 증거금이 부족해요.');return false}
   const qty=notional/entry;
-  const stop=side==='LONG'?entry*(1-d):entry*(1+d);
-  const tp=side==='LONG'?entry*(1+(rr*(d+2*paperTradeCost())+2*paperTradeCost())):
+  const stop=reserved?.slPrice>0?Number(reserved.slPrice):
+   side==='LONG'?entry*(1-d):entry*(1+d);
+  const tp=reserved?.tpPrice>0?Number(reserved.tpPrice):
+   side==='LONG'?entry*(1+(rr*(d+2*paperTradeCost())+2*paperTradeCost())):
     entry*(1-(rr*(d+2*paperTradeCost())+2*paperTradeCost()));
   const entryType=reserved?'limit':pendingFillType||document.querySelector('input[name="orderType"]:checked')?.value||'market';
   const entryFeeRate=entryType==='limit'?paperFeeRates().maker:paperFeeRates().taker;
@@ -5919,6 +6007,12 @@ function request(side){
     const price=Number($('limitPrice').value);
     if(!(price>0)||!Number.isFinite(price)){alert('유효한 지정가를 입력해 주세요.');return}
     const order=pendingOrderSnapshot(side,price);
+    if(order&&chartReservedProtectionDraft?.side===side){
+     const c=chartReservedProtectionDraft;
+     const tp=priceFromDraftAtEntry(c,'tp',price),sl=priceFromDraftAtEntry(c,'sl',price);
+     if(!(tp>0&&sl>0)){alert('익절·손절 가격 설정을 확인하세요.');return;}
+     order.tpPrice=tp;order.slPrice=sl;order.stopPct=Math.abs(price-sl)/price;
+    }
     if(!order){alert('수동 피라미드 한도 또는 사용 가능한 증거금이 부족해요.');return}
     if(!(order.rr>=1&&order.hold>0)){alert('익절/유지 시간 설정을 확인해 주세요.');return}
     const sideCount=hedgePositions[side].filter(p=>!p.autoStrategy).length+pendingOrders.filter(o=>o.side===side).length+1;
