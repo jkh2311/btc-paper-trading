@@ -237,6 +237,7 @@ async function moveProtection(l,raw){
    algos=final.filter(a=>a.symbol===symbol);readStamp=Date.now();algoError='';
    redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));
    actionNotice('✅ '+s+' '+(kind==='sl'?'손절':'익절')+' '+snapped+' USDT · 거래소 활성 주문 확인 완료');
+   return true;
   }catch(issue){
    if(oldCancelled){
     // Restore only when no replacement/other matching order is active.
@@ -248,7 +249,7 @@ async function moveProtection(l,raw){
       algos=latest.filter(a=>a.symbol===symbol);readStamp=Date.now();algoError='';
       redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));
       actionNotice('✅ 새 주문 '+snapped+' USDT 활성 확인 · 이전 주문은 취소됨');
-      return;
+      return true;
      }
      if(latest.filter(a=>matching(a,p,kind)).length===0){
       // Check the position and the old trigger relative to current MARK_PRICE.
@@ -280,9 +281,38 @@ async function moveProtection(l,raw){
    }
    throw issue;
   }
- }catch(e){actionNotice('⚠ 주문 변경을 확인하지 못했습니다: '+String(e?.message||e)+'\n바이낸스에서 해당 방향의 손절·익절 주문과 중복 여부를 확인해 주세요.',true)}
+ }catch(e){actionNotice('⚠ 주문 변경을 확인하지 못했습니다: '+String(e?.message||e)+'\n바이낸스에서 해당 방향의 손절·익절 주문과 중복 여부를 확인해 주세요.',true);return false}
  finally{requestBusy=false;void readAlgos();}
 }
+// The position-card price editor reuses the EXACT guarded exchange workflow
+// used by dragging/tapping the live chart TP/SL line. Never update UI optimistically.
+window.btcRequestRealProtectionChange=async({side:direction,positionSide,amount,kind,price})=>{
+ if(!['LONG','SHORT'].includes(direction)||!['tp','sl'].includes(kind))
+  return {ok:false,message:'포지션 방향 또는 보호 주문 종류가 잘못되었습니다.'};
+ const target=Number(price);
+ if(!Number.isFinite(target)||!(target>0))
+  return {ok:false,message:'0보다 큰 유효한 가격을 입력하세요.'};
+ if(requestBusy)return {ok:false,message:'이미 다른 보호 주문을 변경하고 있습니다.'};
+ if(document.hidden)return {ok:false,message:'앱이 보이는 상태에서 다시 시도하세요.'};
+ const pos=positions.find(p=>p.side===positionSide&&side(p)===direction&&
+  Math.abs(num(p.amount)-Number(amount))<1e-8);
+ if(!pos)return {ok:false,message:'실제 포지션 수량 또는 방향이 변경되었습니다. 계좌 새로고침 후 다시 시도하세요.'};
+ if(algoError||Date.now()-readStamp>15000)
+  return {ok:false,message:'거래소 보호 주문 조회가 최신 상태가 아닙니다. 새로고침 후 다시 시도하세요.'};
+ const current=getProtection(pos,kind);
+ const oldPrice=num(current?.triggerPrice);
+ if(Number.isFinite(oldPrice)&&Math.abs(oldPrice-target)<1e-8)
+  return {ok:true,message:'이미 거래소에 동일한 가격의 보호 주문이 등록되어 있습니다.'};
+ const success=await moveProtection({p:pos,side:direction,kind,price:oldPrice,order:current},target);
+ // Confirm success through the freshly verified in-memory exchange order list;
+ // declined browser confirmation and failed replacement MUST never look applied.
+ const active=getProtection(pos,kind);
+ const verified=success===true&&!algoError&&Date.now()-readStamp<=15000&&
+  num(active?.triggerPrice)>0&&Math.abs(num(active.triggerPrice)-target)<=
+    Math.max(1e-6,target*.00001);
+ return {ok:verified,message:verified?'바이낸스 보호 주문 변경 및 확인 완료':
+  '변경이 확인되지 않았습니다. 차트 안내와 바이낸스 주문 상태를 확인하세요.'};
+};
 function start(x,y){
  if(requestBusy||document.hidden)return false;
  const l=touchHit(x,y);if(!l)return false;
