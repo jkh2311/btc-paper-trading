@@ -7861,8 +7861,12 @@ window.btcOpenSwitch=(p,prefillPrice)=>{
  */
 window.btcSwitchNow=async(raw,newQuantity)=>{
  if(busy)return;
- const p=normalize(raw),qty=Number(newQuantity);
- if(!p||!(Number.isFinite(qty)&&qty>0)){alert('전환 포지션 또는 BTC 수량이 유효하지 않습니다.');return}
+ const p=normalize(raw),useBalance=newQuantity&&typeof newQuantity==='object'&&newQuantity.mode==='balance';
+ const pct=useBalance?Number(newQuantity.percent):null,qty=useBalance?null:Number(newQuantity);
+ if(!p||(!useBalance&&!(Number.isFinite(qty)&&qty>0))){
+  alert('전환 포지션 또는 BTC 수량이 유효하지 않습니다.');return;
+ }
+ if(useBalance){try{balanceSwitchPercent(pct)}catch(e){alert(e.message);return;}}
  try{
   resumeState();
   if(armed?.state==='REVIEW'||armed?.state==='EXECUTING')
@@ -7885,14 +7889,17 @@ window.btcSwitchNow=async(raw,newQuantity)=>{
   const [normal,algo,lot]=await Promise.all([normals(),algos(),qtyFilter()]);
   if(normal.length)throw Error('기존 일반 미체결 주문을 먼저 정리해 주세요.');
   allowedAlgos(algo,p);
-  const exact=exactQty(qty,lot);
+  const exact=useBalance?null:exactQty(qty,lot);
+  if(useBalance)await confirmedSymbolLeverage();
   const price=Number(live.markPrice)||p.mark;
-  if(!(price>0&&Number(exact)*price>=5.1))
+  if(!(price>0&&(useBalance||Number(exact)*price>=5.1)))
    throw Error('신규 포지션이 최소 주문 금액을 충족하지 못합니다.');
   if(document.hidden)throw Error('앱이 비활성 상태가 되었습니다.');
   const opposite=p.side==='SHORT'?'LONG':'SHORT';
   if(!confirm('⚠ 실제 바이낸스 시장가 주문 확인\\n\\n'+
-    p.side+' '+fmt(originalQty)+' BTC 전량 청산 후 '+opposite+' '+fmt(exact)+' BTC 신규 진입\\n\\n'+
+    p.side+' '+fmt(originalQty)+' BTC 전량 청산 후 '+opposite+' '+
+    (useBalance?'청산 후 확정수익 포함 실제 사용 가능 잔고 '+pct+'% 기준 재계산':fmt(exact)+' BTC')+
+    ' 신규 진입\\n\\n'+
     '기존 익절/손절 보호주문을 취소하며, 새 포지션의 보호주문은 자동 설정되지 않습니다.\\n'+
     '청산 완료 후 신규 진입이 실패할 수도 있습니다.\\n\\n지금 실제 스위칭을 실행할까요?'))return;
   selected={...p,amount:originalQty};
@@ -7900,7 +7907,8 @@ window.btcSwitchNow=async(raw,newQuantity)=>{
   $('btcSwitchHeading').textContent='BTCUSDT '+p.side+' → '+opposite+' 즉시 스위칭';
   const plan={id:'btcsrim'+Date.now().toString(36),state:'ARMED',side:p.side,
    positionSide:p.positionSide,entry:Number(live.entryPrice),oldQty:originalQty,
-   newQty:Number(exact),type:'immediate',price:0,tpId:null,
+   newQty:useBalance?originalQty:Number(exact),qtyMode:useBalance?'balance':'quantity',
+   balancePct:useBalance?pct:null,type:'immediate',price:0,tpId:null,
    created:Date.now(),message:'즉시 실행 준비'};
   store(plan);renderState();
   await execute(plan);
@@ -7935,15 +7943,18 @@ $('btcSwitchArm').addEventListener('click',async()=>{
   const mode=$('btcSwitchType').value;
   if(!['price','tp'].includes(mode))throw Error('스위칭 방법을 선택해 주세요');
   const target=Number($('btcSwitchPrice').value),newQty=Number($('btcSwitchNewQty').value);
-  if(!(target>0&&newQty>0))throw Error('목표 가격과 신규 포지션 BTC 규모를 입력해 주세요');
+  const useBalance=$('btcSwitchSizeMode').value==='balance';
+  const pct=useBalance?balanceSwitchPercent($('btcSwitchBalancePct').value):null;
+  if(!(target>0&&(useBalance||newQty>0)))
+   throw Error('목표 가격과 신규 포지션 BTC 규모를 입력해 주세요');
   if(!profitable(p.side,target,p.entry,p.mark))
    throw Error('지정 가격은 진입가와 현재가보다 익절 방향이어야 합니다');
-  const lot=await qtyFilter();exactQty(newQty,lot);
-  // Prevent obvious below-minimum new-position orders before accepting an
-  // armed rule. Binance is still the authority at actual order placement.
-  const minNotional=5;
-  if(newQty*p.mark<minNotional*1.02)
-   throw Error('신규 진입 규모가 최소 명목가치 약 '+minNotional+' USDT보다 작습니다.');
+  const lot=await qtyFilter();
+  if(useBalance)await confirmedSymbolLeverage();
+  else{
+   exactQty(newQty,lot);
+   if(newQty*p.mark<5.1)throw Error('신규 진입 명목가치 5 USDT 미만입니다.');
+  }
   const r=await risk(),live=findPosition(r,p);
   if(!live||r.dual!==(p.positionSide!=='BOTH'))throw Error('바이낸스 포지션 또는 헤지 모드가 일치하지 않아요');
   const q=Math.abs(Number(live.positionAmt));
@@ -7964,12 +7975,15 @@ $('btcSwitchArm').addEventListener('click',async()=>{
   const inverse=p.side==='SHORT'?'LONG':'SHORT';
   if(!confirm('BTCUSDT 실전 스위칭을 적용할까요?\n\n'+p.side+' → '+inverse+
    '\n스위칭 조건: '+(mode==='tp'?'기존 단일 익절라인 ':'직접 지정 가격 ')+fmt(target)+' USDT'+
-   '\n기존 보유: '+fmt(q)+' BTC 전량 청산\n신규 '+inverse+': '+fmt(newQty)+' BTC 시장가 진입\n\n'+
+   '\n기존 보유: '+fmt(q)+' BTC 전량 청산\n신규 '+inverse+': '+
+   (useBalance?'청산 후 확정수익 포함 잔고 '+pct+'% 기준 재계산':fmt(newQty)+' BTC')+
+   ' 시장가 진입\n\n'+
    '⚠ 실제 시장가 주문이 제출됩니다. 기존 손절·익절은 취소되며 신규 포지션에 보호주문이 자동 생성되지 않습니다.'+
    '\n스위칭 조건은 직접 취소할 때까지 저장됩니다. 앱이 비활성일 때는 실행되지 않으며 복귀 후 감시를 재개합니다. 체결·가격은 보장되지 않습니다.'))return;
   store({id:'btcsr'+Date.now().toString(36),state:'ARMED',side:p.side,
-   positionSide:p.positionSide,entry:p.entry,oldQty:q,newQty:Number(exactQty(newQty,lot)),
-   type:mode,price:target,tpId,created:Date.now(),message:''});
+   positionSide:p.positionSide,entry:p.entry,oldQty:q,
+   newQty:useBalance?q:Number(exactQty(newQty,lot)),qtyMode:useBalance?'balance':'quantity',
+   balancePct:useBalance?pct:null,type:mode,price:target,tpId,created:Date.now(),message:''});
   renderState();
   hideSwitchDialog();
  }catch(e){$('btcSwitchStatus').textContent='⚠ 설정 실패: '+e.message}
@@ -8001,7 +8015,12 @@ async function preflight(p){
   if(!target||Math.abs(Number(target.triggerPrice)-p.price)>Math.max(.02,p.price*.000001))
    throw Error('기존 익절 주문이 변경되었거나 이미 체결됨');
  }
- return {r,pos,protection,old:exactQty(p.oldQty,lot),next:exactQty(p.newQty,lot)};
+ if(p.qtyMode==='balance'){
+  balanceSwitchPercent(p.balancePct);
+  await confirmedSymbolLeverage();
+ }else exactQty(p.newQty,lot);
+ return {r,pos,protection,lot,old:exactQty(p.oldQty,lot),
+  next:p.qtyMode==='balance'?null:exactQty(p.newQty,lot)};
 }
 async function execute(plan){
  if(busy||!armed||armed.id!==plan.id||armed.state!=='ARMED'||document.hidden)return;
