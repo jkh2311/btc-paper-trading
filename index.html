@@ -7943,8 +7943,10 @@ window.btcOpenSwitch=(p,prefillPrice)=>{
  */
 window.btcSwitchNow=async(raw,newQuantity)=>{
  if(busy)return;
- const p=normalize(raw),useBalance=newQuantity&&typeof newQuantity==='object'&&newQuantity.mode==='balance';
- const pct=useBalance?Number(newQuantity.percent):null,qty=useBalance?null:Number(newQuantity);
+ const p=normalize(raw),spec=newQuantity&&typeof newQuantity==='object'?newQuantity:null,
+  useBalance=spec?.mode==='balance';
+ const pct=useBalance?Number(spec.percent):null,qty=useBalance?null:Number(spec?spec.quantity:newQuantity);
+ const desired=spec?{tp:Number(spec.tp),sl:Number(spec.sl)}:null;
  if(!p||(!useBalance&&!(Number.isFinite(qty)&&qty>0))){
   alert('전환 포지션 또는 BTC 수량이 유효하지 않습니다.');return;
  }
@@ -7974,15 +7976,19 @@ window.btcSwitchNow=async(raw,newQuantity)=>{
   const exact=useBalance?null:exactQty(qty,lot);
   if(useBalance)await confirmedSymbolLeverage();
   const price=Number(live.markPrice)||p.mark;
+  const opposite=p.side==='SHORT'?'LONG':'SHORT';
+  if(!(desired&&desired.tp>0&&desired.sl>0&&
+   (opposite==='LONG'?desired.tp>price&&desired.sl<price:
+    desired.tp<price&&desired.sl>price)))
+   throw Error('새 '+opposite+' 포지션 익절·손절가가 현재 마크가 기준 올바르지 않습니다. 주문 미전송');
   if(!(price>0&&(useBalance||Number(exact)*price>=5.1)))
    throw Error('신규 포지션이 최소 주문 금액을 충족하지 못합니다.');
   if(document.hidden)throw Error('앱이 비활성 상태가 되었습니다.');
-  const opposite=p.side==='SHORT'?'LONG':'SHORT';
   if(!confirm('⚠ 실제 바이낸스 시장가 주문 확인\\n\\n'+
     p.side+' '+fmt(originalQty)+' BTC 전량 청산 후 '+opposite+' '+
     (useBalance?'청산 후 확정수익 포함 실제 사용 가능 잔고 '+pct+'% 기준 재계산':fmt(exact)+' BTC')+
-    ' 신규 진입\\n\\n'+
-    '기존 익절/손절 보호주문을 취소하며, 새 포지션의 보호주문은 자동 설정되지 않습니다.\\n'+
+    ' 신규 진입\\n새 '+opposite+' 익절 '+fmt(desired.tp)+' / 손절 '+fmt(desired.sl)+' USDT\\n\\n'+
+    '기존 보호주문을 취소하며, 새 포지션 체결 후 TP/SL을 등록·검증합니다. 등록 실패 시 직접 확인해야 합니다.\\n'+
     '청산 완료 후 신규 진입이 실패할 수도 있습니다.\\n\\n지금 실제 스위칭을 실행할까요?'))return;
   selected={...p,amount:originalQty};
   host.hidden=false;
@@ -7991,6 +7997,7 @@ window.btcSwitchNow=async(raw,newQuantity)=>{
    positionSide:p.positionSide,entry:Number(live.entryPrice),oldQty:originalQty,
    newQty:useBalance?originalQty:Number(exact),qtyMode:useBalance?'balance':'quantity',
    balancePct:useBalance?pct:null,type:'immediate',price:0,tpId:null,
+   targets:desired,
    created:Date.now(),message:'즉시 실행 준비'};
   store(plan);renderState();
   await execute(plan);
