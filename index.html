@@ -1460,7 +1460,7 @@ body.ai-entry-modal-open{overflow:hidden!important}
         <input id="chartReservedTpPercent" type="number" min="0.01" max="99" step="0.1" inputmode="decimal" aria-label="익절 변동률 퍼센트" style="width:100%;min-width:0;padding:10px 7px;background:#294363;color:white;border:1px solid #6884a2;border-radius:8px">
         <label for="chartReservedSlPrice">손절 목표 가격 (USDT)</label><label for="chartReservedSlPercent">손절 변동률 (%)</label>
         <input id="chartReservedSlPrice" type="text" inputmode="decimal" autocomplete="off" aria-label="손절 목표 가격 USDT" style="width:100%;min-width:0;padding:10px 7px;background:#294363;color:white;border:1px solid #6884a2;border-radius:8px">
-        <input id="chartReservedSlPercent" type="number" min="0.01" max="99" step="0.1" inputmode="decimal" aria-label="손절 변동률 퍼센트" style="width:100%;min-width:0;padding:10px 7px;background:#294363;color:white;border:1px solid #6884a2;border-radius:8px">
+        <input id="chartReservedSlPercent" type="number" min="0.05" max="10" step="0.05" inputmode="decimal" aria-label="손절 변동률 퍼센트" style="width:100%;min-width:0;padding:10px 7px;background:#294363;color:white;border:1px solid #6884a2;border-radius:8px">
       </div>
       <div id="chartReservedProtectionHelp" role="status" style="font-size:11px;line-height:1.55;color:#b7e0d6;margin-top:9px">익절·손절 가격 또는 %를 입력하면 서로 연동돼요.</div>
       <button id="chartReservedProtectionConfirm" type="button" style="width:100%;min-height:42px;margin-top:9px;background:#126b58;color:white;border:1px solid #42af94;border-radius:9px">보호가격 확인 후 주문창으로</button>
@@ -4921,8 +4921,8 @@ function initChartPriceOrderChoice(){
   const {price:entry,side}=chartPriceChoice;
   const tp=priceNumber(tpPrice.value),sl=priceNumber(slPrice.value);
   const tpPct=pctFromPrice(side,'tp',tp,entry),slPct=pctFromPrice(side,'sl',sl,entry);
-  if(!(tp>0&&sl>0&&Number.isFinite(tpPct)&&Number.isFinite(slPct)&&tpPct>0&&slPct>0&&tpPct<=99&&slPct<=99)){
-   helper.textContent='가격 방향 확인: 롱 익절은 진입가 위·손절은 아래 / 숏 익절은 아래·손절은 위. 0~99% 사이에서 설정하세요.';
+  if(!(tp>0&&sl>0&&Number.isFinite(tpPct)&&Number.isFinite(slPct)&&tpPct>0&&slPct>=.05&&tpPct<=99&&slPct<=10)){
+   helper.textContent='가격 방향 확인: 롱 익절은 진입가 위·손절은 아래 / 숏 익절은 아래·손절은 위. 익절 0~99%, 손절 0.05~10% 사이에서 설정하세요.';
    helper.style.color='#ffb2ad';confirmButton.disabled=true;return null;
   }
   const draft={side,entryPrice:entry,tpPrice:tp,slPrice:sl,tpPercent:tpPct,slPercent:slPct};
@@ -6018,6 +6018,7 @@ function request(side){
     const sideCount=hedgePositions[side].filter(p=>!p.autoStrategy).length+pendingOrders.filter(o=>o.side===side).length+1;
     if(!confirm('가상 '+side+' #'+sideCount+' 예약 지정가 '+fmt(price)+' USDT\n예약 증거금 '+fmt(order.margin)+' USDT · 미체결 수량 '+order.qty.toFixed(6)+' BTC\n접수 즉시 가상 증거금을 예약합니다.'))return;
     pendingOrders.push(order);
+    chartReservedProtectionDraft=null;
     add('가상 '+side+' #'+sideCount+' 지정가 예약 '+fmt(price)+' USDT · 증거금 '+fmt(order.margin)+' USDT · 수량 '+order.qty.toFixed(6)+' BTC');
     savePaperState();render();
     // A marketable limit can be filled immediately using the snapshot size.
@@ -7553,7 +7554,7 @@ setInterval(()=>{
 },5000);
 timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),p=Math.max(1000,v.c*(1+(Math.random()-.5)*.001));a.push({t:Date.now(),o:v.c,h:Math.max(p,v.c),l:Math.min(p,v.c),c:p,v:Math.round(30+Math.random()*200)});a.shift()}last=candles['1m'].at(-1).c;process();render()}else refresh()},45000);
 
-</script><script src="./real-position-hedge.js?v=editable-tpsl-v257"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=orders-partial-limit-close-v256"></script><script src="./live-manual-protection.js?v=protection-176"></script><script src="./live-chart-levels.js?v=editable-tpsl-v257"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
+</script><script src="./real-position-hedge.js?v=editable-tpsl-v257"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=orders-reserved-tpsl-v258"></script><script src="./live-manual-protection.js?v=protection-reserved-tpsl-v258"></script><script src="./live-chart-levels.js?v=editable-tpsl-v257"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
 <script>
 /* v200: Opt-in foreground-only live switch. Standalone single TP trigger or
  * manual price. No 3-part TP integration. Never auto-arm after reload.
