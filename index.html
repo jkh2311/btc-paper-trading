@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261119-switch-postclose-balance-v259"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261119-switch-limit-v260"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -7777,7 +7777,7 @@ async function confirmedSymbolLeverage(){
   throw Error('실제 바이낸스 BTCUSDT 레버리지를 확인하지 못했습니다.');
  return lev;
 }
-async function afterCloseSize(pct,lot){
+async function afterCloseSize(pct,lot,limitPrice=0){
  const [account,leverage,ticker]=await Promise.all([
   signed('GET','/fapi/v3/account'),confirmedSymbolLeverage(),
   fetch(BASE+'/fapi/v1/premiumIndex?symbol='+SYM,{cache:'no-store'}).then(async r=>{
@@ -7792,7 +7792,7 @@ async function afterCloseSize(pct,lot){
  const pctValue=balanceSwitchPercent(pct);
  // 95% cap even at 100% chosen; extra conservative 1% price slippage pad.
  const usable=available*Math.min(.95,pctValue/100);
- const priceBudget=mark*1.01;
+ const priceBudget=Math.max(mark,Number(limitPrice)||0)*1.01;
  const step=Number(lot.stepSize),min=Number(lot.minQty),max=Number(lot.maxQty);
  if(!(step>0&&min>0&&max>=min))throw Error('바이낸스 주문 수량 단위 확인 실패.');
  const digits=Math.min(8,(String(lot.stepSize).split('.')[1]||'').length);
@@ -7968,6 +7968,7 @@ $('btcSwitchArm').addEventListener('click',async()=>{
    throw Error('목표 가격과 신규 포지션 BTC 규모를 입력해 주세요');
   if(!profitable(p.side,target,p.entry,p.mark))
    throw Error('지정 가격은 진입가와 현재가보다 익절 방향이어야 합니다');
+  if(executionMode==='LIMIT')await limitSwitchRules(target);
   const lot=await qtyFilter();
   if(useBalance)await confirmedSymbolLeverage();
   else{
@@ -8097,7 +8098,7 @@ async function limitSwitchFillPending(plan){
  const rules=await limitSwitchRules(Number(plan.price));
  let balanceSizing=null;
  if(plan.qtyMode==='balance'){
-  balanceSizing=await afterCloseSize(balanceSwitchPercent(plan.balancePct),rules.lot);
+  balanceSizing=await afterCloseSize(balanceSwitchPercent(plan.balancePct),rules.lot,Number(rules.price));
  }
  const next=balanceSizing?.quantity||exactQty(Number(plan.newQty),rules.lot);
  if(!(Number(next)>0))throw Error('청산 후 지정가 신규 진입 수량 확인 실패');
@@ -8132,6 +8133,10 @@ async function execute(plan){
  busy=true;store({...plan,state:'EXECUTING',message:'거래소 확인 및 청산 처리 중'});renderState();
  try{
   const prep=await preflight(plan);
+  // Validate the entire LIMIT close before removing a live protection order.
+  // An invalid tick/LOT_SIZE must never create a protection gap.
+  const limitRules=plan.executionMode==='LIMIT'?await limitSwitchRules(Number(plan.price)):null;
+  const limitCloseQty=limitRules?exactQty(Number(prep.old),limitRules.lot):null;
   // Only the single full-position STOP / TP market algorithms can be
   // cancelled. All other orders are rejected above, fail closed.
   for(const a of prep.protection){
@@ -8145,11 +8150,10 @@ async function execute(plan){
   const side=plan.side==='LONG'?'SELL':'BUY';
   const closeId='btcswclose'+Date.now().toString(36);
   if(plan.executionMode==='LIMIT'){
-   const rules=await limitSwitchRules(Number(plan.price));
-   const closeQty=exactQty(Number(prep.old),rules.lot);
+   const rules=limitRules;
    store({...armed,closeId,message:'기존 포지션 지정가 청산 '+rules.price+' USDT 전송 중'});
    const closing={symbol:SYM,side,positionSide:plan.positionSide,type:'LIMIT',
-    timeInForce:'GTC',price:rules.price,quantity:closeQty,newClientOrderId:closeId};
+    timeInForce:'GTC',price:rules.price,quantity:limitCloseQty,newClientOrderId:closeId};
    if(plan.positionSide==='BOTH')closing.reduceOnly='true';
    await signed('POST','/fapi/v1/order',closing);
    store({...armed,state:'CLOSE_PENDING',message:'기존 포지션 지정가 청산 '+rules.price+' USDT 체결 대기'});
