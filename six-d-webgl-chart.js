@@ -123,8 +123,8 @@ void main(){
      [color[0]*.70,color[1]*.70,color[2]*.70,color[3]]);
    }
   }
-  const candles=Math.min(data.length,450);
-  for(let i=0;i<candles;i++){
+  const firstCandle=Math.max(0,data.length-450);
+  for(let i=firstCandle;i<data.length;i++){
    const v=data[i],x=(start+i-left+.5)*bw;
    if(x < -bw||x > plotW+bw)continue;
    if(![v.o,v.h,v.l,v.c].every(Number.isFinite))continue;
