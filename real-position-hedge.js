@@ -152,7 +152,7 @@ function closeChoice(p,side){
   // position. Free available margin alone understates post-close capacity.
   // Only confirmed post-close availableBalance sets the actual order size.
   const wallet=Number(snapshot?.wallet);
-  const projectedClosePnl=(entry-Number(p.entry))*(newSide==='LONG'?-1:1)*Number(p.amount);
+  const projectedClosePnl=(entry-Number(p.entry))*(newSide==='LONG'?-1:1)*Math.abs(Number(p.amount));
   // p is the OLD position. Opposite of newSide determines close PnL sign.
   const walletAfterClose=wallet+projectedClosePnl;
   const refQty=useBalance?
