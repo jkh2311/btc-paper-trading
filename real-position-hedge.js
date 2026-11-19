@@ -131,7 +131,9 @@ function closeChoice(p,side){
  const balanceHelp=make('p','기존 포지션 전량 청산·체결 확인 후 확정 수익이 포함된 실제 바이낸스 사용 가능 잔고를 재조회합니다. 최대 95% 증거금을 사용하고 수량은 그때 계산합니다.');
  function updateMode(){
   const useBalance=mode.value==='balance';
-  percentLabel.hidden=!useBalance;balanceHelp.hidden=!useBalance;label.hidden=useBalance;
+  percentLabel.hidden=!useBalance;percentLabel.style.display=useBalance?'block':'none';
+  balanceHelp.hidden=!useBalance;balanceHelp.style.display=useBalance?'':'none';
+  label.hidden=useBalance;label.style.display=useBalance?'none':'block';
  }
  mode.addEventListener('change',updateMode);updateMode();
  const warning=make('p','청산만: 기존 시장가 청산 기능 그대로 사용. 청산 및 스위칭: 기존 포지션 전량 청산 확인 후 반대 방향으로 시장가 신규 진입. 기존 보호주문 취소 가능, 신규 포지션의 손절·익절은 별도로 설정해야 합니다.');
