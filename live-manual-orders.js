@@ -772,7 +772,9 @@ function renderSwitchWatch(){
  title.textContent='↔ 스위칭 감시 '+(p.state==='ARMED'?'적용 중':p.state==='PAUSED'?'중지': '확인 필요')+' · '+p.side+' → '+p.opposite;
  const details=document.createElement('div');
  details.style.cssText='font-size:12px;color:#dce6f2;overflow-wrap:anywhere';
- details.textContent='목표 '+fmt(p.price)+' USDT · 반대방향 신규 '+fmt(p.newQty)+' BTC';
+ details.textContent='목표 '+fmt(p.price)+' USDT · 반대방향 신규 '+
+  (p.qtyMode==='balance'?'청산 후 확정 손익 포함 사용 가능 잔고 '+p.balancePct+'%로 수량 계산':
+   fmt(p.newQty)+' BTC');
  const note=document.createElement('div');
  note.style.cssText='font-size:11px;color:#c6ad7a';
  note.textContent=p.state==='ARMED'?
