@@ -1236,6 +1236,25 @@ body.ai-entry-modal-open{overflow:hidden!important}
 #expandedChartOverlay:not([hidden]) #tradeBar #quickSwitchOpen{flex:1 0 100%!important;min-height:30px!important;height:30px!important;
  font-size:12px!important;padding:3px!important;order:2!important}
 #expandedChartOverlay:not([hidden]) #tradeBar .focus-pnl-strip{order:3!important}
+/* Portrait main chart: keep LONG/SHORT side-by-side, QUICK SWITCH below them. */
+@media (max-width:800px) and (orientation:portrait){
+ body:not(.chart-focus-mode) #tradeBar{
+  flex-wrap:wrap!important;align-content:center!important;
+  height:85px!important;gap:4px!important
+ }
+ body:not(.chart-focus-mode) #tradeBar #long,
+ body:not(.chart-focus-mode) #tradeBar #short{
+  flex:1 1 calc(50% - 4px)!important;min-width:0!important;height:37px!important
+ }
+ body:not(.chart-focus-mode) #tradeBar #quickSwitchOpen{
+  flex:1 0 100%!important;height:30px!important;min-height:30px!important;
+  padding:3px!important;font-size:12px!important
+ }
+ body:not(.chart-focus-mode) main{
+  height:calc(100dvh - 45px - 85px - 45px - env(safe-area-inset-bottom))!important
+ }
+}
+
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
