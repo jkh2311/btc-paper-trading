@@ -7630,8 +7630,9 @@ window.btcLiveSwitchSnapshot=()=>{
  if(!p||!['ARMED','PAUSED','REVIEW','EXECUTING'].includes(p.state))return null;
  if(!(Number(p.price)>0&&Number(p.newQty)>0&&['LONG','SHORT'].includes(p.side)))return null;
  return {state:p.state,side:p.side,opposite:p.side==='SHORT'?'LONG':'SHORT',
-  price:Number(p.price),newQty:Number(p.newQty),created:p.created||0,
-  message:p.message||'',type:p.type};
+  price:Number(p.price),newQty:Number(p.newQty),
+  qtyMode:p.qtyMode||'quantity',balancePct:p.balancePct||null,
+  created:p.created||0,message:p.message||'',type:p.type};
 };
 window.btcLiveSwitchLevel=()=>{
  const p=window.btcLiveSwitchSnapshot();
@@ -7810,7 +7811,9 @@ async function fillTpPrice(){
 function switchSizeMode(){
  const balance=$('btcSwitchSizeMode').value==='balance';
  $('btcSwitchBalanceFields').hidden=!balance;
+ $('btcSwitchBalanceFields').style.display=balance?'':'none';
  $('btcSwitchQtyFields').hidden=balance;
+ $('btcSwitchQtyFields').style.display=balance?'none':'';
 }
 $('btcSwitchSizeMode').addEventListener('change',switchSizeMode);
 function setMode(){
