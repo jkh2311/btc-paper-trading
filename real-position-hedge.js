@@ -145,14 +145,27 @@ function closeChoice(p,side){
   }
   const useBalance=mode.value==='balance',amount=Number(qty.value);
   const signed=newSide==='LONG'?1:-1;
-  const gain=(t-entry)*signed,loss=(st-entry)*signed;
-  const f=x=>(x>=0?'+':'')+x.toFixed(2)+' USDT';
-  estimate.textContent='예상 진입가 '+entry.toFixed(1)+' USDT (실제 체결가와 다름)\n'+
-   '익절 '+t.toFixed(1)+' → 예상 이익 '+
-   (useBalance?f(gain)+' / BTC':f(gain*amount))+'\n'+
-   '손절 '+st.toFixed(1)+' → 예상 손실 '+
-   (useBalance?f(loss)+' / BTC':f(loss*amount))+
-   (useBalance?'\n청산 후 실제 잔고·레버리지 기준으로 수량이 결정됩니다.':'');
+  // The balance-sized quantity is a clearly labelled preview only.
+  // Execution ALWAYS recomputes quantity from Binance after full close.
+  const leverage=Number(p.leverage);
+  const balanceGuess=Number(snapshot?.available)+Number(p.unrealized);
+  const refQty=useBalance?
+   (Number.isFinite(balanceGuess)&&balanceGuess>0&&leverage>0?
+    balanceGuess*Math.min(Number(percent.value)/100,.95)*leverage/(entry*1.01):NaN):
+   amount;
+  const f=x=>(x>=0?'+':'')+fmt(x,2)+' USDT';
+  if(!(refQty>0)){
+   estimate.textContent='예상 진입가 '+entry.toFixed(1)+' USDT\n'+
+    '익절 '+t.toFixed(1)+' / 손절 '+st.toFixed(1)+' USDT\n'+
+    '청산 후 사용 가능 잔고 확인 시 전체 예상 손익을 계산할 수 있어요.';
+   return true;
+  }
+  const gain=(t-entry)*signed*refQty,loss=(st-entry)*signed*refQty;
+  estimate.textContent='새 '+newSide+' 예상 진입가 '+entry.toFixed(1)+' USDT\n'+
+   '익절 '+t.toFixed(1)+' → 예상 이익 '+f(gain)+' · '+won(gain)+'\n'+
+   '손절 '+st.toFixed(1)+' → 예상 손실 '+f(loss)+' · '+won(loss)+'\n'+
+   (useBalance?'청산 후 잔고 추정 기준 약 ':'선택된 주문 수량 ')+fmt(refQty,6)+' BTC\n'+
+   '수수료·펀딩비 제외 / 실제 체결가·수량에 따라 달라집니다.';
   estimate.style.color='#def4ec';return true;
  }
  for(const el of [tp,sl,qty,mode,percent])el.addEventListener('input',showEstimate);
