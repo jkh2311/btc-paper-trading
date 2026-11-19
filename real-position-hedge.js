@@ -111,9 +111,29 @@ function closeChoice(p,side){
  dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
  const title=make('h3',side==='SHORT'?'숏 SHORT 포지션 청산 / 롱 전환':'롱 LONG 포지션 청산 / 숏 전환');
  const desc=make('p',fmt(Math.abs(p.amount),8)+' BTC 보유 · 실제 바이낸스 포지션입니다.');
+ const modeLabel=make('label','반대 방향 포지션 규모 기준');
+ const mode=make('select');mode.setAttribute('aria-label','스위칭 신규 수량 계산 기준');
+ for(const [value,label] of [['balance','청산 후 확정 수익 포함 잔고 기준'],
+  ['quantity','BTC 수량 직접 입력']]){
+  const option=make('option',label);option.value=value;mode.append(option);
+ }
+ mode.value='balance';modeLabel.append(mode);
+ const percentLabel=make('label','청산 후 사용 가능 잔고 사용 비율');
+ const percent=make('select');percent.setAttribute('aria-label','잔고 사용 비율');
+ for(let n=10;n<=100;n+=10){
+  const option=make('option',n+'%'+(n===100?' 선택 (실제로는 최대 95% 사용)':''));
+  option.value=String(n);percent.append(option);
+ }
+ percent.value='100';percentLabel.append(percent);
  const label=make('label','스위칭 후 신규 진입 수량 (BTC)');
  const qty=make('input');qty.type='number';qty.min='0.000001';qty.step='0.000001';
  qty.inputMode='decimal';qty.value=String(Math.abs(p.amount));label.append(qty);
+ const balanceHelp=make('p','기존 포지션 전량 청산·체결 확인 후 확정 수익이 포함된 실제 바이낸스 사용 가능 잔고를 재조회합니다. 최대 95% 증거금을 사용하고 수량은 그때 계산합니다.');
+ function updateMode(){
+  const useBalance=mode.value==='balance';
+  percentLabel.hidden=!useBalance;balanceHelp.hidden=!useBalance;label.hidden=useBalance;
+ }
+ mode.addEventListener('change',updateMode);updateMode();
  const warning=make('p','청산만: 기존 시장가 청산 기능 그대로 사용. 청산 및 스위칭: 기존 포지션 전량 청산 확인 후 반대 방향으로 시장가 신규 진입. 기존 보호주문 취소 가능, 신규 포지션의 손절·익절은 별도로 설정해야 합니다.');
  const actions=make('div',undefined,'real-switch-choice-actions');
  const closeOnly=make('button','청산만 하기');closeOnly.type='button';
@@ -128,16 +148,23 @@ function closeChoice(p,side){
   document.dispatchEvent(new CustomEvent('btc:real-close-requested',{detail:payload}));
  };
  switchNow.onclick=async()=>{
-  const n=Number(qty.value);
-  if(!(Number.isFinite(n)&&n>0)){error.textContent='신규 BTC 수량을 입력해 주세요.';return}
+  const useBalance=mode.value==='balance';
+  const n=Number(qty.value),pct=Number(percent.value);
+  if(!useBalance&&!(Number.isFinite(n)&&n>0)){
+   error.textContent='신규 BTC 수량을 입력해 주세요.';return;
+  }
+  if(useBalance&&!(Number.isInteger(pct)&&pct>=10&&pct<=100&&pct%10===0)){
+   error.textContent='잔고 사용 비율을 10~100% 중에서 선택해 주세요.';return;
+  }
   if(typeof window.btcSwitchNow!=='function'){
    error.textContent='실전 스위칭 모듈을 불러오지 못했어요. 주문은 실행되지 않았습니다.';return;
   }
-  dismiss();await window.btcSwitchNow(payload,n);
+  dismiss();await window.btcSwitchNow(payload,useBalance?{mode:'balance',percent:pct}:n);
  };
  actions.append(closeOnly,switchNow);
- dialog.append(title,desc,label,warning,actions,cancel,error);overlay.append(dialog);
- document.body.append(overlay);qty.focus();
+ dialog.append(title,desc,modeLabel,percentLabel,balanceHelp,label,warning,actions,cancel,error);
+ overlay.append(dialog);document.body.append(overlay);
+ if(mode.value==='quantity')qty.focus();
 }
 
 function normalize(details){
