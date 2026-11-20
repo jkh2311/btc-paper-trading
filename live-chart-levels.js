@@ -37,7 +37,7 @@ function side(p){return p.side==='LONG'||p.side==='SHORT'?p.side:p.side==='BOTH'
 function matching(a,p,kind){
  const wanted=kind==='sl'?['STOP','STOP_MARKET']:['TAKE_PROFIT','TAKE_PROFIT_MARKET'];
  return a.symbol===symbol&&a.positionSide===p.side&&a.side===(side(p)==='LONG'?'SELL':'BUY')&&
-  wanted.includes(a.orderType||a.type)&&['NEW','ACCEPTED',''].includes(String(a.algoStatus||a.status||''))&&num(a.triggerPrice)>0;
+  wanted.includes(a.orderType||a.type)&&['NEW','ACCEPTED','ACTIVE','PENDING_NEW',''].includes(String(a.algoStatus||a.status||''))&&num(a.triggerPrice)>0;
 }
 function getProtection(p,kind){
  return algos.filter(a=>matching(a,p,kind)).sort((a,b)=>Number(b.algoId||0)-Number(a.algoId||0))[0]||null;
@@ -58,12 +58,12 @@ function levels(){
  for(const p of positions){
   const s=side(p),entry=num(p.entry);if(!(entry>0)||!s)continue;
   list.push({p,side:s,kind:'entry',price:entry,active:true});
-  const d=num($('stop')?.value)/100,rr=num($('rr')?.value);
+  const leverage=num($('lev')?.value),d=num($('stop')?.value)/(100*leverage),tpMove=num($('rr')?.value)/(100*leverage);
   for(const kind of ['sl','tp']){
    const order=getProtection(p,kind);
    let price=num(order?.triggerPrice);
-   if(!(price>0)&&d>0&&rr>0){
-    price=entry*(s==='LONG'?(kind==='sl'?1-d:1+d*rr):(kind==='sl'?1+d:1-d*rr));
+   if(!(price>0)&&d>0&&tpMove>0){
+    price=entry*(s==='LONG'?(kind==='sl'?1-d:1+tpMove):(kind==='sl'?1+d:1-tpMove));
    }
    if(price>0)list.push({p,side:s,kind,order,price,active:!!order});
   }
@@ -151,8 +151,6 @@ async function moveProtection(l,raw){
  if(!(mark>0&&targetRaw>0))return note('현재 마크가 확인 후 다시 시도하세요',true);
  const valid=s==='LONG'?(kind==='sl'?targetRaw<mark:targetRaw>mark):(kind==='sl'?targetRaw>mark:targetRaw<mark);
  if(!valid)return note('손절·익절 가격이 현재 마크가의 잘못된 방향입니다',true);
- if(current&&String(current.clientAlgoId||'').startsWith('btcp')===false)
-  return note('앱 외부에서 등록한 보호 주문은 변경하지 않습니다. 바이낸스에서 직접 수정하세요.',true);
  if(algoError||Date.now()-readStamp>15000)return note('바이낸스 조건부 주문이 최신 상태가 아닙니다. 재조회 후 시도하세요.',true);
  let tick='0.1';
  try{
@@ -167,9 +165,11 @@ async function moveProtection(l,raw){
  if(!(Number(snapped)>0))return;
  const validSnapped=s==='LONG'?(kind==='sl'?Number(snapped)<mark:Number(snapped)>mark):(kind==='sl'?Number(snapped)>mark:Number(snapped)<mark);
  if(!validSnapped)return note('호가 단위 반영 후 현재 마크가를 넘습니다. 다른 가격을 선택하세요.',true);
- if(!confirm(s+' '+(kind==='sl'?'손절':'익절')+' 실제 주문을 '+fmt(snapped)+' USDT로 '+(current?'교체':'등록')+'할까요?\n'+
-  (current?'바이낸스는 기존 전체 청산용 조건부 주문과 새 주문의 중복 등록을 거부합니다. 기존 주문을 취소한 뒤 재등록하므로 잠시 보호 공백이 발생할 수 있습니다. 실패하면 기존 가격 복구를 시도하며, 복구도 실패할 수 있습니다.':'바이낸스 실제 조건부 주문을 전송합니다.')+'\n앱 화면이 아니라 거래소 주문 상태를 반드시 확인하세요.'))return;
- requestBusy=true;actionNotice('바이낸스 실제 '+(kind==='sl'?'손절':'익절')+' 주문 변경 중 · 거래소 확인 전에는 적용된 것이 아닙니다');
+ if(!confirm(s+' '+(kind==='sl'?'손절':'익절')+' 조건가를 '+fmt(snapped)+' USDT로 '+(current?'교체':'등록')+'할까요?\n'+
+  (current?'기존 거래소 보호주문을 취소한 뒤 같은 유형으로 재등록합니다. 그동안 보호 공백이 생기며, 실패 시 기존 가격 복구도 실패할 수 있습니다.\n':'새 지정가 조건부 보호주문을 등록합니다. 지정가는 미체결될 수 있습니다.\n')+
+  '지정가 보호주문은 조건가와 지정가를 새 입력가격으로 맞춥니다.\n실제 바이낸스 주문을 반드시 확인하세요.'))return;
+ requestBusy=true;window.btcProtectionEditBusy=true;
+ actionNotice('바이낸스 실제 '+(kind==='sl'?'손절':'익절')+' 주문 변경 중 · 거래소 확인 전에는 적용된 것이 아닙니다');
  try{
   const updated=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
   const currentList=openAlgoList(updated);
@@ -190,13 +190,33 @@ async function moveProtection(l,raw){
   const validNow=s==='LONG'?(kind==='sl'?Number(snapped)<liveMark:Number(snapped)>liveMark):
    (kind==='sl'?Number(snapped)>liveMark:Number(snapped)<liveMark);
   if(!(liveMark>0&&validNow))throw Error('마크가 변동으로 지정 가격이 유효하지 않습니다');
-  const oldType=String(current?.orderType||current?.type||'');
-  if(oldType==='STOP'||oldType==='TAKE_PROFIT')
-   throw Error('조건부 지정가 보호선의 변경은 기존 주문 취소 및 수량 재확인이 필요합니다. 바이낸스에서 직접 수정해 주세요.');
-  const type=kind==='sl'?'STOP_MARKET':'TAKE_PROFIT_MARKET';
+    const oldType=String(current?.orderType||current?.type||'');
+  const limitKind=oldType==='STOP'||oldType==='TAKE_PROFIT'||!current;
+  const type=current?oldType:(kind==='sl'?'STOP':'TAKE_PROFIT');
+  if(current&&!['STOP','TAKE_PROFIT','STOP_MARKET','TAKE_PROFIT_MARKET'].includes(type))
+   throw Error('지원되지 않는 거래소 보호주문 종류 · 변경 중단');
   const newId='btcp'+(kind==='sl'?'s':'t')+s[0]+Date.now().toString(36);
   const req={algoType:'CONDITIONAL',symbol,side:s==='LONG'?'SELL':'BUY',positionSide:p.side,type,
-   closePosition:'true',triggerPrice:snapped,workingType:'MARK_PRICE',clientAlgoId:newId};
+   triggerPrice:snapped,workingType:current?.workingType||'MARK_PRICE',clientAlgoId:newId};
+  if(limitKind){
+   const qty=Math.abs(Number(live.positionAmt)),oldQty=num(current?.quantity);
+   if(!(qty>0)||current&&(!(oldQty>0)||oldQty>qty+1e-8))
+    throw Error('바이낸스 지정가 청산 수량 확인 실패 · 주문 교체 중단');
+   const lot=json.symbols?.find(x=>x.symbol===symbol)?.filters?.find(f=>f.filterType==='LOT_SIZE');
+   const qtyStep=num(lot?.stepSize),qtyMin=num(lot?.minQty);
+   const useQty=current?oldQty:qty;
+   if(!(qtyStep>0&&qtyMin>0&&useQty>=qtyMin&&
+     Math.abs(useQty/qtyStep-Math.round(useQty/qtyStep))<1e-6))
+    throw Error('지정가 보호주문 수량 단위 불일치 · 변경 중단');
+   req.quantity=String(useQty);
+   req.price=snapped;req.timeInForce=current?.timeInForce||'GTC';
+   if(p.side==='BOTH')req.reduceOnly='true';
+  }else{
+   // Keep the existing market-style Close-All semantics (no quantity).
+   if(!(current?.closePosition===true||current?.closePosition==='true'))
+    throw Error('현재 시장가 보호주문이 전체 청산 주문인지 확인되지 않습니다');
+   req.closePosition='true';
+  }
   // Binance -4130 rejects a second GTE closePosition conditional order in
   // the same direction. No general modify endpoint exists for these Algo orders.
   // With explicit user consent, cancel the own old order, then place the new one.
@@ -211,8 +231,8 @@ async function moveProtection(l,raw){
   const restoreId='btcpr'+(kind==='sl'?'s':'t')+s[0]+Date.now().toString(36);
   try{
    if(current){
-    if(!oldId||!(oldPrice>0)||!oldClient.startsWith('btcp'))
-     throw Error('기존 보호 주문 소유권을 확인할 수 없어 취소하지 않습니다');
+    if(!oldId||!(oldPrice>0))
+     throw Error('기존 보호 주문 ID 또는 조건가 확인 실패 · 취소하지 않습니다');
     const beforeCancel=await activeOrders();
     if(!beforeCancel||beforeCancel.filter(a=>matching(a,p,kind)).length!==1||
        !beforeCancel.some(a=>String(a.algoId)===oldId))
@@ -266,6 +286,13 @@ async function moveProtection(l,raw){
        if(!allowed)throw Error('마크가 변동으로 원래 보호 가격을 다시 등록할 수 없습니다');
        const backup={...req,triggerPrice:String(oldPrice),clientAlgoId:restoreId,
         workingType:current.workingType||'MARK_PRICE'};
+       if(limitKind){
+        const originalLimit=num(current?.price);
+        if(!(originalLimit>0))throw Error('이전 지정가 주문 가격 확인 실패 · 자동 복구 불가');
+        backup.price=String(originalLimit);
+        backup.quantity=String(num(current.quantity));
+        backup.timeInForce=current.timeInForce||'GTC';
+       }
        await signed('POST','/fapi/v1/algoOrder',backup);
       }catch(e){restoreError=String(e?.message||e);}
       latest=await activeOrders().catch(()=>null);
@@ -285,7 +312,7 @@ async function moveProtection(l,raw){
    throw issue;
   }
  }catch(e){actionNotice('⚠ 주문 변경을 확인하지 못했습니다: '+String(e?.message||e)+'\n바이낸스에서 해당 방향의 손절·익절 주문과 중복 여부를 확인해 주세요.',true);return false}
- finally{requestBusy=false;void readAlgos();}
+ finally{requestBusy=false;window.btcProtectionEditBusy=false;void readAlgos();}
 }
 // The position-card price editor reuses the EXACT guarded exchange workflow
 // used by dragging/tapping the live chart TP/SL line. Never update UI optimistically.
