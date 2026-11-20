@@ -7956,6 +7956,28 @@ function renderState(){
  window.btcRedrawChart?.();
  quickSwitchState();
 }
+// Manual close takes priority over an untriggered APP-ONLY switch watcher.
+// Never cancel an actual Binance order or an in-flight switch. Fail closed if
+// the monitor is currently checking/trading, rather than racing its execution.
+window.btcDisarmSwitchForManualClose=(side)=>{
+ resumeState();
+ const p=armed;
+ if(!p)return {ok:true,disarmed:false};
+ if(['EXECUTING','REVIEW','CLOSE_PENDING','OPEN_PENDING'].includes(p.state))
+  return {ok:false,reason:'바이낸스 스위칭 주문 처리/확인 중이라 별도 청산을 중단합니다.'};
+ if(busy||checking)
+  return {ok:false,reason:'스위칭 감시가 현재 주문 조건을 확인 중입니다. 잠시 후 다시 누르세요.'};
+ if(!['ARMED','PAUSED'].includes(p.state))
+  return {ok:false,reason:'스위칭 상태를 확인할 수 없습니다. 기존 주문 확인이 필요합니다.'};
+ if(side&&p.side!==side)
+  return {ok:false,reason:'스위칭 감시 포지션과 청산 방향이 다릅니다. 확인이 필요합니다.'};
+ try{
+  store(null);renderState();
+  return {ok:true,disarmed:true};
+ }catch(e){
+  return {ok:false,reason:'스위칭 감시 해제 실패: '+String(e?.message||e)};
+ }
+};
 window.btcLiveSwitchSnapshot=()=>{
  const p=armed;
  if(!p||!['ARMED','PAUSED','REVIEW','EXECUTING','CLOSE_PENDING','OPEN_PENDING'].includes(p.state))return null;
