@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-quick-roi-switch-v264"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-quick-switch-settings-v265"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1447,6 +1447,22 @@ body.ai-entry-modal-open{overflow:hidden!important}
 <section class="tab-page" id="page-liquidation"><div class="card liquidation-card"><h2>BTC 청산맵</h2><a class="liq-link" href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" rel="noopener noreferrer">코인글래스 청산맵 열기 ↗</a></div>
 </section>
 <section class="tab-page" id="page-settings">
+<div class="card" id="quickSwitchSettingsCard">
+<h2>↔ 빠른 스위칭 설정</h2>
+<p class="muted">차트의 빠른 스위칭 버튼에만 적용됩니다. 수량은 기존 포지션 전량 청산 후 바이낸스 실제 사용 가능 잔고로 산정합니다. 일반 스위칭·수동 진입은 변경되지 않습니다.</p>
+<label for="quickSwitchMarginSetting">신규 포지션 증거금 사용 비율 (%)</label>
+<input type="number" id="quickSwitchMarginSetting" min="1" max="95" step="1" inputmode="numeric" value="95" aria-label="빠른 스위칭 증거금 사용 비율">
+<label for="quickSwitchTpSetting">익절 목표 · 증거금 수익률 (%)</label>
+<input type="number" id="quickSwitchTpSetting" min="0.1" max="100" step="0.1" inputmode="decimal" value="5" aria-label="빠른 스위칭 익절 증거금 수익률">
+<label for="quickSwitchSlSetting">손절 목표 · 증거금 손실률 (%)</label>
+<input type="number" id="quickSwitchSlSetting" min="0.1" max="100" step="0.1" inputmode="decimal" value="5" aria-label="빠른 스위칭 손절 증거금 손실률">
+<div class="row" style="margin-top:10px">
+ <button type="button" id="quickSwitchSettingsSave">스위칭 설정 저장</button>
+ <button type="button" id="quickSwitchSettingsReset">기본값 복원</button>
+</div>
+<p class="muted" id="quickSwitchSettingsStatus" role="status" aria-live="polite">기본값: 증거금 95%, 익절 +5%, 손절 -5%</p>
+<p class="muted">익절·손절 %는 BTC 가격 변동률이 아닌 레버리지 적용 증거금 수익률입니다(수수료·펀딩비 제외). 지나치게 촘촘한 목표가는 주문 최소 호가에 걸릴 수 있고, 손절 주문 등록 전 청산 위험이 있습니다. 설정 저장은 기존 포지션이나 등록된 보호주문을 즉시 변경하지 않습니다.</p>
+</div>
 <div class="card" id="rmiStrategySettingsCard">
 <h2>1분봉 RMI 신호 전략 선택</h2>
 <label for="rmiSignalStrategy">현재 사용할 전략</label>
@@ -1524,9 +1540,9 @@ body.ai-entry-modal-open{overflow:hidden!important}
   <p id="quickSwitchPosition" class="muted">바이낸스 실제 보유 포지션 확인 중</p>
   <div class="quick-switch-values">
    <span>청산 및 반대진입: 지정가(GTC) · 6단계 없음</span>
-   <span>청산 후 실제 사용 가능 잔고 기준 · 증거금 최대 95%</span>
+   <span>청산 후 실제 사용 가능 잔고 기준 · 설정된 증거금 비율 사용 (최대 95%)</span>
    <span id="quickSwitchPriceLabel">청산 지정가 · 실시간 호가 기준 자동 산정</span>
-   <span id="quickSwitchTargets">신규 포지션 증거금 수익률 익절 +5% / 손절 -5% (레버리지 반영)</span>
+   <span id="quickSwitchTargets">신규 포지션 증거금 수익률 익절 +5% / 손절 -5% (설정에서 변경 가능)</span>
   </div>
   <p class="quick-switch-warning">⚠ 지정가 주문은 즉시 체결을 보장하지 않습니다. 기존 포지션이 완전히 청산된 후에만 반대 주문을 제출합니다. 대기 중 보호 공백이 생길 수 있습니다. 익절·손절 ±5%는 BTC 가격이 아니라 신규 포지션 증거금 기준의 레버리지 수익률이며 수수료·펀딩비는 제외합니다. 체결 후 마크가가 목표가를 이미 넘어선 경우 보호주문 등록 실패 가능성이 있습니다.</p>
   <div id="quickSwitchMessage" role="status" aria-live="polite"></div>
@@ -7838,8 +7854,8 @@ function exactQty(n,lot){
 // Never pre-spend projected profits. Size by the exchange symbol leverage.
 function balanceSwitchPercent(value){
  const pct=Number(value);
- if(!Number.isInteger(pct)||pct<10||pct>100||pct%10!==0)
-  throw Error('잔고 비중은 10~100%에서 10% 단위로 선택하세요.');
+ if(!Number.isInteger(pct)||pct<1||pct>100)
+  throw Error('잔고 비중은 1~100%의 정수로 선택하세요.');
  return pct;
 }
 async function confirmedSymbolLeverage(){
@@ -8079,6 +8095,57 @@ window.btcSwitchNow=async(raw,newQuantity)=>{
 };
 
 
+// v265 persisted quick-switch preferences. Store no credentials or order
+// details; freeze the settings inside each new switch plan at submission.
+const QUICK_SWITCH_CONFIG_KEY='hanine.quick-switch.preferences.v265';
+const DEFAULT_QUICK_SWITCH_CONFIG={marginPct:95,tpRoi:5,slRoi:5};
+function validateQuickSwitchSettings(input){
+ const marginPct=Number(input.marginPct),tpRoi=Number(input.tpRoi),slRoi=Number(input.slRoi);
+ if(!Number.isInteger(marginPct)||marginPct<1||marginPct>95)
+  throw Error('증거금 사용 비율은 1~95%의 정수로 입력하세요.');
+ for(const [name,value] of [['익절 수익률',tpRoi],['손절 손실률',slRoi]]){
+  if(!Number.isFinite(value)||value<.1||value>100)
+   throw Error(name+'은 0.1~100% 범위로 입력하세요.');
+  if(Math.round(value*10)!==value*10)
+   throw Error(name+'은 소수 첫째 자리까지 입력하세요.');
+ }
+ return {marginPct,tpRoi,slRoi};
+}
+function readQuickSwitchSettings(){
+ try{
+  const stored=JSON.parse(localStorage.getItem(QUICK_SWITCH_CONFIG_KEY)||'null');
+  return stored?validateQuickSwitchSettings(stored):{...DEFAULT_QUICK_SWITCH_CONFIG};
+ }catch(_){return {...DEFAULT_QUICK_SWITCH_CONFIG};}
+}
+function showQuickSwitchSettings(config){
+ $('quickSwitchMarginSetting').value=String(config.marginPct);
+ $('quickSwitchTpSetting').value=String(config.tpRoi);
+ $('quickSwitchSlSetting').value=String(config.slRoi);
+}
+showQuickSwitchSettings(readQuickSwitchSettings());
+$('quickSwitchSettingsSave').addEventListener('click',()=>{
+ const status=$('quickSwitchSettingsStatus');
+ try{
+  const config=validateQuickSwitchSettings({
+   marginPct:$('quickSwitchMarginSetting').value,
+   tpRoi:$('quickSwitchTpSetting').value,
+   slRoi:$('quickSwitchSlSetting').value
+  });
+  localStorage.setItem(QUICK_SWITCH_CONFIG_KEY,JSON.stringify(config));
+  status.textContent='✅ 저장됨 · 증거금 '+config.marginPct+'%, 익절 +'+config.tpRoi+
+   '%, 손절 -'+config.slRoi+'% · 다음 빠른 스위칭부터 적용';
+  status.style.color='#92e6cc';
+ }catch(e){status.textContent='⚠ '+String(e?.message||e);status.style.color='#ffb9bb';}
+});
+$('quickSwitchSettingsReset').addEventListener('click',()=>{
+ const config={...DEFAULT_QUICK_SWITCH_CONFIG};
+ try{localStorage.setItem(QUICK_SWITCH_CONFIG_KEY,JSON.stringify(config));}
+ catch(e){$('quickSwitchSettingsStatus').textContent='⚠ 설정 저장 실패: '+String(e);return;}
+ showQuickSwitchSettings(config);
+ $('quickSwitchSettingsStatus').textContent='✅ 기본값 복원 · 증거금 95%, 익절 +5%, 손절 -5%';
+ $('quickSwitchSettingsStatus').style.color='#92e6cc';
+});
+
 // v263: Explicit two-click QUICK LIMIT reversal.
 // First click opens a review sheet. The SECOND user click starts real exchange
 // orders with no additional browser confirmation. No stage/pyramid sizing.
@@ -8120,8 +8187,10 @@ function openQuickSwitch(){
  $('quickSwitchPosition').textContent='기존 '+target.side+' '+fmt(target.amount)+' BTC 전량 지정가 청산';
  $('quickSwitchPriceLabel').textContent='현재 마크가 '+fmt(target.mark)+
   ' USDT · 실제 지정가는 전환 버튼을 누를 때 바이낸스 호가로 계산';
- $('quickSwitchTargets').textContent='신규 '+opposite+
-  ' 증거금 수익률 익절 +5% / 손절 -5% (BTC 가격 변동률 아님, 레버리지 반영)';
+ const config=readQuickSwitchSettings();
+ $('quickSwitchPosition').textContent='기존 '+target.side+' '+fmt(target.amount)+' BTC 전량 지정가 청산';
+ $('quickSwitchTargets').textContent='신규 '+opposite+' 증거금 ROI 익절 +'+config.tpRoi+
+  '% / 손절 -'+config.slRoi+'% · 증거금 사용 '+config.marginPct+'% (BTC 가격 기준 아님)';
  quickSubmit.disabled=false;
 }
 quickOpen.addEventListener('click',openQuickSwitch);
@@ -8141,6 +8210,7 @@ quickSubmit.addEventListener('click',async()=>{
    throw Error('실제 포지션 정보가 15초 이상 지났습니다. 새로고침하세요.');
   const candidates=(snapshot.positions||[]).map(normalize).filter(Boolean);
   if(candidates.length!==1)throw Error('실전 BTCUSDT 포지션 하나만 있을 때 가능합니다.');
+  const config=readQuickSwitchSettings();
   const p=candidates[0],r=await risk(),live=findPosition(r,p);
   if(!live||r.dual!==(p.positionSide!=='BOTH'))
    throw Error('바이낸스 포지션 또는 헤지 모드 재확인 실패');
@@ -8176,21 +8246,23 @@ quickSubmit.addEventListener('click',async()=>{
   if(!(closePrice>0))throw Error('지정가 계산 실패');
   await limitSwitchRules(closePrice);
   const opposite=p.side==='LONG'?'SHORT':'LONG';
-  // Margin-ROI ±5%, NOT BTC-price ±5%. The actual TP/SL prices
-  // are calculated again from Binance's confirmed reverse-entry basis.
+  // Estimate from the chosen ROI for preflight. Real TP/SL levels use the
+  // verified opposite-position entry price and leverage AFTER execution.
   const newLong=opposite==='LONG';
-  const roiPriceMove=.05/leverage;
-  const tp=snapped(closePrice*(1+(newLong?roiPriceMove:-roiPriceMove)),newLong);
-  const sl=snapped(closePrice*(1+(newLong?-roiPriceMove:roiPriceMove)),!newLong);
+  const tpMove=(config.tpRoi/100)/leverage;
+  const slMove=(config.slRoi/100)/leverage;
+  const tp=snapped(closePrice*(1+(newLong?tpMove:-tpMove)),newLong);
+  const sl=snapped(closePrice*(1+(newLong?-slMove:slMove)),!newLong);
   if(!(tp>0&&sl>0&&(newLong?tp>closePrice&&sl<closePrice:tp<closePrice&&sl>closePrice)))
-   throw Error('30배 등 레버리지 기준 ±5% 손익 목표가가 호가 단위보다 작아 계산할 수 없습니다.');
+   throw Error('선택한 익절·손절 %가 레버리지와 호가 단위에 맞지 않습니다. 설정에서 %를 조정하세요.');
   const plan={id:'btcsquick'+Date.now().toString(36),quickSwitch:true,
-   quickRoiPercent:5,
+   quickTpRoiPercent:config.tpRoi,quickSlRoiPercent:config.slRoi,
    state:'ARMED',side:p.side,positionSide:p.positionSide,entry,oldQty,
-   newQty:oldQty,qtyMode:'balance',balancePct:100,
+   newQty:oldQty,qtyMode:'balance',balancePct:config.marginPct,
    executionMode:'LIMIT',type:'immediate',price:closePrice,tpId:null,
    targets:{tp,sl},created:Date.now(),
-   message:'빠른 지정가 전환 시작 · 신규 포지션은 청산 후 잔고 최대 95% 사용'};
+   message:'빠른 지정가 전환 시작 · 신규 증거금 '+config.marginPct+
+     '% · 익절 +'+config.tpRoi+'% / 손절 -'+config.slRoi+'%'};
   // The only live write below is the existing audited switch workflow,
   // which verifies complete close before sending the reverse entry.
   store(plan);renderState();quickModal.hidden=true;
@@ -8351,12 +8423,14 @@ async function installSwitchProtection(plan,opposite,actualPosition){
   // Only the fast-switch mode uses leveraged collateral ROI. The manual
   // switch's absolute user-entered prices remain completely unchanged.
   const lev=Number(actualPosition?.leverage);
-  const roi=Number(plan.quickRoiPercent);
-  if(!(Number.isFinite(lev)&&lev>0&&Number.isFinite(roi)&&roi===5&&entry>0))
-   throw Error('실제 신규 포지션 레버리지를 확인하지 못해 ±5% 증거금 손익 보호주문을 등록하지 않았습니다.');
-  const move=(roi/100)/lev;
-  tp=entry*(1+(long?move:-move));
-  sl=entry*(1+(long?-move:move));
+  const tpRoi=Number(plan.quickTpRoiPercent),slRoi=Number(plan.quickSlRoiPercent);
+  if(!(Number.isFinite(lev)&&lev>0&&entry>0&&
+    Number.isFinite(tpRoi)&&tpRoi>=.1&&tpRoi<=100&&
+    Number.isFinite(slRoi)&&slRoi>=.1&&slRoi<=100))
+   throw Error('새 포지션 레버리지 또는 저장된 익절·손절 ROI 설정이 잘못되어 보호주문을 등록하지 않았습니다.');
+  const gain=(tpRoi/100)/lev,loss=(slRoi/100)/lev;
+  tp=entry*(1+(long?gain:-gain));
+  sl=entry*(1+(long?-loss:loss));
  }
  if(!(entry>0&&mark>0&&tp>0&&sl>0))
   throw Error('신규 포지션 실체결가·마크가·보호가격 확인 실패');
