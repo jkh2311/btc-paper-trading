@@ -190,7 +190,7 @@ async function moveProtection(l,raw){
   const validNow=s==='LONG'?(kind==='sl'?Number(snapped)<liveMark:Number(snapped)>liveMark):
    (kind==='sl'?Number(snapped)>liveMark:Number(snapped)<liveMark);
   if(!(liveMark>0&&validNow))throw Error('마크가 변동으로 지정 가격이 유효하지 않습니다');
-  const oldType=String(existing?.orderType||existing?.type||'');
+  const oldType=String(current?.orderType||current?.type||'');
   if(oldType==='STOP'||oldType==='TAKE_PROFIT')
    throw Error('조건부 지정가 보호선의 변경은 기존 주문 취소 및 수량 재확인이 필요합니다. 바이낸스에서 직접 수정해 주세요.');
   const type=kind==='sl'?'STOP_MARKET':'TAKE_PROFIT_MARKET';
