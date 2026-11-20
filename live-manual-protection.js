@@ -191,7 +191,7 @@ async function protect(side,p,info){
  }}));
 }
 async function run(){
- if(busy||document.hidden||!getApiCredentials()?.apiKey)return;
+ if(busy||window.btcProtectionEditBusy===true||document.hidden||!getApiCredentials()?.apiKey)return;
  busy=true;
  try{
   const data=records();
