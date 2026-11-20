@@ -3517,7 +3517,9 @@ disparityStageDeleteButton?.addEventListener('click',()=>{
  persistDisparityStages();disparityStageSelection=null;drawRmi();
 });
 function drawRmi(){
- if(!chartIndicators.rmi&&!chartIndicators.disparity)return;
+ if(!chartIndicators.rmi&&!chartIndicators.disparity){
+  updateDisparityStagePanel(null,rmiCanvas,0,0);return;
+ }
  const a=chartViewBars(),cv=$('rmiChart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(52,cv.getBoundingClientRect().height||84),dpr=devicePixelRatio||1;
  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
@@ -3591,7 +3593,10 @@ function drawRmi(){
   disparityStageHitboxes=[];
   const tf=$('tf').value;
   if(chartIndicators.disparityStages!==false){
-   const byTime=new Map(a.map((bar,i)=>[bar.t,i]));
+   // Only index the visible candle window; a whole multi-month archive can
+   // contain tens of thousands of bars and is redrawn on every touch move.
+   const byTime=new Map();
+   for(let i=start;i<end;i++)if(a[i])byTime.set(a[i].t,i);
    const savedEvents=disparitySavedStages.filter(item=>item.tf===tf).flatMap(item=>{
     const globalIndex=byTime.get(item.t);
     if(globalIndex===undefined||globalIndex<start||globalIndex>=end)return [];
