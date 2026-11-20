@@ -88,6 +88,14 @@ async function protect(side,p,info){
   STOP_MARKET:tick(sl,priceFilter.tickSize,side==='SHORT'),
   TAKE_PROFIT_MARKET:tick(tp,priceFilter.tickSize,side==='LONG')
  };
+ const slFinal=Number(prices.STOP_MARKET),tpFinal=Number(prices.TAKE_PROFIT_MARKET);
+ const minPrice=Number(priceFilter.minPrice),maxPrice=Number(priceFilter.maxPrice);
+ if(![sl,tp,slFinal,tpFinal].every(v=>Number.isFinite(v)&&v>0)||
+    (minPrice>0&&(slFinal<minPrice||tpFinal<minPrice))||
+    (maxPrice>0&&(slFinal>maxPrice||tpFinal>maxPrice)))
+  throw Error('설정된 익절/손절 가격이 거래소 허용 가격 범위 밖입니다. 손절 거리·손익비 또는 예약 목표가를 수정하세요 (주문 미전송)');
+ if(!(side==='LONG'?slFinal<entry&&tpFinal>entry:slFinal>entry&&tpFinal<entry))
+  throw Error('실제 진입가 기준 익절/손절 가격 방향이 잘못됐습니다. 목표가격을 수정하세요 (보호주문 미전송)');
  if(custom&&!(side==='LONG'?
   Number(prices.STOP_MARKET)<entry&&Number(prices.TAKE_PROFIT_MARKET)>entry:
   Number(prices.STOP_MARKET)>entry&&Number(prices.TAKE_PROFIT_MARKET)<entry))
@@ -125,7 +133,14 @@ async function protect(side,p,info){
    if(!active.some(o=>(o.orderType||o.type)===type))throw Error(type+' 등록 불확실: '+e.message);
   }
   active=(await algos()).filter(o=>isProtection(o,side,ps));
-  if(!active.some(o=>(o.orderType||o.type)===type))throw Error(type+' 활성 상태 확인 실패');
+  const confirmed=active.find(o=>(o.orderType||o.type)===type&&
+   ['NEW','ACTIVE','PENDING_NEW'].includes(String(o.algoStatus||o.status||'NEW')));
+  if(!confirmed||!(Number(confirmed.triggerPrice)>0))
+   throw Error(type+' 거래소 활성/가격 확인 실패 · 보호 주문 상태 재확인 필요');
+  if(Math.abs(Number(confirmed.triggerPrice)-Number(prices[type]))>
+      Math.max(Number(priceFilter.tickSize)*.5,1e-6))
+   throw Error(type+' 거래소 목표가 불일치 · 설정 '+prices[type]+
+    ' / 실제 '+confirmed.triggerPrice+' USDT · 직접 확인 필요');
  }
 
  if(!active.some(o=>(o.orderType||o.type)==='STOP_MARKET')||
