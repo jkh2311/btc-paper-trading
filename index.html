@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-disparity-arrows-v296"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-disparity-toggle-v297"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1739,7 +1739,7 @@ body.non-chart-tab #tradeBar{display:none!important}
  </select>
  <div id="maPricePatternBasisHint" class="ma-forecast-horizon-status">7개 이평선 종합 · 중단기 및 장기 추세 반영</div>
 </div>
-<div class="ma-forecast-hint">마지막 확정봉의 종가와 그 이전 확정봉만 사용해 가격 파동을 계산해. 진행 중인 1분봉 등에서는 예측이 바뀌지 않고, 봉이 확정될 때만 갱신해. A·B·C… 파동과 미래 이평선은 차트 표시 전용이며 주문·RMI에 사용하지 않아.</div><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label>
+<div class="ma-forecast-hint">마지막 확정봉의 종가와 그 이전 확정봉만 사용해 가격 파동을 계산해. 진행 중인 1분봉 등에서는 예측이 바뀌지 않고, 봉이 확정될 때만 갱신해. A·B·C… 파동과 미래 이평선은 차트 표시 전용이며 주문·RMI에 사용하지 않아.</div><label><input type="checkbox" data-chart-indicator="rmi" checked>RMI (5, 14)</label><label><input type="checkbox" data-chart-indicator="disparity" checked>이격도 (200 / 50 / 20)</label><label><input type="checkbox" data-chart-indicator="disparityStages" checked>이격도 전환 화살표·단계 문구 표시</label>
 <div class="date-range-tools" id="cmeGapTools">
  <strong>CME 갭 · 모든 시간봉 표시</strong>
  <label><input id="cmeGapToggle" type="checkbox" checked>CME 갭 가로선 표시</label>
@@ -3492,13 +3492,15 @@ function drawRmi(){
   trace(d200,yD,'#ed303c');trace(d50,yD,'#2949ed');trace(d20,yD,'#15923b');ctx.restore();
   // Label the exact completed historic crossover points with small arrows,
   // instead of a floating generic current-state badge hiding the curves.
-  const tf=$('tf').value;
-  let completedEnd=end-1;
-  if(completedEnd===a.length-1&&
-     nextCandleTime(tf,a[completedEnd]?.t||0,1)>Date.now())completedEnd--;
-  const transitionEvents=disparityTransitionEvents(d20,d50,d200,completedEnd-metricOffset);
-  drawDisparityTransitionArrows(ctx,transitionEvents,start-metricOffset,
-   completedEnd-metricOffset+1,left-metricOffset,bw,pw,dTop,dBottom,yD);
+  if(chartIndicators.disparityStages!==false){
+   const tf=$('tf').value;
+   let completedEnd=end-1;
+   if(completedEnd===a.length-1&&
+      nextCandleTime(tf,a[completedEnd]?.t||0,1)>Date.now())completedEnd--;
+   const transitionEvents=disparityTransitionEvents(d20,d50,d200,completedEnd-metricOffset);
+   drawDisparityTransitionArrows(ctx,transitionEvents,start-metricOffset,
+    completedEnd-metricOffset+1,left-metricOffset,bw,pw,dTop,dBottom,yD);
+  }
   ctx.fillStyle='#a4b4c8';ctx.fillText('0',pw+5,dMid+3);
   const disparityAxisValue=amplitude/disparityValueZoom;
   if(dTop+10<dMid-5){
@@ -3558,41 +3560,8 @@ function drawRmi(){
    ctx.fillStyle='#7df5bd';ctx.fillText(label,labelX+7,labelY+12);
    ctx.restore();
   }
-  // When a chart candle is inspected by long press, show all three
-  // disparity values at THAT candle, just as RMI shows its inspected value.
-  // Keep the original 200/50/20 legend and indicator calculations intact.
-  if(selected!==null){
-   const offset=selected-metricOffset;
-   const valuesAtCrosshair=[d200[offset],d50[offset],d20[offset]];
-   // Overall disparity gap is MAX(200,50,20) minus MIN(200,50,20)
-   // at the inspected candle, expressed in percentage POINTS (%p).
-   // Never show a misleading number if any line lacks enough history.
-   const fullSpread=valuesAtCrosshair.every(Number.isFinite)?
-    Math.max(...valuesAtCrosshair)-Math.min(...valuesAtCrosshair):null;
-   const items=[[200,d200[offset],'#ed303c'],
-    [50,d50[offset],'#5477ff'],[20,d20[offset],'#35cb64']];
-   ctx.save();ctx.font='bold 9px sans-serif';ctx.textBaseline='alphabetic';
-   const gap=4,pad=3,lineH=11,chipH=10,available=pw-8;
-   let px=5,py=dTop+2;
-   for(const [period,val,color] of items){
-    const text=period+' '+(Number.isFinite(val)?((val>0?'+':'')+val.toFixed(2)+'%'):'--');
-    const chipW=Math.ceil(ctx.measureText(text).width)+pad*2;
-    if(px>5&&px+chipW>available){px=5;py+=lineH;}
-    if(py+chipH>dBottom-2)break;
-    ctx.fillStyle='rgba(8,18,33,.91)';ctx.fillRect(px,py,chipW,chipH);
-    ctx.fillStyle=color;ctx.fillText(text,px+pad,py+9);
-    px+=chipW+gap;
-   }
-   const gapText='종합차 '+(Number.isFinite(fullSpread)?fullSpread.toFixed(2)+'%p':'--');
-   // Place this label beside the three values, wrapping on narrow iPhones.
-   const summaryWidth=Math.ceil(ctx.measureText(gapText).width)+pad*2;
-   if(px>5&&px+summaryWidth>available){px=5;py+=lineH;}
-   if(py+chipH<=dBottom-2){
-    ctx.fillStyle='rgba(8,18,33,.94)';ctx.fillRect(px,py,summaryWidth,chipH);
-    ctx.fillStyle='#ffd978';ctx.fillText(gapText,px+pad,py+9);
-   }
-   ctx.restore();
-  }
+  // The long-press vertical crosshair and its line intersection dots remain.
+  // The old 200/50/20 value chips and spread popover are intentionally hidden.
  }
  // Long-press on the right value axis: a horizontal line crosses just this
  // indicator, with the exact value at its right-hand end.
@@ -5319,7 +5288,7 @@ function drawProjectedMovingAverages(ctx,bars,left,count,plotW,top,bottom,y,bw){
 }
 
 // Indicator visibility affects rendering only, not RMI signals or orders.
-const CHART_INDICATOR_KEYS=['ma5','ma10','ma20','ma40','ma60','ma90','ma120','ma160','ma200','bb','bbForecast','fib','maForecast','rmi','disparity','levelEntry','levelTp','levelStop','levelSwitch'];
+const CHART_INDICATOR_KEYS=['ma5','ma10','ma20','ma40','ma60','ma90','ma120','ma160','ma200','bb','bbForecast','fib','maForecast','rmi','disparity','disparityStages','levelEntry','levelTp','levelStop','levelSwitch'];
 const chartIndicators=Object.fromEntries(CHART_INDICATOR_KEYS.map(k=>[k,k!=='maForecast'&&k!=='bbForecast']));
 const chartIndicatorStorageKey='btc-chart-indicators-v130';
 // Visibility-only: shared by paper and real chart renderers. No order state
