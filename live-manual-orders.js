@@ -925,7 +925,7 @@ function credentialsSafeSilent(){const a=cred();return !!(a?.apiKey&&a?.apiSecre
 const quickCloseLong=$('quickCloseLong'),quickCloseShort=$('quickCloseShort');
 const quickCloseMethod=$('quickCloseMethod'),quickClosePercent=$('quickClosePercent'),quickCloseQuote=$('quickCloseQuote');
 const quickCloseStatus=$('quickCloseStatus');
-let quickCloseBusy=false,quickCloseUncertain=false,quickCloseQuoteBusy=false;
+let quickCloseBusy=false,quickCloseUncertain=false,quickCloseQuoteBusy=false,quickCloseErrorAt=0;
 let quickCloseBook={bid:NaN,ask:NaN,at:0},quickCloseTrack=null,quickCloseTrackBusy=false;
 let quickCloseRiskSnapshot=null,quickCloseRiskBusy=false,quickCloseRiskRequestedAt=0;
 function quickClosePositions(){
@@ -995,7 +995,8 @@ function quickCloseRender(){
    quickCloseTrack?'기존 청산 주문 #'+quickCloseTrack.id+' 상태 확인 중':
    !count?'실제 '+side+' 보유 포지션 없음':'시세·계좌 연결 또는 주문 상태 확인 필요';
  }
- if(!quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack){
+ if(!quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack&&
+    Date.now()-quickCloseErrorAt>15000){
   if(switchBusy)quickCloseSetStatus('스위칭 감시/주문 진행 중 · 스위칭 해제 후 청산 가능');
   else if(!positions.length)quickCloseSetStatus('실제 BTCUSDT 포지션 조회 또는 API 잠금 해제 필요');
   else if(!cred()?.apiKey||!cred()?.apiSecret)quickCloseSetStatus('바이낸스 API 잠금 해제 필요');
@@ -1161,6 +1162,7 @@ async function quickCloseSubmit(side){
   void updateOpenOrders();
   if(response.status==='FILLED')void quickCloseFollowOrder();
  }catch(e){
+  quickCloseErrorAt=Date.now();
   quickCloseSetStatus('⚠ 청산 미실행 또는 확인 필요: '+String(e?.message||e),true);
   if(quickCloseUncertain)message('빠른 청산 주문 결과 불확실 · 바이낸스 확인 필수');
  }finally{quickCloseBusy=false;quickCloseRender();}
