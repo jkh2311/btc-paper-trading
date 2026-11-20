@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261121-global-trendlines-v302"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261121-chart-history-cache-v303"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -2632,12 +2632,139 @@ function initDailyHistoryJump(){
 // are fetched in 1000-bar pages for the selected interval, never all at once.
 // 10m uses two 5m Binance klines fetched for its own horizon, without changing the 5m chart history.
 // Requested historical horizons are independent: 3m/5m 3mo, synthesized 10m
-// 1yr, 15m 1yr, 30m/1h 1yr, 4h 3yr. Never change 1m trading/signal history.
-const HISTORY_LOOKBACK_MONTHS={'1m':2,'3m':3,'5m':3,'10m':12,'15m':12,'30m':12,'1h':12,'4h':36,'6h':36,'12h':36};
+// 1yr, 15m 1yr, 30m/1h 1yr, 4h/6h/12h 6yr. Never change 1m trading/signal history.
+const HISTORY_LOOKBACK_MONTHS={'1m':2,'3m':3,'5m':3,'10m':12,'15m':12,'30m':12,'1h':12,'4h':72,'6h':72,'12h':72};
 const HISTORY_SOURCE_TF={'10m':'5m'};
 const historyReadyUntil={},historyLoading={},historyRetryAt={};
 const fullWeekMonthLoaded={'1w':false,'1M':false};
 const fullWeekMonthBusy={'1w':false,'1M':false};
+// IndexedDB chart-only historical OHLCV cache. No API keys, personal data,
+// positions, paper signals, or trading state enter this database. Browser
+// eviction/private mode can remove it, so network fallback remains essential.
+const CHART_HISTORY_DB='btc-chart-ohlcv-v303';
+const CHART_HISTORY_STORE='full',CHART_SEGMENT_STORE='jumps';
+let chartHistoryDbPromise=null,chartHistoryCacheReady=false;
+let cachedChartSegments=Object.create(null),chartHistoryCacheNotice='';
+function openChartHistoryDb(){
+ if(!window.indexedDB)return Promise.reject(Error('이 기기에서 IndexedDB를 사용할 수 없음'));
+ if(chartHistoryDbPromise)return chartHistoryDbPromise;
+ chartHistoryDbPromise=new Promise((resolve,reject)=>{
+  const request=indexedDB.open(CHART_HISTORY_DB,1);
+  request.onupgradeneeded=()=>{
+   const db=request.result;
+   if(!db.objectStoreNames.contains(CHART_HISTORY_STORE))
+    db.createObjectStore(CHART_HISTORY_STORE,{keyPath:'tf'});
+   if(!db.objectStoreNames.contains(CHART_SEGMENT_STORE))
+    db.createObjectStore(CHART_SEGMENT_STORE,{keyPath:'tf'});
+  };
+  request.onsuccess=()=>resolve(request.result);
+  request.onerror=()=>reject(request.error||Error('차트 캐시 저장소 연결 실패'));
+ }).catch(e=>{chartHistoryDbPromise=null;throw e});
+ return chartHistoryDbPromise;
+}
+async function chartCacheRead(store,key){
+ const db=await openChartHistoryDb();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction(store,'readonly'),req=tx.objectStore(store).get(key);
+  req.onsuccess=()=>resolve(req.result||null);
+  req.onerror=()=>reject(req.error||Error('차트 캐시 읽기 실패'));
+ });
+}
+async function chartCacheWrite(store,row){
+ const db=await openChartHistoryDb();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction(store,'readwrite');
+  tx.objectStore(store).put(row);
+  tx.oncomplete=()=>resolve(true);
+  tx.onerror=()=>reject(tx.error||Error('차트 캐시 저장 실패'));
+  tx.onabort=()=>reject(tx.error||Error('차트 캐시 저장 중단'));
+ });
+}
+function normalizeChartCacheBars(raw){
+ if(!Array.isArray(raw))return [];
+ return raw.filter(b=>b&&Number.isFinite(b.t)&&Number.isFinite(b.o)&&
+  Number.isFinite(b.h)&&Number.isFinite(b.l)&&Number.isFinite(b.c)&&
+  b.t>0&&b.o>0&&b.h>=b.l&&b.l>0&&b.c>0&&Number.isFinite(b.v)&&b.v>=0)
+  .map(b=>({t:b.t,o:b.o,h:b.h,l:b.l,c:b.c,v:b.v,
+    ...(b.source==='spot'?{source:'spot'}:{})}));
+}
+async function saveChartHistorySnapshot(tf,completeFrom){
+ if(demo)return false;
+ const bars=tf==='1m'?minuteChartArchive:candles[tf];
+ if(!Array.isArray(bars)||bars.length<22)return false;
+ const clean=normalizeChartCacheBars(bars);
+ if(clean.length<22)return false;
+ try{
+  // A completeFrom marker is only written after the relevant full-history
+  // loader successfully reaches its historical boundary.
+  const prior=await chartCacheRead(CHART_HISTORY_STORE,tf);
+  const validFrom=Number.isFinite(completeFrom)?completeFrom:
+   Number.isFinite(prior?.completeFrom)?prior.completeFrom:null;
+  await chartCacheWrite(CHART_HISTORY_STORE,{tf,bars:clean,
+   completeFrom:validFrom,savedAt:Date.now(),version:1});
+  chartHistoryCacheNotice='기기 캐시 저장 ✓';
+  return true;
+ }catch(e){
+  chartHistoryCacheNotice='기기 캐시 저장 실패 (공간/권한 확인)';
+  console.warn('차트 캐시 저장 실패',tf,e);
+  return false;
+ }
+}
+async function saveCachedChartSegment(segment){
+ if(demo||!segment||!segment.tf)return;
+ const bars=normalizeChartCacheBars(segment.bars);
+ if(bars.length<22)return;
+ const tf=segment.tf,existing=cachedChartSegments[tf]||[];
+ const first=bars[0].t,last=bars.at(-1).t;
+ const duration=candleDuration[tf]||60000;
+ const overlapping=existing.filter(x=>x.bars?.length&&
+  x.bars[0].t<=last+duration&&x.bars.at(-1).t>=first-duration);
+ const merged=overlapping.reduce((a,x)=>mergeDailyCandles(a,x.bars),bars);
+ const preserved=existing.filter(x=>!overlapping.includes(x));
+ const chunks=[...preserved,{bars:merged,savedAt:Date.now()}]
+  .sort((a,b)=>a.savedAt-b.savedAt).slice(-12);
+ cachedChartSegments[tf]=chunks;
+ try{await chartCacheWrite(CHART_SEGMENT_STORE,{tf,chunks,version:1})}
+ catch(e){console.warn('날짜 이동 구간 캐시 저장 불가',e)}
+}
+function cachedSegmentFor(tf,time){
+ const chunks=cachedChartSegments[tf]||[];
+ const match=chunks.find(x=>x.bars?.length>=22&&
+  x.bars[0].t<=time&&x.bars.at(-1).t>=time);
+ return match?{tf,bars:match.bars}:null;
+}
+async function restoreChartHistoryCache(){
+ try{
+  // Wait for app declarations + base 1000-bar live data; merging in either
+  // order preserves live values for overlapping timestamps.
+  const tfList=['1m','3m','5m','10m','15m','30m','1h','4h','6h','12h','1d','1w','1M'];
+  for(const tf of tfList){
+   const row=await chartCacheRead(CHART_HISTORY_STORE,tf).catch(()=>null);
+   const saved=normalizeChartCacheBars(row?.bars);
+   if(saved.length>=22){
+    if(tf==='1m')minuteChartArchive=mergeDailyCandles(saved,minuteChartArchive||[]);
+    else candles[tf]=mergeDailyCandles(saved,candles[tf]||[]);
+    if(Number.isFinite(row.completeFrom)){
+     if(tf==='1d'&&row.completeFrom<=Date.UTC(2017,7,17))dailyHistoryReady=true;
+     else if(['1w','1M'].includes(tf)&&row.completeFrom<=Date.UTC(2017,7,17))
+      fullWeekMonthLoaded[tf]=true;
+     else historyReadyUntil[tf]=row.completeFrom;
+    }
+   }
+   const segmentRow=await chartCacheRead(CHART_SEGMENT_STORE,tf).catch(()=>null);
+   if(Array.isArray(segmentRow?.chunks)){
+    cachedChartSegments[tf]=segmentRow.chunks.filter(x=>
+     Array.isArray(x?.bars)&&x.bars.length>=22).slice(-12);
+   }
+  }
+  chartHistoryCacheNotice='저장된 차트 불러오기 완료';
+ }catch(e){console.warn('차트 캐시 복구 실패',e)}
+ finally{
+  chartHistoryCacheReady=true;
+  updateDailyHistoryJump();updateIntradayHistoryJump();
+  if(!demo){syncMinuteChartArchive();draw();drawRmi()}
+ }
+}
 // The full-history button joins Binance Futures from launch (Sep 2019)
 // with earlier Binance Spot OHLCV (Aug 2017); spot is chart-only.
 async function loadFullWeekMonthHistory(tf){
@@ -2690,7 +2817,7 @@ function historyCutoff(tf,now=Date.now()){
   return Date.UTC(year,month-months,Math.min(date.getUTCDate(),lastDay));
 }
 function historySourceTf(tf){return HISTORY_SOURCE_TF[tf]||tf}
-function historyPeriodLabel(tf){const m=HISTORY_LOOKBACK_MONTHS[tf];return m===36?'3년':m===12?'1년':m+'개월'}
+function historyPeriodLabel(tf){const m=HISTORY_LOOKBACK_MONTHS[tf];return m===72?'6년':m===36?'3년':m===12?'1년':m+'개월'}
 function updateIntradayHistoryJump(){
   const button=$('intradayHistoryJump');if(!button)return;
   const tf=$('tf').value,full=['1w','1M'].includes(tf),
@@ -5581,7 +5708,8 @@ function scheduleJumpExtension(bars,left,count){
  if(!segment||segment.bars!==bars||jumpExtendBusy||jumpExtendScheduled||
     Date.now()-jumpExtendRetryAt<2500||!bars?.length)return;
  const earliest=Math.max(
-   segment.tf==='1d'?Date.UTC(2017,7,17):historyCutoff('4h'),
+   segment.tf==='1d'?Date.UTC(2017,7,17):
+   historyCutoff(['4h','6h','12h'].includes(segment.tf)?segment.tf:'4h'),
    historyCutoff(segment.tf));
  // Daily history supports earlier spot data.
  const minTime=segment.tf==='1d'?Date.UTC(2017,7,17):earliest;
@@ -5601,7 +5729,8 @@ async function extendJumpHistory(direction,segment){
  const tf=segment.tf,step=candleDuration[tf]||60000;
  const source=tf==='10m'?'5m':tf,sourceStep=candleDuration[source]||step;
  const first=segment.bars[0].t,last=segment.bars.at(-1).t;
- const minTime=tf==='1d'?Date.UTC(2017,7,17):historyCutoff('4h');
+ const minTime=tf==='1d'?Date.UTC(2017,7,17):
+   historyCutoff(['4h','6h','12h'].includes(tf)?tf:'4h');
  const nowLast=candleOpenTime(tf,Date.now());
  const start=direction==='before'?Math.max(minTime,first-450*step):last+step;
  const finish=direction==='before'?first-step:Math.min(nowLast,last+450*step);
@@ -5684,10 +5813,12 @@ async function jumpChartToUtc(requestedTime){
    if(status)status.textContent='유효한 과거 날짜·시간을 선택해 줘.';return;
  }
  const full=['1w','1M'].includes(tf);
- const minimum=tf==='1d'||full?Date.UTC(2017,7,17):historyCutoff('4h');
+ const minimum=tf==='1d'||full?Date.UTC(2017,7,17):
+   historyCutoff(['4h','6h','12h'].includes(tf)?tf:'4h');
  if(requestedTime<minimum){
    if(status)status.textContent=tf==='1d'||full?
     '바이낸스 과거 기록은 2017년 8월부터 볼 수 있어.':
+    ['4h','6h','12h'].includes(tf)?'최근 6년 이내의 날짜를 선택해 줘.':
     '최근 3년 이내의 날짜를 선택해 줘.';
    return;
  }
