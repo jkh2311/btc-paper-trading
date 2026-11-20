@@ -35,9 +35,9 @@ async function signed(method,path,fields={}){
 }
 function side(p){return p.side==='LONG'||p.side==='SHORT'?p.side:p.side==='BOTH'?(p.amount>0?'LONG':'SHORT'):null;}
 function matching(a,p,kind){
- const wanted=kind==='sl'?'STOP_MARKET':'TAKE_PROFIT_MARKET';
+ const wanted=kind==='sl'?['STOP','STOP_MARKET']:['TAKE_PROFIT','TAKE_PROFIT_MARKET'];
  return a.symbol===symbol&&a.positionSide===p.side&&a.side===(side(p)==='LONG'?'SELL':'BUY')&&
-  (a.orderType||a.type)===wanted&&['NEW','ACCEPTED',''].includes(String(a.algoStatus||a.status||''))&&num(a.triggerPrice)>0;
+  wanted.includes(a.orderType||a.type)&&['NEW','ACCEPTED',''].includes(String(a.algoStatus||a.status||''))&&num(a.triggerPrice)>0;
 }
 function getProtection(p,kind){
  return algos.filter(a=>matching(a,p,kind)).sort((a,b)=>Number(b.algoId||0)-Number(a.algoId||0))[0]||null;
@@ -190,6 +190,9 @@ async function moveProtection(l,raw){
   const validNow=s==='LONG'?(kind==='sl'?Number(snapped)<liveMark:Number(snapped)>liveMark):
    (kind==='sl'?Number(snapped)>liveMark:Number(snapped)<liveMark);
   if(!(liveMark>0&&validNow))throw Error('마크가 변동으로 지정 가격이 유효하지 않습니다');
+  const oldType=String(existing?.orderType||existing?.type||'');
+  if(oldType==='STOP'||oldType==='TAKE_PROFIT')
+   throw Error('조건부 지정가 보호선의 변경은 기존 주문 취소 및 수량 재확인이 필요합니다. 바이낸스에서 직접 수정해 주세요.');
   const type=kind==='sl'?'STOP_MARKET':'TAKE_PROFIT_MARKET';
   const newId='btcp'+(kind==='sl'?'s':'t')+s[0]+Date.now().toString(36);
   const req={algoType:'CONDITIONAL',symbol,side:s==='LONG'?'SELL':'BUY',positionSide:p.side,type,
