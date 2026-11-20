@@ -6281,7 +6281,9 @@ function drawingHit(clientX,clientY){
   // anchors. Its projection remains selectable on shorter timeframes where
   // the original 4h points may be outside the loaded 1m archive.
   if(entry.kind==='line'&&pts.length===2&&pts[0]&&pts[1]){
-   const a=pts[0],b=pts[1],dx=b.x-a.x,dy=b.y-a.y;
+   const a=pts[0].x<=pts[1].x?pts[0]:pts[1];
+   const b=pts[0].x<=pts[1].x?pts[1]:pts[0];
+   const dx=b.x-a.x,dy=b.y-a.y;
    if(Math.abs(dx)>1e-8){
     const x0=Math.max(0,Math.min(scale.plotW,a.x));
     const x1=scale.plotW;
@@ -6399,7 +6401,9 @@ function drawSavedChartShapes(ctx,bars,left,count,plotW,top,bottom){
   // All timeframes therefore share the same trendline; beyond its second
   // anchor the extrapolated section is dashed for visual distinction.
   if(kind==='line'&&xy.length===2&&xy[0]&&xy[1]){
-   const [a,b]=xy,dx=b.x-a.x;
+   const a=xy[0].x<=xy[1].x?xy[0]:xy[1];
+   const b=xy[0].x<=xy[1].x?xy[1]:xy[0];
+   const dx=b.x-a.x;
    if(Math.abs(dx)>1e-8&&b.x<plotW){
     const x0=Math.max(0,b.x),x1=plotW;
     if(x1>x0){
