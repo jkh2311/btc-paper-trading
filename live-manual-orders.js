@@ -927,7 +927,11 @@ const quickCloseMethod=$('quickCloseMethod'),quickClosePercent=$('quickClosePerc
 const quickCloseStatus=$('quickCloseStatus');
 let quickCloseBusy=false,quickCloseUncertain=false,quickCloseQuoteBusy=false;
 let quickCloseBook={bid:NaN,ask:NaN,at:0},quickCloseTrack=null,quickCloseTrackBusy=false;
+let quickCloseRiskSnapshot=null,quickCloseRiskBusy=false,quickCloseRiskRequestedAt=0;
 function quickClosePositions(){
+ // Prefer a fresh signed positionRisk snapshot to avoid stale UI/account events.
+ if(quickCloseRiskSnapshot&&Date.now()-quickCloseRiskSnapshot.at<=12000)
+  return quickCloseRiskSnapshot.positions;
  if(!account||Date.now()-Number(account.at)>60000)return [];
  return (account.positions||[]).map(p=>{
   const quantity=Number(p.amount),ps=String(p.side||'BOTH');
@@ -935,6 +939,28 @@ function quickClosePositions(){
   const side=ps==='LONG'||ps==='SHORT'?ps:quantity>0?'LONG':'SHORT';
   return {side,positionSide:ps,amount:Math.abs(quantity)};
  }).filter(Boolean);
+}
+async function quickCloseRefreshPositions(){
+ if(quickCloseRiskBusy||!visible()||!cred()?.apiKey||!cred()?.apiSecret||
+  Date.now()-quickCloseRiskRequestedAt<6500)return;
+ quickCloseRiskBusy=true;quickCloseRiskRequestedAt=Date.now();
+ try{
+  const rows=await signed('GET','/fapi/v3/positionRisk',{symbol});
+  if(!Array.isArray(rows))throw Error('바이낸스 포지션 데이터 형식 오류');
+  const positions=rows.filter(p=>p?.symbol===symbol&&
+    Number.isFinite(Number(p.positionAmt))&&Math.abs(Number(p.positionAmt))>1e-8)
+   .map(p=>({
+    side:p.positionSide==='LONG'||p.positionSide==='SHORT'?p.positionSide:
+     Number(p.positionAmt)>0?'LONG':'SHORT',
+    positionSide:p.positionSide||'BOTH',
+    amount:Math.abs(Number(p.positionAmt))
+   }));
+  quickCloseRiskSnapshot={at:Date.now(),positions};
+  quickCloseRender();
+ }catch(e){
+  if(!account||Date.now()-Number(account.at)>60000)
+   quickCloseSetStatus('실전 포지션 조회 실패 · API 연결 확인: '+String(e?.message||e),true);
+ }finally{quickCloseRiskBusy=false;}
 }
 function quickCloseSwitchInProgress(){
  const x=window.btcLiveSwitchSnapshot?.();
@@ -1147,21 +1173,27 @@ quickCloseMethod?.addEventListener('change',()=>{
 quickClosePercent?.addEventListener('input',quickCloseRender);
 quickClosePercent?.addEventListener('change',quickCloseRender);
 document.addEventListener('btc:real-account-updated',()=>{
- quickCloseRender();if(quickCloseMethod?.value==='LIMIT')void quickCloseRefreshQuote();
+ quickCloseRender();
+ void quickCloseRefreshPositions();
+ if(quickCloseMethod?.value==='LIMIT')void quickCloseRefreshQuote();
 });
 document.addEventListener('btc:real-account-cleared',()=>{
  quickCloseBook={bid:NaN,ask:NaN,at:0};
+ quickCloseRiskSnapshot=null;quickCloseRiskRequestedAt=0;
  quickCloseRender();quickCloseSetStatus('실전 계좌 연결 필요');
 });
 document.addEventListener('btc:live-switch-state',quickCloseRender);
 setInterval(()=>{
  if(!visible())return;
  quickCloseRender();
+ void quickCloseRefreshPositions();
  if(quickCloseMethod?.value==='LIMIT'&&Date.now()-quickCloseBook.at>2000)
   void quickCloseRefreshQuote();
  if(quickCloseTrack)void quickCloseFollowOrder();
 },2300);
+document.addEventListener('btc:credentials-unlocked',()=>void quickCloseRefreshPositions());
 quickCloseRender();
+void quickCloseRefreshPositions();
 
 for(const [id,side] of [['long','LONG'],['short','SHORT']]){
  const b=$(id);if(!b)continue;b.disabled=false;b.onclick=()=>showSheet(side);
