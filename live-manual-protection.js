@@ -85,16 +85,21 @@ async function protect(side,p,info){
   return;
  }
  const entry=Number(p.entryPrice),mark=Number(p.markPrice),stop=Number(info.stop),rr=Number(info.rr);
- if(!(entry>0&&mark>0&&stop>=.05&&stop<=10&&rr>=1))throw Error('손절·익절 계산 설정 확인 필요');
+ const roiMode=info.roiMode===true,lev=Number(info.leverage);
+ if(!(entry>0&&mark>0&&
+    (roiMode?lev>=1&&lev<=100&&stop>=.1&&stop<=100&&rr>=.1&&rr<=100:
+     stop>=.05&&stop<=10&&rr>=1)))
+  throw Error('익절·손절 설정 또는 진입 레버리지 확인 필요');
  const ex=await fetch(base+'/fapi/v1/exchangeInfo?symbol='+symbol,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('거래소 필터 조회 실패');return r.json()});
  const priceFilter=ex.symbols?.[0]?.filters?.find(f=>f.filterType==='PRICE_FILTER');
  if(!priceFilter?.tickSize)throw Error('호가 단위 확인 실패');
- const d=stop/100;
+ const d=(roiMode?stop/lev:stop)/100;
  // A user-chosen reservation price is an absolute exchange target after fill.
  // Ordinary entries retain the established stop-percent / risk-reward defaults.
  const custom=Number(info.tpPrice)>0&&Number(info.slPrice)>0;
  const sl=custom?Number(info.slPrice):entry*(side==='LONG'?1-d:1+d);
- const tp=custom?Number(info.tpPrice):entry*(side==='LONG'?1+d*rr:1-d*rr);
+ const tp=custom?Number(info.tpPrice):entry*(side==='LONG'?
+  1+(roiMode?rr/(100*lev):d*rr):1-(roiMode?rr/(100*lev):d*rr));
  if(custom&&!(side==='LONG'?sl<entry&&tp>entry:sl>entry&&tp<entry))
   throw Error('예약 진입 보호가가 실제 포지션 평균 진입가 기준 올바르지 않습니다. 자동 보호 등록 중단 · 바이낸스 주문 확인 필요');
  const prices={
