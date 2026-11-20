@@ -1223,8 +1223,8 @@ quickCloseReview.innerHTML='<section role="dialog" aria-modal="true" aria-label=
  '<h3 id="qcrTitle" style="margin:0 0 12px;font-size:19px">실전 청산 확인</h3>'+
  '<label style="display:block;margin:9px 0 4px">청산 방식</label><select id="qcrMethod" style="width:100%"><option value="LIMIT">지정가 청산</option><option value="MARKET">시장가 청산</option></select>'+
  '<label style="display:block;margin:9px 0 4px">청산 비율 (%)</label><input id="qcrPercent" type="number" min="1" max="100" step="1" inputmode="numeric" style="width:100%">'+
- '<div id="qcrPreview" style="white-space:pre-line;line-height:1.75;font-size:13px;margin:13px 0;color:#cce3f4">바이낸스 포지션 조회 중…</div>'+
- '<div style="font-size:11px;color:#f6c18a;line-height:1.6">수익률은 수수료율 가정에 따른 추정치입니다. 실제 수수료·슬리피지·펀딩비·체결가에 따라 달라집니다. 지정가는 미체결될 수 있습니다.</div>'+
+ '<div id="qcrPreview" aria-live="polite" style="line-height:1.75;font-size:13px;margin:13px 0;color:#cce3f4">바이낸스 포지션 조회 중…</div>'+
+ '<div style="font-size:11px;color:#f6c18a;line-height:1.6">표시 금액과 수익률은 예상치입니다. 최종 체결 결과에 따라 달라지며 지정가는 미체결될 수 있습니다.</div>'+
  '<div style="display:flex;gap:8px;margin-top:15px"><button type="button" id="qcrCancel" style="flex:1;background:#304660">취소</button><button type="button" id="qcrSubmit" disabled style="flex:1;background:#aa4255;color:white">실제 청산 확인</button></div></section>';
 document.body.append(quickCloseReview);
 const qcr=id=>quickCloseReview.querySelector('#'+id);
@@ -1268,14 +1268,42 @@ async function qcrRefresh(){
    Number(position.positionInitialMargin)*pct/100:
    (leverage>0?entry*qty/leverage:NaN);
   const netRoi=margin>0?(gross-fee)/margin*100:NaN;
-  qcr('qcrPreview').textContent=
-   '실시간 '+(side==='LONG'?'매도(Bid) ':'매수(Ask) ')+fmt(exitPrice)+' USDT\n'+
-   '현재 보유 '+fmt(Math.abs(Number(position.positionAmt)))+' BTC · 청산 약 '+fmt(qty)+' BTC\n'+
-   '예상 총손익 '+fmt(gross)+' USDT\n'+
-   '예상 왕복 수수료 '+fmt(fee)+' USDT (진입 0.05% 가정 / 청산 '+(exitFeeRate*100).toFixed(2)+'% 가정)\n'+
-   '수수료 차감 예상 손익 '+fmt(gross-fee)+' USDT\n'+
-   '수수료 차감 예상 수익률 '+(Number.isFinite(netRoi)?netRoi.toFixed(2)+'%':'증거금 정보 부족으로 산출 불가')+'\n'+
-   (method==='LIMIT'?'확정 시 최신 호가로 GTC 지정가 제출 · 미체결 가능':'확정 시 시장가 제출 · 체결가 변동 가능');
+  // Only the confirmation display is localized: Binance signed order fields
+  // remain BTC quantity and USDT prices so that execution is unchanged.
+  const fx=Number($('fx')?.value);
+  if(!(Number.isFinite(fx)&&fx>0))throw Error('설정에서 유효한 원화 환율을 입력해 주세요');
+  const wonAmount=amount=>Math.round(amount*fx).toLocaleString('ko-KR')+'원';
+  const preview=qcr('qcrPreview');
+  preview.replaceChildren();
+  const line=(label,value,color='#e1eef9',emphasize=false)=>{
+   const row=document.createElement('div');
+   row.style.cssText='display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:4px 0;border-bottom:1px solid rgba(133,172,207,.14)';
+   const title=document.createElement('span');
+   title.style.cssText='color:#b5c9dc;flex:1;min-width:0';
+   title.textContent=label;
+   const number=document.createElement('strong');
+   number.style.cssText='text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;'+
+    'color:'+color+';font-size:'+(emphasize?'20px':'14px')+';font-weight:'+(emphasize?'850':'720');
+   number.textContent=value;
+   row.append(title,number);
+   preview.append(row);
+  };
+  const profitColor=netRoi>=0?'#65edab':'#ff8a9d';
+  const pnlColor=gross-fee>=0?'#65edab':'#ff8a9d';
+  line('실시간 '+(side==='LONG'?'매도가':'매수가'),wonAmount(exitPrice));
+  line('현재 보유 평가금액',wonAmount(Math.abs(Number(position.positionAmt))*exitPrice));
+  line('청산 예정 평가금액',wonAmount(qty*exitPrice)+' ('+pct+'%)');
+  line('예상 총손익',wonAmount(gross),gross>=0?'#65edab':'#ff8a9d');
+  line('예상 수수료',wonAmount(fee),'#f4c58d');
+  line('수수료 차감 예상 손익',wonAmount(gross-fee),pnlColor,true);
+  line('수수료 차감 예상 수익률',Number.isFinite(netRoi)?
+   (netRoi>=0?'+':'')+netRoi.toFixed(2)+'%':'산출 불가',Number.isFinite(netRoi)?profitColor:'#f4c58d',true);
+  const foot=document.createElement('div');
+  foot.style.cssText='padding-top:9px;color:#abc0d4;font-size:11px';
+  foot.textContent='적용 환율 '+Math.round(fx).toLocaleString('ko-KR')+'원 · '+
+   (method==='LIMIT'?'최종 확인 시 최신 호가로 지정가 제출 · 미체결 가능':
+    '최종 확인 시 시장가 주문 · 체결가격 변동 가능');
+  preview.append(foot);
   qcr('qcrSubmit').disabled=false;
  }catch(e){
   if(seq===qcrPreviewSeq&&side===qcrSide)qcr('qcrPreview').textContent=
@@ -1285,7 +1313,7 @@ async function qcrRefresh(){
 function qcrShow(side){
  if(qcrBusy||quickCloseBusy||busy)return;
  qcrSide=side;
- qcr('qcrTitle').textContent='BTCUSDT '+(side==='SHORT'?'숏':'롱')+' 청산 최종 확인';
+ qcr('qcrTitle').textContent=(side==='SHORT'?'숏':'롱')+' 청산 최종 확인';
  qcr('qcrMethod').value=quickCloseMethod.value;
  qcr('qcrPercent').value=quickClosePercent.value;
  quickCloseReview.hidden=false;quickCloseReview.style.display='flex';
