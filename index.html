@@ -2723,8 +2723,10 @@ async function saveCachedChartSegment(segment){
   x.bars[0].t<=last+duration&&x.bars.at(-1).t>=first-duration);
  const merged=overlapping.reduce((a,x)=>mergeDailyCandles(a,x.bars),bars);
  const preserved=existing.filter(x=>!overlapping.includes(x));
+ // Keep every successfully downloaded, non-overlapping date range as long
+ // as the device has storage. No arbitrary last-12-jumps expiration.
  const chunks=[...preserved,{bars:merged,savedAt:Date.now()}]
-  .sort((a,b)=>a.savedAt-b.savedAt).slice(-12);
+  .sort((a,b)=>a.savedAt-b.savedAt);
  cachedChartSegments[tf]=chunks;
  try{await chartCacheWrite(CHART_SEGMENT_STORE,{tf,chunks,version:1})}
  catch(e){console.warn('날짜 이동 구간 캐시 저장 불가',e)}
@@ -2770,7 +2772,7 @@ async function restoreChartHistoryCache(){
    const segmentRow=await chartCacheRead(CHART_SEGMENT_STORE,tf).catch(()=>null);
    if(Array.isArray(segmentRow?.chunks)){
     cachedChartSegments[tf]=segmentRow.chunks.filter(x=>
-     Array.isArray(x?.bars)&&x.bars.length>=22).slice(-12);
+     Array.isArray(x?.bars)&&x.bars.length>=22);
    }
   }
   chartHistoryCacheNotice='저장된 차트 불러오기 완료';
