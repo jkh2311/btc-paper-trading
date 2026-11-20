@@ -801,7 +801,7 @@ function renderSwitchWatch(){
  note.style.cssText='font-size:11px;color:#c6ad7a';
  note.textContent=p.state==='ARMED'?
   '앱 내부 가격 감시 · 바이낸스 미체결 주문 아님 · 앱 활성 중에만 작동':
-  '앱 내부 감시 비활성/확인 필요 · 거래소에 예약된 스위칭 주문 없음';
+  '이전 스위칭 상태 확인 중 · 바이낸스 포지션/미체결 주문 조회 후 자동 정리';
  card.append(title,details,note);
  if(p.state!=='ARMED'&&p.message){
   const status=document.createElement('div');status.style.cssText='font-size:11px;color:#efc9ba';
