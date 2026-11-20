@@ -68,7 +68,8 @@ async function algos(){
 }
 function isProtection(o,side,positionSide){
  return o.symbol===symbol&&o.positionSide===positionSide&&o.side===(side==='LONG'?'SELL':'BUY')&&
- (o.closePosition===true||o.closePosition==='true')&&['STOP_MARKET','TAKE_PROFIT_MARKET'].includes(o.orderType||o.type);
+ ['STOP','TAKE_PROFIT','STOP_MARKET','TAKE_PROFIT_MARKET'].includes(o.orderType||o.type)&&
+ (o.closePosition===true||o.closePosition==='true'||Number(o.quantity)>0);
 }
 async function protect(side,p,info){
  const entry=Number(p.entryPrice),mark=Number(p.markPrice),stop=Number(info.stop),rr=Number(info.rr);
@@ -106,13 +107,22 @@ async function protect(side,p,info){
  const ps=p.positionSide||'BOTH';
  const split=splitPlan(side,p);
  let active=(await algos()).filter(o=>isProtection(o,side,ps));
+ const category=t=>t==='STOP_MARKET'||t==='STOP'?'STOP':'TAKE_PROFIT';
+ const safeQty=Math.abs(Number(p.positionAmt));
+ if(!(Number.isFinite(safeQty)&&safeQty>0))
+  throw Error('보호 지정가 청산 수량 확인 실패');
+ const symbolRules=ex.symbols?.find(x=>x.symbol===symbol);
+ const lot=symbolRules?.filters?.find(f=>f.filterType==='LOT_SIZE');
+ const step=Number(lot?.stepSize),minQty=Number(lot?.minQty);
+ if(!(step>0&&safeQty>=minQty&&Math.abs(safeQty/step-Math.round(safeQty/step))<1e-6))
+  throw Error('현재 포지션 수량이 바이낸스 지정가 청산 단위와 맞지 않습니다. 수동 보호 필요');
  if(custom){
   // Respect existing exchange protective orders. Do not silently override
   // an existing stop or TP when pyramid entries have conflicting targets.
-  for(const [kind,wanted] of [['STOP_MARKET',prices.STOP_MARKET],
-   ['TAKE_PROFIT_MARKET',prices.TAKE_PROFIT_MARKET]]){
-   if(split&&kind==='TAKE_PROFIT_MARKET')continue;
-   const existing=active.find(o=>(o.orderType||o.type)===kind);
+  for(const [kind,wanted] of [['STOP',prices.STOP_MARKET],
+   ['TAKE_PROFIT',prices.TAKE_PROFIT_MARKET]]){
+   if(split&&kind==='TAKE_PROFIT')continue;
+   const existing=active.find(o=>category(o.orderType||o.type)===kind);
    const actual=Number(existing?.triggerPrice);
    if(existing&&Number.isFinite(actual)&&Math.abs(actual-Number(wanted))>
       Math.max(Number(priceFilter.tickSize)*.5,1e-6))
@@ -122,35 +132,44 @@ async function protect(side,p,info){
  // The user's explicitly approved three-limit TP plan replaces only the
  // original full-size TP. Keep/recreate STOP_MARKET throughout the plan.
  // Never create a competing full-size TP while split order state exists.
- for(const type of (split?['STOP_MARKET']:['STOP_MARKET','TAKE_PROFIT_MARKET'])){
-  if(active.some(o=>(o.orderType||o.type)===type))continue;
-  const clientAlgoId='btcp'+(type==='STOP_MARKET'?'s':'t')+side[0]+Date.now().toString(36);
-  const payload={algoType:'CONDITIONAL',symbol,side:side==='LONG'?'SELL':'BUY',positionSide:ps,
-   type,closePosition:'true',triggerPrice:prices[type],workingType:'MARK_PRICE',clientAlgoId};
+ for(const type of (split?['STOP']:['STOP','TAKE_PROFIT'])){
+  if(active.some(o=>category(o.orderType||o.type)===type))continue;
+  const clientAlgoId='btcp'+(type==='STOP'?'s':'t')+side[0]+Date.now().toString(36);
+  const trigger=prices[type==='STOP'?'STOP_MARKET':'TAKE_PROFIT_MARKET'];
+  // GTC conditional limit: the stop/TP trigger and limit price are user-set.
+  // The order may remain unfilled after trigger; never claim guaranteed close.
+  const payload={algoType:'CONDITIONAL',symbol,side:side==='LONG'?'SELL':'BUY',
+   positionSide:ps,type,quantity:String(safeQty),price:trigger,
+   timeInForce:'GTC',triggerPrice:trigger,workingType:'MARK_PRICE',clientAlgoId};
+  if(ps==='BOTH')payload.reduceOnly='true';
   try{await signed('POST','/fapi/v1/algoOrder',payload);}
   catch(e){
    active=(await algos()).filter(o=>isProtection(o,side,ps));
-   if(!active.some(o=>(o.orderType||o.type)===type))throw Error(type+' 등록 불확실: '+e.message);
+   if(!active.some(o=>(o.orderType||o.type)===type&&
+       Number(o.triggerPrice)===Number(trigger)))throw Error(type+' 지정가 등록 불확실: '+e.message);
   }
   active=(await algos()).filter(o=>isProtection(o,side,ps));
   const confirmed=active.find(o=>(o.orderType||o.type)===type&&
    ['NEW','ACTIVE','PENDING_NEW'].includes(String(o.algoStatus||o.status||'NEW')));
   if(!confirmed||!(Number(confirmed.triggerPrice)>0))
    throw Error(type+' 거래소 활성/가격 확인 실패 · 보호 주문 상태 재확인 필요');
-  if(Math.abs(Number(confirmed.triggerPrice)-Number(prices[type]))>
+  if(Math.abs(Number(confirmed.triggerPrice)-Number(trigger))>
+      Math.max(Number(priceFilter.tickSize)*.5,1e-6)||
+     Math.abs(Number(confirmed.price)-Number(trigger))>
       Math.max(Number(priceFilter.tickSize)*.5,1e-6))
-   throw Error(type+' 거래소 목표가 불일치 · 설정 '+prices[type]+
-    ' / 실제 '+confirmed.triggerPrice+' USDT · 직접 확인 필요');
+   throw Error(type+' 거래소 지정가/조건가 불일치 · 직접 확인 필요');
  }
 
- if(!active.some(o=>(o.orderType||o.type)==='STOP_MARKET')||
-    (!split&&!active.some(o=>(o.orderType||o.type)==='TAKE_PROFIT_MARKET')))
+ if(!active.some(o=>category(o.orderType||o.type)==='STOP')||
+    (!split&&!active.some(o=>category(o.orderType||o.type)==='TAKE_PROFIT')))
   throw Error('손절·익절 활성 상태 확인 실패');
+ const hasLegacy=active.some(o=>['STOP_MARKET','TAKE_PROFIT_MARKET'].includes(o.orderType||o.type));
  note.textContent=split?
   side+' 3분할 익절 관리 중 ('+split.state+') · 기존 손절 유지 · SL '+prices.STOP_MARKET+
-  '\n원래 전량 익절은 분할 주문 적용 중 자동 재등록하지 않습니다.':
-  side+' 거래소 손절·익절 활성 확인 · SL '+prices.STOP_MARKET+' / TP '+prices.TAKE_PROFIT_MARKET+
-  '\n보호 주문은 해당 방향 포지션 전체에 적용 · 시간 청산은 앱 활성 중에만 가능';
+  '\n분할 익절 계획 중 기존 TP 주문 자동 교체 안 함':
+  side+' 거래소 TP/SL 조회 완료 · SL '+prices.STOP_MARKET+' / TP '+prices.TAKE_PROFIT_MARKET+
+  (hasLegacy?'\n기존 시장가 보호주문은 임의 변경하지 않았습니다.':
+   '\n조건부 지정가(GTC) 보호주문 · 발동해도 미체결 가능 · 청산 수량 변화 시 재확인 필수');
  document.dispatchEvent(new CustomEvent('btc:manual-protection-status',{detail:{
   side,ok:true,message:note.textContent
  }}));
