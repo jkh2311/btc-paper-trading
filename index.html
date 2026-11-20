@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-close-krw-v289"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-continuous-time-pan-v290"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -4528,7 +4528,7 @@ function renderChartTimeAxis(bars,left,count,plotW){
     172800000,604800000,1209600000];
   const step=tickIntervals.find(ms=>ms>=duration&&ms/duration*px>=83)||
     tickIntervals.at(-1);
-  const start=Math.max(0,Math.floor(left)),end=Math.min(bars.length,Math.ceil(left+count));
+  const start=Math.max(0,Math.floor(left)),end=Math.ceil(left+count);
   const kstOffset=9*3600000,items=[];
   // 4h candles start at 01:00/05:00/etc KST, not midnight.
   // Detect the FIRST candle of each KST date instead of aligning to
@@ -4536,7 +4536,9 @@ function renderChartTimeAxis(bars,left,count,plotW){
   const dateAxis=['4h','6h','12h','1d','1w','1M'].includes($('tf').value);
   let previousX=-100,previousDateKey=null;
   for(let i=start;i<end;i++){
-    const t=bars[i].t;
+    // Blank future slots have timestamps only; never synthesize OHLCV.
+    const t=i<bars.length?bars[i]?.t:
+     bars.at(-1).t+(i-bars.length+1)*duration;
     if(!Number.isFinite(t))continue;
     const date=new Date(t+kstOffset);
     const dateKey=date.getUTCFullYear()+'-'+date.getUTCMonth()+'-'+date.getUTCDate();
@@ -4557,9 +4559,10 @@ function renderChartTimeAxis(bars,left,count,plotW){
   // In short visible windows, ensure at least one precise reference time.
   if(!items.length){
     const i=Math.max(start,Math.min(end-1,Math.round(left+count/2)));
-    const b=bars[i];
-    if(b){
-      const date=new Date(b.t+kstOffset),x=(i-left+.5)*px;
+    const b=i<bars.length?bars[i]:null;
+    const tickTime=b?.t??(bars.at(-1).t+(i-bars.length+1)*duration);
+    if(Number.isFinite(tickTime)){
+      const date=new Date(tickTime+kstOffset),x=(i-left+.5)*px;
       const label=['1d','1w','1M'].includes($('tf').value)?
         String(date.getUTCFullYear()).slice(-2)+'.'+String(date.getUTCMonth()+1).padStart(2,'0')+'.'+String(date.getUTCDate()).padStart(2,'0'):
         dateAxis?String(date.getUTCMonth()+1).padStart(2,'0')+'.'+String(date.getUTCDate()).padStart(2,'0'):
@@ -5312,6 +5315,80 @@ function syncMinuteChartArchive(recentOnly=false){
  const cutoff=historyCutoff('1m')-60000;
  if(old[0]?.t<cutoff){let n=0;while(n<old.length&&old[n].t<cutoff)n++;if(n)old.splice(0,n);}
 }
+// Extend only the selected historical-jump timeline. Live candles and
+// trading/signal archives never receive these historical pages.
+let jumpExtendBusy=false,jumpExtendRetryAt=0,jumpExtendScheduled=false;
+function scheduleJumpExtension(bars,left,count){
+ const segment=chartJumpSegment;
+ if(!segment||segment.bars!==bars||jumpExtendBusy||jumpExtendScheduled||
+    Date.now()-jumpExtendRetryAt<2500||!bars?.length)return;
+ const earliest=Math.max(
+   segment.tf==='1d'?Date.UTC(2017,7,17):historyCutoff('4h'),
+   historyCutoff(segment.tf));
+ // Daily history supports earlier spot data.
+ const minTime=segment.tf==='1d'?Date.UTC(2017,7,17):earliest;
+ const timeStep=candleDuration[segment.tf]||60000;
+ const nowLast=candleOpenTime(segment.tf,Date.now());
+ const before=left<Math.max(45,count*.7)&&bars[0].t>minTime+timeStep;
+ const after=left+count>bars.length-Math.max(45,count*.7)&&
+  bars.at(-1).t<nowLast-timeStep;
+ if(!before&&!after)return;
+ jumpExtendScheduled=true;
+ // Never fetch repeatedly inside draw(); schedule after it completes.
+ setTimeout(()=>{jumpExtendScheduled=false;void extendJumpHistory(before?'before':'after',segment);},30);
+}
+async function extendJumpHistory(direction,segment){
+ if(jumpExtendBusy||chartJumpSegment!==segment)return;
+ jumpExtendBusy=true;jumpExtendRetryAt=Date.now();
+ const tf=segment.tf,step=candleDuration[tf]||60000;
+ const source=tf==='10m'?'5m':tf,sourceStep=candleDuration[source]||step;
+ const first=segment.bars[0].t,last=segment.bars.at(-1).t;
+ const minTime=tf==='1d'?Date.UTC(2017,7,17):historyCutoff('4h');
+ const nowLast=candleOpenTime(tf,Date.now());
+ const start=direction==='before'?Math.max(minTime,first-450*step):last+step;
+ const finish=direction==='before'?first-step:Math.min(nowLast,last+450*step);
+ if(finish<start){jumpExtendBusy=false;return}
+ const status=$('chartTimeJumpStatus');
+ try{
+  const fetched=[];
+  // Use Binance spot for daily timestamps before futures launch.
+  for(let cursor=Math.floor(start/sourceStep)*sourceStep;cursor<=finish;){
+   const spot=tf==='1d'&&cursor<Date.UTC(2019,8,9);
+   const endpoint=spot?'https://data-api.binance.vision/api/v3/klines':
+     'https://fapi.binance.com/fapi/v1/klines';
+   const boundary=spot?Date.UTC(2019,8,9)-sourceStep:finish;
+   const end=Math.min(finish,cursor+999*sourceStep,boundary);
+   const url=endpoint+'?symbol=BTCUSDT&interval='+source+'&limit=1000'+
+    '&startTime='+cursor+'&endTime='+end;
+   const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(16000)});
+   if(!response.ok)throw Error('추가 캔들 조회 HTTP '+response.status);
+   const raw=await response.json();
+   if(!Array.isArray(raw))throw Error('추가 캔들 응답 형식 오류');
+   fetched.push(...raw.map(v=>({t:+v[0],o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:+v[5]}))
+    .filter(v=>Number.isFinite(v.t)&&v.c>0));
+   cursor=end+sourceStep;
+  }
+  const extra=tf==='10m'?buildTenMinuteCandles(fetched):fetched;
+  if(chartJumpSegment!==segment||$('tf').value!==tf)return;
+  const original=segment.bars;
+  // No fabricated candles between disconnected history windows.
+  const additions=extra.filter(b=>direction==='before'?b.t<first:b.t>last);
+  const adjacent=direction==='before'?additions.at(-1)?.t:first&&additions[0]?.t;
+  if(additions.length&&
+     (direction==='before'?first-adjacent<=step:adjacent-last<=step)){
+   segment.bars=direction==='before'?
+    mergeDailyCandles(additions,original):mergeDailyCandles(original,additions);
+   if(direction==='after'){
+    // Adding to the right increases the end-anchored offset. Preserve the
+    // exact candle and screen position the user was browsing.
+    viewOffset+=segment.bars.length-original.length;
+   }
+   draw();drawRmi();
+  }else if(status)status.textContent='추가 거래소 봉이 이어지지 않습니다 · 해당 날짜를 확인하세요';
+ }catch(e){
+  if(status)status.textContent='주변 과거 조회 지연 · 다시 좌우로 이동하면 재시도: '+String(e.message||e);
+ }finally{jumpExtendBusy=false;jumpExtendRetryAt=Date.now();}
+}
 function chartViewBars(){
  const tf=$('tf').value;
  return chartJumpSegment?.tf===tf?chartJumpSegment.bars:
@@ -5378,7 +5455,7 @@ async function jumpChartToUtc(requestedTime){
    }
    const source=tf==='10m'?'5m':tf;
    const sourceDuration=candleDuration[source];
-   const from=Math.max(minimum-duration*360,target-duration*360);
+   const from=Math.max(minimum,target-duration*360);
    const until=Math.min(Date.now(),target+duration*260);
    const fetched=[];
    const spot=tf==='1d'&&target<Date.UTC(2019,8,9);
@@ -5719,7 +5796,8 @@ function drawSixDChartTag(ctx,plotW,top){
  ctx.fillStyle='#a8e5eb';ctx.fillText(label,10,top+18,boxW-9);ctx.restore();
 }
 window.btcRedrawChart=()=>draw();
-function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min((chartIndicators.maForecast||chartIndicators.bbForecast)?600:400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
+function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min((chartIndicators.maForecast||chartIndicators.bbForecast)?600:400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;
+if(chartJumpSegment?.bars===a)scheduleJumpExtension(a,left,count);let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
 if((chartJumpSegment||$('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
    Math.abs(verticalPan)<1e-9&&verticalZoom===1){
   // Past 1m prices may be far from today's fixed live-price scale.
