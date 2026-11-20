@@ -364,7 +364,7 @@ document.addEventListener('btc:manual-protection-status',e=>{
  const detail=e.detail||{};
  if(detail.ok===true){
   actionMessage='';actionError=false;
-  note('실제 바이낸스 익절·손절 등록 확인');
+  actionNotice('✅ 실제 바이낸스 손절·익절 주문 활성 확인 · 차트 라인 갱신',false);
   readStamp=0;
   void readAlgos();
  }else if(detail.ok===false&&detail.message){
