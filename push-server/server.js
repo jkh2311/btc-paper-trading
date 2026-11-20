@@ -8,6 +8,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const webpush=require('web-push');
+const WebSocket=require('ws');
 const liveGuard=require('./live-auto-guard');
 const liveExec=require('./live-auto-executor');
 
@@ -26,6 +27,102 @@ webpush.setVapidDetails(SUBJECT,PUBLIC,PRIVATE);
 
 let subscribers=[];
 let lastPrice=null,lastPriceAt=0,lastPriceError=null,priceBusy=false;
+// Same BTCUSDT USD-M futures contract, via Binance's official public market
+// WebSocket. Never silently substitute spot or a different exchange.
+let wsFeed=null,wsRetryTimer=null,wsClosedBars=[],wsLastMessageAt=0;
+let wsError=null,wsStatus='connecting',wsReconnectDelay=5000;
+let restBlockedUntil=0,restLastError=null,signalFeedSource='none';
+const WS_FUTURES_KLINE_URL='wss://fstream.binance.com/market/ws/btcusdt@kline_1m';
+function connectFuturesKlineStream(){
+ if(wsFeed)return;
+ wsStatus='connecting';
+ const socket=new WebSocket(WS_FUTURES_KLINE_URL,{handshakeTimeout:10000});
+ wsFeed=socket;
+ socket.on('open',()=>{
+  wsStatus='connected';wsError=null;wsReconnectDelay=5000;
+  console.log('FUTURES WS connected');
+ });
+ socket.on('message',buffer=>{
+  let msg;
+  try{msg=JSON.parse(buffer.toString())}catch(_){return}
+  const k=msg?.k||msg?.data?.k;
+  if(k?.i!=='1m'||k?.s!=='BTCUSDT')return;
+  wsLastMessageAt=Date.now();
+  if(k.x!==true)return; // Never treat unfinished bars as trade signals.
+  const t=Number(k.t),c=Number(k.c),v=Number(k.v);
+  if(!Number.isSafeInteger(t)||t%60000!==0||!(c>0&&v>0))return;
+  const row=[t,k.o,k.h,k.l,k.c,k.v];
+  const last=wsClosedBars.at(-1);
+  if(last&&t===Number(last[0])){wsClosedBars[wsClosedBars.length-1]=row;return}
+  if(last&&t<Number(last[0]))return;
+  if(last&&t!==Number(last[0])+60000){
+   // Restart warm-up after any missing candle. No synthetic gaps.
+   console.warn('FUTURES WS candle gap, resetting RMI warm-up');
+   wsClosedBars=[];
+  }
+  wsClosedBars.push(row);
+  if(wsClosedBars.length>500)wsClosedBars.shift();
+ });
+ socket.on('unexpected-response',(_request,response)=>{
+  wsError='WebSocket HTTP '+response.statusCode;
+  console.warn('FUTURES WS upstream:',wsError);
+ });
+ socket.on('error',error=>{
+  wsError=wsError||String(error.message||error).slice(0,120);
+  console.warn('FUTURES WS:',wsError);
+ });
+ socket.on('close',(code,reason)=>{
+  if(wsFeed===socket)wsFeed=null;
+  wsStatus='disconnected';
+  wsError=wsError||('closed '+code+' '+String(reason||'').slice(0,60));
+  wsLastMessageAt=0;
+  if(!wsRetryTimer){
+   const delay=wsReconnectDelay;
+   wsReconnectDelay=Math.min(120000,wsReconnectDelay*2);
+   wsRetryTimer=setTimeout(()=>{wsRetryTimer=null;connectFuturesKlineStream()},delay);
+  }
+ });
+}
+setInterval(()=>{
+ if(wsFeed&&wsStatus==='connected'&&
+    wsLastMessageAt>0&&Date.now()-wsLastMessageAt>95000){
+  wsError='WebSocket market stream stale (>95s)';
+  wsFeed.terminate();
+ }
+},30000);
+function websocketKlines(){
+ // Closed minute bars must be consecutive, fresh, and fully warmed up.
+ const last=wsClosedBars.at(-1);
+ if(wsStatus!=='connected'||!last||wsClosedBars.length<25||
+    Date.now()-wsLastMessageAt>90000||
+    Date.now()-Number(last[0])-60000>45000)return null;
+ return wsClosedBars.slice();
+}
+async function loadSignalKlines(){
+ if(Date.now()>=restBlockedUntil){
+  try{
+   const response=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=500',
+    {signal:AbortSignal.timeout(7500),headers:{'cache-control':'no-cache'}});
+   if(!response.ok){
+    if(response.status===451)restBlockedUntil=Date.now()+300000;
+    throw Error('Binance REST '+response.status);
+   }
+   const raw=await response.json();
+   if(!Array.isArray(raw)||raw.length<25)throw Error('insufficient futures REST bars');
+   restLastError=null;signalFeedSource='binance-usdm-rest';return raw;
+  }catch(e){restLastError=String(e.message||e).slice(0,140)}
+ }
+ const fallback=websocketKlines();
+ if(fallback){
+  signalFeedSource='binance-usdm-websocket';
+  return fallback;
+ }
+ signalFeedSource='none';
+ throw Error((restLastError||'REST not available')+'; futures WS '+
+  wsStatus+' ('+wsClosedBars.length+'/25 warmup bars)'+
+  (wsError?' · '+wsError:''));
+}
+connectFuturesKlineStream();
 let liveSignalBar=0,liveBusy=false,liveLastError=null,liveLastResult=null;
 try{const raw=JSON.parse(fs.readFileSync(SAVE_FILE,'utf8'));if(Array.isArray(raw))subscribers=raw}catch(_){}
 function save(){
@@ -90,7 +187,13 @@ http.createServer(async(req,res)=>{
    serverOrderError:liveLastError,blockers});return;
  }
  if(req.method==='GET'&&url.pathname==='/health'){
-  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',lastPriceAt,lastPriceError,priceAlertSupported:true});
+  respond(res,200,{ok:true,monitor:'remote-push',subscriberCount:subscribers.length,lastCheckTime,lastCheckError,storage:'ephemeral',lastPriceAt,lastPriceError,priceAlertSupported:true,
+ serverVersion:'v301',signalFeed:'binance-usdm-BTCUSDT',signalFeedSource,
+ marketDataWorking:!lastCheckError&&lastCheckTime>0&&Date.now()-lastCheckTime<90000,
+ restLastError,websocketStatus:wsStatus,websocketLastError:wsError,
+ websocketLastMessageAt:wsLastMessageAt,websocketClosedBars:wsClosedBars.length,
+ websocketReady1m:!!websocketKlines(),websocketReady10m:tenMinuteBars(wsClosedBars.map(x=>
+  ({t:Number(x[0]),c:Number(x[4]),v:Number(x[5])}))).length>=20});
   return;
  }
  if(req.method==='POST'&&url.pathname==='/subscribe'){
@@ -285,11 +388,7 @@ async function poll(){
  if(polling||(!subscribers.length&&liveCfg.errors.length))return;
  polling=true;
  try{
-  const res=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=500',
-    {signal:AbortSignal.timeout(7500),headers:{'cache-control':'no-cache'}});
-  if(!res.ok)throw new Error('Binance '+res.status);
-  const raw=await res.json();
-  if(!Array.isArray(raw)||raw.length<25)throw new Error('Insufficient candles');
+  const raw=await loadSignalKlines();
   const now=Date.now()-1800;
   const bars=raw.map(x=>({t:Number(x[0]),c:Number(x[4]),v:Number(x[5])}))
     .filter(x=>Number.isFinite(x.t)&&x.c>0&&x.v>0&&x.t+60000<=now);
