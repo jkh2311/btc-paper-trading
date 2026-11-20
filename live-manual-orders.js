@@ -433,6 +433,20 @@ async function enter(side){
   if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
    throw Error('설정에서 바이낸스 레버리지 적용을 먼저 눌러 확인해 주세요.');
   if(!Number.isInteger(lev)||lev<1||lev>100||!(stop>0&&stop<=10))throw Error('전략 레버리지/단계/손절 설정 확인');
+  // Fail before entry if a normal SHORT take-profit could be zero/negative.
+  // Reserved absolute TP/SL targets are validated below independently.
+  const rr=val('rr');
+  if(!(Number.isFinite(rr)&&rr>=1))
+   throw Error('목표 손익비가 유효하지 않습니다. 주문 미전송');
+  if(!plan){
+   const slTarget=price*(side==='LONG'?1-stop/100:1+stop/100);
+   const tpTarget=price*(side==='LONG'?1+stop/100*rr:1-stop/100*rr);
+   const minPrice=Number(f.price.minPrice),maxPrice=Number(f.price.maxPrice);
+   if(!(slTarget>0&&tpTarget>0&&Number.isFinite(tpTarget))||
+      (minPrice>0&&(slTarget<minPrice||tpTarget<minPrice))||
+      (maxPrice>0&&(slTarget>maxPrice||tpTarget>maxPrice)))
+    throw Error('손절 거리와 목표 손익비로 계산한 TP/SL이 거래소 허용 가격 범위를 벗어납니다. 주문 미전송');
+  }
   const wallet=Number(account.wallet),available=Number(account.available);
   if(!(wallet>0&&available>0))throw Error('주문 가능 증거금 없음');
   const modeSize=$('sizeMode')?.value;
@@ -994,7 +1008,7 @@ function quickCloseRender(){
   const count=positions.filter(p=>p.side===side).length;
   // Live Binance best bid/ask is fetched again when the button is pressed.
   // Do not disable an otherwise valid position just because quote polling lags.
-  const ready=count===1&&!!cred()?.apiKey&&!!cred()?.apiSecret&&!busy&&
+  const ready=!!cred()?.apiKey&&!!cred()?.apiSecret&&!busy&&
    !quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack&&!switchBusy&&validPct;
   button.disabled=!ready;
   button.title=ready?side+' 포지션 '+pct+'% '+(method==='LIMIT'?'지정가':'시장가')+' 청산 주문 바로 전송':
@@ -1079,8 +1093,9 @@ async function quickCloseSubmit(side){
   credentials();
   if(quickCloseSwitchInProgress())throw Error('스위칭 실행/감시 중에는 빠른 청산을 중단합니다.');
   if(quickCloseTrack)throw Error('이전 청산 주문 상태 확인 중 · 미체결 주문 확인 필요');
+  // Do not rely on a stale display snapshot to permit a close.
+  // Only the signed exchange positionRisk below authorizes the actual order.
   const listed=quickClosePositions().filter(p=>p.side===side);
-  if(listed.length!==1)throw Error('선택한 '+side+' 실제 보유 포지션을 확인하지 못했습니다.');
   const [dual,details,f,openOrders]=await Promise.all([
    mode(),signed('GET','/fapi/v3/positionRisk',{symbol}),filters(),
    signed('GET','/fapi/v1/openOrders',{symbol})
@@ -1094,7 +1109,11 @@ async function quickCloseSubmit(side){
    (side==='LONG'?Number(p.positionAmt)>0:Number(p.positionAmt)<0));
   if(matches.length!==1)throw Error('거래소 실제 포지션 방향/수량 확인 실패');
   const p=matches[0],quantity=Math.abs(Number(p.positionAmt));
-  if(Math.abs(quantity-listed[0].amount)>1e-8)
+  // A missing/stale display snapshot is allowed; Binance itself is source of truth.
+  // A fresh matching snapshot is checked to catch a concurrent change.
+  if(listed.length===1&&quickCloseRiskSnapshot&&
+     Date.now()-quickCloseRiskSnapshot.at<3000&&
+     Math.abs(quantity-listed[0].amount)>1e-8)
    throw Error('포지션이 조회 중 변경되었습니다. 계좌 새로고침 후 다시 청산하세요.');
   const lot=method==='LIMIT'?f.lot:f.market;
   // All quantities are exchange-rounded DOWN. Only 100% may send the
