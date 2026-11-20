@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-disparity-inspector-saved-v300"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261121-global-trendlines-v302"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -6224,10 +6224,31 @@ function drawingTimeIndex(bars,time,tf){
  if(!bars?.length||!Number.isFinite(time))return -1;
  const duration=candleDuration[tf]||60000;
  const first=bars[0].t,last=bars.at(-1).t;
- if(time<first)return -1;
+ // Timeframe archives have different history depths. Do not discard
+ // anchors created on a wider timeframe simply because the current archive
+ // starts later. Extrapolate their timeline position from absolute UTC time.
+ const periodIndex=t=>{
+  if(tf==='1M'){
+   const x=new Date(t),f=new Date(first);
+   const months=(x.getUTCFullYear()-f.getUTCFullYear())*12+
+    x.getUTCMonth()-f.getUTCMonth();
+   const open=Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),1);
+   const next=Date.UTC(x.getUTCFullYear(),x.getUTCMonth()+1,1);
+   return months+(t-open)/(next-open);
+  }
+  return (t-first)/duration;
+ };
+ if(time<first)return periodIndex(time);
  if(time>last){
-  const steps=(time-last)/duration;
-  return steps<=10000?bars.length-1+steps:-1;
+  if(tf==='1M'){
+   const x=new Date(time),f=new Date(last);
+   const months=(x.getUTCFullYear()-f.getUTCFullYear())*12+
+    x.getUTCMonth()-f.getUTCMonth();
+   const open=Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),1);
+   const next=Date.UTC(x.getUTCFullYear(),x.getUTCMonth()+1,1);
+   return bars.length-1+months+(time-open)/(next-open);
+  }
+  return bars.length-1+(time-last)/duration;
  }
  let lo=0,hi=bars.length;
  while(lo<hi){const mid=(lo+hi)>>1;
@@ -6255,6 +6276,25 @@ function drawingHit(clientX,clientY){
   for(let i=0;i<pts.length;i++)if(pts[i]){
    const dist=Math.hypot(pts[i].x-x,pts[i].y-y);
    if(dist<best){best=dist;result={id:entry.id,point:i,dist};}
+  }
+  // A trendline is a rightward ray through its two timestamp-price
+  // anchors. Its projection remains selectable on shorter timeframes where
+  // the original 4h points may be outside the loaded 1m archive.
+  if(entry.kind==='line'&&pts.length===2&&pts[0]&&pts[1]){
+   const a=pts[0],b=pts[1],dx=b.x-a.x,dy=b.y-a.y;
+   if(Math.abs(dx)>1e-8){
+    const x0=Math.max(0,Math.min(scale.plotW,a.x));
+    const x1=scale.plotW;
+    if(x1>=x0){
+     const y0=a.y+(x0-a.x)*dy/dx,y1=a.y+(x1-a.x)*dy/dx;
+     const vx=x1-x0,vy=y1-y0,den=vx*vx+vy*vy;
+     if(den>0){
+      const t=Math.max(0,Math.min(1,((x-x0)*vx+(y-y0)*vy)/den));
+      const dist=Math.hypot(x-x0-t*vx,y-y0-t*vy);
+      if(dist<Math.min(best,10)){best=dist;result={id:entry.id,point:null,dist};}
+     }
+    }
+   }
   }
   for(let i=1;i<pts.length;i++){
    const a=pts[i-1],b=pts[i];if(!a||!b)continue;
@@ -6354,6 +6394,23 @@ function drawSavedChartShapes(ctx,bars,left,count,plotW,top,bottom){
   }
   ctx.strokeStyle=color;ctx.lineWidth=selected?2.8:2.2;ctx.setLineDash([]);
   if(started)ctx.stroke();
+  // Projection follows the ORIGINAL two timestamps and absolute prices,
+  // not the candle index used on the timeframe where the line was drawn.
+  // All timeframes therefore share the same trendline; beyond its second
+  // anchor the extrapolated section is dashed for visual distinction.
+  if(kind==='line'&&xy.length===2&&xy[0]&&xy[1]){
+   const [a,b]=xy,dx=b.x-a.x;
+   if(Math.abs(dx)>1e-8&&b.x<plotW){
+    const x0=Math.max(0,b.x),x1=plotW;
+    if(x1>x0){
+     const slope=(b.y-a.y)/dx;
+     ctx.beginPath();ctx.moveTo(x0,b.y+(x0-b.x)*slope);
+     ctx.lineTo(x1,b.y+(x1-b.x)*slope);
+     ctx.setLineDash([6,5]);ctx.lineWidth=selected?2.3:1.8;ctx.stroke();
+     ctx.setLineDash([]);
+    }
+   }
+  }
   xy.forEach((v,i)=>{
    if(!v||v.x<0||v.x>plotW||v.y<top||v.y>bottom)return;
    ctx.fillStyle='#102b3e';ctx.strokeStyle=color;ctx.lineWidth=2;
