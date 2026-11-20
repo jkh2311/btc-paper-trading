@@ -152,12 +152,14 @@ async function moveProtection(l,raw){
  const valid=s==='LONG'?(kind==='sl'?targetRaw<mark:targetRaw>mark):(kind==='sl'?targetRaw>mark:targetRaw<mark);
  if(!valid)return note('손절·익절 가격이 현재 마크가의 잘못된 방향입니다',true);
  if(algoError||Date.now()-readStamp>15000)return note('바이낸스 조건부 주문이 최신 상태가 아닙니다. 재조회 후 시도하세요.',true);
- let tick='0.1';
+ let tick='0.1',marketLot=null;
  try{
   const r=await fetch(api+'/fapi/v1/exchangeInfo?symbol='+symbol,{cache:'no-store'});
   if(!r.ok)throw Error('호가 단위 조회 실패');
   const json=await r.json();
-  tick=json.symbols?.find(x=>x.symbol===symbol)?.filters?.find(f=>f.filterType==='PRICE_FILTER')?.tickSize;
+  const symbolInfo=json.symbols?.find(x=>x.symbol===symbol);
+  tick=symbolInfo?.filters?.find(f=>f.filterType==='PRICE_FILTER')?.tickSize;
+  marketLot=symbolInfo?.filters?.find(f=>f.filterType==='LOT_SIZE')||null;
   if(!tick||!(Number(tick)>0))throw Error('호가 단위 확인 실패');
  }catch(e){return note('가격 단위 확인 실패: '+e.message,true);}
  const step=Number(tick),digits=(String(tick).split('.')[1]||'').length;
@@ -202,8 +204,7 @@ async function moveProtection(l,raw){
    const qty=Math.abs(Number(live.positionAmt)),oldQty=num(current?.quantity);
    if(!(qty>0)||current&&(!(oldQty>0)||oldQty>qty+1e-8))
     throw Error('바이낸스 지정가 청산 수량 확인 실패 · 주문 교체 중단');
-   const lot=json.symbols?.find(x=>x.symbol===symbol)?.filters?.find(f=>f.filterType==='LOT_SIZE');
-   const qtyStep=num(lot?.stepSize),qtyMin=num(lot?.minQty);
+   const qtyStep=num(marketLot?.stepSize),qtyMin=num(marketLot?.minQty);
    const useQty=current?oldQty:qty;
    if(!(qtyStep>0&&qtyMin>0&&useQty>=qtyMin&&
      Math.abs(useQty/qtyStep-Math.round(useQty/qtyStep))<1e-6))
