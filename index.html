@@ -2600,6 +2600,7 @@ async function loadDailyHistory(){
     }
     candles['1d']=combined;
     dailyHistoryReady=true;
+    void saveChartHistorySnapshot('1d',Date.UTC(2017,7,17));
     if($('tf').value==='1d'){resetStableChartScale();draw();drawRmi();}
   }catch(e){
     // Even if the spot endpoint is temporarily unavailable, retain any
@@ -2609,6 +2610,7 @@ async function loadDailyHistory(){
       if($('tf').value==='1d'&&viewOffset>0&&before!==undefined)
         viewOffset+=combined.filter(b=>b.t<before).length;
       candles['1d']=combined;
+      void saveChartHistorySnapshot('1d',null);
     }
     console.warn('일봉 2017년 내역 불러오기 실패',e);
     if($('tf').value==='1d'){$('dailyHistoryJump').title='과거 일봉 조회 실패 · 다시 시도 가능: '+e.message;draw();drawRmi();}
@@ -2690,7 +2692,7 @@ function normalizeChartCacheBars(raw){
 }
 async function saveChartHistorySnapshot(tf,completeFrom){
  if(demo)return false;
- const bars=tf==='1m'?minuteChartArchive:candles[tf];
+ const bars=tf==='1m'?(minuteChartArchive||candles['1m']):candles[tf];
  if(!Array.isArray(bars)||bars.length<22)return false;
  const clean=normalizeChartCacheBars(bars);
  if(clean.length<22)return false;
@@ -2796,6 +2798,7 @@ async function loadFullWeekMonthHistory(tf){
   // Futures wins for any common open timestamp.
   candles[tf]=mergeDailyCandles(spot,mergeDailyCandles(future,candles[tf]));
   fullWeekMonthLoaded[tf]=true;
+  void saveChartHistorySnapshot(tf,Date.UTC(2017,7,17));
   if(status)status.textContent=(tf==='1w'?'주봉':'월봉')+
    ' 전체 과거 연결 완료 · 2017년 이후 현물/선물 기록 · 현재까지 탐색 가능';
   resetStableChartScale();draw();drawRmi();
@@ -2836,7 +2839,9 @@ function updateIntradayHistoryJump(){
   const loading=!!historyLoading[tf];button.disabled=loading;
   if(tf==='1m'){
    button.textContent=loading?'2개월 불러오는 중…':
-    viewOffset>0?'최신 ⟶':minuteChartArchive?.length?'2개월 로딩 완료 ✓':'⟵ 2개월 조회';
+    viewOffset>0?'최신 ⟶':
+    minuteChartArchive?.[0]?.t<=historyCutoff('1m')+120000?
+     '2개월 로딩 완료 ✓':'⟵ 2개월 조회';
   }else if(tf==='30m'){
    button.textContent=loading?'1년 연결 중…':
     viewOffset>0?'최신 ⟶':ready?'1년 로딩 완료 ✓':'⟵ 1년 조회';
@@ -2853,8 +2858,8 @@ function updateIntradayHistoryJump(){
 // Keep a separate array so 1m RMI/live trading never reads >5 days.
 async function loadTwoMonthMinuteChart(){
  if(demo||historyLoading['1m'])return false;
- if(minuteChartArchive?.length)return true;
  const start=Math.floor(historyCutoff('1m')/60000)*60000;
+ if(minuteChartArchive?.length&&minuteChartArchive[0].t<=start+120000)return true;
  const end=Math.floor(Date.now()/60000)*60000;
  const pages=[];
  for(let t=start;t<=end;t+=1000*60000)
@@ -2885,6 +2890,7 @@ async function loadTwoMonthMinuteChart(){
   // Binance latest/WS-confirmed values win for matching minutes.
   minuteChartArchive=mergeDailyCandles(all,candles['1m']);
   syncMinuteChartArchive();
+  void saveChartHistorySnapshot('1m',start);
   if($('tf').value==='1m'){
    // The current/rightmost chart remains the starting viewport.
    chartJumpSegment=null;viewOffset=0;
@@ -2959,6 +2965,7 @@ async function loadOneYearThirtyMinuteChart(){
   // Merge the latest Binance/WS data ONLY after successful full history.
   candles[tf]=mergeDailyCandles(ordered,candles[tf]);
   historyReadyUntil[tf]=cutoff;
+  void saveChartHistorySnapshot(tf,cutoff);
   if($('tf').value===tf){
    chartJumpSegment=null;viewOffset=0;
    crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;
@@ -3031,6 +3038,7 @@ async function loadThreeMonthThreeMinuteChart(){
   // Merge the latest Binance/WS data ONLY after successful full history.
   candles[tf]=mergeDailyCandles(ordered,candles[tf]);
   historyReadyUntil[tf]=cutoff;
+  void saveChartHistorySnapshot(tf,cutoff);
   if($('tf').value===tf){
    chartJumpSegment=null;viewOffset=0;
    crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;
@@ -3090,13 +3098,16 @@ async function loadIntradayHistory(tf){
     const first=candles[tf]?.[0]?.t;
     if(!Number.isFinite(first)||first>cutoff+candleDuration[tf]*2)
       throw Error('요청한 과거 시작 날짜까지 데이터가 없습니다');
-    historyReadyUntil[tf]=cutoff;return true;
+    historyReadyUntil[tf]=cutoff;
+    void saveChartHistorySnapshot(tf,cutoff);
+    return true;
   }catch(e){
     console.warn('과거 '+tf+' 데이터 조회 실패',e);
     if($('tf').value===tf&&button)button.title='과거 조회 오류: '+e.message;
     return false;
   }finally{
     historyLoading[tf]=false;updateIntradayHistoryJump();
+    void saveChartHistorySnapshot(tf,null);
     if($('tf').value===tf){draw();drawRmi();}
   }
 }
@@ -5765,6 +5776,7 @@ async function extendJumpHistory(direction,segment){
      (direction==='before'?first-adjacent<=step:adjacent-last<=step)){
    segment.bars=direction==='before'?
     mergeDailyCandles(additions,original):mergeDailyCandles(original,additions);
+   void saveCachedChartSegment(segment);
    if(direction==='after'){
     // Adding to the right increases the end-anchored offset. Preserve the
     // exact candle and screen position the user was browsing.
@@ -5829,6 +5841,12 @@ async function jumpChartToUtc(requestedTime){
    if(status)status.textContent='선택한 날짜로 이동했어.';
    centerChartOnTimestamp(existing,target);return;
  }
+ const cached=cachedSegmentFor(tf,target);
+ if(cached){
+  chartJumpSegment=cached;
+  if(status)status.textContent='기기에 저장된 차트 · 추가 다운로드 없이 이동';
+  centerChartOnTimestamp(cached.bars,target);return;
+ }
  chartJumpBusy=true;if(button)button.disabled=true;
  if(status)status.textContent='선택한 날짜 주변 캔들 불러오는 중…';
  try{
@@ -5869,6 +5887,7 @@ async function jumpChartToUtc(requestedTime){
      throw Error('해당 시간대의 거래소 캔들을 찾지 못했어');
    if($('tf').value!==tf)return;
    chartJumpSegment={tf,bars};
+   void saveCachedChartSegment(chartJumpSegment);
    centerChartOnTimestamp(bars,target);
    if(status)status.textContent='이동 완료 · '+tf+' · 한국시간 기준 · 최신 복귀 가능';
  }catch(e){
@@ -8672,7 +8691,7 @@ function initSignalAlerts(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden){event.preventDefault();close()}});
 })();
 
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();render();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();render();void restoreChartHistoryCache();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
 setInterval(pollAutoPaperMinute,5000);
 setInterval(()=>{
   if(!autoPendingLimit)return;
