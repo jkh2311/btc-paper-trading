@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-disparity-all-stage2-complete-v299"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-disparity-inspector-saved-v300"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1775,7 +1775,7 @@ body.non-chart-tab #tradeBar{display:none!important}
 <div id="chartTimeJumpControls"><strong>날짜·시간으로 차트 이동</strong><span style="font-size:10px;color:#adc0d5">한국시간(KST) 기준 · 선택한 시간봉</span>
 <div class="time-jump-grid"><input id="chartJumpDate" type="date" aria-label="이동할 연도 월 일"><input id="chartJumpTime" type="time" value="12:00" step="60" aria-label="이동할 시간 분"></div>
 <button id="chartJumpGo" type="button">선택 날짜로 이동</button><button id="chartJumpLatest" type="button">최신 차트로 복귀</button>
-<div id="chartTimeJumpStatus" role="status" aria-live="polite"></div></div></div></div></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label"><span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas></div></div>
+<div id="chartTimeJumpStatus" role="status" aria-live="polite"></div></div></div></div></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label"><span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas><div id="disparityStageInspector" hidden style="position:absolute;z-index:9;display:none;left:7px;align-items:center;gap:5px;max-width:calc(100% - 98px);font-size:10px;pointer-events:auto"><span id="disparityStageInspectorText" style="background:#091729ec;border:1px solid #6787a2;border-radius:5px;padding:4px 5px;color:#dce8f6;white-space:nowrap"></span><button id="disparityStageSave" type="button" style="font-size:10px;min-width:35px;padding:3px 6px;background:#173c38;color:#8df3ba;border:1px solid #408876;border-radius:5px">저장</button><button id="disparityStageDelete" type="button" hidden style="font-size:10px;min-width:35px;padding:3px 6px;background:#43212d;color:#ff9eb3;border:1px solid #ad5c72;border-radius:5px">삭제</button></div></div></div>
  <div id="candleTime" class="muted candle-info"></div>
  <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button></div>
  <div id="range" style="display:none"></div><div id="chartHint" style="display:none"></div><p id="selected" style="display:none"></p>
@@ -3449,9 +3449,73 @@ function drawDisparityTransitionArrows(ctx,events,start,end,left,bw,pw,dTop,dBot
   ctx.strokeStyle=e.color;ctx.lineWidth=.7;
   ctx.strokeRect(e.x0+.5,e.labelY+.5,e.width-1,labelH-1);
   ctx.fillStyle=e.color;ctx.fillText(e.text,e.x0+4,e.labelY+labelH-3,e.width-7);
+  if(e.key)disparityStageHitboxes.push({key:e.key,
+   x0:e.x0-5,x1:e.x0+e.width+5,y0:e.labelY-6,y1:e.labelY+labelH+6});
  }
  ctx.restore();
 }
+// Explicit user-saved disparity stage markers only. The current inspection
+// selection is transient; never change paper trades, signals, or Binance orders.
+const disparitySavedKey='btc-disparity-stage-notes-v300';
+let disparitySavedStages=[];
+try{
+ const persisted=JSON.parse(localStorage.getItem(disparitySavedKey)||'[]');
+ if(Array.isArray(persisted))disparitySavedStages=persisted.filter(item=>
+  item&&typeof item.tf==='string'&&Number.isFinite(item.t)&&
+  typeof item.label==='string'&&item.label.length<48).slice(-1500);
+}catch(_){}
+let disparityStageSelection=null,disparityStageHitboxes=[],disparityStageCurrent=null;
+const disparityStagePanel=$('disparityStageInspector');
+const disparityStageText=$('disparityStageInspectorText');
+const disparityStageSaveButton=$('disparityStageSave');
+const disparityStageDeleteButton=$('disparityStageDelete');
+function disparityStageKey(tf,t){return tf+'|'+String(t)}
+function persistDisparityStages(){
+ try{localStorage.setItem(disparitySavedKey,JSON.stringify(disparitySavedStages))}catch(_){}
+}
+function selectedStageInfo(a,selected,metricOffset,d20,d50,d200){
+ if(selected===null||selected<0||selected>=a.length)return null;
+ const tf=$('tf').value,t=Number(a[selected]?.t);
+ if(!Number.isFinite(t)||nextCandleTime(tf,t,1)>Date.now())return null;
+ const i=selected-metricOffset;
+ if(i<0)return null;
+ const stage=disparityTransitionAt(d20,d50,d200,i);
+ if(stage.rank===null)return null;
+ return {tf,t,label:stage.label,color:stage.color,key:disparityStageKey(tf,t)};
+}
+function updateDisparityStagePanel(info,canvas,top,pw){
+ if(!disparityStagePanel)return;
+ if(!info||chartIndicators.disparity===false||chartIndicators.disparityStages===false){
+  disparityStagePanel.hidden=true;disparityStagePanel.style.display='none';
+  disparityStageCurrent=null;return;
+ }
+ disparityStageCurrent=info;
+ const parent=canvas.parentElement;
+ if(parent&&getComputedStyle(parent).position==='static')parent.style.position='relative';
+ const canvasBox=canvas.getBoundingClientRect(),parentBox=parent.getBoundingClientRect();
+ disparityStagePanel.style.top=Math.round(canvasBox.top-parentBox.top+top+1)+'px';
+ disparityStagePanel.style.left=Math.max(4,Math.round(canvasBox.left-parentBox.left+5))+'px';
+ disparityStagePanel.style.maxWidth=Math.max(125,Math.floor(pw-10))+'px';
+ disparityStageText.textContent=info.label;
+ disparityStageText.style.color=info.color||'#dce8f6';
+ const isSaved=disparitySavedStages.some(item=>item.tf===info.tf&&item.t===info.t);
+ disparityStageSaveButton.hidden=isSaved;
+ disparityStageSaveButton.style.display=isSaved?'none':'';
+ disparityStageDeleteButton.hidden=!isSaved;
+ disparityStageDeleteButton.style.display=isSaved?'':'none';
+ disparityStagePanel.hidden=false;disparityStagePanel.style.display='flex';
+}
+disparityStageSaveButton?.addEventListener('click',()=>{
+ const item=disparityStageCurrent;
+ if(!item||disparitySavedStages.some(x=>x.tf===item.tf&&x.t===item.t))return;
+ disparitySavedStages.push({tf:item.tf,t:item.t,label:item.label});
+ persistDisparityStages();disparityStageSelection=item.key;drawRmi();
+});
+disparityStageDeleteButton?.addEventListener('click',()=>{
+ const item=disparityStageCurrent;if(!item)return;
+ disparitySavedStages=disparitySavedStages.filter(x=>x.tf!==item.tf||x.t!==item.t);
+ persistDisparityStages();disparityStageSelection=null;drawRmi();
+});
 function drawRmi(){
  if(!chartIndicators.rmi&&!chartIndicators.disparity)return;
  const a=chartViewBars(),cv=$('rmiChart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(52,cv.getBoundingClientRect().height||84),dpr=devicePixelRatio||1;
@@ -3487,7 +3551,7 @@ function drawRmi(){
   ctx.beginPath();ctx.moveTo(0,split+.5);ctx.lineTo(w,split+.5);ctx.stroke();
   ctx.lineWidth=1;
  }
- if(!a||a.length<19){ctx.fillStyle='#a4b4c8';ctx.fillText('RMI 데이터 대기',8,12);return}
+ if(!a||a.length<19){updateDisparityStagePanel(null,cv,0,pw);ctx.fillStyle='#a4b4c8';ctx.fillText('RMI 데이터 대기',8,12);return}
  const {start,end,count,left}=visibleWindow(a),metricOffset=Math.max(0,start-260);
  const metricBars=a.slice(metricOffset,end),values=rmiSeries(metricBars),bw=pw/count;
  const readyLabel=$('rmiSignalReadyLabel');
@@ -3522,17 +3586,36 @@ function drawRmi(){
   ctx.strokeStyle='#596170';ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(0,dMid);ctx.lineTo(pw,dMid);ctx.stroke();ctx.setLineDash([]);
   ctx.save();ctx.beginPath();ctx.rect(0,dTop,pw,Math.max(1,dBottom-dTop));ctx.clip();
   trace(d200,yD,'#ed303c');trace(d50,yD,'#2949ed');trace(d20,yD,'#15923b');ctx.restore();
-  // Label the exact completed historic crossover points with small arrows,
-  // instead of a floating generic current-state badge hiding the curves.
+  // Only manual saved stage markers remain. Long-press selects a moment;
+  // a short stage label and Save/Delete actions appear for that candle.
+  disparityStageHitboxes=[];
+  const tf=$('tf').value;
   if(chartIndicators.disparityStages!==false){
-   const tf=$('tf').value;
-   let completedEnd=end-1;
-   if(completedEnd===a.length-1&&
-      nextCandleTime(tf,a[completedEnd]?.t||0,1)>Date.now())completedEnd--;
-   const transitionEvents=disparityTransitionEvents(d20,d50,d200,completedEnd-metricOffset);
-   drawDisparityTransitionArrows(ctx,transitionEvents,start-metricOffset,
-    completedEnd-metricOffset+1,left-metricOffset,bw,pw,dTop,dBottom,yD);
+   const byTime=new Map(a.map((bar,i)=>[bar.t,i]));
+   const savedEvents=disparitySavedStages.filter(item=>item.tf===tf).flatMap(item=>{
+    const globalIndex=byTime.get(item.t);
+    if(globalIndex===undefined||globalIndex<start||globalIndex>=end)return [];
+    const localIndex=globalIndex-metricOffset;
+    const vals=[d20[localIndex],d50[localIndex],d200[localIndex]].filter(Number.isFinite);
+    if(!vals.length)return [];
+    return [{index:localIndex,value:vals.reduce((sum,v)=>sum+v,0)/vals.length,
+      label:item.label,key:disparityStageKey(item.tf,item.t),
+      color:item.label.startsWith('상승')?'#75ecae':item.label.startsWith('하락')?'#ff96a5':'#f1c56c'}];
+   });
+   drawDisparityTransitionArrows(ctx,savedEvents,start-metricOffset,
+    end-metricOffset,left-metricOffset,bw,pw,dTop,dBottom,yD);
   }
+  const selectedTime=crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end?
+   crosshairIndex:null;
+  let info=selectedStageInfo(a,selectedTime,metricOffset,d20,d50,d200);
+  if(!info&&disparityStageSelection){
+   const saved=disparitySavedStages.find(item=>disparityStageKey(item.tf,item.t)===disparityStageSelection);
+   if(saved&&saved.tf===tf){
+    info={...saved,key:disparityStageSelection,
+     color:saved.label.startsWith('상승')?'#75ecae':'#ff96a5'};
+   }
+  }
+  updateDisparityStagePanel(info,cv,dTop,pw);
   ctx.fillStyle='#a4b4c8';ctx.fillText('0',pw+5,dMid+3);
   const disparityAxisValue=amplitude/disparityValueZoom;
   if(dTop+10<dMid-5){
@@ -3624,6 +3707,14 @@ function indicatorInspectAt(clientX){
 rmiCanvas.addEventListener('pointerdown',e=>{
  if(e.pointerType==='mouse'&&e.button!==0)return;
  const rect=rmiCanvas.getBoundingClientRect();
+ // A tap on a saved annotation selects it; the Delete button appears in
+ // the stage inspector. Do not start a crosshair long-press on this tap.
+ const x=e.clientX-rect.left,y=e.clientY-rect.top;
+ const hit=disparityStageHitboxes.find(b=>x>=b.x0&&x<=b.x1&&y>=b.y0&&y<=b.y1);
+ if(hit){
+  disparityStageSelection=hit.key;crosshairIndex=null;futureCrosshairSlot=null;
+  drawRmi();if(e.cancelable)e.preventDefault();return;
+ }
  // Right numeric axes control value zoom; normal long-press remains on the plot.
  if(e.clientX-rect.left>=rect.width-82)return;
  clearTimeout(indicatorInspectTimer);
