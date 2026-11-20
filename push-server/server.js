@@ -29,7 +29,7 @@ let subscribers=[];
 let lastPrice=null,lastPriceAt=0,lastPriceError=null,priceBusy=false;
 // Same BTCUSDT USD-M futures contract, via Binance's official public market
 // WebSocket. Never silently substitute spot or a different exchange.
-let wsFeed=null,wsRetryTimer=null,wsClosedBars=[],wsLastMessageAt=0;
+let wsFeed=null,wsRetryTimer=null,wsClosedBars=[],wsLastMessageAt=0,wsConnectedAt=0;
 let wsError=null,wsStatus='connecting',wsReconnectDelay=5000;
 let restBlockedUntil=0,restLastError=null,signalFeedSource='none';
 const WS_FUTURES_KLINE_URL='wss://fstream.binance.com/market/ws/btcusdt@kline_1m';
@@ -39,7 +39,7 @@ function connectFuturesKlineStream(){
  const socket=new WebSocket(WS_FUTURES_KLINE_URL,{handshakeTimeout:10000});
  wsFeed=socket;
  socket.on('open',()=>{
-  wsStatus='connected';wsError=null;wsReconnectDelay=5000;
+  wsStatus='connected';wsConnectedAt=Date.now();wsError=null;wsReconnectDelay=5000;
   console.log('FUTURES WS connected');
  });
  socket.on('message',buffer=>{
@@ -66,6 +66,8 @@ function connectFuturesKlineStream(){
  socket.on('unexpected-response',(_request,response)=>{
   wsError='WebSocket HTTP '+response.statusCode;
   console.warn('FUTURES WS upstream:',wsError);
+  response.resume();
+  socket.terminate(); // Do not hang indefinitely on a denied handshake.
  });
  socket.on('error',error=>{
   wsError=wsError||String(error.message||error).slice(0,120);
@@ -75,7 +77,7 @@ function connectFuturesKlineStream(){
   if(wsFeed===socket)wsFeed=null;
   wsStatus='disconnected';
   wsError=wsError||('closed '+code+' '+String(reason||'').slice(0,60));
-  wsLastMessageAt=0;
+  wsLastMessageAt=0;wsConnectedAt=0;
   if(!wsRetryTimer){
    const delay=wsReconnectDelay;
    wsReconnectDelay=Math.min(120000,wsReconnectDelay*2);
@@ -85,7 +87,7 @@ function connectFuturesKlineStream(){
 }
 setInterval(()=>{
  if(wsFeed&&wsStatus==='connected'&&
-    wsLastMessageAt>0&&Date.now()-wsLastMessageAt>95000){
+    Date.now()-Math.max(wsLastMessageAt,wsConnectedAt)>95000){
   wsError='WebSocket market stream stale (>95s)';
   wsFeed.terminate();
  }
