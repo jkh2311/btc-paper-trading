@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-disparity-stage2-paper-v298"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-disparity-all-stage2-complete-v299"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -3370,7 +3370,9 @@ function disparityTransitionEvents(d20,d50,d200,lastIndex){
      break;
     }
    }
-   if(cross)events.push({index:cross.index,value:cross.value,label,
+   // Display only second-stage transitions and completed arrangements.
+   // All qualifying historical events are retained, including reversals.
+   if(cross&&(complete||stage===2))events.push({index:cross.index,value:cross.value,label,
     color:direction>0?'#ff96a5':'#75ecae',rank});
   }
   previous={rank};
@@ -3378,45 +3380,75 @@ function disparityTransitionEvents(d20,d50,d200,lastIndex){
  return events;
 }
 function drawDisparityTransitionArrows(ctx,events,start,end,left,bw,pw,dTop,dBottom,yD){
- if(!events.length||pw<115||dBottom-dTop<34)return;
- const labelH=15,margin=5;
- const visible=events.filter(e=>e.index>=start&&e.index<end-1&&
-  (e.index-left+.5)*bw>18&&(e.index-left+.5)*bw<pw-18);
+ if(!events.length||pw<65||dBottom-dTop<26)return;
+ const visible=events.filter(e=>e.index>=start&&e.index<end&&
+  (e.index-left+.5)*bw>=0&&(e.index-left+.5)*bw<=pw);
  if(!visible.length)return;
- ctx.save();ctx.beginPath();ctx.rect(0,dTop,pw,Math.max(1,dBottom-dTop));ctx.clip();
- ctx.font='bold 9px -apple-system,sans-serif';
- // Draw the latest distinct events without overlapping their text boxes.
- const chosen=[],minGap=8;
- for(let i=visible.length-1;i>=0;i--){
-  const e=visible[i],x=(e.index-left+.5)*bw;
-  const textWidth=ctx.measureText(e.label).width;
-  const width=Math.min(pw-10,Math.ceil(textWidth)+12);
-  const center=Math.max(width/2+margin,Math.min(pw-width/2-margin,x));
-  const x0=center-width/2;
-  if(chosen.some(c=>x0<c.right+minGap&&x0+width>c.left-minGap))continue;
-  chosen.push({...e,x,x0,width,left:x0,right:x0+width});
-  if(chosen.length>=Math.min(4,Math.max(1,Math.floor(pw/96))))break;
+ const panelH=dBottom-dTop,margin=3;
+ const labelH=panelH>=51?13:11;
+ const rowCount=panelH>=75?4:panelH>=49?3:2;
+ const rows=Array.from({length:rowCount},()=>[]);
+ const rowY=row=>rowCount===1?dTop+2:
+  dTop+2+(dBottom-dTop-labelH-4)*row/(rowCount-1);
+ ctx.save();ctx.beginPath();ctx.rect(0,dTop,pw,Math.max(1,panelH));ctx.clip();
+ ctx.font='bold '+(panelH>=49?9:8)+'px -apple-system,sans-serif';
+ const placed=[];
+ // Never limit the event count or discard an event due to label collision.
+ // Reserve labels in alternating horizontal lanes; use a shortened but
+ // unambiguous label if the pane is too dense.
+ for(const e of visible){
+  const x=(e.index-left+.5)*bw,full=e.label;
+  const compact=full.replace(' 전환 ',' ').replace(' 배열 완성',' 완성');
+  const tiny=full.replace('상승 전환 2단계','상승2').replace('하락 전환 2단계','하락2')
+   .replace('상승 배열 완성','상승완성').replace('하락 배열 완성','하락완성');
+  const options=[full,compact,tiny];
+  let best=null;
+  for(let k=0;k<options.length;k++){
+   const text=options[k],w=Math.min(pw-6,Math.ceil(ctx.measureText(text).width)+9);
+   const desired=Math.max(margin,Math.min(pw-w-margin,x-w/2));
+   for(let lane=0;lane<rowCount;lane++){
+    const range=rows[lane];
+    // Find a nearby non-overlapping interval, allowing leader arrows to
+    // travel horizontally. If overcrowded, choose least-overlap instead.
+    const candidates=[desired,margin,Math.max(margin,pw-w-margin)];
+    for(const item of range){
+     candidates.push(Math.max(margin,Math.min(pw-w-margin,item.right+3)));
+     candidates.push(Math.max(margin,Math.min(pw-w-margin,item.left-w-3)));
+    }
+    for(const leftX of candidates){
+     const overlap=range.reduce((sum,item)=>sum+Math.max(0,Math.min(leftX+w,item.right+3)-Math.max(leftX,item.left-3)),0);
+     const displacement=Math.abs(leftX+w/2-x);
+     const score=overlap*1000+displacement*.5+k*5+lane*.02;
+     if(!best||score<best.score)best={score,lane,x0:leftX,width:w,text,overlap};
+    }
+   }
+   if(best&&best.overlap===0)break;
+  }
+  if(!best)continue;
+  rows[best.lane].push({left:best.x0,right:best.x0+best.width});
+  placed.push({...e,x,...best,labelY:rowY(best.lane)});
  }
- for(const e of chosen.reverse()){
+ // Leaders and tiny arrowheads are drawn for every qualifying crossover.
+ for(const e of placed){
   const targetY=yD(e.value);
-  if(!Number.isFinite(targetY)||targetY<dTop||targetY>dBottom)continue;
-  // Prefer the side further away from the crossed line. Keep labels within
-  // the indicator pane and use a thin leader arrow to the actual crossover.
-  const upperY=dTop+2,lowerY=dBottom-labelH-2;
-  const labelY=(targetY-(upperY+labelH) >= (lowerY-targetY))?upperY:lowerY;
-  const anchorY=labelY===upperY?labelY+labelH:labelY;
+  if(!Number.isFinite(targetY))continue;
+  const yy=Math.max(dTop+2,Math.min(dBottom-2,targetY));
+  const anchorX=e.x0+e.width/2;
+  const anchorY=e.labelY+labelH/2<yy?e.labelY+labelH:e.labelY;
   ctx.strokeStyle=e.color;ctx.lineWidth=1;ctx.setLineDash([]);
-  ctx.beginPath();ctx.moveTo(e.x0+e.width/2,anchorY);
-  ctx.lineTo(e.x,targetY);ctx.stroke();
-  const angle=Math.atan2(targetY-anchorY,e.x-(e.x0+e.width/2));
-  ctx.beginPath();ctx.moveTo(e.x,targetY);
-  ctx.lineTo(e.x-5*Math.cos(angle-.45),targetY-5*Math.sin(angle-.45));
-  ctx.moveTo(e.x,targetY);
-  ctx.lineTo(e.x-5*Math.cos(angle+.45),targetY-5*Math.sin(angle+.45));
-  ctx.stroke();
-  ctx.fillStyle='rgba(6,17,33,.95)';ctx.fillRect(e.x0,labelY,e.width,labelH);
-  ctx.strokeStyle=e.color;ctx.strokeRect(e.x0+.5,labelY+.5,e.width-1,labelH-1);
-  ctx.fillStyle=e.color;ctx.fillText(e.label,e.x0+6,labelY+10,e.width-10);
+  ctx.beginPath();ctx.moveTo(anchorX,anchorY);ctx.lineTo(e.x,yy);ctx.stroke();
+  const angle=Math.atan2(yy-anchorY,e.x-anchorX);
+  ctx.beginPath();ctx.moveTo(e.x,yy);
+  ctx.lineTo(e.x-4*Math.cos(angle-.5),yy-4*Math.sin(angle-.5));
+  ctx.moveTo(e.x,yy);
+  ctx.lineTo(e.x-4*Math.cos(angle+.5),yy-4*Math.sin(angle+.5));ctx.stroke();
+ }
+ for(const e of placed){
+  ctx.fillStyle='rgba(6,17,33,.94)';
+  ctx.fillRect(e.x0,e.labelY,e.width,labelH);
+  ctx.strokeStyle=e.color;ctx.lineWidth=.7;
+  ctx.strokeRect(e.x0+.5,e.labelY+.5,e.width-1,labelH-1);
+  ctx.fillStyle=e.color;ctx.fillText(e.text,e.x0+4,e.labelY+labelH-3,e.width-7);
  }
  ctx.restore();
 }
