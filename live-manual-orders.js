@@ -1008,17 +1008,16 @@ function quickCloseRender(){
   const count=positions.filter(p=>p.side===side).length;
   // Live Binance best bid/ask is fetched again when the button is pressed.
   // Do not disable an otherwise valid position just because quote polling lags.
-  const ready=!!cred()?.apiKey&&!!cred()?.apiSecret&&!busy&&
-   !quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack&&!switchBusy&&validPct;
-  button.disabled=!ready;
-  button.title=ready?side+' 포지션 '+pct+'% '+(method==='LIMIT'?'지정가':'시장가')+' 청산 주문 바로 전송':
-   switchBusy?'스위칭 주문 진행 중':quickCloseUncertain?'기존 주문 결과 확인 필요':
-   quickCloseTrack?'기존 청산 주문 #'+quickCloseTrack.id+' 상태 확인 중':
-   !count?'실제 '+side+' 보유 포지션 없음':'시세·계좌 연결 또는 주문 상태 확인 필요';
+  // Keep the manual close action tappable; never silently gray it out when
+  // account snapshots, API unlock or watcher states are missing/stale.
+  // All safety conditions are checked on tap and before the exchange POST.
+  button.disabled=false;
+  button.title=side+' '+pct+'% '+(method==='LIMIT'?'지정가':'시장가')+
+   ' 청산 · 누르면 실계좌 검증'+(count?'':' (화면 포지션 갱신 대기)');
  }
  if(!quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack&&
     Date.now()-quickCloseErrorAt>15000){
-  if(switchBusy)quickCloseSetStatus(''); // keep safety lock, hide redundant chart message
+  if(switchBusy)quickCloseSetStatus(''); // hide watcher text; tapping a close gives a specific safety error
   else if(!positions.length)quickCloseSetStatus('실제 BTCUSDT 포지션 조회 또는 API 잠금 해제 필요');
   else if(!cred()?.apiKey||!cred()?.apiSecret)quickCloseSetStatus('바이낸스 API 잠금 해제 필요');
   else if(!validPct)quickCloseSetStatus('청산 비율 1~100%를 확인하세요',true);
@@ -1079,9 +1078,17 @@ async function quickCloseFollowOrder(){
  }finally{quickCloseTrackBusy=false;quickCloseRender();}
 }
 async function quickCloseSubmit(side){
- if(quickCloseBusy||busy||quickCloseUncertain||!['LONG','SHORT'].includes(side))return;
+ if(!['LONG','SHORT'].includes(side))return;
+ if(quickCloseBusy||busy){
+  quickCloseSetStatus('⚠ 다른 실전 주문/조회가 처리 중입니다. 중복 주문 없이 완료 후 다시 확인하세요.',true);return;
+ }
+ if(quickCloseUncertain||quickCloseTrack){
+  quickCloseSetStatus('⚠ 기존 청산 주문 결과/미체결 확인 필요 · 바이낸스에서 확인 후 진행하세요.',true);return;
+ }
  const method=quickCloseMethod?.value;
- if(!['LIMIT','MARKET'].includes(method))return;
+ if(!['LIMIT','MARKET'].includes(method)){
+  quickCloseSetStatus('⚠ 청산 방식을 지정가 또는 시장가로 선택하세요.',true);return;
+ }
  const pct=Number(quickClosePercent?.value);
  if(!Number.isInteger(pct)||pct<1||pct>100){
   quickCloseSetStatus('⚠ 청산 비율은 1~100%의 정수여야 합니다.',true);return;
@@ -1091,7 +1098,8 @@ async function quickCloseSubmit(side){
  try{
   if(!visible())throw Error('앱이 화면에 표시된 상태에서만 청산할 수 있습니다.');
   credentials();
-  if(quickCloseSwitchInProgress())throw Error('스위칭 실행/감시 중에는 빠른 청산을 중단합니다.');
+  if(quickCloseSwitchInProgress())
+   throw Error('스위칭 거래소 주문 처리/확인 중입니다. 바이낸스 미체결 주문 및 스위칭 상태를 먼저 확인하세요.');
   if(quickCloseTrack)throw Error('이전 청산 주문 상태 확인 중 · 미체결 주문 확인 필요');
   // Do not rely on a stale display snapshot to permit a close.
   // Only the signed exchange positionRisk below authorizes the actual order.
