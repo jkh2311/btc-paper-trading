@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-quick-close-percent-v268"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-mobile-compact-tabs-v269"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1318,6 +1318,74 @@ body.ai-entry-modal-open{overflow:hidden!important}
  #expandedChartOverlay:not([hidden]) #tradeBar .quick-close-options{flex-direction:column;gap:2px}
  #expandedChartOverlay:not([hidden]) #tradeBar #quickCloseQuote{font-size:9px;max-width:100%;text-align:center}
  #expandedChartOverlay:not([hidden]) #tradeBar #quickCloseStatus{font-size:9px;max-width:100%;text-align:center}
+}
+
+/* v269: The floating order toolbar only reserves room on the chart tab.
+   Previous v267 rules subtracted 160px from ALL tabs, creating a blank
+   lower area in Position, History and Settings. Keep these tabs scrollable. */
+#tradeBar.hidden{display:none!important}
+body.non-chart-tab #tradeBar{display:none!important}
+@media(max-width:800px){
+ body.non-chart-tab:not(.chart-focus-mode) main{
+  height:calc(100dvh - 45px - 45px - env(safe-area-inset-bottom))!important;
+  max-height:none!important;min-height:0!important;overflow:hidden!important
+ }
+ body.non-chart-tab:not(.chart-focus-mode) .tab-page.active{
+  height:100%!important;min-height:0!important;overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;padding-bottom:16px!important
+ }
+}
+/* Hide the duplicate LONG/SHORT bid/ask text near the order selector.
+   The order module still refreshes and validates live Binance quotes. */
+#tradeBar #quickCloseQuote{display:none!important}
+/* v269: Only the ordinary (non-expanded) portrait chart gets a shorter bar.
+   Expanded chart/landscape controls preserve their existing dimensions. */
+@media(max-width:800px) and (orientation:portrait){
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar{
+  height:108px!important;gap:2px!important;
+  align-content:center!important;justify-content:flex-start!important;
+  padding:3px 8px!important
+ }
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar #long,
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar #short{
+  flex:1 1 calc(50% - 4px)!important;
+  height:23px!important;min-height:23px!important;
+  padding:1px 4px!important;font-size:12px!important;
+  line-height:1.1!important;border-radius:7px!important
+ }
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar #quickCloseControls{
+  flex:1 0 100%!important;gap:2px!important
+ }
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar .quick-close-buttons{gap:6px!important}
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar .quick-close-buttons button{
+  height:22px!important;min-height:22px!important;
+  padding:1px 4px!important;font-size:12px!important;
+  line-height:1.1!important;border-radius:7px!important
+ }
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar .quick-close-options{gap:6px!important}
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar #quickCloseMethod{
+  height:22px!important;min-height:22px!important;
+  min-width:88px!important;max-width:95px!important;
+  padding:1px 2px!important;font-size:11px!important
+ }
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar #quickClosePercent{
+  width:41px!important;height:22px!important;min-height:22px!important;
+  padding:1px 2px!important;font-size:11px!important
+ }
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar .quick-close-percent-label{
+  font-size:10px!important;gap:2px!important
+ }
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar #quickCloseStatus{
+  min-height:10px!important;font-size:9px!important;line-height:1.1!important
+ }
+ body:not(.chart-focus-mode):not(.non-chart-tab) #tradeBar #quickSwitchOpen{
+  flex:1 0 100%!important;height:22px!important;min-height:22px!important;
+  padding:1px 4px!important;font-size:11px!important;line-height:1.1!important;
+  border-radius:7px!important
+ }
+ body:not(.chart-focus-mode):not(.non-chart-tab) main{
+  height:calc(100dvh - 45px - 108px - 45px - env(safe-area-inset-bottom))!important
+ }
 }
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
@@ -6598,7 +6666,7 @@ function drawOi(){const cv=$('oiChart');if($('oiPanel').hidden)return;const rect
 function renderOi(){const status=$('oiStatus'),value=$('oiValue');value.textContent=oiCurrent!==null?'현재 '+formatOi(oiCurrent)+' BTC':'BTCUSDT · OI --';status.textContent=oiError?'OI 조회 실패 · '+oiError:oiHistory.length?'바이낸스 BTCUSDT 선물 · '+oiPeriod+' 간격 · 최근 '+oiHistory.length+'개 · 과거 최대 약 30일':oiLoading?'OI 조회 중…':'OI 데이터 대기';drawOi()}
 async function updateOi(){if(oiLoading)return;oiLoading=true;oiError='';renderOi();try{const [now,hist]=await Promise.all([fetch('https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT',{cache:'no-store'}),fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period='+oiPeriod+'&limit=90',{cache:'no-store'})]);if(!now.ok||!hist.ok)throw Error('HTTP '+(!now.ok?now.status:hist.status));const current=await now.json(),rows=await hist.json(),v=Number(current.openInterest);if(!Number.isFinite(v)||!Array.isArray(rows))throw Error('응답 형식 오류');oiCurrent=v;oiHistory=rows.map(d=>({timestamp:Number(d.timestamp),value:Number(d.sumOpenInterest)})).filter(d=>Number.isFinite(d.timestamp)&&Number.isFinite(d.value)).sort((a,b)=>a.timestamp-b.timestamp);oiUpdated=Date.now()}catch(e){oiError=e.message||'네트워크 오류'}finally{oiLoading=false;renderOi()}}
 $('oiToggle').addEventListener('click',()=>{const p=$('oiPanel'),show=p.hidden;p.hidden=!show;$('oiToggle').textContent=show?'OI 미결제약정 닫기 ▴':'OI 미결제약정 보기 ▾';$('oiToggle').setAttribute('aria-expanded',String(show));if(show){if(!oiHistory.length)updateOi();else renderOi()}requestAnimationFrame(()=>{draw();drawRmi();drawOi()})});
-function switchTab(name){for(const el of document.querySelectorAll('.tab-page'))el.classList.toggle('active',el.id==='page-'+name);for(const el of document.querySelectorAll('.nav-btn'))el.classList.toggle('active',el.dataset.tab===name);$('tradeBar').classList.toggle('hidden',name!=='chart');if(name==='position')updatePosition();if(name==='chart')requestAnimationFrame(()=>{draw();drawRmi();drawOi();paintLivePrice()});}
+function switchTab(name){for(const el of document.querySelectorAll('.tab-page'))el.classList.toggle('active',el.id==='page-'+name);for(const el of document.querySelectorAll('.nav-btn'))el.classList.toggle('active',el.dataset.tab===name);document.body.classList.toggle('non-chart-tab',name!=='chart');$('tradeBar').classList.toggle('hidden',name!=='chart');if(name==='position')updatePosition();if(name==='chart')requestAnimationFrame(()=>{draw();drawRmi();drawOi();paintLivePrice()});}
 for(const el of document.querySelectorAll('.nav-btn'))el.addEventListener('click',()=>switchTab(el.dataset.tab));$('settingsTop').onclick=()=>switchTab('settings');
 
 
