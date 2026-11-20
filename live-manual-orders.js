@@ -915,7 +915,7 @@ function credentialsSafeSilent(){const a=cred();return !!(a?.apiKey&&a?.apiSecre
 // Never call an opening-side order: LIMIT/MARKET orders always target the
 // existing confirmed position and One-way mode always sets reduceOnly.
 const quickCloseLong=$('quickCloseLong'),quickCloseShort=$('quickCloseShort');
-const quickCloseMethod=$('quickCloseMethod'),quickCloseQuote=$('quickCloseQuote');
+const quickCloseMethod=$('quickCloseMethod'),quickClosePercent=$('quickClosePercent'),quickCloseQuote=$('quickCloseQuote');
 const quickCloseStatus=$('quickCloseStatus');
 let quickCloseBusy=false,quickCloseUncertain=false,quickCloseQuoteBusy=false;
 let quickCloseBook={bid:NaN,ask:NaN,at:0},quickCloseTrack=null,quickCloseTrackBusy=false;
@@ -945,15 +945,17 @@ function quickCloseSetStatus(text,isError=false){
 function quickCloseRender(){
  if(!quickCloseLong||!quickCloseShort)return;
  const method=quickCloseMethod.value;
+ const pct=Number(quickClosePercent?.value);
+ const validPct=Number.isInteger(pct)&&pct>=1&&pct<=100;
  const positions=quickClosePositions();
  const switchBusy=quickCloseSwitchInProgress();
  for(const [side,button] of [['LONG',quickCloseLong],['SHORT',quickCloseShort]]){
   const count=positions.filter(p=>p.side===side).length;
   const ready=count===1&&!!cred()?.apiKey&&!!cred()?.apiSecret&&!busy&&
    !quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack&&!switchBusy&&
-   (method==='MARKET'||Number.isFinite(quickClosePrice(side)));
+   validPct&&(method==='MARKET'||Number.isFinite(quickClosePrice(side)));
   button.disabled=!ready;
-  button.title=ready?side+' 포지션 전량 '+(method==='LIMIT'?'지정가':'시장가')+' 청산 주문 바로 전송':
+  button.title=ready?side+' 포지션 '+pct+'% '+(method==='LIMIT'?'지정가':'시장가')+' 청산 주문 바로 전송':
    switchBusy?'스위칭 주문 진행 중':quickCloseUncertain?'기존 주문 결과 확인 필요':
    quickCloseTrack?'기존 청산 주문 #'+quickCloseTrack.id+' 상태 확인 중':
    !count?'실제 '+side+' 보유 포지션 없음':'시세·계좌 연결 또는 주문 상태 확인 필요';
@@ -997,7 +999,7 @@ async function quickCloseFollowOrder(){
   });
   const state=String(o?.status||'UNKNOWN');
   const done=Number(o?.executedQty||0),requested=Number(o?.origQty||quickCloseTrack.qty);
-  quickCloseSetStatus(quickCloseTrack.side+' '+quickCloseTrack.kind+' 청산 #'+o.orderId+
+  quickCloseSetStatus(quickCloseTrack.side+' '+quickCloseTrack.pct+'% '+quickCloseTrack.kind+' 청산 #'+o.orderId+
    ' · '+state+' · 체결 '+fmt(done)+'/'+fmt(requested)+' BTC',
    state==='REJECTED'||state==='EXPIRED');
   if(state==='FILLED'||state==='CANCELED'||state==='EXPIRED'||state==='REJECTED'){
@@ -1014,8 +1016,12 @@ async function quickCloseSubmit(side){
  if(quickCloseBusy||busy||quickCloseUncertain||!['LONG','SHORT'].includes(side))return;
  const method=quickCloseMethod?.value;
  if(!['LIMIT','MARKET'].includes(method))return;
+ const pct=Number(quickClosePercent?.value);
+ if(!Number.isInteger(pct)||pct<1||pct>100){
+  quickCloseSetStatus('⚠ 청산 비율은 1~100%의 정수여야 합니다.',true);return;
+ }
  quickCloseBusy=true;quickCloseRender();
- quickCloseSetStatus(side+' '+(method==='LIMIT'?'지정가':'시장가')+' 전량 청산 · 실계좌 검증 중…');
+ quickCloseSetStatus(side+' '+(method==='LIMIT'?'지정가':'시장가')+' '+pct+'% 청산 · 실계좌 검증 중…');
  try{
   if(!visible())throw Error('앱이 화면에 표시된 상태에서만 청산할 수 있습니다.');
   credentials();
@@ -1039,10 +1045,17 @@ async function quickCloseSubmit(side){
   if(Math.abs(quantity-listed[0].amount)>1e-8)
    throw Error('포지션이 조회 중 변경되었습니다. 계좌 새로고침 후 다시 청산하세요.');
   const lot=method==='LIMIT'?f.lot:f.market;
-  const qty=roundDown(quantity,lot.stepSize);
-  if(!(Number(qty)>0&&Math.abs(Number(qty)-quantity)<=1e-8&&
-       Number(qty)>=Number(lot.minQty)&&Number(qty)<=Number(lot.maxQty)))
-   throw Error('바이낸스 최소 수량/수량 단위가 현재 보유 포지션과 맞지 않아 전량 청산을 중단합니다.');
+  // All quantities are exchange-rounded DOWN. Only 100% may send the
+  // full original position; partial percentages must never round up to full.
+  const rawQty=quantity*pct/100;
+  const qty=roundDown(rawQty,lot.stepSize);
+  if(!(Number(qty)>0&&Number(qty)>=Number(lot.minQty)&&
+       Number(qty)<=Number(lot.maxQty)&&Number(qty)<=quantity+1e-8))
+   throw Error('선택한 '+pct+'% 청산 수량이 거래소 최소/최대 수량을 벗어났습니다.');
+  if(pct===100&&Math.abs(Number(qty)-quantity)>1e-8)
+   throw Error('전량 청산 수량이 바이낸스 주문 단위와 맞지 않습니다.');
+  if(pct<100&&Number(qty)>=quantity-1e-8)
+   throw Error('선택 비율이 거래소 최소 수량 단위 때문에 전량 청산이 됩니다. 비율을 낮춰 주세요.');
   const exitSide=side==='LONG'?'SELL':'BUY';
   const order={symbol,side:exitSide,positionSide:ps,type:method,
    quantity:qty,newOrderRespType:'RESULT',
@@ -1095,11 +1108,11 @@ async function quickCloseSubmit(side){
    throw Error('바이낸스 주문 상태 확인 필요 · 주문번호 '+String(response?.orderId||order.newClientOrderId)+
     ' · 자동 재주문 차단');
   }
-  quickCloseTrack={id:order.newClientOrderId,side,kind:method,qty};
-  quickCloseSetStatus(side+' '+(method==='LIMIT'?'지정가':'시장가')+
+  quickCloseTrack={id:order.newClientOrderId,side,kind:method,qty,pct};
+  quickCloseSetStatus(side+' '+pct+'% '+(method==='LIMIT'?'지정가':'시장가')+
    ' 청산 #'+response.orderId+' · '+response.status+
    ' · '+fmt(Number(response.executedQty||0))+'/'+qty+' BTC');
-  message('빠른 '+side+' '+method+' 청산 주문 #'+response.orderId+
+  message('빠른 '+side+' '+pct+'% '+method+' 청산 주문 #'+response.orderId+
    ' · '+response.status+' · '+fmt(Number(response.executedQty||0))+'/'+qty+
    ' BTC (기존 손절/익절 보호주문은 거래소에서 별도 확인)');
   $('realAccountRefresh')?.click();
@@ -1115,6 +1128,8 @@ for(const [side,button] of [['LONG',quickCloseLong],['SHORT',quickCloseShort]])
 quickCloseMethod?.addEventListener('change',()=>{
  quickCloseRender();if(quickCloseMethod.value==='LIMIT')void quickCloseRefreshQuote();
 });
+quickClosePercent?.addEventListener('input',quickCloseRender);
+quickClosePercent?.addEventListener('change',quickCloseRender);
 document.addEventListener('btc:real-account-updated',()=>{
  quickCloseRender();if(quickCloseMethod?.value==='LIMIT')void quickCloseRefreshQuote();
 });
