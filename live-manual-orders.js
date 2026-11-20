@@ -182,7 +182,7 @@ function stageRecords(){
 function saveStageRecord(side,order,protection=null){
  const all=stageRecords(),entries=Array.isArray(all[side])?all[side]:[];
  entries.push({id:String(order.orderId),time:Date.now(),stop:Number(protection?.slPercent||$('stop').value),
-  rr:Number($('rr').value),hold:Number($('hold').value),
+  rr:Number($('rr').value),
   ...(protection?{tpPrice:Number(protection.tpPrice),slPrice:Number(protection.slPrice),
    reservationPrice:Number(order.price),tpPercent:Number(protection.tpPercent),
    slPercent:Number(protection.slPercent)}:{})});all[side]=entries.slice(-20);
@@ -1023,7 +1023,7 @@ function quickCloseRender(){
   else if(!validPct)quickCloseSetStatus('청산 비율 1~100%를 확인하세요',true);
   else if(quickCloseHasSwitchWatcher())
    quickCloseSetStatus('청산 시 실행 전 스위칭 감시를 해제하고 청산 주문을 전송합니다');
-  else quickCloseSetStatus('보유 포지션 확인됨 · 청산 버튼을 누르면 즉시 주문 요청');
+  else quickCloseSetStatus('보유 포지션 확인됨 · 청산 버튼을 누르면 확인창 표시');
  }
  if(method==='MARKET'){
   quickCloseQuote.textContent='시장가 · 체결가 변동 가능';
@@ -1077,7 +1077,8 @@ async function quickCloseFollowOrder(){
    String(e?.message||e),true);
  }finally{quickCloseTrackBusy=false;quickCloseRender();}
 }
-async function quickCloseSubmit(side){
+async function quickCloseSubmit(side,selection){
+ if(!selection?.confirmed)return;
  if(!['LONG','SHORT'].includes(side))return;
  if(quickCloseBusy||busy){
   quickCloseSetStatus('⚠ 다른 실전 주문/조회가 처리 중입니다. 중복 주문 없이 완료 후 다시 확인하세요.',true);return;
@@ -1085,11 +1086,11 @@ async function quickCloseSubmit(side){
  if(quickCloseUncertain||quickCloseTrack){
   quickCloseSetStatus('⚠ 기존 청산 주문 결과/미체결 확인 필요 · 바이낸스에서 확인 후 진행하세요.',true);return;
  }
- const method=quickCloseMethod?.value;
+ const method=selection.method;
  if(!['LIMIT','MARKET'].includes(method)){
   quickCloseSetStatus('⚠ 청산 방식을 지정가 또는 시장가로 선택하세요.',true);return;
  }
- const pct=Number(quickClosePercent?.value);
+ const pct=Number(selection.pct);
  if(!Number.isInteger(pct)||pct<1||pct>100){
   quickCloseSetStatus('⚠ 청산 비율은 1~100%의 정수여야 합니다.',true);return;
  }
@@ -1214,8 +1215,103 @@ async function quickCloseSubmit(side){
   if(quickCloseUncertain)message('빠른 청산 주문 결과 불확실 · 바이낸스 확인 필수');
  }finally{quickCloseBusy=false;quickCloseRender();}
 }
+// Review-only entry point: tapping a close button NEVER submits to Binance.
+const quickCloseReview=document.createElement('div');
+quickCloseReview.id='quickCloseReview';
+quickCloseReview.hidden=true;
+quickCloseReview.style.cssText='position:fixed;inset:0;z-index:100100;background:rgba(3,10,21,.88);display:none;align-items:center;justify-content:center;padding:16px';
+quickCloseReview.innerHTML='<section role="dialog" aria-modal="true" aria-label="실전 청산 최종 확인" style="width:min(440px,100%);max-height:90dvh;overflow:auto;background:#14243b;color:#edf5ff;border:1px solid #6183a2;border-radius:17px;padding:18px;box-shadow:0 12px 36px #0009">'+
+ '<h3 id="qcrTitle" style="margin:0 0 12px;font-size:19px">실전 청산 확인</h3>'+
+ '<label style="display:block;margin:9px 0 4px">청산 방식</label><select id="qcrMethod" style="width:100%"><option value="LIMIT">지정가 청산</option><option value="MARKET">시장가 청산</option></select>'+
+ '<label style="display:block;margin:9px 0 4px">청산 비율 (%)</label><input id="qcrPercent" type="number" min="1" max="100" step="1" inputmode="numeric" style="width:100%">'+
+ '<div id="qcrPreview" style="white-space:pre-line;line-height:1.75;font-size:13px;margin:13px 0;color:#cce3f4">바이낸스 포지션 조회 중…</div>'+
+ '<div style="font-size:11px;color:#f6c18a;line-height:1.6">수익률은 수수료율 가정에 따른 추정치입니다. 실제 수수료·슬리피지·펀딩비·체결가에 따라 달라집니다. 지정가는 미체결될 수 있습니다.</div>'+
+ '<div style="display:flex;gap:8px;margin-top:15px"><button type="button" id="qcrCancel" style="flex:1;background:#304660">취소</button><button type="button" id="qcrSubmit" disabled style="flex:1;background:#aa4255;color:white">실제 청산 확인</button></div></section>';
+document.body.append(quickCloseReview);
+const qcr=id=>quickCloseReview.querySelector('#'+id);
+let qcrSide=null,qcrBusy=false,qcrPreviewSeq=0;
+function qcrHide(){
+ if(qcrBusy)return;
+ qcrSide=null;quickCloseReview.hidden=true;quickCloseReview.style.display='none';
+ qcrPreviewSeq++;
+}
+async function qcrRefresh(){
+ const side=qcrSide,seq=++qcrPreviewSeq;
+ if(!side)return;
+ qcr('qcrSubmit').disabled=true;
+ qcr('qcrPreview').textContent='바이낸스 실시간 포지션·호가 확인 중…';
+ const method=qcr('qcrMethod').value,pct=Number(qcr('qcrPercent').value);
+ if(!['LIMIT','MARKET'].includes(method)||!Number.isInteger(pct)||pct<1||pct>100){
+  qcr('qcrPreview').textContent='청산 비율은 1~100% 정수여야 합니다.';return;
+ }
+ try{
+  credentials();
+  const [details,book,dual]=await Promise.all([
+   signed('GET','/fapi/v3/positionRisk',{symbol}),
+   publicJson('/fapi/v1/ticker/bookTicker?symbol='+symbol),mode()
+  ]);
+  if(seq!==qcrPreviewSeq||qcrSide!==side)return;
+  const list=Array.isArray(details)?details:[details];
+  const ps=dual?side:'BOTH';
+  const position=list.find(x=>x.symbol===symbol&&x.positionSide===ps&&
+    (side==='LONG'?Number(x.positionAmt)>0:Number(x.positionAmt)<0));
+  if(!position)throw Error('바이낸스에서 '+side+' 보유 포지션을 찾지 못했습니다');
+  const bid=Number(book.bidPrice),ask=Number(book.askPrice),entry=Number(position.entryPrice);
+  if(!(bid>0&&ask>=bid&&entry>0))throw Error('실시간 호가/진입가 확인 실패');
+  const exitPrice=side==='LONG'?bid:ask;
+  const qty=Math.abs(Number(position.positionAmt))*pct/100;
+  const gross=(side==='LONG'?exitPrice-entry:entry-exitPrice)*qty;
+  // Estimates only: maker exit 0.02%, taker exit 0.05%, entry 0.05%.
+  const exitFeeRate=method==='LIMIT'?0.0002:0.0005,entryFeeRate=0.0005;
+  const fee=qty*entry*entryFeeRate+qty*exitPrice*exitFeeRate;
+  const leverage=Number((account?.positions||[]).find(x=>x.side===side||x.side===ps)?.leverage);
+  const margin=Number(position.positionInitialMargin)>0?
+   Number(position.positionInitialMargin)*pct/100:
+   (leverage>0?entry*qty/leverage:NaN);
+  const netRoi=margin>0?(gross-fee)/margin*100:NaN;
+  qcr('qcrPreview').textContent=
+   '실시간 '+(side==='LONG'?'매도(Bid) ':'매수(Ask) ')+fmt(exitPrice)+' USDT\n'+
+   '현재 보유 '+fmt(Math.abs(Number(position.positionAmt)))+' BTC · 청산 약 '+fmt(qty)+' BTC\n'+
+   '예상 총손익 '+fmt(gross)+' USDT\n'+
+   '예상 왕복 수수료 '+fmt(fee)+' USDT (진입 0.05% 가정 / 청산 '+(exitFeeRate*100).toFixed(2)+'% 가정)\n'+
+   '수수료 차감 예상 손익 '+fmt(gross-fee)+' USDT\n'+
+   '수수료 차감 예상 수익률 '+(Number.isFinite(netRoi)?netRoi.toFixed(2)+'%':'증거금 정보 부족으로 산출 불가')+'\n'+
+   (method==='LIMIT'?'확정 시 최신 호가로 GTC 지정가 제출 · 미체결 가능':'확정 시 시장가 제출 · 체결가 변동 가능');
+  qcr('qcrSubmit').disabled=false;
+ }catch(e){
+  if(seq===qcrPreviewSeq&&side===qcrSide)qcr('qcrPreview').textContent=
+   '⚠ 확인 실패: '+String(e?.message||e)+'\n실제 청산 주문은 아직 전송되지 않았습니다.';
+ }
+}
+function qcrShow(side){
+ if(qcrBusy||quickCloseBusy||busy)return;
+ qcrSide=side;
+ qcr('qcrTitle').textContent='BTCUSDT '+(side==='SHORT'?'숏':'롱')+' 청산 최종 확인';
+ qcr('qcrMethod').value=quickCloseMethod.value;
+ qcr('qcrPercent').value=quickClosePercent.value;
+ quickCloseReview.hidden=false;quickCloseReview.style.display='flex';
+ void qcrRefresh();
+}
+qcr('qcrCancel').addEventListener('click',qcrHide);
+quickCloseReview.addEventListener('click',e=>{if(e.target===quickCloseReview)qcrHide()});
+qcr('qcrMethod').addEventListener('change',()=>void qcrRefresh());
+qcr('qcrPercent').addEventListener('change',()=>void qcrRefresh());
+qcr('qcrSubmit').addEventListener('click',async()=>{
+ if(qcrBusy||qcr('qcrSubmit').disabled||!qcrSide)return;
+ const side=qcrSide,selection={confirmed:true,method:qcr('qcrMethod').value,pct:Number(qcr('qcrPercent').value)};
+ if(!Number.isInteger(selection.pct)||selection.pct<1||selection.pct>100)return;
+ qcrBusy=true;qcr('qcrSubmit').disabled=true;qcr('qcrCancel').disabled=true;
+ quickCloseReview.hidden=true;quickCloseReview.style.display='none';
+ try{
+  quickCloseMethod.value=selection.method;quickClosePercent.value=String(selection.pct);
+  await quickCloseSubmit(side,selection);
+ }finally{
+  qcrBusy=false;qcr('qcrCancel').disabled=false;qcrSide=null;qcrPreviewSeq++;
+ }
+});
+setInterval(()=>{if(!quickCloseReview.hidden&&!qcrBusy&&visible())void qcrRefresh()},3500);
 for(const [side,button] of [['LONG',quickCloseLong],['SHORT',quickCloseShort]])
- if(button)button.addEventListener('click',()=>void quickCloseSubmit(side));
+ if(button)button.addEventListener('click',()=>qcrShow(side));
 quickCloseMethod?.addEventListener('change',()=>{
  quickCloseRender();if(quickCloseMethod.value==='LIMIT')void quickCloseRefreshQuote();
 });
