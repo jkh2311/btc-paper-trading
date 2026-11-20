@@ -504,7 +504,15 @@ async function enter(side){
    response=known;
   }
   lastOrderIssue=false;
-  if(response?.orderId&& !['REJECTED','CANCELED','EXPIRED'].includes(response.status))saveStageRecord(side,response,protection);
+  if(response?.orderId&& !['REJECTED','CANCELED','EXPIRED'].includes(response.status)){
+   saveStageRecord(side,response,protection);
+   // Request exchange-side STOP/TP verification as soon as a fill exists.
+   // Pending LIMIT entries are monitored by the existing supervisor.
+   document.dispatchEvent(new CustomEvent('btc:manual-entry-placed',{
+    detail:{side,orderId:String(response.orderId),status:String(response.status||''),
+     filled:Number(response.executedQty||0)}
+   }));
+  }
   message('실제 주문 확인 · #'+response.orderId+' · '+response.status+
    ' · 체결 '+(response.executedQty||'0')+' BTC\n'+
    (protection?'예약 익절 '+protection.tpPrice+' / 손절 '+protection.slPrice+
@@ -920,7 +928,7 @@ const quickCloseStatus=$('quickCloseStatus');
 let quickCloseBusy=false,quickCloseUncertain=false,quickCloseQuoteBusy=false;
 let quickCloseBook={bid:NaN,ask:NaN,at:0},quickCloseTrack=null,quickCloseTrackBusy=false;
 function quickClosePositions(){
- if(!account||Date.now()-Number(account.at)>15000)return [];
+ if(!account||Date.now()-Number(account.at)>60000)return [];
  return (account.positions||[]).map(p=>{
   const quantity=Number(p.amount),ps=String(p.side||'BOTH');
   if(!Number.isFinite(quantity)||Math.abs(quantity)<=1e-8)return null;
@@ -951,14 +959,22 @@ function quickCloseRender(){
  const switchBusy=quickCloseSwitchInProgress();
  for(const [side,button] of [['LONG',quickCloseLong],['SHORT',quickCloseShort]]){
   const count=positions.filter(p=>p.side===side).length;
+  // Live Binance best bid/ask is fetched again when the button is pressed.
+  // Do not disable an otherwise valid position just because quote polling lags.
   const ready=count===1&&!!cred()?.apiKey&&!!cred()?.apiSecret&&!busy&&
-   !quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack&&!switchBusy&&
-   validPct&&(method==='MARKET'||Number.isFinite(quickClosePrice(side)));
+   !quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack&&!switchBusy&&validPct;
   button.disabled=!ready;
   button.title=ready?side+' 포지션 '+pct+'% '+(method==='LIMIT'?'지정가':'시장가')+' 청산 주문 바로 전송':
    switchBusy?'스위칭 주문 진행 중':quickCloseUncertain?'기존 주문 결과 확인 필요':
    quickCloseTrack?'기존 청산 주문 #'+quickCloseTrack.id+' 상태 확인 중':
    !count?'실제 '+side+' 보유 포지션 없음':'시세·계좌 연결 또는 주문 상태 확인 필요';
+ }
+ if(!quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack){
+  if(switchBusy)quickCloseSetStatus('스위칭 감시/주문 진행 중 · 스위칭 해제 후 청산 가능');
+  else if(!positions.length)quickCloseSetStatus('실제 BTCUSDT 포지션 조회 또는 API 잠금 해제 필요');
+  else if(!cred()?.apiKey||!cred()?.apiSecret)quickCloseSetStatus('바이낸스 API 잠금 해제 필요');
+  else if(!validPct)quickCloseSetStatus('청산 비율 1~100%를 확인하세요',true);
+  else quickCloseSetStatus('보유 포지션 확인됨 · 청산 버튼을 누르면 즉시 주문 요청');
  }
  if(method==='MARKET'){
   quickCloseQuote.textContent='시장가 · 체결가 변동 가능';
@@ -1090,7 +1106,7 @@ async function quickCloseSubmit(side){
    (side==='LONG'?Number(x.positionAmt)>0:Number(x.positionAmt)<0));
   if(!final||Math.abs(Math.abs(Number(final.positionAmt))-quantity)>1e-8)
    throw Error('주문 직전 포지션 수량이 변경되었습니다. 미전송');
-  quickCloseSetStatus(side+' '+method+' 전량 청산 주문 전송 중…');
+  quickCloseSetStatus(side+' '+method+' '+pct+'% 청산 주문 전송 중…');
   let response;
   try{response=await signed('POST','/fapi/v1/order',order);}
   catch(e){
