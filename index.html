@@ -3073,7 +3073,10 @@ async function loadThreeMonthThreeMinuteChart(){
 }
 async function loadIntradayHistory(tf){
   if(demo||tf==='1m'||!Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf))return false;
-  const source=historySourceTf(tf),duration=candleDuration[source],cutoff=historyCutoff(tf);
+  const source=historySourceTf(tf),duration=candleDuration[source];
+  // Page starts align with final requested candles (particularly 10m
+  // constructed from pairs of 5m candles), avoiding split candle windows.
+  const cutoff=Math.floor(historyCutoff(tf)/candleDuration[tf])*candleDuration[tf];
   if(historyLoading[tf])return false;
   if(historyReadyUntil[tf]!==undefined&&historyReadyUntil[tf]<=cutoff)return true;
   if(Date.now()-(historyRetryAt[tf]||0)<12000)return false;
@@ -3096,7 +3099,7 @@ async function loadIntradayHistory(tf){
         const raw=await resp.json();if(!Array.isArray(raw))throw Error('과거 '+source+' 응답 오류');
         const bars=raw.map(v=>({t:+v[0],o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:+v[5]}))
           .filter(v=>Number.isFinite(v.t)&&v.c>0&&v.t>=page.start&&v.t<=page.end);
-        return tf==='10m'?buildTenMinuteCandles(bars):bars;
+        return tf==='10m'?buildTenMinuteCandles(bars,true):bars;
       }));
       completed+=results.length;
       const older=results.flat();
@@ -3177,18 +3180,23 @@ let pricePaintTimer=null,chartPaintTimer=null,pricePaintQueued=false,chartPaintQ
 let lastChartPaintAt=0,lastPricePaintAt=0,connectionWatchdog=null;
 // 10m candles from Binance 5m bars; do not change the 1m signal feed.
 const candleDuration={'1m':60000,'3m':180000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'6h':21600000,'12h':43200000,'1d':86400000,'1w':604800000,'1M':2592000000};
-function buildTenMinuteCandles(fiveBars){
+function buildTenMinuteCandles(fiveBars,completeOnly=false){
   if(!Array.isArray(fiveBars)||!fiveBars.length)return [];
-  const result=[];
+  const result=[],fiveCount=[],fiveFirst=[],fiveLast=[];
   for(const b of fiveBars){
     if(!Number.isFinite(b?.t)||!(b.c>0))continue;
     const t=Math.floor(b.t/600000)*600000,last=result.at(-1);
     if(last&&last.t===t){
       last.h=Math.max(last.h,b.h);last.l=Math.min(last.l,b.l);
       last.c=b.c;last.v+=Number(b.v)||0;
-    }else result.push({t,o:b.o,h:b.h,l:b.l,c:b.c,v:Number(b.v)||0});
+      fiveCount[fiveCount.length-1]++;fiveLast[fiveLast.length-1]=b.t;
+    }else{
+      result.push({t,o:b.o,h:b.h,l:b.l,c:b.c,v:Number(b.v)||0});
+      fiveCount.push(1);fiveFirst.push(b.t);fiveLast.push(b.t);
+    }
   }
-  return result;
+  return completeOnly?result.filter((x,i)=>fiveCount[i]===2&&
+    fiveFirst[i]===x.t&&fiveLast[i]===x.t+300000):result;
 }
 // Keep the 10m synthetic chart fast while its own one-year history is loaded.
 // Recompute only if its source array or latest OHLCV actually changes.
@@ -5780,7 +5788,7 @@ async function extendJumpHistory(direction,segment){
     .filter(v=>Number.isFinite(v.t)&&v.c>0));
    cursor=end+sourceStep;
   }
-  const extra=tf==='10m'?buildTenMinuteCandles(fetched):fetched;
+  const extra=tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
   if(chartJumpSegment!==segment||$('tf').value!==tf)return;
   const original=segment.bars;
   // No fabricated candles between disconnected history windows.
@@ -5898,7 +5906,7 @@ async function jumpChartToUtc(requestedTime){
        .filter(v=>Number.isFinite(v.t)&&v.c>0));
      cursor=end+sourceDuration;
    }
-   const bars=tf==='10m'?buildTenMinuteCandles(fetched):fetched;
+   const bars=tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
    if(bars.length<22||!bars.some(v=>Math.abs(v.t-target)<duration*2))
      throw Error('해당 시간대의 거래소 캔들을 찾지 못했어');
    if($('tf').value!==tf)return;
