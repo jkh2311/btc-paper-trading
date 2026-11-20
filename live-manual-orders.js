@@ -980,6 +980,7 @@ function quickCloseSetStatus(text,isError=false){
  if(!quickCloseStatus)return;
  quickCloseStatus.textContent=text;
  quickCloseStatus.title=text;
+ quickCloseStatus.style.display=text?'':'none';
  quickCloseStatus.style.color=isError?'#ffadb8':'#b0d7ed';
 }
 function quickCloseRender(){
@@ -1003,7 +1004,7 @@ function quickCloseRender(){
  }
  if(!quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack&&
     Date.now()-quickCloseErrorAt>15000){
-  if(switchBusy)quickCloseSetStatus('스위칭 감시/주문 진행 중 · 스위칭 해제 후 청산 가능');
+  if(switchBusy)quickCloseSetStatus(''); // keep safety lock, hide redundant chart message
   else if(!positions.length)quickCloseSetStatus('실제 BTCUSDT 포지션 조회 또는 API 잠금 해제 필요');
   else if(!cred()?.apiKey||!cred()?.apiSecret)quickCloseSetStatus('바이낸스 API 잠금 해제 필요');
   else if(!validPct)quickCloseSetStatus('청산 비율 1~100%를 확인하세요',true);
