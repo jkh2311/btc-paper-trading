@@ -136,6 +136,9 @@ async function protect(side,p,info){
   '\n원래 전량 익절은 분할 주문 적용 중 자동 재등록하지 않습니다.':
   side+' 거래소 손절·익절 활성 확인 · SL '+prices.STOP_MARKET+' / TP '+prices.TAKE_PROFIT_MARKET+
   '\n보호 주문은 해당 방향 포지션 전체에 적용 · 시간 청산은 앱 활성 중에만 가능';
+ document.dispatchEvent(new CustomEvent('btc:manual-protection-status',{detail:{
+  side,ok:true,message:note.textContent
+ }}));
 }
 async function closeAtDeadline(side,p,orders,info,dual){
  const qty=Math.abs(Number(p.positionAmt));if(!(qty>0))return;
@@ -196,11 +199,23 @@ async function run(){
    await protect(side,p,first);
   }
  }catch(e){note.textContent='⚠ 실전 보호/보유시간 확인 실패: '+String(e?.message||e)+
-  '\n바이낸스에서 손절·익절 주문 상태를 확인하세요.';}
+  '\n바이낸스에서 손절·익절 주문 상태를 확인하세요.';
+  document.dispatchEvent(new CustomEvent('btc:manual-protection-status',{
+   detail:{ok:false,message:note.textContent}
+  }));
+ }
  finally{busy=false;}
 }
-setInterval(run,15000);
-document.addEventListener('btc:real-account-updated',()=>{if(Date.now()-lastRun>5000){lastRun=Date.now();void run();}});
+setInterval(run,10000);
+// A filled manual entry deserves prompt real Binance-hosted protection, not
+// only the 10-second periodic supervisor. Limit orders are rechecked without
+// assuming that NEW / PARTIALLY_FILLED is a complete fill.
+document.addEventListener('btc:manual-entry-placed',()=>{
+ lastRun=0;
+ for(const delay of [0,1400,3700,7500])
+  setTimeout(()=>{if(!document.hidden)void run();},delay);
+});
+document.addEventListener('btc:real-account-updated',()=>{if(Date.now()-lastRun>2500){lastRun=Date.now();void run();}});
 document.addEventListener('btc:credentials-unlocked',()=>setTimeout(run,1000));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void run()});
 setTimeout(run,2500);
