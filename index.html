@@ -3169,8 +3169,25 @@ function initIntradayHistoryJump(){
  });
  updateIntradayHistoryJump();
 }
-async function get(tf){let u='https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval='+tf+'&limit=1000';let r=await fetch(u,{cache:'no-store',signal:AbortSignal.timeout(12000)});if(!r.ok)throw Error('HTTP '+r.status+' / '+tf);let d=await r.json();if(!Array.isArray(d))throw Error('캔들 형식 오류');return d.map(v=>({t:+v[0],o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:+v[5]}))}
-async function refresh(){if(working||demo)return;working=true;$('status').textContent='시세 갱신 중…';let out=await Promise.allSettled(tfs.map(get));let ok=0,errors=[];out.forEach((r,i)=>{if(r.status==='fulfilled'){const tf=tfs[i],incoming=r.value,old=candles[tf];if(wsConnected&&old?.length&&incoming?.length){const latest=old[old.length-1],lastIncoming=incoming[incoming.length-1];if(latest.t===lastIncoming.t){lastIncoming.c=latest.c;lastIncoming.h=Math.max(lastIncoming.h,latest.h);lastIncoming.l=Math.min(lastIncoming.l,latest.l)}else if(latest.t>lastIncoming.t&&latest.t-lastIncoming.t<=candleDuration[tf]){incoming.push({...latest});if(incoming.length>1000)incoming.shift()}}candles[tf]=tf==='1m'?mergeMinuteCandles(old,incoming):old?.length&&(tf==='1d'||tf==='1w'||tf==='1M'||(Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf)&&old[0].t<incoming[0]?.t))?mergeDailyCandles(old,incoming):incoming;ok++}else errors.push(tfs[i]+': '+String(r.reason.message||r.reason))});syncTenMinuteCandles();syncMinuteChartArchive();if(candles['1m']&&(!lastTickAt||Date.now()-lastTickAt>12000)){last=candles['1m'].at(-1).c;lastTickAt=Date.now()}$('status').textContent='캔들 연결 '+ok+'/'+tfs.length+(errors.length?' · 오류: '+errors.join(' | '):' · 캔들 보정 15초');if(!ok){$('mode').textContent='연결 실패';if(!wsConnected)showMarketConnectionError('캔들 조회 실패 · 연결 상태를 확인하고 다시 시도해 주세요.')}else if(wsConnected)hideMarketConnectionError();working=false;detectDailyConvergence();renderMarketRegimeBadge();process();if(out[tfs.indexOf('1m')]?.status==='fulfilled')maybeEvaluateAutoPaperSignals();
+async function get(tf){
+ const bars=candles[tf],lastTime=bars?.at(-1)?.t;
+ const recent=Array.isArray(bars)&&bars.length>=200&&
+  Number.isFinite(lastTime)&&nextCandleTime(tf,lastTime,2)>Date.now();
+ // Reuse previously fetched history and request only five current bars.
+ // Missing, stale, or restarted timeframes retain the original 1000-bar
+ // bootstrap so indicators and RMI history have sufficient samples.
+ const limit=recent?5:1000;
+ const url='https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval='+tf+'&limit='+limit;
+ const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(12000)});
+ if(!response.ok)throw Error('HTTP '+response.status+' / '+tf);
+ const raw=await response.json();
+ if(!Array.isArray(raw)||!raw.length)throw Error('캔들 형식 오류');
+ return raw.map(v=>({t:+v[0],o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:+v[5]}));
+}
+async function refresh(){if(working||demo)return;working=true;$('status').textContent='시세 갱신 중…';let out=await Promise.allSettled(tfs.map(get));let ok=0,errors=[];out.forEach((r,i)=>{if(r.status==='fulfilled'){const tf=tfs[i],incoming=r.value,old=candles[tf];if(wsConnected&&old?.length&&incoming?.length){const latest=old[old.length-1],lastIncoming=incoming[incoming.length-1];if(latest.t===lastIncoming.t){lastIncoming.c=latest.c;lastIncoming.h=Math.max(lastIncoming.h,latest.h);lastIncoming.l=Math.min(lastIncoming.l,latest.l)}else if(latest.t>lastIncoming.t&&latest.t-lastIncoming.t<=candleDuration[tf]){incoming.push({...latest});if(incoming.length>1000)incoming.shift()}}// Preserve earlier loaded/cached candles across every timeframe while
+ // overlaying the latest confirmed REST/WS values.
+ candles[tf]=tf==='1m'?mergeMinuteCandles(old,incoming):
+  old?.length?mergeDailyCandles(old,incoming):incoming;ok++}else errors.push(tfs[i]+': '+String(r.reason.message||r.reason))});syncTenMinuteCandles();syncMinuteChartArchive();if(candles['1m']&&(!lastTickAt||Date.now()-lastTickAt>12000)){last=candles['1m'].at(-1).c;lastTickAt=Date.now()}$('status').textContent='캔들 연결 '+ok+'/'+tfs.length+(errors.length?' · 오류: '+errors.join(' | '):' · 캔들 보정 15초');if(!ok){$('mode').textContent='연결 실패';if(!wsConnected)showMarketConnectionError('캔들 조회 실패 · 연결 상태를 확인하고 다시 시도해 주세요.')}else if(wsConnected)hideMarketConnectionError();working=false;detectDailyConvergence();renderMarketRegimeBadge();process();if(out[tfs.indexOf('1m')]?.status==='fulfilled')maybeEvaluateAutoPaperSignals();
 if(!wsConnected)render();else scheduleLivePaint();
 if(ok>0)scheduleChartCacheFlush();
 if(candles['1m']?.length)void loadFiveDayMinuteHistory();if($('tf').value==='1d'&&!dailyHistoryReady)void loadDailyHistory();}
