@@ -87,7 +87,7 @@ window.btcVisibleLiveChartPrices=()=>levels().filter(l=>chartVisible(l.kind))
 window.btcDrawLiveLevels=(ctx,scale)=>{
  const all=levels().filter(l=>chartVisible(l.kind));
  for(const level of all){
-  const price=drag?.level?.p===level.p&&drag.level.kind===level.kind?drag.price:level.price;
+  const price=drag&&drag.level.kind===level.kind&&drag.level.side===level.side&&drag.level.p.side===level.p.side?drag.price:level.price;
   const y=scale.y(price);
   if(y<scale.top||y>scale.priceBottom)continue;
   const color=level.active?(level.side==='LONG'?'#41dbad':'#ff819b'):'#f4bc61';
@@ -97,7 +97,8 @@ window.btcDrawLiveLevels=(ctx,scale)=>{
   ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(scale.plotW,y);ctx.stroke();
   ctx.setLineDash([]);
   const type=level.kind==='entry'?'진입':level.kind==='sl'?'손절':'익절';
-  const label=level.side+' '+type+(level.active?'':' 미등록')+' '+fmt(price);
+  const preview=drag&&drag.level.kind===level.kind&&drag.level.side===level.side&&drag.level.p.side===level.p.side;
+  const label=level.side+' '+type+(preview?' 이동 중':level.active?'':' 미등록')+' '+fmt(price);
   ctx.font='bold 10px -apple-system,sans-serif';
   const labelW=Math.min(scale.plotW-6,ctx.measureText(label).width+10);
   const x=level.kind==='entry'?5:level.kind==='sl'?Math.max(5,scale.plotW/3):Math.max(5,scale.plotW*2/3);
@@ -132,12 +133,14 @@ document.addEventListener('btc:real-account-updated',e=>{
 document.addEventListener('btc:real-account-cleared',()=>{positions=[];algos=[];accountAt=0;readStamp=0;redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));});
 function scaleNow(){return window.btcLiveScale||null;}
 function touchHit(x,y){
- const scale=scaleNow();if(!scale||!positions.length)return null;
+ const scale=scaleNow();if(!scale||!positions.length||document.hidden)return null;
  const rect=chart.getBoundingClientRect(),px=x-rect.left,py=y-rect.top;
- if(px<0||px>scale.plotW||py<scale.top-12||py>scale.priceBottom+12)return null;
+ if(px<0||px>scale.plotW||py<scale.top-26||py>scale.priceBottom+26||!(scale.hi>scale.lo))return null;
  return levels().filter(l=>l.kind!=='entry'&&chartVisible(l.kind)).map(l=>({l,dist:Math.abs(py-(scale.top+(scale.hi-l.price)/(scale.hi-scale.lo)*(scale.priceBottom-scale.top)))}))
-  .filter(x=>x.dist<=17).sort((a,b)=>a.dist-b.dist)[0]?.l||null;
+  .filter(x=>x.dist<=26).sort((a,b)=>a.dist-b.dist||(b.l.active?1:0)-(a.l.active?1:0))[0]?.l||null;
 }
+// The parent chart drawing tool must defer when an actual TP/SL line is hit.
+window.btcRealProtectionHit=(x,y)=>!!touchHit(x,y);
 function priceAt(y){
  const s=scaleNow(),rect=chart.getBoundingClientRect();
  const local=y-rect.top;
@@ -348,6 +351,7 @@ function start(x,y){
  if(requestBusy||document.hidden)return false;
  const l=touchHit(x,y);if(!l)return false;
  drag={level:l,startY:y,price:l.price,moved:false};
+ actionNotice('↕ '+l.side+' '+(l.kind==='sl'?'손절':'익절')+'선 선택됨 · 위아래로 이동 후 놓으면 변경 확인창이 뜹니다');
  return true;
 }
 function move(y){
@@ -355,12 +359,15 @@ function move(y){
  if(Math.abs(y-drag.startY)>5)drag.moved=true;
  if(!drag.moved)return;
  const price=priceAt(y);
- if(Number.isFinite(price)&&price>0){drag.price=price;redraw();}
+ if(Number.isFinite(price)&&price>0){drag.price=price;redraw();
+  actionNotice('↕ '+drag.level.side+' '+(drag.level.kind==='sl'?'손절':'익절')+' 변경 예정 '+fmt(price)+' USDT · 손가락을 놓으면 확인');}
 }
 function finish(cancel=false){
  const d=drag;drag=null;redraw();
  if(cancel||!d)return;
- if(d.moved&&Math.abs(d.price-d.level.price)>=.01){void moveProtection(d.level,d.price);return;}
+ if(d.moved&&Math.abs(d.price-d.level.price)>=.01){
+  actionNotice('보호 가격 '+fmt(d.price)+' USDT · 주문 변경 확인 대기');
+  void moveProtection(d.level,d.price);return;}
  // A tap opens a precise-price editor; drag still offers direct placement.
  const requested=prompt(d.level.side+' '+(d.level.kind==='sl'?'손절':'익절')+
   ' 가격 입력 (USDT) · 바이낸스 실제 조건부 주문을 변경합니다',String(Math.round(d.level.price*10)/10));
