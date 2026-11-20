@@ -175,7 +175,7 @@ http.createServer(async(req,res)=>{
  if(req.method==='GET'&&url.pathname==='/live/preflight'){
   // Read-only status. Trading is armed only by separate Render secrets,
   // persistent database and explicit server-side consent; never by a link.
-  const feedOk=!lastCheckError&&lastCheckTime>0&&Date.now()-lastCheckTime<90000;
+  const feedOk=signalFeedSource==='binance-usdm-rest'&&!lastCheckError&&lastCheckTime>0&&Date.now()-lastCheckTime<90000;
   const cfg=liveExec.settings();
   const blockers=[...cfg.errors,...(!feedOk?['바이낸스 선물 시세 연결 미확인 또는 차단']:[])];
   respond(res,200,{ok:true,mode:blockers.length?'LIVE_LOCKED':'LIVE_READY',
@@ -442,7 +442,9 @@ async function poll(){
   lastCheckTime=Date.now();lastCheckError=null;
   // Fire-and-forget only after a validated, fresh, fully closed Binance bar.
   // runLiveExecution itself holds the persistent duplicate-claim check.
-  void pollLiveExecution(bars,current);
+  // A fallback notification feed must never silently enable real orders.
+  // Server-side LIVE execution remains restricted to the original REST feed.
+  if(signalFeedSource==='binance-usdm-rest')void pollLiveExecution(bars,current);
  }catch(e){lastCheckError=String(e.message||e).slice(0,180);console.warn('RMI poll:',lastCheckError)}
  finally{polling=false}
 }
