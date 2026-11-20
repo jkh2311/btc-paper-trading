@@ -910,6 +910,221 @@ async function refreshLoop(){
  finally{refreshBusy=false;}
 }
 function credentialsSafeSilent(){const a=cred();return !!(a?.apiKey&&a?.apiSecret);}
+
+// v267 fast close: direct tap is the final user action. No confirm/prompt.
+// Never call an opening-side order: LIMIT/MARKET orders always target the
+// existing confirmed position and One-way mode always sets reduceOnly.
+const quickCloseLong=$('quickCloseLong'),quickCloseShort=$('quickCloseShort');
+const quickCloseMethod=$('quickCloseMethod'),quickCloseQuote=$('quickCloseQuote');
+const quickCloseStatus=$('quickCloseStatus');
+let quickCloseBusy=false,quickCloseUncertain=false,quickCloseQuoteBusy=false;
+let quickCloseBook={bid:NaN,ask:NaN,at:0},quickCloseTrack=null,quickCloseTrackBusy=false;
+function quickClosePositions(){
+ if(!account||Date.now()-Number(account.at)>15000)return [];
+ return (account.positions||[]).map(p=>{
+  const quantity=Number(p.amount),ps=String(p.side||'BOTH');
+  if(!Number.isFinite(quantity)||Math.abs(quantity)<=1e-8)return null;
+  const side=ps==='LONG'||ps==='SHORT'?ps:quantity>0?'LONG':'SHORT';
+  return {side,positionSide:ps,amount:Math.abs(quantity)};
+ }).filter(Boolean);
+}
+function quickCloseSwitchInProgress(){
+ const x=window.btcLiveSwitchSnapshot?.();
+ return !!x&&['ARMED','PAUSED','EXECUTING','REVIEW','CLOSE_PENDING','OPEN_PENDING'].includes(x.state);
+}
+function quickClosePrice(side){
+ const n=side==='LONG'?quickCloseBook.bid:quickCloseBook.ask;
+ return Number.isFinite(n)&&n>0&&Date.now()-quickCloseBook.at<=6000?n:NaN;
+}
+function quickCloseSetStatus(text,isError=false){
+ if(!quickCloseStatus)return;
+ quickCloseStatus.textContent=text;
+ quickCloseStatus.title=text;
+ quickCloseStatus.style.color=isError?'#ffadb8':'#b0d7ed';
+}
+function quickCloseRender(){
+ if(!quickCloseLong||!quickCloseShort)return;
+ const method=quickCloseMethod.value;
+ const positions=quickClosePositions();
+ const switchBusy=quickCloseSwitchInProgress();
+ for(const [side,button] of [['LONG',quickCloseLong],['SHORT',quickCloseShort]]){
+  const count=positions.filter(p=>p.side===side).length;
+  const ready=count===1&&!!cred()?.apiKey&&!!cred()?.apiSecret&&!busy&&
+   !quickCloseBusy&&!quickCloseUncertain&&!switchBusy&&
+   (method==='MARKET'||Number.isFinite(quickClosePrice(side)));
+  button.disabled=!ready;
+  button.title=ready?side+' 포지션 전량 '+(method==='LIMIT'?'지정가':'시장가')+' 청산 주문 바로 전송':
+   switchBusy?'스위칭 주문 진행 중':quickCloseUncertain?'기존 주문 결과 확인 필요':
+   !count?'실제 '+side+' 보유 포지션 없음':'시세·계좌 연결 또는 주문 상태 확인 필요';
+ }
+ if(method==='MARKET'){
+  quickCloseQuote.textContent='시장가 · 체결가 변동 가능';
+ }else if(Number.isFinite(quickCloseBook.bid)&&Number.isFinite(quickCloseBook.ask)&&
+          Date.now()-quickCloseBook.at<=6000){
+  quickCloseQuote.textContent='롱 '+fmt(quickCloseBook.bid)+' / 숏 '+
+   fmt(quickCloseBook.ask)+' USDT · 현재 호가';
+ }else{
+  quickCloseQuote.textContent='지정가 호가 갱신 중…';
+ }
+}
+async function quickCloseRefreshQuote(){
+ if(quickCloseQuoteBusy||!visible()||quickCloseMethod?.value!=='LIMIT'||
+    !quickClosePositions().length)return;
+ quickCloseQuoteBusy=true;
+ const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),4800);
+ try{
+  const res=await fetch(base+'/fapi/v1/ticker/bookTicker?symbol='+symbol,
+   {cache:'no-store',signal:controller.signal});
+  if(!res.ok)throw Error('HTTP '+res.status);
+  const q=await res.json();
+  const bid=Number(q?.bidPrice),ask=Number(q?.askPrice);
+  if(q.symbol!==symbol||!(bid>0&&ask>=bid))
+   throw Error('최우선 호가 데이터 오류');
+  quickCloseBook={bid,ask,at:Date.now()};
+ }catch(_){
+  if(Date.now()-quickCloseBook.at>6000)
+   quickCloseBook={bid:NaN,ask:NaN,at:0};
+ }finally{clearTimeout(timeout);quickCloseQuoteBusy=false;quickCloseRender();}
+}
+async function quickCloseFollowOrder(){
+ if(!quickCloseTrack||quickCloseTrackBusy||!visible()||!cred()?.apiKey||
+    !cred()?.apiSecret||quickCloseBusy)return;
+ quickCloseTrackBusy=true;
+ try{
+  const o=await signed('GET','/fapi/v1/order',{
+   symbol,origClientOrderId:quickCloseTrack.id
+  });
+  const state=String(o?.status||'UNKNOWN');
+  const done=Number(o?.executedQty||0),requested=Number(o?.origQty||quickCloseTrack.qty);
+  quickCloseSetStatus(quickCloseTrack.side+' '+quickCloseTrack.kind+' 청산 #'+o.orderId+
+   ' · '+state+' · 체결 '+fmt(done)+'/'+fmt(requested)+' BTC',
+   state==='REJECTED'||state==='EXPIRED');
+  if(state==='FILLED'||state==='CANCELED'||state==='EXPIRED'||state==='REJECTED'){
+   quickCloseTrack=null;
+   $('realAccountRefresh')?.click();
+   void updateOpenOrders();
+  }
+ }catch(e){
+  quickCloseSetStatus('⚠ 청산 주문 최종 상태 조회 실패 · 바이낸스 확인 필요: '+
+   String(e?.message||e),true);
+ }finally{quickCloseTrackBusy=false;quickCloseRender();}
+}
+async function quickCloseSubmit(side){
+ if(quickCloseBusy||busy||quickCloseUncertain||!['LONG','SHORT'].includes(side))return;
+ const method=quickCloseMethod?.value;
+ if(!['LIMIT','MARKET'].includes(method))return;
+ quickCloseBusy=true;quickCloseRender();
+ quickCloseSetStatus(side+' '+(method==='LIMIT'?'지정가':'시장가')+' 전량 청산 · 실계좌 검증 중…');
+ try{
+  if(!visible())throw Error('앱이 화면에 표시된 상태에서만 청산할 수 있습니다.');
+  credentials();
+  if(quickCloseSwitchInProgress())throw Error('스위칭 실행/감시 중에는 빠른 청산을 중단합니다.');
+  if(quickCloseTrack)throw Error('이전 청산 주문 상태 확인 중 · 미체결 주문 확인 필요');
+  const listed=quickClosePositions().filter(p=>p.side===side);
+  if(listed.length!==1)throw Error('선택한 '+side+' 실제 보유 포지션을 확인하지 못했습니다.');
+  const [dual,details,f,openOrders]=await Promise.all([
+   mode(),signed('GET','/fapi/v3/positionRisk',{symbol}),filters(),
+   signed('GET','/fapi/v1/openOrders',{symbol})
+  ]);
+  if(!Array.isArray(openOrders))throw Error('바이낸스 미체결 주문 조회 실패');
+  if(openOrders.some(o=>o.symbol===symbol))
+   throw Error('기존 미체결 일반 주문이 있습니다. 중복 청산 방지를 위해 주문을 보내지 않았습니다.');
+  const rows=Array.isArray(details)?details:[details];
+  const ps=dual?side:'BOTH';
+  const matches=rows.filter(p=>p.symbol===symbol&&p.positionSide===ps&&
+   (side==='LONG'?Number(p.positionAmt)>0:Number(p.positionAmt)<0));
+  if(matches.length!==1)throw Error('거래소 실제 포지션 방향/수량 확인 실패');
+  const p=matches[0],quantity=Math.abs(Number(p.positionAmt));
+  if(Math.abs(quantity-listed[0].amount)>1e-8)
+   throw Error('포지션이 조회 중 변경되었습니다. 계좌 새로고침 후 다시 청산하세요.');
+  const lot=method==='LIMIT'?f.lot:f.market;
+  const qty=roundDown(quantity,lot.stepSize);
+  if(!(Number(qty)>0&&Math.abs(Number(qty)-quantity)<=1e-8&&
+       Number(qty)>=Number(lot.minQty)&&Number(qty)<=Number(lot.maxQty)))
+   throw Error('바이낸스 최소 수량/수량 단위가 현재 보유 포지션과 맞지 않아 전량 청산을 중단합니다.');
+  const exitSide=side==='LONG'?'SELL':'BUY';
+  const order={symbol,side:exitSide,positionSide:ps,type:method,
+   quantity:qty,newOrderRespType:'RESULT',
+   newClientOrderId:'btcQClose'+Date.now().toString(36)+
+    Math.floor(Math.random()*65535).toString(36)};
+  if(!dual)order.reduceOnly='true';
+  if(method==='LIMIT'){
+   // Refresh BBO at click time; do NOT send a stale UI displayed price.
+   const book=await publicJson('/fapi/v1/ticker/bookTicker?symbol='+symbol);
+   const bid=Number(book?.bidPrice),ask=Number(book?.askPrice);
+   const tick=Number(f.price.tickSize);
+   if(book.symbol!==symbol||!(bid>0&&ask>=bid&&tick>0))
+    throw Error('실시간 바이낸스 지정가 호가 조회 실패');
+   const raw=side==='LONG'?bid:ask;
+   const steps=side==='LONG'?Math.floor((raw+tick*1e-7)/tick):
+    Math.ceil((raw-tick*1e-7)/tick);
+   const digits=Math.min(8,(String(f.price.tickSize).split('.')[1]||'').length);
+   const price=Number((steps*tick).toFixed(digits));
+   if(!(price>0&&
+    (Number(f.price.minPrice)<=0||price>=Number(f.price.minPrice))&&
+    (Number(f.price.maxPrice)<=0||price<=Number(f.price.maxPrice))))
+    throw Error('지정가 가격 단위 또는 허용 범위 확인 실패');
+   order.price=String(price);order.timeInForce='GTC';
+   quickCloseBook={bid,ask,at:Date.now()};
+  }
+  if(!visible()||quickCloseSwitchInProgress())
+   throw Error('주문 전 앱 상태가 변경되었습니다. 청산 요청 중단');
+  // A final signed snapshot prevents sending the reverse of a closed position.
+  const latest=await signed('GET','/fapi/v3/positionRisk',{symbol});
+  const final=(Array.isArray(latest)?latest:[latest]).find(x=>
+   x.symbol===symbol&&x.positionSide===ps&&
+   (side==='LONG'?Number(x.positionAmt)>0:Number(x.positionAmt)<0));
+  if(!final||Math.abs(Math.abs(Number(final.positionAmt))-quantity)>1e-8)
+   throw Error('주문 직전 포지션 수량이 변경되었습니다. 미전송');
+  quickCloseSetStatus(side+' '+method+' 전량 청산 주문 전송 중…');
+  let response;
+  try{response=await signed('POST','/fapi/v1/order',order);}
+  catch(e){
+   // Network failure may follow exchange acceptance. Never resubmit.
+   try{response=await signed('GET','/fapi/v1/order',{
+    symbol,origClientOrderId:order.newClientOrderId});}
+   catch(_){
+    quickCloseUncertain=true;
+    throw Error('주문 결과 불확실 (ID '+order.newClientOrderId+'). '+
+     '같은 주문을 재전송하지 않았습니다. 바이낸스에서 반드시 확인하세요. '+e.message);
+   }
+  }
+  if(!response?.orderId||!['NEW','PARTIALLY_FILLED','FILLED'].includes(String(response.status)))
+   throw Error('바이낸스 주문 상태 확인 필요 · 주문번호 '+String(response?.orderId||order.newClientOrderId));
+  quickCloseTrack={id:order.newClientOrderId,side,kind:method,qty};
+  quickCloseSetStatus(side+' '+(method==='LIMIT'?'지정가':'시장가')+
+   ' 청산 #'+response.orderId+' · '+response.status+
+   ' · '+fmt(Number(response.executedQty||0))+'/'+qty+' BTC');
+  $('realAccountRefresh')?.click();
+  void updateOpenOrders();
+  if(response.status==='FILLED')void quickCloseFollowOrder();
+ }catch(e){
+  quickCloseSetStatus('⚠ 청산 미실행 또는 확인 필요: '+String(e?.message||e),true);
+  if(quickCloseUncertain)message('빠른 청산 주문 결과 불확실 · 바이낸스 확인 필수');
+ }finally{quickCloseBusy=false;quickCloseRender();}
+}
+for(const [side,button] of [['LONG',quickCloseLong],['SHORT',quickCloseShort]])
+ if(button)button.addEventListener('click',()=>void quickCloseSubmit(side));
+quickCloseMethod?.addEventListener('change',()=>{
+ quickCloseRender();if(quickCloseMethod.value==='LIMIT')void quickCloseRefreshQuote();
+});
+document.addEventListener('btc:real-account-updated',()=>{
+ quickCloseRender();if(quickCloseMethod?.value==='LIMIT')void quickCloseRefreshQuote();
+});
+document.addEventListener('btc:real-account-cleared',()=>{
+ quickCloseBook={bid:NaN,ask:NaN,at:0};
+ quickCloseRender();quickCloseSetStatus('실전 계좌 연결 필요');
+});
+document.addEventListener('btc:live-switch-state',quickCloseRender);
+setInterval(()=>{
+ if(!visible())return;
+ quickCloseRender();
+ if(quickCloseMethod?.value==='LIMIT'&&Date.now()-quickCloseBook.at>2000)
+  void quickCloseRefreshQuote();
+ if(quickCloseTrack)void quickCloseFollowOrder();
+},2300);
+quickCloseRender();
+
 for(const [id,side] of [['long','LONG'],['short','SHORT']]){
  const b=$(id);if(!b)continue;b.disabled=false;b.onclick=()=>showSheet(side);
 }
