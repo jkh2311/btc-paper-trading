@@ -182,7 +182,7 @@ function stageRecords(){
 function saveStageRecord(side,order,protection=null){
  const all=stageRecords(),entries=Array.isArray(all[side])?all[side]:[];
  entries.push({id:String(order.orderId),time:Date.now(),stop:Number(protection?.slPercent||$('stop').value),
-  rr:Number($('rr').value),
+  rr:Number($('rr').value),roiMode:!protection,leverage:Number($('lev').value),
   ...(protection?{tpPrice:Number(protection.tpPrice),slPrice:Number(protection.slPrice),
    reservationPrice:Number(order.price),tpPercent:Number(protection.tpPercent),
    slPercent:Number(protection.slPercent)}:{})});all[side]=entries.slice(-20);
@@ -427,20 +427,20 @@ async function enter(side){
   if(chartLimitPriceMode&&!plan)throw Error('예약진입 익절·손절 목표가가 누락됐습니다. 주문 미전송');
   if(plan&&plan.side!==side)throw Error('예약진입 방향이 바뀌었습니다. 주문 미전송');
   const lev=val('lev'),count=Number($('pyramidEntryCount')?.value),
-   stop=plan?Math.abs(price-Number(plan.slPrice))/price*100:val('stop');
+   stop=plan?Math.abs(price-Number(plan.slPrice))/price*100:val('stop')/lev;
   if(!Number.isInteger(count)||count<1||count>7)
    throw Error('진입 단계는 설정에서 1~7단계 중 선택해 주세요. 주문 미전송');
   if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
    throw Error('설정에서 바이낸스 레버리지 적용을 먼저 눌러 확인해 주세요.');
-  if(!Number.isInteger(lev)||lev<1||lev>100||!(stop>0&&stop<=10))throw Error('전략 레버리지/단계/손절 설정 확인');
+  if(!Number.isInteger(lev)||lev<1||lev>100||!(stop>0&&stop<=10))throw Error('레버리지/진입 단계/손절 ROI 설정 확인');
   // Fail before entry if a normal SHORT take-profit could be zero/negative.
   // Reserved absolute TP/SL targets are validated below independently.
   const rr=val('rr');
-  if(!(Number.isFinite(rr)&&rr>=1))
-   throw Error('목표 손익비가 유효하지 않습니다. 주문 미전송');
+  if(!(Number.isFinite(rr)&&rr>=.1&&rr<=100&&val('stop')>=.1&&val('stop')<=100))
+   throw Error('익절/손절 ROI는 각각 0.1~100%로 설정하세요. 주문 미전송');
   if(!plan){
    const slTarget=price*(side==='LONG'?1-stop/100:1+stop/100);
-   const tpTarget=price*(side==='LONG'?1+stop/100*rr:1-stop/100*rr);
+   const tpTarget=price*(side==='LONG'?1+rr/(100*lev):1-rr/(100*lev));
    const minPrice=Number(f.price.minPrice),maxPrice=Number(f.price.maxPrice);
    if(!(slTarget>0&&tpTarget>0&&Number.isFinite(tpTarget))||
       (minPrice>0&&(slTarget<minPrice||tpTarget<minPrice))||
@@ -452,8 +452,7 @@ async function enter(side){
   const modeSize=$('sizeMode')?.value;
   let totalMargin;
   if(modeSize==='margin'){const pct=val('marginPct');if(!(pct>0&&pct<=100))throw Error('증거금 사용 비율 확인');totalMargin=available*pct/100;}
-  else if(modeSize==='risk'){const pct=val('risk');if(!(pct>0&&pct<=5))throw Error('계좌 위험 비율 확인');totalMargin=wallet*(pct/100)/(stop/100)/lev;}
-  else throw Error('주문 규모 계산 방식 확인');
+  else throw Error('증거금 비율 방식을 선택하세요. 주문 미전송');
   totalMargin=Math.min(totalMargin,available*.95);
   // One order is one pyramid stage; repeated manual entries are explicitly separate orders.
   const stageState=await usedManualStages(side,dual),used=stageState.used;
