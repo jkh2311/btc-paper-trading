@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-disparity-stages-v295"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-disparity-arrows-v296"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -3337,6 +3337,89 @@ function disparityTransitionAt(d20,d50,d200,lastIndex){
   {label:'하락 전환 '+stage+'단계',color:'#ff8d9a',rank:lastRank}:
   {label:'상승 전환 '+stage+'단계',color:'#68e6aa',rank:lastRank};
 }
+// Historic annotations for real crossings of the 20/50/200 disparity lines.
+// Never assign a transition label to an arbitrary time or a live unfinished bar.
+function disparityTransitionEvents(d20,d50,d200,lastIndex){
+ const events=[],end=Math.min(lastIndex,d20.length-1,d50.length-1,d200.length-1);
+ let previous=null,direction=0,stage=0;
+ for(let i=0;i<=end;i++){
+  const values=[d20[i],d50[i],d200[i]];
+  if(!values.every(Number.isFinite)){previous=null;continue;}
+  const [g,b,r]=values,compared=[g-b,g-r,b-r];
+  if(compared.some(v=>Math.abs(v)<=1e-8))continue;
+  const rank=compared.filter(v=>v>0).length;
+  if(previous&&rank!==previous.rank){
+   const newDirection=rank>previous.rank?1:-1;
+   const jump=Math.abs(rank-previous.rank);
+   stage=newDirection===direction?Math.min(2,stage+jump):Math.min(2,jump);
+   direction=newDirection;
+   const complete=rank===0||rank===3;
+   const label=complete?(rank===0?'상승 배열 완성':'하락 배열 완성'):
+    (direction>0?'하락 전환 ':'상승 전환 ')+stage+'단계';
+   // Locate the true crossover between successive candle points, rather
+   // than pointing at the label or the current candle without a cross.
+   const prior=[d20[i-1],d50[i-1],d200[i-1]];
+   let cross=null;
+   if(prior.every(Number.isFinite)){
+    for(const [a,b] of [[0,1],[0,2],[1,2]]){
+     const oldDiff=prior[a]-prior[b],newDiff=values[a]-values[b];
+     if(oldDiff*newDiff>=0)continue;
+     const fraction=Math.max(0,Math.min(1,oldDiff/(oldDiff-newDiff)));
+     const midPrev=(prior[a]+prior[b])/2,midNow=(values[a]+values[b])/2;
+     cross={index:i-1+fraction,value:midPrev+(midNow-midPrev)*fraction};
+     break;
+    }
+   }
+   if(cross)events.push({index:cross.index,value:cross.value,label,
+    color:direction>0?'#ff96a5':'#75ecae',rank});
+  }
+  previous={rank};
+ }
+ return events;
+}
+function drawDisparityTransitionArrows(ctx,events,start,end,left,bw,pw,dTop,dBottom,yD){
+ if(!events.length||pw<115||dBottom-dTop<34)return;
+ const labelH=15,margin=5;
+ const visible=events.filter(e=>e.index>=start&&e.index<end-1&&
+  (e.index-left+.5)*bw>18&&(e.index-left+.5)*bw<pw-18);
+ if(!visible.length)return;
+ ctx.save();ctx.beginPath();ctx.rect(0,dTop,pw,Math.max(1,dBottom-dTop));ctx.clip();
+ ctx.font='bold 9px -apple-system,sans-serif';
+ // Draw the latest distinct events without overlapping their text boxes.
+ const chosen=[],minGap=8;
+ for(let i=visible.length-1;i>=0;i--){
+  const e=visible[i],x=(e.index-left+.5)*bw;
+  const textWidth=ctx.measureText(e.label).width;
+  const width=Math.min(pw-10,Math.ceil(textWidth)+12);
+  const center=Math.max(width/2+margin,Math.min(pw-width/2-margin,x));
+  const x0=center-width/2;
+  if(chosen.some(c=>x0<c.right+minGap&&x0+width>c.left-minGap))continue;
+  chosen.push({...e,x,x0,width,left:x0,right:x0+width});
+  if(chosen.length>=Math.min(4,Math.max(1,Math.floor(pw/96))))break;
+ }
+ for(const e of chosen.reverse()){
+  const targetY=yD(e.value);
+  if(!Number.isFinite(targetY)||targetY<dTop||targetY>dBottom)continue;
+  // Prefer the side further away from the crossed line. Keep labels within
+  // the indicator pane and use a thin leader arrow to the actual crossover.
+  const upperY=dTop+2,lowerY=dBottom-labelH-2;
+  const labelY=(targetY-(upperY+labelH) >= (lowerY-targetY))?upperY:lowerY;
+  const anchorY=labelY===upperY?labelY+labelH:labelY;
+  ctx.strokeStyle=e.color;ctx.lineWidth=1;ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(e.x0+e.width/2,anchorY);
+  ctx.lineTo(e.x,targetY);ctx.stroke();
+  const angle=Math.atan2(targetY-anchorY,e.x-(e.x0+e.width/2));
+  ctx.beginPath();ctx.moveTo(e.x,targetY);
+  ctx.lineTo(e.x-5*Math.cos(angle-.45),targetY-5*Math.sin(angle-.45));
+  ctx.moveTo(e.x,targetY);
+  ctx.lineTo(e.x-5*Math.cos(angle+.45),targetY-5*Math.sin(angle+.45));
+  ctx.stroke();
+  ctx.fillStyle='rgba(6,17,33,.95)';ctx.fillRect(e.x0,labelY,e.width,labelH);
+  ctx.strokeStyle=e.color;ctx.strokeRect(e.x0+.5,labelY+.5,e.width-1,labelH-1);
+  ctx.fillStyle=e.color;ctx.fillText(e.label,e.x0+6,labelY+10,e.width-10);
+ }
+ ctx.restore();
+}
 function drawRmi(){
  if(!chartIndicators.rmi&&!chartIndicators.disparity)return;
  const a=chartViewBars(),cv=$('rmiChart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(52,cv.getBoundingClientRect().height||84),dpr=devicePixelRatio||1;
@@ -3407,23 +3490,15 @@ function drawRmi(){
   ctx.strokeStyle='#596170';ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(0,dMid);ctx.lineTo(pw,dMid);ctx.stroke();ctx.setLineDash([]);
   ctx.save();ctx.beginPath();ctx.rect(0,dTop,pw,Math.max(1,dBottom-dTop));ctx.clip();
   trace(d200,yD,'#ed303c');trace(d50,yD,'#2949ed');trace(d20,yD,'#15923b');ctx.restore();
-  // Show the state of the rightmost visible COMPLETED candle, not the
-  // still-forming live candle. Panning to history evaluates that time.
-  const tf=$('tf').value,barDuration=candleDuration[tf]||60000;
-  let stageIndex=end-1;
-  if(stageIndex===a.length-1&&
-     nextCandleTime(tf,a[stageIndex]?.t||0,1)>Date.now())stageIndex--;
-  const stage=disparityTransitionAt(d20,d50,d200,stageIndex-metricOffset);
-  const stateText='이격도 · '+stage.label;
-  ctx.save();
-  ctx.font='bold 10px -apple-system,sans-serif';
-  const badgeWidth=Math.min(pw-10,Math.ceil(ctx.measureText(stateText).width)+14);
-  const badgeY=dTop+2;
-  ctx.fillStyle='rgba(8,23,42,.91)';
-  ctx.fillRect(4,badgeY,badgeWidth,17);
-  ctx.fillStyle=stage.color;
-  ctx.fillText(stateText,10,badgeY+12,badgeWidth-10);
-  ctx.restore();
+  // Label the exact completed historic crossover points with small arrows,
+  // instead of a floating generic current-state badge hiding the curves.
+  const tf=$('tf').value;
+  let completedEnd=end-1;
+  if(completedEnd===a.length-1&&
+     nextCandleTime(tf,a[completedEnd]?.t||0,1)>Date.now())completedEnd--;
+  const transitionEvents=disparityTransitionEvents(d20,d50,d200,completedEnd-metricOffset);
+  drawDisparityTransitionArrows(ctx,transitionEvents,start-metricOffset,
+   completedEnd-metricOffset+1,left-metricOffset,bw,pw,dTop,dBottom,yD);
   ctx.fillStyle='#a4b4c8';ctx.fillText('0',pw+5,dMid+3);
   const disparityAxisValue=amplitude/disparityValueZoom;
   if(dTop+10<dMid-5){
