@@ -963,8 +963,14 @@ async function quickCloseRefreshPositions(){
  }finally{quickCloseRiskBusy=false;}
 }
 function quickCloseSwitchInProgress(){
+ // ARMED/PAUSED is a foreground-only watcher, not a Binance order.
+ // A direct manual close may safely disarm that watcher just before submit.
  const x=window.btcLiveSwitchSnapshot?.();
- return !!x&&['ARMED','PAUSED','EXECUTING','REVIEW','CLOSE_PENDING','OPEN_PENDING'].includes(x.state);
+ return !!x&&['EXECUTING','REVIEW','CLOSE_PENDING','OPEN_PENDING'].includes(x.state);
+}
+function quickCloseHasSwitchWatcher(){
+ const x=window.btcLiveSwitchSnapshot?.();
+ return !!x&&['ARMED','PAUSED'].includes(x.state);
 }
 function quickClosePrice(side){
  const n=side==='LONG'?quickCloseBook.bid:quickCloseBook.ask;
@@ -1001,6 +1007,8 @@ function quickCloseRender(){
   else if(!positions.length)quickCloseSetStatus('실제 BTCUSDT 포지션 조회 또는 API 잠금 해제 필요');
   else if(!cred()?.apiKey||!cred()?.apiSecret)quickCloseSetStatus('바이낸스 API 잠금 해제 필요');
   else if(!validPct)quickCloseSetStatus('청산 비율 1~100%를 확인하세요',true);
+  else if(quickCloseHasSwitchWatcher())
+   quickCloseSetStatus('청산 시 실행 전 스위칭 감시를 해제하고 청산 주문을 전송합니다');
   else quickCloseSetStatus('보유 포지션 확인됨 · 청산 버튼을 누르면 즉시 주문 요청');
  }
  if(method==='MARKET'){
@@ -1133,7 +1141,14 @@ async function quickCloseSubmit(side){
    (side==='LONG'?Number(x.positionAmt)>0:Number(x.positionAmt)<0));
   if(!final||Math.abs(Math.abs(Number(final.positionAmt))-quantity)>1e-8)
    throw Error('주문 직전 포지션 수량이 변경되었습니다. 미전송');
-  quickCloseSetStatus(side+' '+method+' '+pct+'% 청산 주문 전송 중…');
+  // Before the final POST, retire only an untriggered app-only reversal
+  // watcher. If a switch order is being sent or monitored, do not compete.
+  if(typeof window.btcDisarmSwitchForManualClose!=='function')
+   throw Error('스위칭 안전 상태 확인 기능이 로드되지 않았습니다. 주문 미전송');
+  const watch=window.btcDisarmSwitchForManualClose(side);
+  if(!watch?.ok)throw Error(watch?.reason||'스위칭 해제 상태 미확정 · 주문 미전송');
+  quickCloseSetStatus(side+' '+method+' '+pct+'% 청산 주문 전송 중…'+
+   (watch.disarmed?' · 스위칭 감시 해제됨':''));
   let response;
   try{response=await signed('POST','/fapi/v1/order',order);}
   catch(e){
