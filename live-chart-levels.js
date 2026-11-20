@@ -358,6 +358,21 @@ chart.addEventListener('mousedown',e=>{
  const onUp=()=>{window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);finish();};
  window.addEventListener('mousemove',onMove);window.addEventListener('mouseup',onUp);
 },true);
+// Re-read Binance-hosted TP/SL as soon as the manual order supervisor
+// confirms an order. The chart never labels an unregistered preview as active.
+document.addEventListener('btc:manual-protection-status',e=>{
+ const detail=e.detail||{};
+ if(detail.ok===true){
+  actionMessage='';actionError=false;
+  note('실제 바이낸스 익절·손절 등록 확인');
+  readStamp=0;
+  void readAlgos();
+ }else if(detail.ok===false&&detail.message){
+  actionNotice(String(detail.message),true);
+  readStamp=0;
+  void readAlgos();
+ }
+});
 setInterval(()=>{if(Date.now()-readStamp>5500)void readAlgos()},5500);
 document.addEventListener('btc:credentials-unlocked',()=>setTimeout(readAlgos,800));
 setTimeout(readAlgos,1500);
