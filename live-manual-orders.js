@@ -432,7 +432,7 @@ async function enter(side){
    throw Error('진입 단계는 설정에서 1~7단계 중 선택해 주세요. 주문 미전송');
   if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
    throw Error('설정에서 바이낸스 레버리지 적용을 먼저 눌러 확인해 주세요.');
-  if(!Number.isInteger(lev)||lev<1||lev>100||!(stop>0&&stop<=10))throw Error('레버리지/진입 단계/손절 ROI 설정 확인');
+  if(!Number.isInteger(lev)||lev<1||lev>100||!(stop>0&&(plan?stop<=10:val('stop')<=100)))throw Error('레버리지/진입 단계/손절 ROI 설정 확인');
   // Fail before entry if a normal SHORT take-profit could be zero/negative.
   // Reserved absolute TP/SL targets are validated below independently.
   const rr=val('rr');
@@ -445,7 +445,7 @@ async function enter(side){
    if(!(slTarget>0&&tpTarget>0&&Number.isFinite(tpTarget))||
       (minPrice>0&&(slTarget<minPrice||tpTarget<minPrice))||
       (maxPrice>0&&(slTarget>maxPrice||tpTarget>maxPrice)))
-    throw Error('손절 거리와 목표 손익비로 계산한 TP/SL이 거래소 허용 가격 범위를 벗어납니다. 주문 미전송');
+    throw Error('익절/손절 ROI로 계산한 실제 TP/SL 가격이 거래소 허용 범위를 벗어납니다. 주문 미전송');
   }
   const wallet=Number(account.wallet),available=Number(account.available);
   if(!(wallet>0&&available>0))throw Error('주문 가능 증거금 없음');
