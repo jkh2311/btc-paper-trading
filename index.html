@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-hold-init-guard-v285"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-position-roi-v286"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1936,7 +1936,7 @@ body.non-chart-tab #tradeBar{display:none!important}
 <option value="off">거래 안 함 · 신규 진입 차단</option>
 </select>
 
-</div><div class="card"><h2>전략 설정</h2><label>가상 계좌 USDT</label><input id="balance" type="number" value="822" min="1" step="1"><label>레버리지</label><input id="lev" type="number" value="20" min="1" max="100" step="1"><div class="row" style="margin:8px 0 4px"><button id="applyRealLeverage" type="button">바이낸스 레버리지 적용</button></div><div id="realLeverageStatus" class="muted" role="status" aria-live="polite" style="font-size:11px">실계좌 적용 전</div><label for="sizeMode">포지션 크기 계산 방식</label><select id="sizeMode"><option value="risk">위험 기준 (기본)</option><option value="margin">증거금 기준 (직접 선택)</option></select><div id="pyramidControls"><label for="pyramidEntryCount">롱·숏 진입 단계 (각각 1~7단계)</label><select id="pyramidEntryCount" aria-label="진입 단계 직접 설정"><option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option><option value="4">4단계</option><option value="5">5단계</option><option value="6" selected>6단계</option><option value="7">7단계</option></select></div><div id="marginControls" hidden><label for="marginPct">피라미드에 사용할 증거금 비율 (%)</label><input id="marginPct" type="number" value="25" min="0.1" max="100" step="0.5" inputmode="decimal" aria-label="피라미드 전체에 사용할 사용 가능 증거금 비율 (%)"><div class="muted" style="font-size:11px;margin:5px 0 8px">예: 100% 선택 → 5% 안전 여유를 남기고 설정 배율에 따른 단계 배분</div></div><div id="riskControls"><label>1회 계좌 위험 (%)</label><input id="risk" type="number" value="0.5" min="0.01" max="5" step="0.05"></div><label>손절 거리 (%)</label><input id="stop" type="number" value="0.3" min="0.05" max="10" step="0.05"><label>목표 순손익비</label><input id="rr" type="number" value="2" min="1" step="0.5"><label>USD → KRW 환율</label><input id="fx" type="number" value="1400" min="1" step="0.1"><div id="fxstatus" class="muted"></div><div id="calc" class="muted"></div><div class="auto-strategy-guards" aria-label="자동 모의 보호 설정">
+</div><div class="card"><h2>전략 설정</h2><label>가상 계좌 USDT</label><input id="balance" type="number" value="822" min="1" step="1"><label>레버리지</label><input id="lev" type="number" value="20" min="1" max="100" step="1"><div class="row" style="margin:8px 0 4px"><button id="applyRealLeverage" type="button">바이낸스 레버리지 적용</button></div><div id="realLeverageStatus" class="muted" role="status" aria-live="polite" style="font-size:11px">실계좌 적용 전</div><label for="sizeMode">포지션 크기 계산 방식</label><select id="sizeMode"><option value="margin" selected>증거금 비율 기준</option></select><div id="pyramidControls"><label for="pyramidEntryCount">롱·숏 진입 단계 (각각 1~7단계)</label><select id="pyramidEntryCount" aria-label="진입 단계 직접 설정"><option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option><option value="4">4단계</option><option value="5">5단계</option><option value="6" selected>6단계</option><option value="7">7단계</option></select></div><div id="marginControls"><label for="marginPct">피라미드에 사용할 증거금 비율 (%)</label><input id="marginPct" type="number" value="25" min="0.1" max="100" step="0.5" inputmode="decimal" aria-label="피라미드 전체에 사용할 사용 가능 증거금 비율 (%)"><div class="muted" style="font-size:11px;margin:5px 0 8px">예: 100% 선택 → 5% 안전 여유를 남기고 설정 배율에 따른 단계 배분</div></div><label for="rr">익절 수익률 (%) · 포지션 ROI</label><input id="rr" type="number" value="5" min="0.1" max="100" step="0.1" inputmode="decimal"><label for="stop">손절 수익률 (%) · 포지션 ROI</label><input id="stop" type="number" value="5" min="0.1" max="100" step="0.1" inputmode="decimal"><div class="muted" style="font-size:11px;margin:5px 0 8px">진입 증거금 기준 예상 수익률입니다. 예: 20배 손절 5% = BTC 가격 약 0.25% 역행. 수수료·펀딩비 제외이며 기존 주문은 변경되지 않습니다.</div><label>USD → KRW 환율</label><input id="fx" type="number" value="1400" min="1" step="0.1"><div id="fxstatus" class="muted"></div><div id="calc" class="muted"></div><div class="auto-strategy-guards" aria-label="자동 모의 보호 설정">
 <h3>자동 모의 보호 설정</h3>
 
 <div class="auto-settings-grid">
@@ -2047,15 +2047,16 @@ function cancelManualPendingOrder(id,reason='사용자 취소'){
 }
 function pendingOrderSnapshot(side,price,createdAt=Date.now()){
  const bal=Number($('balance').value),lev=Number($('lev').value),
-       risk=Number($('risk').value)/100,stopPct=Number($('stop').value)/100;
- if(!(bal>0&&lev>0&&stopPct>=.0005&&stopPct<=.1&&risk>0&&price>0))return null;
+       stopRoi=Number($('stop').value),tpRoi=Number($('rr').value);
+ const stopPct=stopRoi/(100*lev);
+ if(!(bal>0&&lev>0&&stopRoi>=.1&&stopRoi<=100&&tpRoi>=.1&&tpRoi<=100&&price>0))return null;
  const plan=paperMode()==='hedge'?manualHedgePyramidPlan(side,lev):null;
  if(plan?.full)return null;
- const notional=paperMode()==='hedge'?plan.notional:positionNotional(bal,lev,risk,stopPct);
+ const notional=paperMode()==='hedge'?plan.notional:positionNotional(bal,lev,0,stopPct);
  const margin=notional/lev;
  if(!(notional>.01&&margin>0&&margin<=paperFreeMargin()+1e-7))return null;
  return {id:'manual-limit-'+paperPositionId(),side,price,createdAt,notional,margin,qty:notional/price,
-   leverage:lev,stopPct,rr:Number($('rr').value),
+   leverage:lev,stopPct,rr:tpRoi,roiMode:true,
    entryPattern:capturePaperEntryPattern()};
 }
 
@@ -2457,8 +2458,8 @@ function initAiEntryTiming(){
 function render(){ renderMarketRegimeBadge();$('balanceSummary').textContent=fmt(+$('balance').value||0)+' USDT';const pnlKrw=Math.round(paperPortfolioPnl()*(+$('fx').value||1400));const pnlEl=$('pnlSummary');pnlEl.textContent=(pnlKrw<0?'-':pnlKrw>0?'+':'')+'₩'+Math.abs(pnlKrw).toLocaleString('ko-KR');pnlEl.classList.toggle('pnl-positive',pnlKrw>0);pnlEl.classList.toggle('pnl-negative',pnlKrw<0); $('price').textContent=last?fmt(last)+' USDT':'-- USDT';$('mode').textContent=demo?'데모 시세':wsConnected?'실시간 연결':lastTickAt&&Date.now()-lastTickAt<10000?'REST 시세':'연결 대기';renderTrends();// Manual LONG/SHORT work regardless of AUTO market mode and pending orders.
 $('long').disabled=$('short').disabled=!last||(!demo&&Date.now()-lastTickAt>10000);draw();drawRmi();updatePosition();calc();if(typeof window.renderActualBalanceStrip==='function')window.renderActualBalanceStrip()}
 function calc(){
-  const bal=Number($('balance').value)||0,r=Number($('risk').value)/100||0,d=Number($('stop').value)/100||0,lev=Number($('lev').value)||1;
-  const free=paperFreeMargin(),n=manualHedgePyramidNotional(selectedHedgeSide,bal,lev,r,d),margin=n/lev,loss=n*(d+2*paperTradeCost()),riskPct=bal>0?loss/bal*100:0;
+  const bal=Number($('balance').value)||0,lev=Number($('lev').value)||1,d=(Number($('stop').value)||0)/(100*lev);
+  const n=manualHedgePyramidNotional(selectedHedgeSide,bal,lev,0,d),margin=n/lev,loss=n*(d+2*paperTradeCost());
   const full=paperMode()!=='hedge'&&$('sizeMode').value==='margin'&&Number($('marginPct').value)===100;
   const pyramid=paperMode()==='hedge'?manualHedgePyramidPlan(selectedHedgeSide,lev):null;
   $('calc').textContent='모의 계산 · '+(pyramid?(pyramid.full?'진입 한도':(pyramid.index+1)+'/'+pyramid.limit+'단계')+' · ':'')+'예상 증거금 '+fmt(margin)+' USDT · 예상 손절 '+won(loss)+(full?' · 잔고 전액 사용 주의':'');
@@ -4241,7 +4242,7 @@ function fillAutoPendingLimit(market,now=Date.now(),fromFreshOrderBook=false){
   }
   const entry=fromFreshOrderBook?market:o.price,side=o.side,qty=o.notional/entry,d=o.stopPct,rr=o.rr;
   const stop=side==='LONG'?entry*(1-d):entry*(1+d);
-  const takeMove=rr*(d+2*paperTradeCost())+2*paperTradeCost();
+  const takeMove=o.roiMode?rr/(100*o.leverage):rr*(d+2*paperTradeCost())+2*paperTradeCost();
   const tp=side==='LONG'?entry*(1+takeMove):entry*(1-takeMove);
   if(!(entry>0&&qty>0&&stop>0&&tp>0))return false;
   // Aggressive LIMIT may cross the spread; conservatively charge taker on entry.
@@ -4289,18 +4290,18 @@ function executeAutoPaperSignal(signal){
   if(LIVE_RMI_OBSERVER_ONLY)return 'RMI 신호 관찰 전용 · 실제 주문도 가상 주문도 실행하지 않음';
   if(autoPendingLimit)return '다른 자동 지정가 대기 중';
   const side=signal.side,lev=Number($('lev').value);
-  const risk=Number($('risk').value)/100,stopPct=Number($('stop').value)/100;
-  const rr=Number($('rr').value);
+  const stopRoi=Number($('stop').value),tpRoi=Number($('rr').value);
+  const stopPct=stopRoi/(100*lev),rr=tpRoi;
   const balance=Number($('balance').value),free=paperFreeMargin();
-  if(!(balance>0&&lev>0&&Number.isFinite(lev)&&risk>0&&stopPct>=.0015&&stopPct<=.006&&rr>=1&&free>0))
+  if(!(balance>0&&lev>0&&Number.isFinite(lev)&&stopRoi>=.1&&stopRoi<=100&&rr>=.1&&rr<=100&&free>0))
     return '설정 탭의 전략 설정을 확인해 주세요';
-  const base=positionNotional(balance,lev,risk,stopPct);
+  const base=positionNotional(balance,lev,0,stopPct);
   const notional=Math.min(base*(signal.aligned?1:.35),free*lev);
   if(!(notional>=10)||!Number.isFinite(notional))return '가상 주문 규모 부족';
   const price=autoLimitPrice(side,last);if(!(price>0))return '지정가 계산 오류';
   if(signal.marketMode==='range'){
     // Avoid a range entry whose configured profit target already lies outside the box.
-    const d=stopPct,cost=paperTradeCost(),takeMove=rr*(d+2*cost)+2*cost;
+    const takeMove=rr/(100*lev);
     const target=side==='LONG'?price*(1+takeMove):price*(1-takeMove);
     if(!(signal.rangeHigh>signal.rangeLow)||
        (side==='LONG'?target>=signal.rangeHigh-price*.0005:
@@ -4310,7 +4311,7 @@ function executeAutoPaperSignal(signal){
   const now=Date.now();
   autoPendingLimit={id:'auto-limit-'+paperPositionId(),side,price,createdAt:now,
     expiresAt:now+AUTO_LIMIT_LIFETIME_MS,notional,leverage:lev,
-    stopPct,rr,hold,strategy:AUTO_PAPER_STRATEGY,signalBarTime:signal.barTime,signalPrice:signal.price,
+    stopPct,rr,roiMode:true,strategy:AUTO_PAPER_STRATEGY,signalBarTime:signal.barTime,signalPrice:signal.price,
     marketMode:signal.marketMode||'trend',rangeLow:signal.rangeLow,rangeHigh:signal.rangeHigh,
     entryPattern:{...capturePaperEntryPattern('1m'),signalRmi:{
       daily:signal.dailyRmi,minute:signal.minuteRmi,dailyBias:signal.dailyBias,aligned:signal.aligned,
@@ -5527,10 +5528,11 @@ function initChartPriceOrderChoice(){
    if(!chartPriceChoice)return;
    chartPriceChoice.side=side;panel.hidden=false;
    $('chartReservedProtectionSide').textContent=(side==='LONG'?'롱':'숏')+' 예약진입 · 익절/손절 설정';
-   const stop=Math.max(.05,Math.min(10,Number($('stop')?.value)||1));
-   const rr=Math.max(1,Number($('rr')?.value)||2);
-   tpPercent.value=String(Number((stop*rr).toFixed(2)));
-   slPercent.value=String(Number(stop.toFixed(2)));
+   const lev=Math.max(1,Number($('lev')?.value)||1);
+   const stop=Math.max(.01,Number($('stop')?.value)||5)/lev;
+   const take=Math.max(.01,Number($('rr')?.value)||5)/lev;
+   tpPercent.value=String(Number(take.toFixed(3)));
+   slPercent.value=String(Number(stop.toFixed(3)));
    syncPercent('tp');syncPercent('sl');
    panel.scrollIntoView?.({block:'nearest',behavior:'smooth'});
   });
@@ -6371,7 +6373,7 @@ function renderPaperPerformance(){
 
 function savePaperState(){try{localStorage.setItem(PAPER_SAVE_KEY,JSON.stringify({
   position,hedgePositions,selectedHedgeSide,selectedPaperPositionId,paperMode:paperMode(),pendingOrders,autoPendingLimit,logs,closedPaperTrades,paperStatsBaseBalance,balance:$('balance').value,
-  settings:{...Object.fromEntries(['lev','risk','stop','rr','sizeMode','marginPct','pyramidEntryCount','autoMarketMode'].map(id=>[id,$(id).value])),autoMarketModeRevision:22}
+  settings:{...Object.fromEntries(['lev','stop','rr','sizeMode','marginPct','pyramidEntryCount','autoMarketMode'].map(id=>[id,$(id).value])),autoMarketModeRevision:22,roiSettingsVersion:1}
 }))}catch(e){console.warn('모의매매 저장 실패',e)}}
 function restorePaperState(){
   try{
@@ -6407,8 +6409,11 @@ function restorePaperState(){
     if(Number(state.paperStatsBaseBalance)>0)paperStatsBaseBalance=Number(state.paperStatsBaseBalance);
     if(Number(state.balance)>0)$('balance').value=state.balance;
     if(state.settings){
-      for(const id of ['lev','risk','stop','rr','marginPct'])if(Number(state.settings[id])>0)$(id).value=state.settings[id];
-      if(['risk','margin'].includes(state.settings.sizeMode))$('sizeMode').value=state.settings.sizeMode;
+      for(const id of ['lev','marginPct'])if(Number(state.settings[id])>0)$(id).value=state.settings[id];
+      if(state.settings.roiSettingsVersion===1){
+       for(const id of ['stop','rr'])if(Number(state.settings[id])>=.1&&Number(state.settings[id])<=100)$(id).value=state.settings[id];
+      }
+      $('sizeMode').value='margin';
       // Restore the user's stage choice after refresh/app relaunch (legacy values: 6/7).
       const savedSteps=Number(state.settings.pyramidEntryCount);
       if(Number.isInteger(savedSteps)&&savedSteps>=1&&savedSteps<=7)
@@ -6439,8 +6444,7 @@ function positionNotional(bal,lev,r,d){
     const pct=Math.max(0,Math.min(100,Number($('marginPct').value)||0));
     return free*lev*pct/100;
   }
-  const riskNotional=bal*r/(d+2*paperTradeCost());
-  return Math.max(0,Math.min(riskNotional,free*lev));
+  return free*lev*Math.max(0,Math.min(100,Number($('marginPct').value)||0))/100;
 }
 // Manual hedge: divide available margin among N ascending weights, not a recurring percent.
 function pyramidEntryCount(){
@@ -6480,7 +6484,7 @@ function syncSizeMode(){
   const hedge=paperMode()==='hedge';
   $('pyramidControls').hidden=!hedge;
   $('marginControls').hidden=$('sizeMode').value!=='margin';
-  $('riskControls').hidden=$('sizeMode').value==='margin';
+
 }
 function capturePaperEntryPattern(timeframeOverride){
   try{
@@ -6513,11 +6517,10 @@ function capturePaperEntryPattern(timeframeOverride){
 let pendingFillType=null;
 function openTrade(side,entry,reserved=null){
   let bal=Number($('balance').value);
-  const r=reserved?1:Number($('risk').value)/100;
-  const d=reserved?Number(reserved.stopPct):Number($('stop').value)/100;
   const lev=reserved?Number(reserved.leverage):Number($('lev').value);
+  const d=reserved?Number(reserved.stopPct):Number($('stop').value)/(100*lev);
   const rr=reserved?Number(reserved.rr):Number($('rr').value);
-  if(!(bal>0&&r>0&&d>=.0005&&d<=.1&&lev>0&&rr>=1&&entry>0)){
+  if(!(bal>0&&d>0&&d<=.1&&lev>0&&rr>0&&entry>0)){
     if(!reserved)alert('전략 설정을 확인해 줘 (손절 거리 0.05~10%).');
     return false;
   }
@@ -6531,7 +6534,7 @@ function openTrade(side,entry,reserved=null){
   const free=paperFreeMargin();
   const pyramid=!reserved&&paperMode()==='hedge'?manualHedgePyramidPlan(side,lev):null;
   if(pyramid?.full){alert((side==='LONG'?'롱':'숏')+' 수동 피라미드 '+pyramid.limit+'개 한도에 도달했어요.');return false}
-  const intended=reserved?Number(reserved.notional):manualHedgePyramidNotional(side,bal,lev,r,d);
+  const intended=reserved?Number(reserved.notional):manualHedgePyramidNotional(side,bal,lev,0,d);
   if(reserved&&free+1e-7<intended/lev)return false;
   const notional=reserved?intended:Math.min(intended,free*lev);
   if(!(notional>.01)||!Number.isFinite(notional)){if(!reserved)alert('사용 가능한 가상 증거금이 부족해요.');return false}
@@ -6539,12 +6542,12 @@ function openTrade(side,entry,reserved=null){
   const stop=reserved?.slPrice>0?Number(reserved.slPrice):
    side==='LONG'?entry*(1-d):entry*(1+d);
   const tp=reserved?.tpPrice>0?Number(reserved.tpPrice):
-   side==='LONG'?entry*(1+(rr*(d+2*paperTradeCost())+2*paperTradeCost())):
-    entry*(1-(rr*(d+2*paperTradeCost())+2*paperTradeCost()));
+   side==='LONG'?entry*(1+(reserved&&!reserved.roiMode?rr*(d+2*paperTradeCost())+2*paperTradeCost():rr/(100*lev))):
+    entry*(1-(reserved&&!reserved.roiMode?rr*(d+2*paperTradeCost())+2*paperTradeCost():rr/(100*lev)));
   const entryType=reserved?'limit':pendingFillType||document.querySelector('input[name="orderType"]:checked')?.value||'market';
   const entryFeeRate=entryType==='limit'?paperFeeRates().maker:paperFeeRates().taker;
   const p={id:paperPositionId(),side,entry,stop,tp,qty,notional,entryFeeRate,entryType,leverage:lev,
-    opened:Date.now(),hold,entryPattern:reserved?.entryPattern||capturePaperEntryPattern()};
+    opened:Date.now(),entryPattern:reserved?.entryPattern||capturePaperEntryPattern()};
   hedgePositions[side].push(p);
   selectedPaperPositionId=p.id;selectedHedgeSide=side;position=p;selected=null;
   add('가상 '+side+' 개별 포지션 진입 '+fmt(entry)+' USDT · 증거금 '+fmt(notional/lev)+' USDT · 남은 가상 증거금 '+fmt(paperFreeMargin())+' USDT');
@@ -6578,7 +6581,7 @@ function request(side){
      order.tpPrice=tp;order.slPrice=sl;order.stopPct=slPct/100;
     }
     if(!order){alert('수동 피라미드 한도 또는 사용 가능한 증거금이 부족해요.');return}
-    if(!(order.rr>=1)){alert('익절 손익비 설정을 확인해 주세요.');return}
+    if(!(order.rr>0)){alert('익절 수익률 설정을 확인해 주세요.');return}
     const sideCount=hedgePositions[side].filter(p=>!p.autoStrategy).length+pendingOrders.filter(o=>o.side===side).length+1;
     if(!confirm('가상 '+side+' #'+sideCount+' 예약 지정가 '+fmt(price)+' USDT\n예약 증거금 '+fmt(order.margin)+' USDT · 미체결 수량 '+order.qty.toFixed(6)+' BTC\n접수 즉시 가상 증거금을 예약합니다.'))return;
     pendingOrders.push(order);
@@ -7465,7 +7468,7 @@ $('tf').onchange=()=>{viewOffset=0;resetStableChartScale();crosshairIndex=null;f
 $('paperStatsReset').onclick=()=>{
   if(!confirm('청산 완료 모의거래 통계와 개별 수익률 기록만 초기화할까요? 가상 포지션·잔고·일반 거래내역은 유지됩니다.'))return;
   closedPaperTrades=[];paperStatsBaseBalance=null;renderPaperPerformance();savePaperState();
-};for(let id of ['balance','lev','risk','stop','rr','fx','sizeMode','marginPct','pyramidEntryCount'])$(id).oninput=()=>{syncSizeMode();calc();if(id==='fx'){renderDailyVolume();renderVolume30()}savePaperState()};$('paperPositionMode').addEventListener('change',()=>{
+};for(let id of ['balance','lev','stop','rr','fx','sizeMode','marginPct','pyramidEntryCount'])$(id).oninput=()=>{syncSizeMode();calc();if(id==='fx'){renderDailyVolume();renderVolume30()}savePaperState()};$('paperPositionMode').addEventListener('change',()=>{
   if(paperMode()==='oneway'&&hedgePositions.LONG.length&&hedgePositions.SHORT.length){
     alert('롱과 숏을 모두 보유 중이에요. 한쪽을 청산한 뒤 단방향 모드로 변경할 수 있어요.');
     $('paperPositionMode').value='hedge';return;
