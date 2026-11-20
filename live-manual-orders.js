@@ -1098,6 +1098,10 @@ async function quickCloseSubmit(side){
  try{
   if(!visible())throw Error('앱이 화면에 표시된 상태에서만 청산할 수 있습니다.');
   credentials();
+  if(quickCloseSwitchInProgress()&&window.btcLiveSwitchSnapshot?.()?.state==='REVIEW'){
+   const resolution=await window.btcResolveStaleSwitchForManualClose?.(side);
+   if(!resolution?.ok)throw Error(resolution?.reason||'이전 스위칭 거래소 확인 실패');
+  }
   if(quickCloseSwitchInProgress())
    throw Error('스위칭 거래소 주문 처리/확인 중입니다. 바이낸스 미체결 주문 및 스위칭 상태를 먼저 확인하세요.');
   if(quickCloseTrack)throw Error('이전 청산 주문 상태 확인 중 · 미체결 주문 확인 필요');
