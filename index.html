@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-quickclose-protection-v270"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261120-focus-roi-compact-v271"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1387,6 +1387,68 @@ body.non-chart-tab #tradeBar{display:none!important}
   height:calc(100dvh - 45px - 108px - 45px - env(safe-area-inset-bottom))!important
  }
 }
+
+/* v271 — Compact expanded-portrait trade controls. Only focus mode is
+   affected; the normal chart and landscape sidebar keep their own sizing. */
+#expandedChartOverlay .focus-pnl-numbers{display:flex;align-items:center;
+ justify-content:flex-end;gap:10px;min-width:0;margin-left:auto}
+#expandedChartOverlay #focusPnlPercent{font-size:13px;font-weight:750;
+ white-space:nowrap;color:#d9eaf7;font-variant-numeric:tabular-nums}
+#expandedChartOverlay #focusPnlPercent.pnl-positive{color:#53d9aa}
+#expandedChartOverlay #focusPnlPercent.pnl-negative{color:#f58b9d}
+@media (orientation:portrait){
+ #expandedChartOverlay:not([hidden]) #tradeBar{
+  gap:3px!important;padding:4px 8px!important;
+  align-content:flex-start!important;justify-content:flex-start!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar #long,
+ #expandedChartOverlay:not([hidden]) #tradeBar #short{
+  flex:1 1 calc(50% - 4px)!important;
+  height:22px!important;min-height:22px!important;
+  padding:1px 5px!important;font-size:12px!important;
+  line-height:1.1!important;border-radius:8px!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar #quickCloseControls{
+  flex:1 0 100%!important;gap:2px!important;
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar .quick-close-buttons{gap:6px!important}
+ #expandedChartOverlay:not([hidden]) #tradeBar .quick-close-buttons button{
+  height:22px!important;min-height:22px!important;
+  padding:1px 4px!important;font-size:12px!important;
+  line-height:1.1!important;border-radius:8px!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar .quick-close-options{
+  flex-direction:row!important;gap:5px!important;
+  min-height:0!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar #quickCloseMethod{
+  height:21px!important;min-height:21px!important;
+  min-width:88px!important;max-width:98px!important;width:auto!important;
+  padding:0 2px!important;font-size:11px!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar .quick-close-percent-label{
+  font-size:10px!important;gap:2px!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar #quickClosePercent{
+  height:21px!important;min-height:21px!important;
+  width:43px!important;padding:0 2px!important;font-size:11px!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar #quickCloseStatus{
+  min-height:10px!important;font-size:9px!important;line-height:1.1!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar #quickSwitchOpen{
+  flex:1 0 100%!important;order:2!important;
+  height:23px!important;min-height:23px!important;
+  padding:1px 5px!important;font-size:11px!important;
+  line-height:1.1!important;border-radius:8px!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar .focus-pnl-strip{
+  order:3!important;flex:1 0 100%!important;
+  height:27px!important;min-height:27px!important;padding:3px 8px!important
+ }
+ #expandedChartOverlay #focusPnlValue{font-size:13px!important}
+ #expandedChartOverlay #focusPnlPercent{font-size:12px!important}
+}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -1683,7 +1745,7 @@ body.non-chart-tab #tradeBar{display:none!important}
  </div>
  <div id="quickCloseStatus" role="status" aria-live="polite" title="실전 청산 주문 상태">포지션 확인 후 버튼 활성화</div>
 </div>
-<button id="quickSwitchOpen" type="button" aria-label="빠른 실전 지정가 스위칭">↔ 스위칭</button><div class="focus-pnl-strip" id="focusPnlStrip" aria-label="미실현 손익"><span>미실현 손익 (원화 추정)</span><strong id="focusPnlValue">—</strong></div></div>
+<button id="quickSwitchOpen" type="button" aria-label="빠른 실전 지정가 스위칭">↔ 스위칭</button><div class="focus-pnl-strip" id="focusPnlStrip" aria-label="미실현 손익"><span>미실현 손익 (원화 추정)</span><span class="focus-pnl-numbers"><strong id="focusPnlPercent">—%</strong><strong id="focusPnlValue">—</strong></span></div></div>
 <div id="quickSwitchModal" hidden role="dialog" aria-modal="true" aria-label="빠른 지정가 스위칭">
  <div class="quick-switch-sheet">
   <h2 id="quickSwitchTitle">실전 빠른 지정가 스위칭</h2>
@@ -7720,12 +7782,36 @@ function initSignalAlerts(){
   let previousFocus=null;
   // Mirror the existing real balance-strip value. No new PnL calculation,
   // Binance requests, or simulated values are introduced by focus mode.
-  const pnlSource=$('pnlSummary'),pnlFocus=$('focusPnlValue');
+  const pnlSource=$('pnlSummary'),pnlFocus=$('focusPnlValue'),pnlPercent=$('focusPnlPercent');
+  function updateFocusReturn(){
+    if(!pnlPercent)return;
+    const snap=liveAccountSnapshot;
+    const rows=snap&&Date.now()-snap.at<=30000&&Array.isArray(snap.data?.positions)?
+      snap.data.positions.filter(p=>p.symbol==='BTCUSDT'&&
+       Math.abs(Number(p.positionAmt))>0):[];
+    let pnl=0,margin=0,valid=rows.length>0;
+    for(const p of rows){
+      const qty=Math.abs(Number(p.positionAmt)),gain=Number(p.unrealizedProfit);
+      const leverage=Number(p.leverage),entry=Number(p.entryPrice);
+      const statedMargin=Number(p.positionInitialMargin??p.initialMargin);
+      const basis=statedMargin>0?statedMargin:
+       entry>0&&leverage>0?qty*entry/leverage:NaN;
+      if(!Number.isFinite(gain)||!(basis>0)){valid=false;break;}
+      pnl+=gain;margin+=basis;
+    }
+    pnlPercent.textContent=valid&&margin>0?
+      (pnl>0?'+':'')+(pnl/margin*100).toFixed(2)+'%':'—%';
+    pnlPercent.classList.toggle('pnl-positive',valid&&pnl>0);
+    pnlPercent.classList.toggle('pnl-negative',valid&&pnl<0);
+  }
+  document.addEventListener('btc:real-account-updated',updateFocusReturn);
+  document.addEventListener('btc:real-account-cleared',updateFocusReturn);
   function syncFocusPnl(){
     if(!pnlSource||!pnlFocus)return;
     pnlFocus.textContent=pnlSource.textContent||'—';
     pnlFocus.classList.toggle('pnl-positive',pnlSource.classList.contains('pnl-positive')||pnlSource.classList.contains('real-pnl-positive'));
     pnlFocus.classList.toggle('pnl-negative',pnlSource.classList.contains('pnl-negative')||pnlSource.classList.contains('real-pnl-negative'));
+    updateFocusReturn();
   }
   if(pnlSource){
     new MutationObserver(syncFocusPnl).observe(pnlSource,{childList:true,characterData:true,subtree:true,attributes:true,attributeFilter:['class']});
