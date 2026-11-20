@@ -1254,6 +1254,66 @@ body.ai-entry-modal-open{overflow:hidden!important}
  }
 }
 
+
+/* v267 — compact two-sided direct live close, quote / market selector. */
+#tradeBar #quickCloseControls{display:flex;flex:1 0 100%;order:1;min-width:0;
+ flex-direction:column;gap:3px;margin:0;padding:0}
+#tradeBar .quick-close-buttons{display:flex;gap:7px;min-width:0}
+#tradeBar .quick-close-buttons button{flex:1 1 50%!important;min-width:0;
+ min-height:30px;height:32px!important;padding:4px 6px!important;
+ font-size:12px!important;font-weight:720;color:#f4faff;background:#2a3e57;
+ border:1px solid #60809c;border-radius:8px}
+#tradeBar #quickCloseLong:not(:disabled){background:#155d51;border-color:#48ac8a}
+#tradeBar #quickCloseShort:not(:disabled){background:#783a4d;border-color:#d47b88}
+#tradeBar .quick-close-buttons button:disabled{opacity:.38;cursor:not-allowed}
+#tradeBar .quick-close-options{display:flex;align-items:center;gap:7px;min-width:0}
+#tradeBar #quickCloseMethod{min-width:99px;max-width:115px;height:26px;padding:2px 5px;
+ border-radius:6px;color:#e9f5ff;background:#1e3550;border:1px solid #557da2;
+ font-size:11px;flex-shrink:0}
+#tradeBar #quickCloseQuote{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;
+ white-space:nowrap;font-size:10px;color:#a9d8ec;font-variant-numeric:tabular-nums}
+#tradeBar #quickCloseStatus{font-size:10px;line-height:1.3;color:#91b7d1;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:12px}
+#tradeBar #quickSwitchOpen{order:2}
+#tradeBar .focus-pnl-strip{order:3}
+@media (max-width:800px) and (orientation:portrait){
+ body:not(.chart-focus-mode) #tradeBar{
+  height:160px!important;align-content:center!important;justify-content:flex-start!important;
+  gap:3px!important;padding:5px 8px!important
+ }
+ body:not(.chart-focus-mode) #tradeBar #quickCloseControls{
+  flex:1 0 100%!important;gap:2px!important
+ }
+ body:not(.chart-focus-mode) #tradeBar #quickSwitchOpen{
+  height:29px!important;min-height:29px!important;order:2!important
+ }
+ body:not(.chart-focus-mode) main{
+  height:calc(100dvh - 45px - 160px - 45px - env(safe-area-inset-bottom))!important
+ }
+}
+#expandedChartOverlay:not([hidden]) #tradeBar #quickCloseControls{
+ flex:1 0 100%!important;order:1!important;gap:3px!important
+}
+#expandedChartOverlay:not([hidden]) #tradeBar .quick-close-buttons button{
+ height:31px!important;min-height:31px!important;flex:1 1 50%!important;
+ font-size:12px!important;padding:4px!important
+}
+@media (orientation:landscape) and (max-height:700px) and (max-width:1400px){
+ #expandedChartOverlay:not([hidden]) #tradeBar #quickCloseControls{
+  flex:0 0 auto!important;width:100%;gap:3px!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar .quick-close-buttons{
+  display:grid!important;grid-template-columns:1fr 1fr;gap:3px!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar .quick-close-buttons button{
+  width:100%!important;height:32px!important;min-height:32px!important;
+  font-size:10px!important
+ }
+ #expandedChartOverlay:not([hidden]) #tradeBar #quickCloseMethod{width:100%;min-width:0;max-width:none;font-size:10px}
+ #expandedChartOverlay:not([hidden]) #tradeBar .quick-close-options{flex-direction:column;gap:2px}
+ #expandedChartOverlay:not([hidden]) #tradeBar #quickCloseQuote{font-size:9px;max-width:100%;text-align:center}
+ #expandedChartOverlay:not([hidden]) #tradeBar #quickCloseStatus{font-size:9px;max-width:100%;text-align:center}
+}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -1532,7 +1592,22 @@ body.ai-entry-modal-open{overflow:hidden!important}
   <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><button type="button" id="expandedChartLatest" aria-label="최신 캔들로 이동" title="최신 차트로 이동">최신</button><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
 </div>
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
-<div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button><button id="quickSwitchOpen" type="button" aria-label="빠른 실전 지정가 스위칭">↔ 스위칭</button><div class="focus-pnl-strip" id="focusPnlStrip" aria-label="미실현 손익"><span>미실현 손익 (원화 추정)</span><strong id="focusPnlValue">—</strong></div></div>
+<div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button>
+<div id="quickCloseControls" role="group" aria-label="실전 포지션 빠른 청산">
+ <div class="quick-close-buttons">
+  <button id="quickCloseLong" type="button" disabled>롱 청산</button>
+  <button id="quickCloseShort" type="button" disabled>숏 청산</button>
+ </div>
+ <div class="quick-close-options">
+  <select id="quickCloseMethod" aria-label="실전 청산 주문 방식">
+   <option value="LIMIT" selected>지정가 청산</option>
+   <option value="MARKET">시장가 청산</option>
+  </select>
+  <span id="quickCloseQuote" aria-live="off">실시간 호가 확인 중</span>
+ </div>
+ <div id="quickCloseStatus" role="status" aria-live="polite" title="실전 청산 주문 상태">포지션 확인 후 버튼 활성화</div>
+</div>
+<button id="quickSwitchOpen" type="button" aria-label="빠른 실전 지정가 스위칭">↔ 스위칭</button><div class="focus-pnl-strip" id="focusPnlStrip" aria-label="미실현 손익"><span>미실현 손익 (원화 추정)</span><strong id="focusPnlValue">—</strong></div></div>
 <div id="quickSwitchModal" hidden role="dialog" aria-modal="true" aria-label="빠른 지정가 스위칭">
  <div class="quick-switch-sheet">
   <h2 id="quickSwitchTitle">실전 빠른 지정가 스위칭</h2>
