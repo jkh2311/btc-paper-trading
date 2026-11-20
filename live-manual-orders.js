@@ -950,11 +950,12 @@ function quickCloseRender(){
  for(const [side,button] of [['LONG',quickCloseLong],['SHORT',quickCloseShort]]){
   const count=positions.filter(p=>p.side===side).length;
   const ready=count===1&&!!cred()?.apiKey&&!!cred()?.apiSecret&&!busy&&
-   !quickCloseBusy&&!quickCloseUncertain&&!switchBusy&&
+   !quickCloseBusy&&!quickCloseUncertain&&!quickCloseTrack&&!switchBusy&&
    (method==='MARKET'||Number.isFinite(quickClosePrice(side)));
   button.disabled=!ready;
   button.title=ready?side+' 포지션 전량 '+(method==='LIMIT'?'지정가':'시장가')+' 청산 주문 바로 전송':
    switchBusy?'스위칭 주문 진행 중':quickCloseUncertain?'기존 주문 결과 확인 필요':
+   quickCloseTrack?'기존 청산 주문 #'+quickCloseTrack.id+' 상태 확인 중':
    !count?'실제 '+side+' 보유 포지션 없음':'시세·계좌 연결 또는 주문 상태 확인 필요';
  }
  if(method==='MARKET'){
@@ -1089,12 +1090,18 @@ async function quickCloseSubmit(side){
      '같은 주문을 재전송하지 않았습니다. 바이낸스에서 반드시 확인하세요. '+e.message);
    }
   }
-  if(!response?.orderId||!['NEW','PARTIALLY_FILLED','FILLED'].includes(String(response.status)))
-   throw Error('바이낸스 주문 상태 확인 필요 · 주문번호 '+String(response?.orderId||order.newClientOrderId));
+  if(!response?.orderId||!['NEW','PARTIALLY_FILLED','FILLED'].includes(String(response.status))){
+   quickCloseUncertain=true;
+   throw Error('바이낸스 주문 상태 확인 필요 · 주문번호 '+String(response?.orderId||order.newClientOrderId)+
+    ' · 자동 재주문 차단');
+  }
   quickCloseTrack={id:order.newClientOrderId,side,kind:method,qty};
   quickCloseSetStatus(side+' '+(method==='LIMIT'?'지정가':'시장가')+
    ' 청산 #'+response.orderId+' · '+response.status+
    ' · '+fmt(Number(response.executedQty||0))+'/'+qty+' BTC');
+  message('빠른 '+side+' '+method+' 청산 주문 #'+response.orderId+
+   ' · '+response.status+' · '+fmt(Number(response.executedQty||0))+'/'+qty+
+   ' BTC (기존 손절/익절 보호주문은 거래소에서 별도 확인)');
   $('realAccountRefresh')?.click();
   void updateOpenOrders();
   if(response.status==='FILLED')void quickCloseFollowOrder();
