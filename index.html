@@ -3201,15 +3201,18 @@ async function repairChartGapPage(tf,gap){
  const source=tf==='10m'?'5m':tf,step=candleDuration[source]||60000;
  // Limit one request to the exchange's 1000 OHLCV rows. For 10m, align
  // the window to BOTH of the 5m constituents.
- const end=Math.min(gap.end-step,gap.start+999*(candleDuration[tf]||step));
+ const end=Math.min(nextCandleTime(tf,gap.end,-1)+
+  (tf==='10m'?step:0),gap.start+999*(candleDuration[tf]||step));
  if(end<gap.start)return [];
  const collected=[];
  for(let cursor=gap.start;cursor<=end;){
-  const spot=['1d','1w','1M'].includes(tf)&&cursor<FUTURES_DAILY_START;
+  const launchStart=['1w','1M'].includes(tf)?
+   candleOpenTime(tf,FUTURES_DAILY_START):FUTURES_DAILY_START;
+  const spot=['1d','1w','1M'].includes(tf)&&cursor<launchStart;
   const endpoint=spot?'https://data-api.binance.vision/api/v3/klines':
    'https://fapi.binance.com/fapi/v1/klines';
   let segmentEnd=Math.min(end,cursor+999*step);
-  if(spot)segmentEnd=Math.min(segmentEnd,FUTURES_DAILY_START-1);
+  if(spot)segmentEnd=Math.min(segmentEnd,launchStart-step);
   const params=new URLSearchParams({symbol:'BTCUSDT',interval:source,
    limit:'1000',startTime:String(cursor),endTime:String(segmentEnd)});
   const response=await fetch(endpoint+'?'+params,{cache:'no-store',
@@ -3220,7 +3223,7 @@ async function repairChartGapPage(tf,gap){
   collected.push(...raw.map(v=>({t:+v[0],o:+v[1],h:+v[2],l:+v[3],
    c:+v[4],v:+v[5],...(spot?{source:'spot'}:{})}))
    .filter(v=>Number.isFinite(v.t)&&v.t>=cursor&&v.t<=segmentEnd&&v.c>0));
-  cursor=segmentEnd+step;
+  cursor=nextCandleTime(source,segmentEnd,1);
  }
  return tf==='10m'?buildTenMinuteCandles(collected,true):collected;
 }
