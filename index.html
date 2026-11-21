@@ -2780,7 +2780,7 @@ async function restoreChartHistoryCache(){
  finally{
   chartHistoryCacheReady=true;
   updateDailyHistoryJump();updateIntradayHistoryJump();
-  if(!demo){syncMinuteChartArchive();draw();drawRmi();requestChartGapRepairs()}
+  if(!demo){tenMinuteSourceCache=null;syncMinuteChartArchive();draw();drawRmi();requestChartGapRepairs()}
  }
 }
 // The full-history button joins Binance Futures from launch (Sep 2019)
@@ -3338,7 +3338,12 @@ function syncTenMinuteCandles(){
  if(tenMinuteSourceCache?.signature===signature&&tenMinuteSourceCache.bars===five)return;
  // Restore ALL available recent 10m bars, not just two at the tail:
  // after sleep/offline, the old code left a large empty chart interval.
- const recent=buildTenMinuteCandles(five.slice(-1000),true);
+ const previousSource=tenMinuteSourceCache;
+ const needsRecovery=!previousSource||previousSource.first!==five[0].t||
+  five.at(-1).t>previousSource.last+300000;
+ // Full recent-page reconstruction runs only after a disconnect/reload.
+ // During normal ticks, update the last few candles for iPhone speed.
+ const recent=buildTenMinuteCandles(five.slice(needsRecovery?-1000:-6),true);
  const latest=buildTenMinuteCandles(five.slice(-4));
  let ten=candles['10m'];
  const joined=mergeDailyCandles(Array.isArray(ten)?ten:[],recent);
@@ -3351,7 +3356,7 @@ function syncTenMinuteCandles(){
   }else if(bar.t===candleOpenTime('10m',Date.now()))joined.push(bar);
  }
  candles['10m']=joined;
- tenMinuteSourceCache={bars:five,signature};
+ tenMinuteSourceCache={bars:five,signature,first:five[0].t,last:five.at(-1).t};
 }
 
 // Weekly BTCUSDT starts Monday UTC; monthly starts the first UTC day.
