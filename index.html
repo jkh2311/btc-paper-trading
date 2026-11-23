@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261123-historical-analog-v316"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261123-historical-real-chart-v317"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -6589,15 +6589,20 @@ function patternCompareSetIndex(which,index){
  // Always leave room for the selected number of visible candles AND MA
  // warmup; otherwise panning near the oldest archived candle goes blank.
  const firstAllowed=Math.min(state.bars.length-1,warmup+view.count-1);
- const anchor=Math.max(firstAllowed,Math.min(state.bars.length-1,view.baseIndex));
- // Never pan beyond the requested number of subsequent REAL historical
- // bars. Both panes share this limit, not the main-chart forecast controls.
- const allowed=Math.min(state.forecastBars||50,
-  Math.max(0,state.bars.length-1-
-   (which==='historical'?view.baseIndex:state.match.index)));
- const capped=Math.max(firstAllowed,Math.min(anchor+allowed,i));
- view.index=Math.min(anchor,capped);
- view.futureShift=Math.max(0,capped-anchor);
+ if(which==='historical'){
+  // Historical pane is a normal, unprojected market chart: scroll freely
+  // across EVERY genuine candle available for the chosen timeframe.
+  view.index=Math.max(firstAllowed,Math.min(state.bars.length-1,i));
+  view.futureShift=0;
+ }else{
+  // Only the current pane uses the selected rank's future analogue path.
+  const anchor=Math.max(firstAllowed,Math.min(state.bars.length-1,view.baseIndex));
+  const allowed=Math.min(state.forecastBars||50,
+   Math.max(0,state.bars.length-1-state.match.index));
+  const capped=Math.max(firstAllowed,Math.min(anchor+allowed,i));
+  view.index=Math.min(anchor,capped);
+  view.futureShift=Math.max(0,capped-anchor);
+ }
  renderPatternComparison();
 }
 function patternCompareSetCount(which,count){
@@ -6673,24 +6678,30 @@ function renderPatternComparison(){
  ]){
   const view=state.views[which],config={...state.config,window:view.count},
    index=patternCompareLimit(view);
-  // A true point-in-time historical snapshot is isolated from live candles.
-  const source=which==='historical'?state.historicalBars:state.bars;
-  const bar=source?.[index];if(!bar)continue;
-  const rankAnchor=which==='historical'?index:state.match.index;
-  // Reuse the computed curves while the user is just dragging or zooming
-  // the future view. Recompute when a candle, rank, timeframe or limit changes.
-  const replayKey=[index,rankAnchor,state.forecastBars,
-   state.bars.length,state.bars.at(-1)?.t,
-   state.bars.at(-1)?.c].join('|');
-  if(view.replayKey!==replayKey||view.replaySource!==state.bars){
-   view.replayScenario=patternReplaySeries(state.bars,index,rankAnchor,
-    state.forecastBars,state.tf,which==='historical');
-   view.replayKey=replayKey;
-   view.replaySource=state.bars;
+  // Both panes use real market candles. The historical pane NEVER draws
+  // prediction lines or a projected area and is free to pan from the
+  // oldest available record to the newest one.
+  const source=state.bars;
+  const bar=source[index];if(!bar)continue;
+  let replay=null;
+  if(which==='current'){
+   const replayKey=[index,state.match.index,state.forecastBars,
+    source.length,source.at(-1)?.t,source.at(-1)?.c].join('|');
+   if(view.replayKey!==replayKey||view.replaySource!==source){
+    view.replayScenario=patternReplaySeries(source,index,state.match.index,
+     state.forecastBars,state.tf,false);
+    view.replayKey=replayKey;
+    view.replaySource=source;
+   }
+   replay=view.replayScenario;
+  }else{
+   view.replayScenario=null;
+   view.replayKey=null;
+   view.replaySource=null;
   }
-  const replay=view.replayScenario;
   view.forecastBars=state.forecastBars;
   view.historical=which==='historical';
+  view.futureEnabled=which==='current';
   paintPatternCompareCanvas(canvasId,source,state.tf,index,config,
    view.inspectIndex,view.show,view);
   const fmt=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',
@@ -6701,7 +6712,8 @@ function renderPatternComparison(){
    fmt.format(new Date(bar.t))+' KST · '+view.count+'봉'+
    (view.futureShift?' · 이후 +'+view.futureShift+'봉':'')+
    (which==='historical'?
-    ' · '+state.rank+'위 과거 실제기록 · 유사도 '+state.match.similarity.toFixed(1)+'점':
+    ' · '+state.rank+'위 검색 결과 · 실제 과거 전체 차트 · 유사도 '+
+     state.match.similarity.toFixed(1)+'점':
     ' · '+state.rank+'위 실제 이후 변동률 반영')+
    (replay?' · 이후 자료 '+replay.available+'봉':'')+
    (inspected?' · 선택 종가 '+inspected.c.toLocaleString('en-US',{maximumFractionDigits:2}):'');
@@ -6730,7 +6742,7 @@ function setPatternComparisonRank(rank){
  const previous=state.views.historical;
  state.views.historical={
   ...previous,index:selected.index,baseIndex:selected.index,
-  inspectIndex:null,priceZoom:1,pricePan:0,futureShift:0,futureEnabled:true
+  inspectIndex:null,priceZoom:1,pricePan:0,futureShift:0,futureEnabled:false
  };
  $('patternCompareHistoricalTitle').textContent='과거 실제 차트 ('+rank+'위)';
  for(const button of $('patternCompareRanks')?.querySelectorAll('button[data-rank]')||[])
@@ -6771,7 +6783,7 @@ function openPatternComparison(tf,bars,matches,rank){
     futureEnabled:true,futureShift:0},
    historical:{index:match.index,baseIndex:match.index,count:config.window,
     show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0,
-    futureEnabled:true,futureShift:0}
+    futureEnabled:false,futureShift:0}
   }
  };
  $('patternCompareHistoricalTitle').textContent='과거 실제 차트 ('+rank+'위)';
@@ -6781,8 +6793,8 @@ function openPatternComparison(tf,bars,matches,rank){
  if(forecastInput)forecastInput.value=String(patternComparison.forecastBars);
  $('patternCompareFoot').textContent=config.name+
   ' · 이평 50% / 이격도 30% / 볼밴 15% / RMI 5%'+
-  ' · 현재 차트는 선택한 과거 '+rank+'위 이후 실제 등락률을 적용한 시나리오'+
-  ' · 아래는 과거 해당 날짜와 이후 실제 캔들 · 비교창에만 적용';
+  ' · 현재 차트만 과거 유사 흐름으로 미래 시나리오 표시'+
+  ' · 아래 과거 차트는 예측선 없이 전체 실제 기록 자유 이동';
  patternCompareBodyOverflow=document.body.style.overflow;
  document.body.style.overflow='hidden';
  $('patternCompare').hidden=false;
@@ -6799,10 +6811,10 @@ function initPatternComparison(){
   try{localStorage.setItem(PATTERN_COMPARE_FUTURE_KEY,String(patternCompareFutureBars))}catch(_){}
   if(patternComparison){
    patternComparison.forecastBars=patternCompareFutureBars;
-   for(const which of ['current','historical']){
-    const view=patternComparison.views[which];
-    patternCompareSetIndex(which,view.index+(view.futureShift||0));
-   }
+   // Future length is meaningful ONLY for the current pane. Do not alter
+   // the historical pane's freely chosen time position.
+   const view=patternComparison.views.current;
+   patternCompareSetIndex('current',view.index+(view.futureShift||0));
    renderPatternComparison();
   }
  });
