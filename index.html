@@ -6278,10 +6278,11 @@ function patternReplaySeries(allBars,anchorIndex,rankIndex,horizon,tf,historical
   const base=allBars.slice(anchorIndex-length+1,anchorIndex+1)
    .map(row=>row.c);
   if(base.length!==length||base.some(v=>!(v>0)))continue;
-  const values=[base.reduce((a,b)=>a+b,0)/length],q=base.slice();
+  let sum=base.reduce((a,b)=>a+b,0);
+  const values=[sum/length],q=base.slice();
   for(let k=1;k<prices.length;k++){
-   q.shift();q.push(prices[k]);
-   values.push(q.reduce((a,b)=>a+b,0)/length);
+   sum+=prices[k]-q.shift();q.push(prices[k]);
+   values.push(sum/length);
   }
   ma.push({period:length,color,values});
  }
@@ -6675,10 +6676,19 @@ function renderPatternComparison(){
   // A true point-in-time historical snapshot is isolated from live candles.
   const source=which==='historical'?state.historicalBars:state.bars;
   const bar=source?.[index];if(!bar)continue;
-  const replay=patternReplaySeries(state.bars,index,
-   which==='historical'?index:state.match.index,
-   state.forecastBars,state.tf,which==='historical');
-  view.replayScenario=replay;
+  const rankAnchor=which==='historical'?index:state.match.index;
+  // Reuse the computed curves while the user is just dragging or zooming
+  // the future view. Recompute when a candle, rank, timeframe or limit changes.
+  const replayKey=[index,rankAnchor,state.forecastBars,
+   state.bars.length,state.bars.at(-1)?.t,
+   state.bars.at(-1)?.c].join('|');
+  if(view.replayKey!==replayKey||view.replaySource!==state.bars){
+   view.replayScenario=patternReplaySeries(state.bars,index,rankAnchor,
+    state.forecastBars,state.tf,which==='historical');
+   view.replayKey=replayKey;
+   view.replaySource=state.bars;
+  }
+  const replay=view.replayScenario;
   view.forecastBars=state.forecastBars;
   view.historical=which==='historical';
   paintPatternCompareCanvas(canvasId,source,state.tf,index,config,
