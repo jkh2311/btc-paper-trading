@@ -6129,6 +6129,10 @@ function historicalPatternCandidates(bars){
  if(n<200+SIMILAR_PATTERN_BARS+SIMILAR_PATTERN_LOOKAHEAD)return [];
  const present=n-2; // Always exclude the still-forming four-hour candle.
  if(!features[present])return [];
+ // Current target window must also contain sixty consecutive genuine 4h
+ // candles; never rank a cache gap as an actual indicator pattern.
+ for(let j=present-SIMILAR_PATTERN_BARS+1;j<=present;j++)
+  if(j>0&&bars[j].t-bars[j-1].t!==14400000)return [];
  const picks=[];
  for(let i=199+SIMILAR_PATTERN_BARS-1;
    i<=present-SIMILAR_PATTERN_BARS-SIMILAR_PATTERN_LOOKAHEAD;i++){
@@ -6190,7 +6194,7 @@ function initIndicatorPatternSearch(){
     const out=match.returns.map(x=>x.bars+'봉 '+(x.percent>=0?'+':'')+
      x.percent.toFixed(1)+'%').join(' · ');
     button.textContent=(index+1)+'위 · '+dt+' KST · 유사도 '+match.similarity.toFixed(1)+
-     '점\\n이후 실제 변화: '+out;
+     '점\n이후 실제 변화: '+out;
     button.style.whiteSpace='pre-line';
     button.addEventListener('click',()=>{
      $('tf').value='4h';$('tf').dispatchEvent(new Event('change',{bubbles:true}));
