@@ -6395,7 +6395,10 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
     for(let k=0;k<values.length&&k<=futureCount;k++){
      if(!Number.isFinite(values[k]))continue;
      const x=F(k),y=Y(values[k]);
-     if(x<left-10||x>left+pw+10){active=false;continue}
+     if(x<left-10||x>left+pw+10){
+      if(active){ctx.stroke();ctx.beginPath();active=false;}
+      continue;
+     }
      if(!active){ctx.moveTo(x,y);active=true}else ctx.lineTo(x,y);
     }
     if(active)ctx.stroke();
