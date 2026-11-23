@@ -6269,7 +6269,14 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  const {visible,ma,maPeriods,bb,rmi,disp,working,offset}=row,n=visible.length;
  const show=visibleIndicators||{};
  const left=6,right=70,pw=width-right-left,pt=7,pb=Math.round(height*.61),volB=Math.round(height*.70),rt=volB+12,rb=Math.round(height*.84),dt=rb+12,db=height-19;
- const X=i=>left+(i+.5)*pw/n;
+ // Current chart has the main chart's right-hand future area, while the
+ // historical match remains a strictly past-only record. Nothing is added
+ // to exchange candles or trade signals.
+ const futureCount=priceView?.futureEnabled&&index>=bars.length-2?
+  Math.min(60,Math.max(12,chartIndicators.maForecast||chartIndicators.bbForecast?
+   maForecastBars:20)):0;
+ const slots=n+futureCount;
+ const X=i=>left+(i+.5)*pw/slots;
  let low=Infinity,high=-Infinity;
  for(let i=0;i<n;i++){
   const bar=visible[i];low=Math.min(low,bar.l);high=Math.max(high,bar.h);
@@ -6288,7 +6295,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  ctx.save();ctx.beginPath();ctx.rect(left,pt,pw,pb-pt);ctx.clip();
  // Use the shared KST weekend highlighting behind the candles.
  if(chartIndicators.weekendBoxes!==false&&WEEKEND_MARK_TFS.has(tf)){
-  const regions=chartWeekendRegions(visible,tf,0,n,0,pw/n,pw);
+  const regions=chartWeekendRegions(visible,tf,0,n,0,pw/slots,pw);
   ctx.save();ctx.translate(left,0);
   paintChartWeekendRegions(ctx,regions,pt,pb,pw,'background');
   ctx.restore();
@@ -6308,7 +6315,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  // Main chart uses the same Fibonacci price zones when enabled.
  if(chartIndicators.fib&&typeof drawAutoFibChannel==='function'){
   ctx.save();ctx.translate(left,0);
-  drawAutoFibChannel(ctx,working,offset,working.length,offset,pw/n,Y,pt,pb,pw);
+  drawAutoFibChannel(ctx,working,offset,working.length,offset,pw/slots,Y,pt,pb,pw);
   ctx.restore();
  }
  const colorByPeriod={5:'#ffd65e',10:'#ffffff',20:'#b6f266',40:'#ffffff',
@@ -6316,9 +6323,53 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  if(show.ma!==false)ma.forEach((arr,i)=>trace(arr,
   colorByPeriod[maPeriods[i]]||['#ffd65e','#ffffff','#b6f266','#2166ff','#ff4f50','#bf79ff'][i%6],
   Y,pt,pb,1.3));
+ if(futureCount){
+  // Main-chart-style forecast region. The dashed lines are visual
+  // projections, NOT actual traded candles or guaranteed future prices.
+  const boundary=left+n*pw/slots;
+  ctx.fillStyle='rgba(21,42,72,.28)';
+  ctx.fillRect(boundary,pt,left+pw-boundary,pb-pt);
+  ctx.strokeStyle='rgba(130,184,222,.8)';ctx.lineWidth=1;
+  ctx.setLineDash([3,5]);ctx.beginPath();
+  ctx.moveTo(boundary,pt);ctx.lineTo(boundary,pb);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#a4c0e5';ctx.font='bold 10px -apple-system,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('미래 · 예상',boundary+(left+pw-boundary)/2,pt+15);
+  const anchor=forecastLastClosedIndex(bars,tf);
+  const scenario=projectedPricePattern(bars,futureCount,tf);
+  // A-E wave uses exactly the same projectedPricePattern() as the main
+  // chart. If there are not enough candles, keep the region empty.
+  if(scenario&&scenario.anchorIndex>=index-1){
+   const baseX=X(n-1)+(scenario.anchorIndex-index)*pw/slots;
+   const F=k=>baseX+k*pw/slots;
+   const forecastLine=(values,color,lineWidth=1.4)=>{
+    if(!values?.length)return;
+    ctx.strokeStyle=color;ctx.lineWidth=lineWidth;ctx.setLineDash([5,5]);
+    ctx.beginPath();let active=false;
+    for(let k=0;k<values.length&&k<=futureCount;k++){
+     if(!Number.isFinite(values[k]))continue;
+     const x=F(k),y=Y(values[k]);
+     if(!active){ctx.moveTo(x,y);active=true}else ctx.lineTo(x,y);
+    }
+    if(active)ctx.stroke();
+    ctx.setLineDash([]);
+   };
+   forecastLine(scenario.prices,'rgba(235,240,255,.72)',1.2);
+   if(chartIndicators.maForecast){
+    const projected=projectedMaSeries(bars,futureCount,tf);
+    for(const line of projected||[])forecastLine(line.values,line.color,1.7);
+   }
+   if(chartIndicators.bbForecast){
+    const projected=projectedBollingerSeries(bars,futureCount,tf);
+    if(projected?.values)for(const key of ['upper','mid','lower'])
+     forecastLine(projected.values.map(v=>v[key]),
+      key==='mid'?'rgba(146,225,202,.95)':'rgba(97,186,168,.85)',1.4);
+   }
+  }
+ }
  // Reuse the primary chart candle renderer, including its selected 2D
  // or dimensional style, rather than a separate palette/body algorithm.
- visible.forEach((bar,i)=>drawDimensionCandle(ctx,bar,X(i),pw/n,Y));
+ visible.forEach((bar,i)=>drawDimensionCandle(ctx,bar,X(i),pw/slots,Y));
  ctx.restore();
  // Same up/down volume histogram convention as the main chart.
  const maxVolume=Math.max(1,...visible.map(b=>Number(b.v)||0));
@@ -6326,7 +6377,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  visible.forEach((bar,i)=>{
   const vh=(Number(bar.v)||0)/maxVolume*(volB-pb-9);
   ctx.fillStyle=bar.c>=bar.o?'rgba(52,206,156,.7)':'rgba(240,92,107,.7)';
-  ctx.fillRect(X(i)-Math.max(.8,pw/n*.24),volB-3-vh,Math.max(1.5,pw/n*.48),vh);
+  ctx.fillRect(X(i)-Math.max(.8,pw/slots*.24),volB-3-vh,Math.max(1.5,pw/slots*.48),vh);
  });ctx.restore();
  ctx.fillStyle='#aabbd0';ctx.font='10px -apple-system,sans-serif';ctx.textAlign='left';
  for(let i=0;i<=3;i++){const value=low+(high-low)*i/3;ctx.fillText(value.toLocaleString('en-US',{maximumFractionDigits:1}),width-right+3,Y(value)+3)}
@@ -6527,7 +6578,8 @@ function openPatternComparison(tf,bars,matches,rank){
   tf,bars,config,match:{...match},matches:matches.map(x=>({...x})),rank,
   views:{
    current:{index:currentIndex,baseIndex:currentIndex,count:config.window,
-    show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0},
+    show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0,
+    futureEnabled:true},
    historical:{index:match.index,baseIndex:match.index,count:config.window,
     show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0}
   }
@@ -6536,7 +6588,7 @@ function openPatternComparison(tf,bars,matches,rank){
  renderPatternComparisonRankButtons();
  $('patternCompareFoot').textContent=config.name+
   ' · 이평 80% / 이격도 12% / 볼밴 6% / RMI 2%'+
-  ' · 차트별 좌우 이동·확대·날짜 이동 · 비교창은 읽기 전용 · 과거 수익은 미래를 보장하지 않음';
+  ' · 현재 차트 오른쪽에 미래 예상 영역 · 손가락 탐색 · 비교창은 읽기 전용 · 미래 예상은 확정 가격이 아님';
  patternCompareBodyOverflow=document.body.style.overflow;
  document.body.style.overflow='hidden';
  $('patternCompare').hidden=false;
