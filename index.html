@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261123-compare-ranks-v312"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261123-5yr-30m-1h-v313"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -2651,8 +2651,8 @@ function initDailyHistoryJump(){
 // are fetched in 1000-bar pages for the selected interval, never all at once.
 // 10m uses two 5m Binance klines fetched for its own horizon, without changing the 5m chart history.
 // Requested historical horizons are independent: 3m/5m 3mo, synthesized 10m
-// 1yr, 15m 1yr, 30m/1h 1yr, 4h/6h/12h 6yr. Never change 1m trading/signal history.
-const HISTORY_LOOKBACK_MONTHS={'1m':2,'3m':3,'5m':3,'10m':12,'15m':12,'30m':12,'1h':12,'4h':72,'6h':72,'12h':72};
+// 1yr, 15m 1yr, 30m/1h 5yr, 4h/6h/12h 6yr. Never change 1m trading/signal history.
+const HISTORY_LOOKBACK_MONTHS={'1m':2,'3m':3,'5m':3,'10m':12,'15m':12,'30m':60,'1h':60,'4h':72,'6h':72,'12h':72};
 const HISTORY_SOURCE_TF={'10m':'5m'};
 const historyReadyUntil={},historyLoading={},historyRetryAt={};
 const fullWeekMonthLoaded={'1w':false,'1M':false};
@@ -2856,7 +2856,7 @@ function historyCutoff(tf,now=Date.now()){
   return Date.UTC(year,month-months,Math.min(date.getUTCDate(),lastDay));
 }
 function historySourceTf(tf){return HISTORY_SOURCE_TF[tf]||tf}
-function historyPeriodLabel(tf){const m=HISTORY_LOOKBACK_MONTHS[tf];return m===72?'6년':m===36?'3년':m===12?'1년':m+'개월'}
+function historyPeriodLabel(tf){const m=HISTORY_LOOKBACK_MONTHS[tf];return m===72?'6년':m===60?'5년':m===36?'3년':m===12?'1년':m+'개월'}
 function updateIntradayHistoryJump(){
   const button=$('intradayHistoryJump');if(!button)return;
   const tf=$('tf').value,full=['1w','1M'].includes(tf),
@@ -2878,9 +2878,6 @@ function updateIntradayHistoryJump(){
     viewOffset>0?'최신 ⟶':
     minuteChartArchive?.[0]?.t<=historyCutoff('1m')+120000?
      '2개월 로딩 완료 ✓':'⟵ 2개월 조회';
-  }else if(tf==='30m'){
-   button.textContent=loading?'1년 연결 중…':
-    viewOffset>0?'최신 ⟶':ready?'1년 로딩 완료 ✓':'⟵ 1년 조회';
   }else if(tf==='3m'){
    button.textContent=loading?'3개월 연결 중…':
     viewOffset>0?'최신 ⟶':ready?'3개월 로딩 완료 ✓':'⟵ 3개월 조회';
@@ -3168,11 +3165,6 @@ function initIntradayHistoryJump(){
    if(tf==='1m'){
     if(viewOffset>0){resetChartTimeJump();return;}
     if(!minuteChartArchive)await loadTwoMonthMinuteChart();
-    return;
-   }
-   if(tf==='30m'){
-    if(viewOffset>0||chartJumpSegment?.tf===tf){resetChartTimeJump();return;}
-    await loadOneYearThirtyMinuteChart();
     return;
    }
    if(tf==='3m'){
@@ -5902,7 +5894,7 @@ function scheduleJumpExtension(bars,left,count){
  // Each timeframe retains its own requested horizon; the old maximum
  // calculation unintentionally limited 4h/6h/12h jumps to three years.
  const minTime=segment.tf==='1d'?Date.UTC(2017,7,17):
-  historyCutoff(['4h','6h','12h'].includes(segment.tf)?segment.tf:'4h');
+  historyCutoff(segment.tf);
  const timeStep=candleDuration[segment.tf]||60000;
  const nowLast=candleOpenTime(segment.tf,Date.now());
  const before=left<Math.max(45,count*.7)&&bars[0].t>minTime+timeStep;
@@ -5920,7 +5912,7 @@ async function extendJumpHistory(direction,segment){
  const source=tf==='10m'?'5m':tf,sourceStep=candleDuration[source]||step;
  const first=segment.bars[0].t,last=segment.bars.at(-1).t;
  const minTime=tf==='1d'?Date.UTC(2017,7,17):
-   historyCutoff(['4h','6h','12h'].includes(tf)?tf:'4h');
+   historyCutoff(tf);
  const nowLast=candleOpenTime(tf,Date.now());
  const start=direction==='before'?Math.max(minTime,first-450*step):last+step;
  const finish=direction==='before'?first-step:Math.min(nowLast,last+450*step);
@@ -6006,12 +5998,11 @@ async function jumpChartToUtc(requestedTime){
  }
  const full=['1w','1M'].includes(tf);
  const minimum=tf==='1d'||full?Date.UTC(2017,7,17):
-   historyCutoff(['4h','6h','12h'].includes(tf)?tf:'4h');
+   historyCutoff(tf);
  if(requestedTime<minimum){
    if(status)status.textContent=tf==='1d'||full?
     '바이낸스 과거 기록은 2017년 8월부터 볼 수 있어.':
-    ['4h','6h','12h'].includes(tf)?'최근 6년 이내의 날짜를 선택해 줘.':
-    '최근 3년 이내의 날짜를 선택해 줘.';
+    '최근 '+historyPeriodLabel(tf)+' 이내의 날짜를 선택해 줘.';
    return;
  }
  const duration=candleDuration[tf]||60000;
