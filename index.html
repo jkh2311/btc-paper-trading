@@ -6174,7 +6174,7 @@ function indicatorPatternContinuous(bars,tf,from,to){
   if(bars[j].t!==nextCandleTime(tf,bars[j-1].t,1))return false;
  return true;
 }
-function historicalPatternCandidates(bars,tf,now=Date.now()){
+async function historicalPatternCandidates(bars,tf,now=Date.now(),onProgress=null){
  const config=indicatorPatternConfig(tf),n=bars.length;
  const warmup=Math.max(config.bb,...config.ma,...config.disparity);
  if(n<warmup+config.window+config.lookahead+3)return [];
@@ -6188,12 +6188,19 @@ function historicalPatternCandidates(bars,tf,now=Date.now()){
  const picks=[],minIndex=warmup+config.window-2,
   maxIndex=present-config.window-config.lookahead;
  for(let i=minIndex;i<=maxIndex;i++){
+  // Yield during exhaustive multi-year searches so mobile Safari can paint
+  // progress and respond to taps instead of freezing the UI.
+  if((i-minIndex)%600===0){
+   if(onProgress)onProgress(i-minIndex+1,maxIndex-minIndex+1);
+   await new Promise(resolve=>setTimeout(resolve,0));
+  }
   if(!features[i]||!indicatorPatternContinuous(bars,tf,i-config.window+1,i))continue;
   // A comparison cannot straddle a missing market candle.
   const distance=indicatorPatternDistance(features,present,i,config);
   if(Number.isFinite(distance))picks.push({index:i,distance});
  }
  picks.sort((a,b)=>a.distance-b.distance);
+ if(onProgress)onProgress(maxIndex-minIndex+1,maxIndex-minIndex+1);
  const results=[];
  for(const p of picks){
   if(results.some(x=>Math.abs(x.index-p.index)<config.window))continue;
@@ -6795,11 +6802,19 @@ function initIndicatorPatternSearch(){
    status.textContent='선택한 '+SIMILAR_PATTERN_LABELS[tf]+
     ' 볼밴·이평·RMI·이격도 유사도 계산 중…';
    await new Promise(resolve=>setTimeout(resolve,40));
-   const matches=historicalPatternCandidates(bars,tf);
+   const firstAvailable=bars[0]?.t,lastAvailable=bars.at(-1)?.t;
+   const asKst=t=>new Date(t+9*3600000).toISOString().slice(0,10);
+   const matches=await historicalPatternCandidates(bars,tf,Date.now(),(done,total)=>{
+    if(done===total||done===1||done%1800===1)
+     status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 과거 전체 탐색 중… '+
+      Math.min(100,Math.floor(done/Math.max(1,total)*100))+'% · '+
+      '조회 범위 '+asKst(firstAvailable)+' ~ '+asKst(lastAvailable);
+   });
    if(!matches.length)throw Error('유효한 연속 '+config.window+
     '봉 구간이 부족해. 누락된 과거 캔들 조회를 확인해 줘.');
-   status.textContent=config.name+' · 과거 유사 패턴 TOP '+matches.length+
-    ' · 결과를 누르면 해당 시간봉 과거 날짜로 이동';
+   status.textContent=config.name+' · 과거 '+bars.length.toLocaleString()+
+    '개 캔들 검색 ('+asKst(firstAvailable)+' ~ '+asKst(lastAvailable)+
+    ') · 유사 TOP '+matches.length+' · 누르면 비교 차트 표시';
    for(const [index,match] of matches.entries()){
     const button=document.createElement('button');
     button.type='button';
