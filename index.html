@@ -6333,15 +6333,19 @@ function patternCompareRows(bars,tf,index,config){
 function patternCompareStageAt(bars,config,inspectIndex,view){
  if(!Number.isInteger(inspectIndex)||inspectIndex<0||inspectIndex>=bars.length)return null;
  const periods=config.disparity||[20,50,200];
- const key=periods.join(',')+'|'+bars.length+'|'+bars.at(-1)?.t;
+ const key=periods.join(',')+'|'+bars.length+'|'+bars.at(-1)?.t+'|'+bars.at(-1)?.c;
  if(view?.stageCacheKey!==key||view?.stageCacheBars!==bars){
   if(view){
    view.stageCacheKey=key;view.stageCacheBars=bars;
    view.stageCacheSeries=periods.map(p=>disparitySeries(bars,p));
   }
  }
+ if(view&&view.stageResultIndex===inspectIndex&&view.stageResultKey===key)
+  return view.stageResult;
  const lines=view?.stageCacheSeries||periods.map(p=>disparitySeries(bars,p));
- return disparityTransitionAt(lines[0],lines[1],lines[2],inspectIndex);
+ const stage=disparityTransitionAt(lines[0],lines[1],lines[2],inspectIndex);
+ if(view){view.stageResultIndex=inspectIndex;view.stageResultKey=key;view.stageResult=stage;}
+ return stage;
 }
 function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,visibleIndicators=null,priceView=null){
  const canvas=$(id);if(!canvas)return;
@@ -6904,6 +6908,22 @@ function initPatternComparison(){
     Math.max(0,Math.min(state.bars.length-1,index));
    renderPatternComparison();
   };
+  // A held finger in the right-hand price scale pins a horizontal
+  // inspection line. This uses the rendered/zoomed price scale.
+  const inspectAtPriceY=(screenY)=>{
+   const view=patternCompareView(which);
+   const axis=view?.priceAxisRange;if(!axis)return;
+   const rect=canvas.getBoundingClientRect();
+   const y=Math.max(axis.top,Math.min(axis.bottom,screenY-rect.top));
+   view.inspectPrice=axis.high-
+    (y-axis.top)/(axis.bottom-axis.top)*(axis.high-axis.low);
+   renderPatternComparison();
+  };
+  const clearComparisonGuides=()=>{
+   const view=patternCompareView(which);if(!view)return;
+   view.inspectIndex=null;view.inspectPrice=null;
+   renderPatternComparison();
+  };
   const pxPerCandle=()=>Math.max(2,(canvas.clientWidth-76)/
    Math.max(10,patternCompareView(which)?.count||60));
   canvas.addEventListener('pointerdown',e=>{
@@ -6915,12 +6935,14 @@ function initPatternComparison(){
     const r=canvas.getBoundingClientRect();
     dragMode=e.clientX-r.left>=r.width-71?'price':
      e.clientY-r.top>=r.height-24?'timeScale':'time';
-    if(dragMode==='time'){
+    if(dragMode==='time'||dragMode==='price'){
      holdTimer=setTimeout(()=>{
       holdTimer=null;
       if(!patternComparison||pointers.size!==1||tapMoved)return;
-      holdingCrosshair=true;inspectAtX(lastX);
-     },350);
+      holdingCrosshair=true;
+      if(dragMode==='price')inspectAtPriceY(lastY);
+      else inspectAtX(lastX);
+     },380);
     }
    }
    if(pointers.size===2){
@@ -6939,7 +6961,9 @@ function initPatternComparison(){
    )&&!holdingCrosshair){tapMoved=true;clearHold();}
    if(holdingCrosshair&&pointers.size===1){
     lastX=e.clientX;lastY=e.clientY;
-    inspectAtX(e.clientX);return;
+    if(dragMode==='price')inspectAtPriceY(e.clientY);
+    else inspectAtX(e.clientX);
+    return;
    }
    if(pointers.size===2){tapMoved=true;
     const [a,b]=[...pointers.values()];
@@ -6992,9 +7016,12 @@ function initPatternComparison(){
    // A simple tap inspects the candle like the original crosshair. Dragging
    // moves through historical bars; pinch zoom is never treated as a tap.
    clearHold();
+   // A short single tap CLEARS pinned crosshair/price guides; a long
+   // press creates one. No inspection is created on a short tap.
    if(e.type==='pointerup'&&!tapMoved&&!holdingCrosshair&&
-      pointers.size===1&&dragMode==='time'&&patternComparison)
-    inspectAtX(e.clientX);
+      pointers.size===1&&patternComparison&&
+      (dragMode==='time'||dragMode==='price'))
+    clearComparisonGuides();
    pointers.delete(e.pointerId);
    holdingCrosshair=false;
    lastDistance=0;
