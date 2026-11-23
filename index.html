@@ -6494,15 +6494,21 @@ function initPatternComparison(){
   });
   // Pointer capture permits one-finger drag on iOS and mouse dragging.
   // Two touch pointers use their distance to zoom the candle count.
-  const pointers=new Map();let lastDistance=0,lastX=0;
-  let tapX=null,tapMoved=false;
+  const pointers=new Map();let lastDistance=0,lastX=0,lastY=0;
+  let tapX=null,tapMoved=false,dragMode='time';
   const pxPerCandle=()=>Math.max(2,(canvas.clientWidth-76)/
    Math.max(10,patternCompareView(which)?.count||60));
   canvas.addEventListener('pointerdown',e=>{
    if(!patternComparison)return;
    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-   if(pointers.size===1){lastX=e.clientX;tapX=e.clientX;tapMoved=false;}
+   if(pointers.size===1){
+    lastX=e.clientX;lastY=e.clientY;tapX=e.clientX;tapMoved=false;
+    const r=canvas.getBoundingClientRect();
+    dragMode=e.clientX-r.left>=r.width-71?'price':
+     e.clientY-r.top>=r.height-24?'timeScale':'time';
+   }
    if(pointers.size===2){
+    dragMode='pinch';
     const [a,b]=[...pointers.values()];
     lastDistance=Math.hypot(a.x-b.x,a.y-b.y);
    }
@@ -6521,19 +6527,38 @@ function initPatternComparison(){
      lastDistance=dist;
     }
    }else if(pointers.size===1){
-    const delta=e.clientX-lastX;
-    const barsMoved=Math.trunc(delta/pxPerCandle());
-    if(barsMoved){
-     lastX+=barsMoved*pxPerCandle();
-     const view=patternCompareView(which);
-     patternCompareSetIndex(which,view.index-barsMoved);
+    const view=patternCompareView(which);
+    if(!view)return;
+    if(dragMode==='price'){
+     // Native-style right price-axis gesture: vertical drag changes the
+     // price scale, never the candle count or the selected historic time.
+     const dy=e.clientY-lastY;
+     if(Math.abs(dy)>=.8){
+      const factor=Math.exp(-dy/Math.max(150,canvas.clientHeight)*2.3);
+      view.priceZoom=Math.max(.12,Math.min(20,(view.priceZoom||1)*factor));
+      lastY=e.clientY;renderPatternComparison();
+     }
+    }else if(dragMode==='timeScale'){
+     const dx=e.clientX-lastX;
+     if(Math.abs(dx)>3){
+      lastX=e.clientX;
+      patternCompareSetCount(which,view.count*Math.exp(-dx/Math.max(150,canvas.clientWidth)*1.8));
+     }
+    }else{
+     const delta=e.clientX-lastX;
+     const barsMoved=Math.trunc(delta/pxPerCandle());
+     if(barsMoved){
+      lastX+=barsMoved*pxPerCandle();
+      patternCompareSetIndex(which,view.index-barsMoved);
+     }
     }
    }
   });
   const endPointer=e=>{
    // A simple tap inspects the candle like the original crosshair. Dragging
    // moves through historical bars; pinch zoom is never treated as a tap.
-   if(e.type==='pointerup'&&!tapMoved&&pointers.size===1&&patternComparison){
+   if(e.type==='pointerup'&&!tapMoved&&pointers.size===1&&
+     dragMode==='time'&&patternComparison){
     const view=patternCompareView(which),rect=canvas.getBoundingClientRect();
     if(view&&rect.width>0){
      const fraction=Math.max(0,Math.min(1,
@@ -6545,9 +6570,19 @@ function initPatternComparison(){
    }
    pointers.delete(e.pointerId);
    lastDistance=0;
-   if(pointers.size===1)lastX=[...pointers.values()][0].x;
-   else tapX=null;
+   if(pointers.size===1){
+    const remaining=[...pointers.values()][0];
+    lastX=remaining.x;lastY=remaining.y;dragMode='time';
+   }else{tapX=null;dragMode='time'}
   };
+  canvas.addEventListener('dblclick',e=>{
+   if(!patternComparison)return;
+   const view=patternCompareView(which);if(!view)return;
+   const rect=canvas.getBoundingClientRect();
+   if(e.clientX-rect.left>=rect.width-71){view.priceZoom=1;view.pricePan=0;}
+   else {view.count=patternComparison.config.window;view.index=view.baseIndex;}
+   renderPatternComparison();
+  });
   canvas.addEventListener('pointerup',endPointer);
   canvas.addEventListener('pointercancel',endPointer);
   canvas.addEventListener('lostpointercapture',endPointer);
@@ -6555,7 +6590,11 @@ function initPatternComparison(){
    if(!patternComparison)return;
    e.preventDefault();
    const view=patternCompareView(which);
-   if(e.ctrlKey||e.metaKey||e.shiftKey){
+   if(e.offsetX>=canvas.clientWidth-71){
+    view.priceZoom=Math.max(.12,Math.min(20,(view.priceZoom||1)*
+     (e.deltaY<0?1.1:.9)));
+    renderPatternComparison();
+   }else if(e.ctrlKey||e.metaKey||e.shiftKey){
     patternCompareSetCount(which,view.count*(e.deltaY<0?.86:1.16));
    }else{
     patternCompareSetIndex(which,view.index+
