@@ -6654,17 +6654,29 @@ function renderPatternComparison(){
   ['historical','patternCompareHistoricalCanvas','patternCompareHistoricalLabel']
  ]){
   const view=state.views[which],config={...state.config,window:view.count},
-   index=patternCompareLimit(view),bar=state.bars[index];
-  if(!bar)continue;
-  paintPatternCompareCanvas(canvasId,state.bars,state.tf,index,config,view.inspectIndex,view.show,view);
+   index=patternCompareLimit(view);
+  // A true point-in-time historical snapshot is isolated from live candles.
+  const source=which==='historical'?state.historicalBars:state.bars;
+  const bar=source?.[index];if(!bar)continue;
+  const replay=patternReplaySeries(state.bars,index,
+   which==='historical'?index:state.match.index,
+   state.forecastBars,state.tf,which==='historical');
+  view.replayScenario=replay;
+  view.forecastBars=state.forecastBars;
+  view.historical=which==='historical';
+  paintPatternCompareCanvas(canvasId,source,state.tf,index,config,
+   view.inspectIndex,view.show,view);
   const fmt=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',
    year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',
    minute:'2-digit',hour12:false});
   const inspected=Number.isInteger(view.inspectIndex)?state.bars[view.inspectIndex]:null;
   $(labelId).textContent=SIMILAR_PATTERN_LABELS[state.tf]+' · '+
    fmt.format(new Date(bar.t))+' KST · '+view.count+'봉'+
-   (view.futureShift?' · 미래 +'+view.futureShift+'봉':'')+
-   (which==='historical'?' · 기준 유사도 '+state.match.similarity.toFixed(1)+'점':'')+
+   (view.futureShift?' · 이후 +'+view.futureShift+'봉':'')+
+   (which==='historical'?
+    ' · '+state.rank+'위 과거 실제기록 · 유사도 '+state.match.similarity.toFixed(1)+'점':
+    ' · '+state.rank+'위 실제 이후 변동률 반영')+
+   (replay?' · 이후 자료 '+replay.available+'봉':'')+
    (inspected?' · 선택 종가 '+inspected.c.toLocaleString('en-US',{maximumFractionDigits:2}):'');
 
  }
@@ -6688,7 +6700,7 @@ function setPatternComparisonRank(rank){
   ...previous,index:selected.index,baseIndex:selected.index,
   inspectIndex:null,priceZoom:1,pricePan:0,futureShift:0,futureEnabled:true
  };
- $('patternCompareHistoricalTitle').textContent='과거 유사 차트 ('+rank+'위)';
+ $('patternCompareHistoricalTitle').textContent='과거 실제 차트 ('+rank+'위)';
  for(const button of $('patternCompareRanks')?.querySelectorAll('button[data-rank]')||[])
   button.setAttribute('aria-pressed',String(Number(button.dataset.rank)===rank));
  renderPatternComparison();
@@ -6730,14 +6742,15 @@ function openPatternComparison(tf,bars,matches,rank){
     futureEnabled:true,futureShift:0}
   }
  };
- $('patternCompareHistoricalTitle').textContent='과거 유사 차트 ('+rank+'위)';
+ $('patternCompareHistoricalTitle').textContent='과거 실제 차트 ('+rank+'위)';
  renderPatternComparisonRankButtons();
  updatePatternCompareHistorySnapshot();
  const forecastInput=$('patternForecastBars');
  if(forecastInput)forecastInput.value=String(patternComparison.forecastBars);
  $('patternCompareFoot').textContent=config.name+
   ' · 이평 50% / 이격도 30% / 볼밴 15% / RMI 5%'+
-  ' · 현재·과거 차트 미래 최대 500봉 탐색 · 과거는 해당 시점 데이터만으로 예측 · 본 차트 설정 변경 없음';
+  ' · 현재 차트는 선택한 과거 '+rank+'위 이후 실제 등락률을 적용한 시나리오'+
+  ' · 아래는 과거 해당 날짜와 이후 실제 캔들 · 비교창에만 적용';
  patternCompareBodyOverflow=document.body.style.overflow;
  document.body.style.overflow='hidden';
  $('patternCompare').hidden=false;
