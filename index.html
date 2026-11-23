@@ -6243,7 +6243,7 @@ function patternCompareRows(bars,tf,index,config){
   const sd=Math.sqrt(v.reduce((sum,x)=>sum+(x.c-mean)**2,0)/v.length);
   bb.push({mid:mean,upper:mean+2*sd,lower:mean-2*sd});
  }
- return {visible,rmi,ma,maPeriods,disp,bb};
+ return {visible,rmi,ma,maPeriods,disp,bb,working,offset};
 }
 function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,visibleIndicators=null,priceView=null){
  const canvas=$(id);if(!canvas)return;
@@ -6253,7 +6253,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#080f19';ctx.fillRect(0,0,width,height);
  const row=patternCompareRows(bars,tf,index,config);
  if(!row){ctx.fillStyle='#e8efff';ctx.fillText('차트 데이터 부족',12,22);return}
- const {visible,ma,maPeriods,bb,rmi,disp}=row,n=visible.length;
+ const {visible,ma,maPeriods,bb,rmi,disp,working,offset}=row,n=visible.length;
  const show=visibleIndicators||{};
  const left=6,right=70,pw=width-right-left,pt=7,pb=Math.round(height*.61),volB=Math.round(height*.70),rt=volB+12,rb=Math.round(height*.84),dt=rb+12,db=height-19;
  const X=i=>left+(i+.5)*pw/n;
@@ -6266,6 +6266,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  if(!(high>low)){low=visible[0].c*.97;high=visible[0].c*1.03}
  const pad=(high-low)*.06;low-=pad;high+=pad;
  const baselineRange=high-low;
+ if(priceView){priceView.priceBaselineRange=baselineRange;priceView.pricePlotHeight=pb-pt;}
  const zoom=Math.max(.12,Math.min(20,Number(priceView?.priceZoom)||1));
  const pan=Number.isFinite(priceView?.pricePan)?priceView.pricePan:0;
  const mid=(high+low)/2+pan*baselineRange,half=baselineRange/(2*zoom);
@@ -6291,18 +6292,21 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  if(show.bb!==false)for(const [key,color] of [['upper','#67cbb7'],['mid','#49a99f'],['lower','#67cbb7']]){
   trace(bb.map(v=>v?.[key]??null),color,Y,pt,pb);
  }
+ // Main chart uses the same Fibonacci price zones when enabled.
+ if(chartIndicators.fib&&typeof drawAutoFibChannel==='function'){
+  ctx.save();ctx.translate(left,0);
+  drawAutoFibChannel(ctx,working,offset,working.length,offset,pw/n,Y,pt,pb,pw);
+  ctx.restore();
+ }
  const colorByPeriod={5:'#ffd65e',10:'#ffffff',20:'#b6f266',40:'#ffffff',
   60:'#2166ff',90:'#69d2ff',120:'#ff4f50',160:'#bf79ff',200:'#ff9d43'};
  if(show.ma!==false)ma.forEach((arr,i)=>trace(arr,
   colorByPeriod[maPeriods[i]]||['#ffd65e','#ffffff','#b6f266','#2166ff','#ff4f50','#bf79ff'][i%6],
   Y,pt,pb,1.3));
- visible.forEach((bar,i)=>{
-  const x=X(i),up=bar.c>=bar.o;ctx.strokeStyle=ctx.fillStyle=up?'#35dcb5':'#ff6371';
-  ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,Y(bar.h));ctx.lineTo(x,Y(bar.l));ctx.stroke();
-  const bodyWidth=Math.max(1.5,Math.min(12,pw/n*.65));
-  ctx.fillRect(x-bodyWidth/2,Y(Math.max(bar.o,bar.c)),bodyWidth,
-   Math.max(1.3,Math.abs(Y(bar.o)-Y(bar.c))));
- });ctx.restore();
+ // Reuse the primary chart candle renderer, including its selected 2D
+ // or dimensional style, rather than a separate palette/body algorithm.
+ visible.forEach((bar,i)=>drawDimensionCandle(ctx,bar,X(i),pw/n,Y));
+ ctx.restore();
  // Same up/down volume histogram convention as the main chart.
  const maxVolume=Math.max(1,...visible.map(b=>Number(b.v)||0));
  ctx.save();ctx.beginPath();ctx.rect(left,pb+4,pw,volB-pb-4);ctx.clip();
@@ -6317,7 +6321,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  for(const y of [pb,rt-9,dt-6]){ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(width-3,y);ctx.stroke()}
  const yr=v=>rt+(100-v)/100*(rb-rt);
  ctx.setLineDash([3,4]);ctx.strokeStyle='#4b5a77';
- for(const threshold of [20,50,85]){const y=yr(threshold);ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(left+pw,y);ctx.stroke()}ctx.setLineDash([]);
+ for(const threshold of [15,20,50,85,90]){const y=yr(threshold);ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(left+pw,y);ctx.stroke()}ctx.setLineDash([]);
  if(show.rmi!==false)trace(rmi,'#ff6069',yr,rt,rb,1.7);
  const dv=disp.flat().filter(Number.isFinite),range=Math.max(1,...dv.map(x=>Math.abs(x)))*1.2;
  const yd=v=>(dt+db)/2-v/range*(db-dt)/2;
