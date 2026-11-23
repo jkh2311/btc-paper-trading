@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261123-5yr-30m-1h-v313"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261123-ma-full-history-future-v314"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1963,7 +1963,7 @@ body.non-chart-tab #tradeBar{display:none!important}
  <label>재진입 대기 (분)<input id="autoCooldownMin" type="number" inputmode="numeric" min="1" max="240" step="1" value="15"></label>
 </div></div></div></section>
 </main>
-<div id="patternCompare" class="patternCompare" role="dialog" aria-modal="true" aria-label="유사 패턴 비교 차트" hidden><div><header><strong>🔎 유사 패턴 비교 차트</strong><button id="patternCompareClose" type="button" aria-label="닫기">×</button></header><section><div><strong>현재 차트 (기준)</strong><span id="patternCompareCurrentLabel"></span></div><canvas id="patternCompareCurrentCanvas" aria-label="현재 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><nav id="patternCompareRanks" class="patternCompareRanks" aria-label="과거 유사 패턴 순위 선택"></nav><section class="historical"><div><strong id="patternCompareHistoricalTitle">과거 유사 차트</strong><span id="patternCompareHistoricalLabel"></span></div><canvas id="patternCompareHistoricalCanvas" aria-label="과거 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><footer id="patternCompareFoot">이평선 50% · 이격도 30% · 볼린저밴드 15% · RMI 5% · 두 차트는 각각 터치하여 이동·확대</footer></div></div><div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
+<div id="patternCompare" class="patternCompare" role="dialog" aria-modal="true" aria-label="유사 패턴 비교 차트" hidden><div><header><strong>🔎 유사 패턴 비교 차트</strong><button id="patternCompareClose" type="button" aria-label="닫기">×</button></header><section><div><strong>현재 차트 (기준)</strong><span id="patternCompareCurrentLabel"></span></div><canvas id="patternCompareCurrentCanvas" aria-label="현재 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><nav id="patternCompareRanks" class="patternCompareRanks" aria-label="과거 유사 패턴 순위 선택"></nav><section class="historical"><div><strong id="patternCompareHistoricalTitle">과거 유사 차트</strong><span id="patternCompareHistoricalLabel"></span></div><canvas id="patternCompareHistoricalCanvas" aria-label="과거 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><footer id="patternCompareFoot">이평선 80% · 이격도 12% · 볼린저밴드 6% · RMI 2% · 두 차트는 각각 터치하여 이동·확대</footer></div></div><div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
   <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><button type="button" id="expandedChartLatest" aria-label="최신 캔들로 이동" title="최신 차트로 이동">최신</button><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
 </div>
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
@@ -6111,6 +6111,17 @@ function historicalPatternFeatures(bars,config){
   const variance=Math.max(0,(squares[i+1]-squares[i+1-bb])/bb-mid*mid);
   const sd=Math.sqrt(variance);
   const x=ma.map(v=>(c/v-1)*100);
+  // Absolute BTC price is never used as a similarity feature.
+  // MA geometry: position relative to the slowest MA, slope over the last
+  // three completed bars, and the spacing of adjacent moving averages.
+  const slow=ma.at(-1),slopeLag=Math.min(3,i-warmup);
+  const slopes=maLengths.map((length,j)=>{
+   if(slopeLag<=0||i-slopeLag-length+1<0)return 0;
+   const past=(sums[i+1-slopeLag]-sums[i+1-slopeLag-length])/length;
+   return past>0?(ma[j]/past-1)*100:0;
+  });
+  const maGeometry=ma.map(v=>(v/slow-1)*100);
+  const maGaps=ma.slice(0,-1).map((v,j)=>(v/ma[j+1]-1)*100);
   features[i]=[
    (c-mid)/Math.max(sd,1e-8),
    4*sd/mid*100,
@@ -6120,32 +6131,42 @@ function historicalPatternFeatures(bars,config){
    ...divergenceLengths.map(length=>{
     const avg=(sums[i+1]-sums[i+1-length])/length;
     return avg>0?(c/avg-1)*100:0;
-   })
+   }),
+   ...maGeometry,...slopes,...maGaps
   ];
  }
  return features;
 }
 function indicatorPatternDistance(features,a,b,config){
- let bb=0,ma=0,rmi=0,disparity=0,count=0;
+ let bb=0,maPosition=0,maGeometry=0,maSlope=0,maGaps=0;
+ let rmi=0,disparity=0,count=0;
  const stride=config.window>=40?2:1;
+ const maCount=config.ma.length;
+ // Later candles matter a little more, but the entire past window counts.
+ let weightSum=0;
  for(let k=0;k<config.window;k+=stride){
   const p=features[a-k],q=features[b-k];
   if(!p||!q)return Infinity;
   const clip=(v,scale)=>Math.min(3,Math.abs(v)/scale);
-  bb+=clip(p[0]-q[0],1.6)+clip(p[1]-q[1],6)+clip(p[2]-q[2],3);
-  for(let j=3;j<=8;j++)ma+=clip(p[j]-q[j],4);
-  rmi+=clip(p[9]-q[9],23);
-  for(let j=10;j<=12;j++)disparity+=clip(p[j]-q[j],4);
-  count++;
+  const weight=1.5-.5*k/Math.max(1,config.window-1);
+  bb+=weight*(clip(p[0]-q[0],1.6)+clip(p[1]-q[1],6)+clip(p[2]-q[2],3))/3;
+  for(let j=0;j<maCount;j++){
+   maPosition+=weight*clip(p[3+j]-q[3+j],4)/maCount;
+   maGeometry+=weight*clip(p[13+j]-q[13+j],2.7)/maCount;
+   maSlope+=weight*clip(p[13+maCount+j]-q[13+maCount+j],.55)/maCount;
+  }
+  for(let j=0;j<maCount-1;j++)
+   maGaps+=weight*clip(p[13+2*maCount+j]-q[13+2*maCount+j],1.4)/(maCount-1);
+  rmi+=weight*clip(p[9]-q[9],23);
+  for(let j=10;j<=12;j++)disparity+=weight*clip(p[j]-q[j],4)/3;
+  count++;weightSum+=weight;
  }
- // Match ranking: MA structure (50%), actual disparity (30%),
- // Bollinger (15%), RMI (5%). Weekly/monthly use shorter periods.
- return count?(
-  .50*ma/(6*count)+
-  .30*disparity/(3*count)+
-  .15*bb/(3*count)+
-  .05*rmi/count
- ):Infinity;
+ if(!count)return Infinity;
+ // MA 80% (shape + relative order/spacing + slope), disparity 12%,
+ // Bollinger 6%, RMI 2%. Most weight is MA-to-MA geometry, not BTC price.
+ const ma=(.14*maPosition+.33*maGeometry+.32*maSlope+.21*maGaps)/weightSum;
+ return .80*ma+.12*disparity/weightSum+
+  .06*bb/weightSum+.02*rmi/weightSum;
 }
 function indicatorPatternContinuous(bars,tf,from,to){
  if(from<0||to>=bars.length)return false;
@@ -6514,7 +6535,7 @@ function openPatternComparison(tf,bars,matches,rank){
  $('patternCompareHistoricalTitle').textContent='과거 유사 차트 ('+rank+'위)';
  renderPatternComparisonRankButtons();
  $('patternCompareFoot').textContent=config.name+
-  ' · 이평 50% / 이격도 30% / 볼밴 15% / RMI 5%'+
+  ' · 이평 80% / 이격도 12% / 볼밴 6% / RMI 2%'+
   ' · 차트별 좌우 이동·확대·날짜 이동 · 비교창은 읽기 전용 · 과거 수익은 미래를 보장하지 않음';
  patternCompareBodyOverflow=document.body.style.overflow;
  document.body.style.overflow='hidden';
@@ -6695,7 +6716,7 @@ function initIndicatorPatternSearch(){
  const updateHint=()=>{
   const tf=tfSelect.value,config=indicatorPatternConfig(tf);
   if(hint)hint.textContent=config.name+
-   ' · 이평 50% / 이격도 30% / 볼밴 15% / RMI 5% · BTC 절대가격 제외 · 유사도 ≠ 승률';
+   ' · 이평 80% / 이격도 12% / 볼밴 6% / RMI 2% · BTC 절대가격 제외 · 유사도 ≠ 승률';
  };
  tfSelect.addEventListener('change',()=>{
   if(!indicatorPatternSearchBusy){resultsEl.replaceChildren();status.textContent='';}
