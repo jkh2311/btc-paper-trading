@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261123-weekend-boxes-v307"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261123-dual-pattern-compare-v308"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1672,6 +1672,7 @@ body.non-chart-tab #tradeBar{display:none!important}
   font-size:11px!important;line-height:1.1!important
  }
 }
+.patternCompare[hidden]{display:none!important}.patternCompare{position:fixed;inset:0;z-index:99990;background:#07101d;color:#e7f2ff;overflow-y:auto;padding:env(safe-area-inset-top,0px) 5px env(safe-area-inset-bottom,0px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.patternCompare>div{margin:auto;max-width:1600px;display:grid;gap:8px;padding:6px 0}.patternCompare header{position:static;display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border:1px solid #385779;border-radius:10px;background:#142742}.patternCompare header strong{font-size:clamp(14px,2.4vw,20px)}.patternCompare header button{font-size:23px;min-width:42px;min-height:36px;border-radius:8px;color:white;background:#294363;border:1px solid #668eaf}.patternCompare section{border:1px solid #2e5171;background:#080f19;border-radius:12px;padding:5px;overflow:hidden}.patternCompare section>div{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 5px 4px;min-height:26px;color:#bdcfe1;font-size:clamp(10px,1.6vw,13px)}.patternCompare section strong{background:#1b625d;border:1px solid #4bd1be;border-radius:7px;padding:3px 8px;color:#fff;white-space:nowrap}.patternCompare section.historical strong{background:#593878;border-color:#c899ff}.patternCompare canvas{width:100%;height:clamp(275px,41vh,515px);display:block}.patternCompare footer{font-size:11px;color:#a6bdd5;text-align:center;padding:3px;line-height:1.5}@media(max-width:600px){.patternCompare canvas{height:clamp(250px,38vh,390px)}.patternCompare>div{gap:5px}}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -1960,7 +1961,7 @@ body.non-chart-tab #tradeBar{display:none!important}
  <label>재진입 대기 (분)<input id="autoCooldownMin" type="number" inputmode="numeric" min="1" max="240" step="1" value="15"></label>
 </div></div></div></section>
 </main>
-<div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
+<div id="patternCompare" class="patternCompare" role="dialog" aria-modal="true" aria-label="유사 패턴 비교 차트" hidden><div><header><strong>🔎 유사 패턴 비교 차트</strong><button id="patternCompareClose" type="button" aria-label="닫기">×</button></header><section><div><strong>현재 차트 (기준)</strong><span id="patternCompareCurrentLabel"></span></div><canvas id="patternCompareCurrentCanvas" aria-label="현재 지표 차트"></canvas></section><section class="historical"><div><strong id="patternCompareHistoricalTitle">과거 유사 차트</strong><span id="patternCompareHistoricalLabel"></span></div><canvas id="patternCompareHistoricalCanvas" aria-label="과거 지표 차트"></canvas></section><footer id="patternCompareFoot">볼린저밴드 · 이동평균선 · RMI · 이격도 · 절대 BTC 가격 제외</footer></div></div><div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
   <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><button type="button" id="expandedChartLatest" aria-label="최신 캔들로 이동" title="최신 차트로 이동">최신</button><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
 </div>
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
@@ -6211,6 +6212,120 @@ async function loadIndicatorPatternHistory(tf){
  }
  return candles[tf]||[];
 }
+// Read-only dual chart view for a selected similarity match.
+let patternComparison=null,patternCompareBodyOverflow='';
+function patternCompareRows(bars,tf,index,config){
+ const warmup=Math.max(config.bb,...config.ma,config.rmiLength+config.rmiMomentum)+2;
+ const start=Math.max(0,index-config.window+1-warmup);
+ const working=bars.slice(start,index+1),offset=index-config.window+1-start;
+ if(offset<0||working.length<config.window)return null;
+ const visible=working.slice(offset),rmi=rmiSeries(working,config.rmiLength,config.rmiMomentum).slice(offset);
+ const ma=config.ma.map(length=>working.map((_,i)=>sma(working,i,length)).slice(offset));
+ const dispLengths=tf==='1M'?[3,5,20]:tf==='1w'?[10,20,60]:[20,50,200];
+ const disp=dispLengths.map(length=>disparitySeries(working,length).slice(offset));
+ const bb=[];
+ for(let i=offset;i<working.length;i++){
+  const v=working.slice(i-config.bb+1,i+1);
+  if(v.length!==config.bb){bb.push(null);continue}
+  const mean=v.reduce((sum,x)=>sum+x.c,0)/v.length;
+  const sd=Math.sqrt(v.reduce((sum,x)=>sum+(x.c-mean)**2,0)/v.length);
+  bb.push({mid:mean,upper:mean+2*sd,lower:mean-2*sd});
+ }
+ return {visible,rmi,ma,disp,bb};
+}
+function paintPatternCompareCanvas(id,bars,tf,index,config){
+ const canvas=$(id);if(!canvas)return;
+ const rect=canvas.getBoundingClientRect(),width=Math.max(260,Math.floor(rect.width)),height=Math.max(240,Math.floor(rect.height)),dpr=Math.min(3,window.devicePixelRatio||1);
+ canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+ const ctx=canvas.getContext('2d');if(!ctx)return;
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#080f19';ctx.fillRect(0,0,width,height);
+ const row=patternCompareRows(bars,tf,index,config);
+ if(!row){ctx.fillStyle='#e8efff';ctx.fillText('차트 데이터 부족',12,22);return}
+ const {visible,ma,bb,rmi,disp}=row,n=visible.length;
+ const left=6,right=70,pw=width-right-left,pt=7,pb=Math.round(height*.69),rt=pb+13,rb=Math.round(height*.83),dt=rb+9,db=height-19;
+ const X=i=>left+(i+.5)*pw/n;
+ let low=Infinity,high=-Infinity;
+ for(let i=0;i<n;i++){
+  const bar=visible[i];low=Math.min(low,bar.l);high=Math.max(high,bar.h);
+  if(bb[i]){low=Math.min(low,bb[i].lower);high=Math.max(high,bb[i].upper)}
+  for(const arr of ma)if(Number.isFinite(arr[i])){low=Math.min(low,arr[i]);high=Math.max(high,arr[i])}
+ }
+ if(!(high>low)){low=visible[0].c*.97;high=visible[0].c*1.03}
+ const pad=(high-low)*.06;low-=pad;high+=pad;
+ const Y=v=>pt+(high-v)/(high-low)*(pb-pt);
+ ctx.save();ctx.beginPath();ctx.rect(left,pt,pw,pb-pt);ctx.clip();
+ ctx.strokeStyle='#273950';ctx.lineWidth=.7;
+ for(let i=0;i<=3;i++){const y=pt+(pb-pt)*i/3;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(left+pw,y);ctx.stroke()}
+ const trace=(values,color,fn,top,bottom,width=1.5)=>{
+  ctx.save();ctx.beginPath();ctx.rect(left,top,pw,bottom-top);ctx.clip();
+  ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=width;let begun=false;
+  values.forEach((v,i)=>{if(!Number.isFinite(v))return;
+   const x=X(i),y=fn(v);if(!begun){ctx.moveTo(x,y);begun=true}else ctx.lineTo(x,y);
+  });if(begun)ctx.stroke();ctx.restore();
+ };
+ for(const [key,color] of [['upper','#67cbb7'],['mid','#49a99f'],['lower','#67cbb7']]){
+  trace(bb.map(v=>v?.[key]??null),color,Y,pt,pb);
+ }
+ const colors=['#fbd063','#e8f0f4','#a7ee69','#fff','#3470ff','#6bc8ed','#ff5660','#bc7ef3','#ffa14c'];
+ ma.forEach((arr,i)=>trace(arr,colors[i%colors.length],Y,pt,pb,1.3));
+ visible.forEach((bar,i)=>{
+  const x=X(i),up=bar.c>=bar.o;ctx.strokeStyle=ctx.fillStyle=up?'#35dcb5':'#ff6371';
+  ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,Y(bar.h));ctx.lineTo(x,Y(bar.l));ctx.stroke();
+  const bodyWidth=Math.max(1.5,Math.min(12,pw/n*.65));
+  ctx.fillRect(x-bodyWidth/2,Y(Math.max(bar.o,bar.c)),bodyWidth,
+   Math.max(1.3,Math.abs(Y(bar.o)-Y(bar.c))));
+ });ctx.restore();
+ ctx.fillStyle='#aabbd0';ctx.font='10px -apple-system,sans-serif';ctx.textAlign='left';
+ for(let i=0;i<=3;i++){const value=low+(high-low)*i/3;ctx.fillText(value.toLocaleString('en-US',{maximumFractionDigits:1}),width-right+3,Y(value)+3)}
+ ctx.strokeStyle='#59718f';ctx.lineWidth=.9;
+ for(const y of [rt-9,dt-6]){ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(width-3,y);ctx.stroke()}
+ const yr=v=>rt+(100-v)/100*(rb-rt);
+ ctx.setLineDash([3,4]);ctx.strokeStyle='#4b5a77';
+ for(const threshold of [20,50,85]){const y=yr(threshold);ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(left+pw,y);ctx.stroke()}ctx.setLineDash([]);
+ trace(rmi,'#ff6069',yr,rt,rb,1.7);
+ const dv=disp.flat().filter(Number.isFinite),range=Math.max(1,...dv.map(x=>Math.abs(x)))*1.2;
+ const yd=v=>(dt+db)/2-v/range*(db-dt)/2;
+ ctx.strokeStyle='#4a6275';ctx.beginPath();ctx.moveTo(left,yd(0));ctx.lineTo(left+pw,yd(0));ctx.stroke();
+ ['#35dd87','#3f75fa','#fd4e65'].forEach((color,i)=>trace(disp[i],color,yd,dt,db));
+ ctx.fillStyle='#d5e0ee';ctx.textAlign='left';ctx.fillText('RMI',left+3,rt+10);ctx.fillText('이격도',left+3,dt+9);
+ const formatter=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
+ ctx.fillStyle='#afc1d2';ctx.textAlign='center';ctx.font='10px -apple-system,sans-serif';
+ for(const i of [0,Math.floor((n-1)/2),n-1])
+  ctx.fillText(formatter.format(new Date(visible[i].t)),X(i),height-4,Math.max(60,pw/3-6));
+}
+function renderPatternComparison(){
+ const state=patternComparison;if(!state||$('patternCompare')?.hidden)return;
+ paintPatternCompareCanvas('patternCompareCurrentCanvas',state.bars,state.tf,state.currentIndex,state.config);
+ paintPatternCompareCanvas('patternCompareHistoricalCanvas',state.bars,state.tf,state.match.index,state.config);
+}
+function closePatternComparison(){
+ if($('patternCompare')?.hidden)return;
+ $('patternCompare').hidden=true;patternComparison=null;
+ document.body.style.overflow=patternCompareBodyOverflow;
+}
+function openPatternComparison(tf,bars,match,rank){
+ if(!bars?.length||!$('patternCompare'))return;
+ let currentIndex=bars.length-1;
+ while(currentIndex>=0&&nextCandleTime(tf,bars[currentIndex].t,1)>Date.now())currentIndex--;
+ if(currentIndex<0||match.index>=currentIndex)return;
+ const fmt=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
+ const config=indicatorPatternConfig(tf),label=SIMILAR_PATTERN_LABELS[tf];
+ patternComparison={tf,bars,currentIndex,match,config};
+ $('patternCompareCurrentLabel').textContent=label+' · '+fmt.format(new Date(bars[currentIndex].t))+' KST';
+ $('patternCompareHistoricalTitle').textContent='과거 유사 차트 ('+rank+'위)';
+ $('patternCompareHistoricalLabel').textContent=label+' · '+fmt.format(new Date(bars[match.index].t))+' KST · 유사도 '+match.similarity.toFixed(1)+'점';
+ $('patternCompareFoot').textContent=config.name+' · 같은 길이의 실제 차트 · 볼밴/이평/RMI/이격도 · BTC 가격은 유사도에서 제외 · 과거 결과는 미래를 보장하지 않음';
+ patternCompareBodyOverflow=document.body.style.overflow;
+ document.body.style.overflow='hidden';
+ $('patternCompare').hidden=false;
+ requestAnimationFrame(renderPatternComparison);
+ $('patternCompareClose').focus({preventScroll:true});
+}
+function initPatternComparison(){
+ $('patternCompareClose')?.addEventListener('click',closePatternComparison);
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('patternCompare')?.hidden)closePatternComparison()});
+ window.addEventListener('resize',()=>{if(patternComparison)requestAnimationFrame(renderPatternComparison)});
+}
 function initIndicatorPatternSearch(){
  const btn=$('indicatorPatternSearch'),tfSelect=$('indicatorPatternTf'),
   status=$('indicatorPatternStatus'),resultsEl=$('indicatorPatternMatches'),
@@ -6262,12 +6377,7 @@ function initIndicatorPatternSearch(){
      match.similarity.toFixed(1)+'점\n이후 실제 변화: '+out;
     button.style.whiteSpace='pre-line';
     button.addEventListener('click',()=>{
-     $('tf').value=tf;$('tf').dispatchEvent(new Event('change',{bubbles:true}));
-     chartJumpSegment=null;
-     // Re-use cached continuous history for this timeframe.
-     centerChartOnTimestamp(tf==='1m'?(minuteChartArchive||bars):candles[tf],match.time);
-     status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 유사 패턴 '+(index+1)+
-      '위로 이동 · 과거 결과는 미래 수익을 보장하지 않아';
+     openPatternComparison(tf,bars,match,index+1);
     });
     resultsEl.appendChild(button);
    }
@@ -9134,7 +9244,7 @@ function initSignalAlerts(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden){event.preventDefault();close()}});
 })();
 
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initIndicatorPatternSearch();render();void restoreChartHistoryCache();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();render();void restoreChartHistoryCache();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
 setInterval(pollAutoPaperMinute,5000);
 setInterval(()=>{
   if(!autoPendingLimit)return;
