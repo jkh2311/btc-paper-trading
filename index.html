@@ -6508,19 +6508,40 @@ function initPatternComparison(){
   // Pointer capture permits one-finger drag on iOS and mouse dragging.
   // Two touch pointers use their distance to zoom the candle count.
   const pointers=new Map();let lastDistance=0,lastX=0,lastY=0;
-  let tapX=null,tapMoved=false,dragMode='time';
+  let tapX=null,tapY=null,tapMoved=false,dragMode='time';
+  let holdTimer=null,holdingCrosshair=false;
+  const clearHold=()=>{if(holdTimer!==null){clearTimeout(holdTimer);holdTimer=null}};
+  const inspectAtX=(screenX)=>{
+   const view=patternCompareView(which),state=patternComparison;
+   if(!view||!state)return;
+   const rect=canvas.getBoundingClientRect();
+   const fraction=Math.max(0,Math.min(.999999,
+    (screenX-rect.left-6)/Math.max(1,rect.width-76)));
+   view.inspectIndex=Math.max(0,Math.min(state.bars.length-1,
+    view.index-view.count+1+Math.floor(fraction*view.count)));
+   renderPatternComparison();
+  };
   const pxPerCandle=()=>Math.max(2,(canvas.clientWidth-76)/
    Math.max(10,patternCompareView(which)?.count||60));
   canvas.addEventListener('pointerdown',e=>{
    if(!patternComparison)return;
    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
    if(pointers.size===1){
-    lastX=e.clientX;lastY=e.clientY;tapX=e.clientX;tapMoved=false;
+    clearHold();holdingCrosshair=false;
+    lastX=e.clientX;lastY=e.clientY;tapX=e.clientX;tapY=e.clientY;tapMoved=false;
     const r=canvas.getBoundingClientRect();
     dragMode=e.clientX-r.left>=r.width-71?'price':
      e.clientY-r.top>=r.height-24?'timeScale':'time';
+    if(dragMode==='time'){
+     holdTimer=setTimeout(()=>{
+      holdTimer=null;
+      if(!patternComparison||pointers.size!==1||tapMoved)return;
+      holdingCrosshair=true;inspectAtX(lastX);
+     },350);
+    }
    }
    if(pointers.size===2){
+    clearHold();holdingCrosshair=false;tapMoved=true;
     dragMode='pinch';
     const [a,b]=[...pointers.values()];
     lastDistance=Math.hypot(a.x-b.x,a.y-b.y);
@@ -6530,7 +6551,13 @@ function initPatternComparison(){
   canvas.addEventListener('pointermove',e=>{
    if(!patternComparison||!pointers.has(e.pointerId))return;
    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-   if(tapX!==null&&Math.abs(e.clientX-tapX)>7)tapMoved=true;
+   if(tapX!==null&&(
+     Math.abs(e.clientX-tapX)>8||Math.abs(e.clientY-tapY)>9
+   )&&!holdingCrosshair){tapMoved=true;clearHold();}
+   if(holdingCrosshair&&pointers.size===1){
+    lastX=e.clientX;lastY=e.clientY;
+    inspectAtX(e.clientX);return;
+   }
    if(pointers.size===2){tapMoved=true;
     const [a,b]=[...pointers.values()];
     const dist=Math.hypot(a.x-b.x,a.y-b.y);
@@ -6547,6 +6574,7 @@ function initPatternComparison(){
      // price scale, never the candle count or the selected historic time.
      const dy=e.clientY-lastY;
      if(Math.abs(dy)>=.8){
+      tapMoved=true;
       const factor=Math.exp(-dy/Math.max(150,canvas.clientHeight)*2.3);
       view.priceZoom=Math.max(.12,Math.min(20,(view.priceZoom||1)*factor));
       lastY=e.clientY;renderPatternComparison();
@@ -6554,39 +6582,43 @@ function initPatternComparison(){
     }else if(dragMode==='timeScale'){
      const dx=e.clientX-lastX;
      if(Math.abs(dx)>3){
-      lastX=e.clientX;
+      tapMoved=true;lastX=e.clientX;
       patternCompareSetCount(which,view.count*Math.exp(-dx/Math.max(150,canvas.clientWidth)*1.8));
      }
     }else{
-     const delta=e.clientX-lastX;
-     const barsMoved=Math.trunc(delta/pxPerCandle());
+     const deltaX=e.clientX-lastX,deltaY=e.clientY-lastY;
+     const barsMoved=Math.trunc(deltaX/pxPerCandle());
+     // Mirror the native chart's price pan, while the right-side price
+     // scale continues to control vertical zoom independently.
+     const scale=(view.priceBaselineRange||1)/Math.max(.12,view.priceZoom||1);
+     if(Math.abs(deltaY)>=1){
+      view.pricePan=(view.pricePan||0)+
+       deltaY/Math.max(80,view.pricePlotHeight||canvas.clientHeight*.61)*scale/
+        Math.max(1,view.priceBaselineRange||1);
+      lastY=e.clientY;tapMoved=true;
+     }
      if(barsMoved){
       lastX+=barsMoved*pxPerCandle();
       patternCompareSetIndex(which,view.index-barsMoved);
-     }
+      tapMoved=true;
+     }else if(Math.abs(deltaY)>=1)renderPatternComparison();
     }
    }
   });
   const endPointer=e=>{
    // A simple tap inspects the candle like the original crosshair. Dragging
    // moves through historical bars; pinch zoom is never treated as a tap.
-   if(e.type==='pointerup'&&!tapMoved&&pointers.size===1&&
-     dragMode==='time'&&patternComparison){
-    const view=patternCompareView(which),rect=canvas.getBoundingClientRect();
-    if(view&&rect.width>0){
-     const fraction=Math.max(0,Math.min(1,
-      (e.clientX-rect.left-6)/(rect.width-76)));
-     view.inspectIndex=Math.max(0,Math.min(patternComparison.bars.length-1,
-      view.index-view.count+1+Math.floor(fraction*view.count)));
-     renderPatternComparison();
-    }
-   }
+   clearHold();
+   if(e.type==='pointerup'&&!tapMoved&&!holdingCrosshair&&
+      pointers.size===1&&dragMode==='time'&&patternComparison)
+    inspectAtX(e.clientX);
    pointers.delete(e.pointerId);
+   holdingCrosshair=false;
    lastDistance=0;
    if(pointers.size===1){
     const remaining=[...pointers.values()][0];
     lastX=remaining.x;lastY=remaining.y;dragMode='time';
-   }else{tapX=null;dragMode='time'}
+   }else{tapX=null;tapY=null;dragMode='time'}
   };
   canvas.addEventListener('dblclick',e=>{
    if(!patternComparison)return;
