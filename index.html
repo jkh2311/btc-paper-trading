@@ -6712,6 +6712,11 @@ function setPatternComparisonRank(rank){
  if(!selected||!state.bars[selected.index])return;
  state.rank=rank;state.match={...selected};
  updatePatternCompareHistorySnapshot();
+ // A newly selected match can have fewer available subsequent candles.
+ // Preserve the user's current-chart zoom, but avoid a blank future viewport.
+ const current=state.views.current;
+ current.futureShift=Math.min(current.futureShift||0,
+  Math.max(0,Math.min(state.forecastBars,state.bars.length-1-selected.index)));
  const previous=state.views.historical;
  state.views.historical={
   ...previous,index:selected.index,baseIndex:selected.index,
