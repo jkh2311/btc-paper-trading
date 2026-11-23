@@ -6443,7 +6443,25 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  const formatter=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
  ctx.fillStyle='#afc1d2';ctx.textAlign='center';ctx.font='10px -apple-system,sans-serif';
  for(const i of [0,Math.floor((n-1)/2),n-1])
-  ctx.fillText(formatter.format(new Date(visible[i].t)),X(i),height-4,Math.max(60,pw/3-6));
+  if(X(i)>=left+18&&X(i)<=left+pw-18)
+   ctx.fillText(formatter.format(new Date(visible[i].t)),X(i),height-4,
+    Math.max(60,pw/3-6));
+ if(futureEnabled){
+  // Future-only views need a real forecast TIME axis rather than keeping
+  // the final historical candle's old timestamp at the right edge.
+  const start=Math.max(1,Math.floor(futureShift-n+1));
+  const stop=Math.min(futureCount,Math.ceil(futureShift+futureSlots));
+  if(start<=stop){
+   const step=Math.max(1,Math.ceil((stop-start+1)/3));
+   ctx.fillStyle='#9ebff2';
+   for(let k=start;k<=stop;k+=step){
+    const xx=X(n-1)+k*pw/slots;
+    if(xx<left+28||xx>left+pw-28)continue;
+    const t=nextCandleTime(tf,visible.at(-1).t,k);
+    ctx.fillText(formatter.format(new Date(t)),xx,height-4,Math.max(55,pw/3-6));
+   }
+  }
+ }
  const last=visible.at(-1),lastY=Y(last.c);
  if(lastY>=pt&&lastY<=pb){
   ctx.save();ctx.fillStyle='#24b99a';ctx.fillRect(width-right,lastY-11,right-3,22);
