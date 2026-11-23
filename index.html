@@ -6577,7 +6577,12 @@ function patternCompareSetIndex(which,index){
  // warmup; otherwise panning near the oldest archived candle goes blank.
  const firstAllowed=Math.min(state.bars.length-1,warmup+view.count-1);
  const anchor=Math.max(firstAllowed,Math.min(state.bars.length-1,view.baseIndex));
- const capped=Math.max(firstAllowed,Math.min(anchor+500,i));
+ // Never pan beyond the requested number of subsequent REAL historical
+ // bars. Both panes share this limit, not the main-chart forecast controls.
+ const allowed=Math.min(state.forecastBars||50,
+  Math.max(0,state.bars.length-1-
+   (which==='historical'?view.baseIndex:state.match.index)));
+ const capped=Math.max(firstAllowed,Math.min(anchor+allowed,i));
  view.index=Math.min(anchor,capped);
  view.futureShift=Math.max(0,capped-anchor);
  renderPatternComparison();
@@ -6769,7 +6774,7 @@ function initPatternComparison(){
    patternComparison.forecastBars=patternCompareFutureBars;
    for(const which of ['current','historical']){
     const view=patternComparison.views[which];
-    if(view.futureShift>patternCompareFutureBars)view.futureShift=patternCompareFutureBars;
+    patternCompareSetIndex(which,view.index+(view.futureShift||0));
    }
    renderPatternComparison();
   }
