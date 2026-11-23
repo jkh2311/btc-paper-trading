@@ -6246,6 +6246,67 @@ async function loadIndicatorPatternHistory(tf){
 }
 // Read-only dual chart view for a selected similarity match.
 let patternComparison=null,patternCompareBodyOverflow='';
+// Comparison-only analogue replay. Rank #N is frozen at its historical
+// timestamp. Past candles AFTER that timestamp are used as an illustrative
+// future path for the current chart; no exchange orders or main-chart
+// prediction settings are touched. Both curves are real-history-derived.
+const PATTERN_COMPARE_FUTURE_KEY='btc-pattern-compare-future-bars-v316';
+const PATTERN_COMPARE_MAX_FUTURE=500;
+let patternCompareFutureBars=50;
+try{
+ const stored=Number(localStorage.getItem(PATTERN_COMPARE_FUTURE_KEY));
+ if(Number.isInteger(stored)&&stored>=5&&stored<=PATTERN_COMPARE_MAX_FUTURE)
+  patternCompareFutureBars=stored;
+}catch(_){}
+function patternReplaySeries(allBars,anchorIndex,rankIndex,horizon,tf,historical=false){
+ if(!Array.isArray(allBars)||anchorIndex<0||rankIndex<0||
+    anchorIndex>=allBars.length||rankIndex>=allBars.length)return null;
+ const anchor=allBars[anchorIndex],reference=allBars[rankIndex];
+ if(!(anchor?.c>0&&reference?.c>0))return null;
+ const period=Math.min(PATTERN_COMPARE_MAX_FUTURE,Math.max(0,Math.floor(horizon)));
+ const prices=[anchor.c],actual=[];
+ for(let k=1;k<=period;k++){
+  const before=allBars[rankIndex+k-1],after=allBars[rankIndex+k];
+  if(!after||!before||after.t!==nextCandleTime(tf,before.t,1))break;
+  const price=historical?after.c:anchor.c*(after.c/reference.c);
+  if(!(price>0&&Number.isFinite(price)))break;
+  prices.push(price);
+  if(historical)actual.push(after);
+ }
+ const ma=[];
+ for(const [length,color] of MA_FORECAST_PERIODS){
+  const base=allBars.slice(anchorIndex-length+1,anchorIndex+1)
+   .map(row=>row.c);
+  if(base.length!==length||base.some(v=>!(v>0)))continue;
+  const values=[base.reduce((a,b)=>a+b,0)/length],q=base.slice();
+  for(let k=1;k<prices.length;k++){
+   q.shift();q.push(prices[k]);
+   values.push(q.reduce((a,b)=>a+b,0)/length);
+  }
+  ma.push({period:length,color,values});
+ }
+ const bb=[];
+ const q=allBars.slice(anchorIndex-19,anchorIndex+1).map(v=>v.c);
+ if(q.length===20&&q.every(v=>v>0)){
+  for(let k=0;k<prices.length;k++){
+   if(k){q.shift();q.push(prices[k]);}
+   const mean=q.reduce((a,b)=>a+b,0)/20;
+   const sd=Math.sqrt(q.reduce((a,b)=>a+(b-mean)**2,0)/20);
+   bb.push({mid:mean,upper:mean+2*sd,lower:mean-2*sd});
+  }
+ }
+ return {prices,ma,bb,actual,rankTime:reference.t,
+  available:prices.length-1,historical};
+}
+function updatePatternCompareHistorySnapshot(){
+ const state=patternComparison;
+ if(!state)return;
+ const index=state.match.index;
+ // Deliberately omit EVERY post-match bar from the historical candlestick
+ // data source. Subsequent real candles are shown ONLY in the separate,
+ // explicitly-labelled continuation layer.
+ state.historicalBars=state.bars.slice(0,index+1);
+}
 function patternCompareRows(bars,tf,index,config){
  const warmup=Math.max(config.bb,...config.ma,config.rmiLength+config.rmiMomentum)+2;
  const start=Math.max(0,index-config.window+1-warmup);
@@ -6277,9 +6338,8 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  const {visible,ma,maPeriods,bb,rmi,disp,working,offset}=row,n=visible.length;
  const show=visibleIndicators||{};
  const left=6,right=70,pw=width-right-left,pt=7,pb=Math.round(height*.61),volB=Math.round(height*.70),rt=volB+12,rb=Math.round(height*.84),dt=rb+12,db=height-19;
- // Current chart has the main chart's right-hand future area, while the
- // historical match remains a strictly past-only record. Nothing is added
- // to exchange candles or trade signals.
+ // Historical candles use a frozen past-only snapshot. The separate
+ // continuation is actual post-match history, never today's candles.
  const futureEnabled=priceView?.futureEnabled===true;
  const futureShift=futureEnabled?Math.max(0,Math.floor(priceView?.futureShift||0)):0;
  // The native viewport keeps a stable candle width while swiping into
@@ -6566,6 +6626,7 @@ function refreshPatternComparisonCandles(){
    patternCompareNearestIndex(merged,rankedTimes[i]):m.index
  }));
  state.match={...state.matches[state.rank-1]};
+ updatePatternCompareHistorySnapshot();
  for(const which of ['current','historical']){
   const view=state.views[which],saved=anchorTimes[which];
   if(which==='current'&&saved.index===oldLast.t)
@@ -6611,6 +6672,7 @@ function setPatternComparisonRank(rank){
  const selected=state.matches[rank-1];
  if(!selected||!state.bars[selected.index])return;
  state.rank=rank;state.match={...selected};
+ updatePatternCompareHistorySnapshot();
  const previous=state.views.historical;
  state.views.historical={
   ...previous,index:selected.index,baseIndex:selected.index,
@@ -6648,6 +6710,7 @@ function openPatternComparison(tf,bars,matches,rank){
  const config=indicatorPatternConfig(tf);
  patternComparison={
   tf,bars,config,match:{...match},matches:matches.map(x=>({...x})),rank,
+  forecastBars:patternCompareFutureBars,
   views:{
    current:{index:currentIndex,baseIndex:currentIndex,count:config.window,
     show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0,
@@ -6659,6 +6722,9 @@ function openPatternComparison(tf,bars,matches,rank){
  };
  $('patternCompareHistoricalTitle').textContent='과거 유사 차트 ('+rank+'위)';
  renderPatternComparisonRankButtons();
+ updatePatternCompareHistorySnapshot();
+ const forecastInput=$('patternForecastBars');
+ if(forecastInput)forecastInput.value=String(patternComparison.forecastBars);
  $('patternCompareFoot').textContent=config.name+
   ' · 이평 50% / 이격도 30% / 볼밴 15% / RMI 5%'+
   ' · 현재·과거 차트 미래 최대 500봉 탐색 · 과거는 해당 시점 데이터만으로 예측 · 본 차트 설정 변경 없음';
@@ -6670,6 +6736,21 @@ function openPatternComparison(tf,bars,matches,rank){
 }
 function initPatternComparison(){
  $('patternCompareClose')?.addEventListener('click',closePatternComparison);
+ $('patternForecastBars')?.addEventListener('change',e=>{
+  const requested=Math.round(Number(e.target.value));
+  if(!Number.isFinite(requested))return;
+  patternCompareFutureBars=Math.min(500,Math.max(5,requested));
+  e.target.value=String(patternCompareFutureBars);
+  try{localStorage.setItem(PATTERN_COMPARE_FUTURE_KEY,String(patternCompareFutureBars))}catch(_){}
+  if(patternComparison){
+   patternComparison.forecastBars=patternCompareFutureBars;
+   for(const which of ['current','historical']){
+    const view=patternComparison.views[which];
+    if(view.futureShift>patternCompareFutureBars)view.futureShift=patternCompareFutureBars;
+   }
+   renderPatternComparison();
+  }
+ });
  $('patternCompareRanks')?.addEventListener('click',e=>{
   const button=e.target.closest('button[data-rank]');
   if(button)setPatternComparisonRank(Number(button.dataset.rank));
