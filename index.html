@@ -6279,16 +6279,47 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  // Current chart has the main chart's right-hand future area, while the
  // historical match remains a strictly past-only record. Nothing is added
  // to exchange candles or trade signals.
- const futureCount=priceView?.futureEnabled&&index>=bars.length-2?
-  Math.min(60,Math.max(12,chartIndicators.maForecast||chartIndicators.bbForecast?
-   maForecastBars:20)):0;
- const slots=n+futureCount;
- const X=i=>left+(i+.5)*pw/slots;
+ const futureEnabled=priceView?.futureEnabled===true;
+ const futureShift=futureEnabled?Math.max(0,Math.floor(priceView?.futureShift||0)):0;
+ // The native viewport keeps a stable candle width while swiping into
+ // empty future slots; never clamp the right edge to the last real bar.
+ const futureSlots=futureEnabled?Math.max(12,Math.min(42,Math.ceil(n*.30))):0;
+ const slots=n+futureSlots;
+ const X=i=>left+(i+.5-futureShift)*pw/slots;
+ // Past matches use ONLY candles available at that historical timestamp.
+ // Supplying the past timestamp as "now" makes partial-bar detection
+ // identical to a real historical replay, with no look-ahead candles.
+ const forecastInput=futureEnabled?bars.slice(0,index+1):null;
+ const forecastNow=futureEnabled&&index<bars.length-1?
+  nextCandleTime(tf,bars[index].t,1)+1000:Date.now();
+ const futureCount=futureEnabled?
+  Math.min(500,Math.max(maForecastBars,25,futureShift+futureSlots+5)):0;
+ const scenario=futureEnabled?projectedPricePattern(forecastInput,futureCount,tf,forecastNow):null;
+ const projectedMa=futureEnabled&&chartIndicators.maForecast&&scenario?
+  projectedMaSeries(forecastInput,futureCount,tf,forecastNow):null;
+ const projectedBb=futureEnabled&&chartIndicators.bbForecast&&scenario?
+  projectedBollingerSeries(forecastInput,futureCount,tf,forecastNow):null;
  let low=Infinity,high=-Infinity;
  for(let i=0;i<n;i++){
   const bar=visible[i];low=Math.min(low,bar.l);high=Math.max(high,bar.h);
   if(bb[i]){low=Math.min(low,bb[i].lower);high=Math.max(high,bb[i].upper)}
   for(const arr of ma)if(Number.isFinite(arr[i])){low=Math.min(low,arr[i]);high=Math.max(high,arr[i])}
+ }
+ if(scenario){
+  // Include visible forecast lines in the price scale, just as the real
+  // chart's future region does; never replace historical market candles.
+  const first=Math.max(0,Math.floor(futureShift-futureSlots)),
+   last=Math.min(futureCount,Math.ceil(futureShift+futureSlots));
+  const bounds=[];
+  for(let k=first;k<=last;k++){
+   bounds.push(scenario.prices[k]);
+   for(const line of projectedMa||[])bounds.push(line.values[k]);
+   const v=projectedBb?.values?.[k];
+   if(v)bounds.push(v.upper,v.lower);
+  }
+  for(const value of bounds)if(Number.isFinite(value)){
+   low=Math.min(low,value);high=Math.max(high,value);
+  }
  }
  if(!(high>low)){low=visible[0].c*.97;high=visible[0].c*1.03}
  const pad=(high-low)*.06;low-=pad;high+=pad;
@@ -6330,25 +6361,24 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  if(show.ma!==false)ma.forEach((arr,i)=>trace(arr,
   colorByPeriod[maPeriods[i]]||['#ffd65e','#ffffff','#b6f266','#2166ff','#ff4f50','#bf79ff'][i%6],
   Y,pt,pb,1.3));
- if(futureCount){
-  // Main-chart-style forecast region. The dashed lines are visual
-  // projections, NOT actual traded candles or guaranteed future prices.
-  const boundary=left+n*pw/slots;
+ if(futureEnabled){
+  // Future area is visible at any historical rank as well as now.
+  const boundary=left+(n-futureShift)*pw/slots;
   ctx.fillStyle='rgba(21,42,72,.28)';
-  ctx.fillRect(boundary,pt,left+pw-boundary,pb-pt);
+  ctx.fillRect(Math.max(left,boundary),pt,
+   Math.max(0,left+pw-Math.max(left,boundary)),pb-pt);
   ctx.strokeStyle='rgba(130,184,222,.8)';ctx.lineWidth=1;
   ctx.setLineDash([3,5]);ctx.beginPath();
-  ctx.moveTo(boundary,pt);ctx.lineTo(boundary,pb);ctx.stroke();ctx.setLineDash([]);
+  ctx.moveTo(boundary,pt);ctx.lineTo(boundary,pb);ctx.stroke();
+  ctx.setLineDash([]);
   ctx.fillStyle='#a4c0e5';ctx.font='bold 10px -apple-system,sans-serif';
   ctx.textAlign='center';
-  ctx.fillText('미래 · 예상',boundary+(left+pw-boundary)/2,pt+15);
-  const anchor=forecastLastClosedIndex(bars,tf);
-  const scenario=projectedPricePattern(bars,futureCount,tf);
-  // A-E wave uses exactly the same projectedPricePattern() as the main
-  // chart. If there are not enough candles, keep the region empty.
-  if(scenario&&scenario.anchorIndex>=index-1){
-   const baseX=X(n-1)+(scenario.anchorIndex-index)*pw/slots;
-   const F=k=>baseX+k*pw/slots;
+  if(boundary<left+pw)ctx.fillText(
+    index<bars.length-2?'과거 기준 미래 · 예상':'미래 · 예상',
+    Math.max(left+40,Math.min(left+pw-40,(boundary+left+pw)/2)),pt+15);
+  if(scenario){
+   const offset=scenario.anchorIndex-index;
+   const F=k=>X(n-1)+offset*pw/slots+k*pw/slots;
    const forecastLine=(values,color,lineWidth=1.4)=>{
     if(!values?.length)return;
     ctx.strokeStyle=color;ctx.lineWidth=lineWidth;ctx.setLineDash([5,5]);
@@ -6356,22 +6386,21 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
     for(let k=0;k<values.length&&k<=futureCount;k++){
      if(!Number.isFinite(values[k]))continue;
      const x=F(k),y=Y(values[k]);
+     if(x<left-10||x>left+pw+10){active=false;continue}
      if(!active){ctx.moveTo(x,y);active=true}else ctx.lineTo(x,y);
     }
     if(active)ctx.stroke();
     ctx.setLineDash([]);
    };
    forecastLine(scenario.prices,'rgba(235,240,255,.72)',1.2);
-   if(chartIndicators.maForecast){
-    const projected=projectedMaSeries(bars,futureCount,tf);
-    for(const line of projected||[])forecastLine(line.values,line.color,1.7);
-   }
-   if(chartIndicators.bbForecast){
-    const projected=projectedBollingerSeries(bars,futureCount,tf);
-    if(projected?.values)for(const key of ['upper','mid','lower'])
-     forecastLine(projected.values.map(v=>v[key]),
-      key==='mid'?'rgba(146,225,202,.95)':'rgba(97,186,168,.85)',1.4);
-   }
+   for(const line of projectedMa||[])forecastLine(line.values,line.color,1.7);
+   if(projectedBb?.values)for(const key of ['upper','mid','lower'])
+    forecastLine(projectedBb.values.map(v=>v[key]),
+     key==='mid'?'rgba(146,225,202,.95)':'rgba(97,186,168,.85)',1.4);
+  }else{
+   ctx.fillStyle='#9aacc5';
+   ctx.fillText('예측 계산에 필요한 과거 데이터 부족',
+    left+pw/2,pt+34,pw-8);
   }
  }
  // Reuse the primary chart candle renderer, including its selected 2D
