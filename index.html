@@ -6422,11 +6422,17 @@ function refreshPatternComparisonCandles(){
    inspect:Number.isInteger(view.inspectIndex)?old[view.inspectIndex]?.t:null
   };
  }
- const historicTime=old[state.match.index]?.t;
+ const rankedTimes=state.matches.map(m=>old[m.index]?.t??m.time);
  const merged=mergeDailyCandles(old,live);
  if(!merged.length)return;
  state.bars=merged;
- state.match.index=patternCompareNearestIndex(merged,historicTime);
+ // Rebase EVERY rank after new candles or restored cache rows are merged.
+ // Otherwise switching to 2nd–5th rank can land on a different historical day.
+ state.matches=state.matches.map((m,i)=>({
+  ...m,index:Number.isFinite(rankedTimes[i])?
+   patternCompareNearestIndex(merged,rankedTimes[i]):m.index
+ }));
+ state.match={...state.matches[state.rank-1]};
  for(const which of ['current','historical']){
   const view=state.views[which],saved=anchorTimes[which];
   if(which==='current'&&saved.index===oldLast.t)
