@@ -6352,7 +6352,10 @@ function patternCompareSetCount(which,count){
  const minWarmup=Math.max(patternComparison.config.bb,
    ...patternComparison.config.ma,
    patternComparison.config.rmiLength+patternComparison.config.rmiMomentum)+2;
- const maxCount=Math.max(10,Math.min(300,patternComparison.bars.length-minWarmup));
+ // Never jump away from the inspected historical match when zooming out.
+ // Limit the visible count to bars with enough preceding indicator warmup.
+ const maxCount=Math.max(10,Math.min(300,patternComparison.bars.length-minWarmup,
+  view.index-minWarmup+1));
  view.count=Math.max(10,Math.min(maxCount,Math.round(count)));
  patternCompareSetIndex(which,view.index);
 }
