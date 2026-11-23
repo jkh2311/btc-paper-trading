@@ -6370,7 +6370,9 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  if(scenario){
   // Include visible forecast lines in the price scale, just as the real
   // chart's future region does; never replace historical market candles.
-  const first=Math.max(0,Math.floor(futureShift-n-1)),
+  // Include only projections that could actually be visible at this
+  // horizontal offset; offscreen future prices must not squash the candles.
+  const first=Math.max(0,Math.floor(futureShift-n)),
    last=Math.min(futureCount,Math.ceil(futureShift+futureSlots+2));
   const bounds=[];
   for(let k=first;k<=last;k++){
@@ -6491,12 +6493,22 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  visible.forEach((bar,i)=>drawDimensionCandle(ctx,bar,X(i),pw/slots,Y));
  ctx.restore();
  // Same up/down volume histogram convention as the main chart.
- const maxVolume=Math.max(1,...visible.map(b=>Number(b.v)||0));
+ const futureActual=priceView?.historical&&scenario?.actual?scenario.actual:[];
+ const maxVolume=Math.max(1,...visible.map(b=>Number(b.v)||0),
+  ...futureActual.map(b=>Number(b.v)||0));
  ctx.save();ctx.beginPath();ctx.rect(left,pb+4,pw,volB-pb-4);ctx.clip();
  visible.forEach((bar,i)=>{
   const vh=(Number(bar.v)||0)/maxVolume*(volB-pb-9);
   ctx.fillStyle=bar.c>=bar.o?'rgba(52,206,156,.7)':'rgba(240,92,107,.7)';
   ctx.fillRect(X(i)-Math.max(.8,pw/slots*.24),volB-3-vh,Math.max(1.5,pw/slots*.48),vh);
+ });
+ futureActual.forEach((bar,i)=>{
+  const x=X(n-1)+(i+1)*pw/slots;
+  if(x<left||x>left+pw)return;
+  const vh=(Number(bar.v)||0)/maxVolume*(volB-pb-9);
+  ctx.fillStyle=bar.c>=bar.o?'rgba(52,206,156,.7)':'rgba(240,92,107,.7)';
+  ctx.fillRect(x-Math.max(.8,pw/slots*.24),volB-3-vh,
+   Math.max(1.5,pw/slots*.48),vh);
  });ctx.restore();
  ctx.fillStyle='#aabbd0';ctx.font='10px -apple-system,sans-serif';ctx.textAlign='left';
  for(let i=0;i<=3;i++){const value=low+(high-low)*i/3;ctx.fillText(value.toLocaleString('en-US',{maximumFractionDigits:1}),width-right+3,Y(value)+3)}
