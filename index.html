@@ -6093,11 +6093,11 @@ const SIMILAR_PATTERN_LABELS={'1m':'1분','3m':'3분','5m':'5분',
  '10m':'10분','15m':'15분','30m':'30분','1h':'1시간','4h':'4시간',
  '6h':'6시간','12h':'12시간','1d':'일봉','1w':'주봉','1M':'월봉'};
 function indicatorPatternConfig(tf){
- if(tf==='1M')return {window:10,lookahead:6,ma:[3,5,8,10,15,20],bb:10,rmiLength:8,rmiMomentum:3,
+ if(tf==='1M')return {window:10,lookahead:6,ma:[3,5,8,10,15,20],disparity:[3,5,20],bb:10,rmiLength:8,rmiMomentum:3,
   returns:[1,3,6],name:'월봉 · 10봉 / 이평 3·5·8·10·15·20'};
- if(tf==='1w')return {window:24,lookahead:12,ma:[10,20,30,40,50,60],bb:20,rmiLength:14,rmiMomentum:5,
+ if(tf==='1w')return {window:24,lookahead:12,ma:[10,20,30,40,50,60],disparity:[10,20,60],bb:20,rmiLength:14,rmiMomentum:5,
   returns:[3,6,12],name:'주봉 · 24봉 / 이평 10·20·30·40·50·60'};
- return {window:60,lookahead:24,ma:[20,40,60,90,120,200],bb:20,rmiLength:14,rmiMomentum:5,
+ return {window:60,lookahead:24,ma:[20,40,60,90,120,200],disparity:[20,50,200],bb:20,rmiLength:14,rmiMomentum:5,
   returns:[6,12,24],name:SIMILAR_PATTERN_LABELS[tf]+' · 60봉 / 이평 20·40·60·90·120·200'};
 }
 function historicalPatternFeatures(bars,config){
@@ -6110,7 +6110,8 @@ function historicalPatternFeatures(bars,config){
  }
  const features=new Array(n).fill(null),
   rmi=rmiSeries(bars,config.rmiLength,config.rmiMomentum);
- const warmup=Math.max(config.bb,...maLengths)-1;
+ const divergenceLengths=config.disparity||[20,50,200];
+ const warmup=Math.max(config.bb,...maLengths,...divergenceLengths)-1;
  for(let i=warmup;i<n;i++){
   const c=bars[i].c,ma=maLengths.map(k=>(sums[i+1]-sums[i+1-k])/k);
   if(ma.some(v=>!(v>0)))continue;
@@ -6124,7 +6125,10 @@ function historicalPatternFeatures(bars,config){
    (mid/ma[2]-1)*100,
    ...x,
    Number.isFinite(rmi[i])?rmi[i]:50,
-   x[0]-x[2],x[2]-x[5],x[0]-x[5]
+   ...divergenceLengths.map(length=>{
+    const avg=(sums[i+1]-sums[i+1-length])/length;
+    return avg>0?(c/avg-1)*100:0;
+   })
   ];
  }
  return features;
@@ -6143,7 +6147,8 @@ function indicatorPatternDistance(features,a,b,config){
   count++;
  }
  // Strongest match: MA structure (50%), then Bollinger (25%),
- // disparity (15%), RMI (10%). All groups use normalized differences.
+ // actual 20/50/200 disparity values (15%), RMI (10%). For weekly and
+ // monthly use the configured shorter period triples. Normalized values.
  return count?(
   .50*ma/(6*count)+
   .25*bb/(3*count)+
@@ -6159,7 +6164,7 @@ function indicatorPatternContinuous(bars,tf,from,to){
 }
 function historicalPatternCandidates(bars,tf,now=Date.now()){
  const config=indicatorPatternConfig(tf),n=bars.length;
- const warmup=Math.max(config.bb,...config.ma);
+ const warmup=Math.max(config.bb,...config.ma,...config.disparity);
  if(n<warmup+config.window+config.lookahead+3)return [];
  // If the last bar is still forming, exclude it. If already closed, use it.
  let present=n-1;
@@ -6228,7 +6233,7 @@ function patternCompareRows(bars,tf,index,config){
  if(offset<0||working.length<config.window)return null;
  const visible=working.slice(offset),rmi=rmiSeries(working,config.rmiLength,config.rmiMomentum).slice(offset);
  const ma=config.ma.map(length=>working.map((_,i)=>sma(working,i,length)).slice(offset));
- const dispLengths=tf==='1M'?[3,5,20]:tf==='1w'?[10,20,60]:[20,50,200];
+ const dispLengths=config.disparity;
  const disp=dispLengths.map(length=>disparitySeries(working,length).slice(offset));
  const bb=[];
  for(let i=offset;i<working.length;i++){
