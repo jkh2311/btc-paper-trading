@@ -6246,7 +6246,7 @@ function patternCompareRows(bars,tf,index,config){
  }
  return {visible,rmi,ma,maPeriods,disp,bb};
 }
-function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,visibleIndicators=null){
+function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,visibleIndicators=null,priceView=null){
  const canvas=$(id);if(!canvas)return;
  const rect=canvas.getBoundingClientRect(),width=Math.max(260,Math.floor(rect.width)),height=Math.max(240,Math.floor(rect.height)),dpr=Math.min(3,window.devicePixelRatio||1);
  canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
@@ -6256,7 +6256,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  if(!row){ctx.fillStyle='#e8efff';ctx.fillText('차트 데이터 부족',12,22);return}
  const {visible,ma,maPeriods,bb,rmi,disp}=row,n=visible.length;
  const show=visibleIndicators||{};
- const left=6,right=70,pw=width-right-left,pt=7,pb=Math.round(height*.69),rt=pb+13,rb=Math.round(height*.83),dt=rb+9,db=height-19;
+ const left=6,right=70,pw=width-right-left,pt=7,pb=Math.round(height*.61),volB=Math.round(height*.70),rt=volB+12,rb=Math.round(height*.84),dt=rb+12,db=height-19;
  const X=i=>left+(i+.5)*pw/n;
  let low=Infinity,high=-Infinity;
  for(let i=0;i<n;i++){
@@ -6266,8 +6266,20 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  }
  if(!(high>low)){low=visible[0].c*.97;high=visible[0].c*1.03}
  const pad=(high-low)*.06;low-=pad;high+=pad;
+ const baselineRange=high-low;
+ const zoom=Math.max(.12,Math.min(20,Number(priceView?.priceZoom)||1));
+ const pan=Number.isFinite(priceView?.pricePan)?priceView.pricePan:0;
+ const mid=(high+low)/2+pan*baselineRange,half=baselineRange/(2*zoom);
+ low=mid-half;high=mid+half;
  const Y=v=>pt+(high-v)/(high-low)*(pb-pt);
  ctx.save();ctx.beginPath();ctx.rect(left,pt,pw,pb-pt);ctx.clip();
+ // Use the shared KST weekend highlighting behind the candles.
+ if(chartIndicators.weekendBoxes!==false&&WEEKEND_MARK_TFS.has(tf)){
+  const regions=chartWeekendRegions(visible,tf,0,n,0,pw/n,pw);
+  ctx.save();ctx.translate(left,0);
+  paintChartWeekendRegions(ctx,regions,pt,pb,pw,'background');
+  ctx.restore();
+ }
  ctx.strokeStyle='#273950';ctx.lineWidth=.7;
  for(let i=0;i<=3;i++){const y=pt+(pb-pt)*i/3;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(left+pw,y);ctx.stroke()}
  const trace=(values,color,fn,top,bottom,width=1.5)=>{
@@ -6292,10 +6304,18 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
   ctx.fillRect(x-bodyWidth/2,Y(Math.max(bar.o,bar.c)),bodyWidth,
    Math.max(1.3,Math.abs(Y(bar.o)-Y(bar.c))));
  });ctx.restore();
+ // Same up/down volume histogram convention as the main chart.
+ const maxVolume=Math.max(1,...visible.map(b=>Number(b.v)||0));
+ ctx.save();ctx.beginPath();ctx.rect(left,pb+4,pw,volB-pb-4);ctx.clip();
+ visible.forEach((bar,i)=>{
+  const vh=(Number(bar.v)||0)/maxVolume*(volB-pb-9);
+  ctx.fillStyle=bar.c>=bar.o?'rgba(52,206,156,.7)':'rgba(240,92,107,.7)';
+  ctx.fillRect(X(i)-Math.max(.8,pw/n*.24),volB-3-vh,Math.max(1.5,pw/n*.48),vh);
+ });ctx.restore();
  ctx.fillStyle='#aabbd0';ctx.font='10px -apple-system,sans-serif';ctx.textAlign='left';
  for(let i=0;i<=3;i++){const value=low+(high-low)*i/3;ctx.fillText(value.toLocaleString('en-US',{maximumFractionDigits:1}),width-right+3,Y(value)+3)}
  ctx.strokeStyle='#59718f';ctx.lineWidth=.9;
- for(const y of [rt-9,dt-6]){ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(width-3,y);ctx.stroke()}
+ for(const y of [pb,rt-9,dt-6]){ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(width-3,y);ctx.stroke()}
  const yr=v=>rt+(100-v)/100*(rb-rt);
  ctx.setLineDash([3,4]);ctx.strokeStyle='#4b5a77';
  for(const threshold of [20,50,85]){const y=yr(threshold);ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(left+pw,y);ctx.stroke()}ctx.setLineDash([]);
@@ -6304,11 +6324,19 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  const yd=v=>(dt+db)/2-v/range*(db-dt)/2;
  ctx.strokeStyle='#4a6275';ctx.beginPath();ctx.moveTo(left,yd(0));ctx.lineTo(left+pw,yd(0));ctx.stroke();
  if(show.disparity!==false)['#35dd87','#3f75fa','#fd4e65'].forEach((color,i)=>trace(disp[i],color,yd,dt,db));
- ctx.fillStyle='#d5e0ee';ctx.textAlign='left';ctx.fillText('RMI',left+3,rt+10);ctx.fillText('이격도',left+3,dt+9);
+ ctx.fillStyle='#d5e0ee';ctx.textAlign='left';ctx.fillText('Vol',left+3,pb+12);ctx.fillText('RMI',left+3,rt+10);ctx.fillText('이격도',left+3,dt+9);
  const formatter=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
  ctx.fillStyle='#afc1d2';ctx.textAlign='center';ctx.font='10px -apple-system,sans-serif';
  for(const i of [0,Math.floor((n-1)/2),n-1])
   ctx.fillText(formatter.format(new Date(visible[i].t)),X(i),height-4,Math.max(60,pw/3-6));
+ const last=visible.at(-1),lastY=Y(last.c);
+ if(lastY>=pt&&lastY<=pb){
+  ctx.save();ctx.fillStyle='#24b99a';ctx.fillRect(width-right,lastY-11,right-3,22);
+  ctx.fillStyle='#061725';ctx.font='bold 11px -apple-system,sans-serif';
+  ctx.textAlign='left';
+  ctx.fillText(last.c.toLocaleString('en-US',{maximumFractionDigits:2}),width-right+4,lastY+4,right-10);
+  ctx.restore();
+ }
  if(Number.isInteger(inspectIndex)){
   const j=inspectIndex-(index-n+1);
   if(j>=0&&j<n){
@@ -6380,7 +6408,7 @@ function renderPatternComparison(){
   const view=state.views[which],config={...state.config,window:view.count},
    index=patternCompareLimit(view),bar=state.bars[index];
   if(!bar)continue;
-  paintPatternCompareCanvas(canvasId,state.bars,state.tf,index,config,view.inspectIndex,view.show);
+  paintPatternCompareCanvas(canvasId,state.bars,state.tf,index,config,view.inspectIndex,view.show,view);
   const fmt=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',
    year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',
    minute:'2-digit',hour12:false});
@@ -6417,9 +6445,9 @@ function openPatternComparison(tf,bars,match,rank){
   tf,bars,config,match,
   views:{
    current:{index:currentIndex,baseIndex:currentIndex,count:config.window,
-    show:{ma:true,bb:true,rmi:true,disparity:true}},
+    show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0},
    historical:{index:match.index,baseIndex:match.index,count:config.window,
-    show:{ma:true,bb:true,rmi:true,disparity:true}}
+    show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0}
   }
  };
  $('patternCompareHistoricalTitle').textContent='과거 유사 차트 ('+rank+'위)';
