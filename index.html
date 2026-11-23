@@ -6240,7 +6240,7 @@ function patternCompareRows(bars,tf,index,config){
  }
  return {visible,rmi,ma,disp,bb};
 }
-function paintPatternCompareCanvas(id,bars,tf,index,config){
+function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null){
  const canvas=$(id);if(!canvas)return;
  const rect=canvas.getBoundingClientRect(),width=Math.max(260,Math.floor(rect.width)),height=Math.max(240,Math.floor(rect.height)),dpr=Math.min(3,window.devicePixelRatio||1);
  canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
@@ -6299,6 +6299,22 @@ function paintPatternCompareCanvas(id,bars,tf,index,config){
  ctx.fillStyle='#afc1d2';ctx.textAlign='center';ctx.font='10px -apple-system,sans-serif';
  for(const i of [0,Math.floor((n-1)/2),n-1])
   ctx.fillText(formatter.format(new Date(visible[i].t)),X(i),height-4,Math.max(60,pw/3-6));
+ if(Number.isInteger(inspectIndex)){
+  const j=inspectIndex-(index-n+1);
+  if(j>=0&&j<n){
+   const x=X(j),bar=visible[j];
+   ctx.save();ctx.strokeStyle='#f0f4ff';ctx.lineWidth=1;
+   ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(x,pt);ctx.lineTo(x,db);
+   ctx.stroke();ctx.setLineDash([]);
+   const label=formatter.format(new Date(bar.t))+' · '+bar.c.toLocaleString('en-US',{maximumFractionDigits:2});
+   ctx.font='bold 10px -apple-system,sans-serif';
+   const ww=Math.min(pw-8,Math.max(80,ctx.measureText(label).width+10));
+   const lx=Math.max(4,Math.min(width-right-ww-2,x-ww/2));
+   ctx.fillStyle='rgba(25,44,67,.97)';ctx.fillRect(lx,pt+2,ww,17);
+   ctx.textAlign='left';ctx.fillStyle='#e7f0fb';ctx.fillText(label,lx+5,pt+14,ww-9);
+   ctx.restore();
+  }
+ }
 }
 // Independent history navigation; controls never alter the primary chart.
 function patternCompareView(which){
@@ -6351,13 +6367,15 @@ function renderPatternComparison(){
   const view=state.views[which],config={...state.config,window:view.count},
    index=patternCompareLimit(view),bar=state.bars[index];
   if(!bar)continue;
-  paintPatternCompareCanvas(canvasId,state.bars,state.tf,index,config);
+  paintPatternCompareCanvas(canvasId,state.bars,state.tf,index,config,view.inspectIndex);
   const fmt=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',
    year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',
    minute:'2-digit',hour12:false});
+  const inspected=Number.isInteger(view.inspectIndex)?state.bars[view.inspectIndex]:null;
   $(labelId).textContent=SIMILAR_PATTERN_LABELS[state.tf]+' · '+
    fmt.format(new Date(bar.t))+' KST · '+view.count+'봉'+
-   (which==='historical'?' · 유사도 '+state.match.similarity.toFixed(1)+'점':'');
+   (which==='historical'?' · 기준 유사도 '+state.match.similarity.toFixed(1)+'점':'')+
+   (inspected?' · 선택 종가 '+inspected.c.toLocaleString('en-US',{maximumFractionDigits:2}):'');
   const panel=document.querySelector('[data-pattern-nav="'+which+'"]');
   if(panel){
    const input=panel.querySelector('input[type="datetime-local"]');
@@ -6425,12 +6443,13 @@ function initPatternComparison(){
   // Pointer capture permits one-finger drag on iOS and mouse dragging.
   // Two touch pointers use their distance to zoom the candle count.
   const pointers=new Map();let lastDistance=0,lastX=0;
+  let tapX=null,tapMoved=false;
   const pxPerCandle=()=>Math.max(2,(canvas.clientWidth-76)/
    Math.max(10,patternCompareView(which)?.count||60));
   canvas.addEventListener('pointerdown',e=>{
    if(!patternComparison)return;
    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-   if(pointers.size===1)lastX=e.clientX;
+   if(pointers.size===1){lastX=e.clientX;tapX=e.clientX;tapMoved=false;}
    if(pointers.size===2){
     const [a,b]=[...pointers.values()];
     lastDistance=Math.hypot(a.x-b.x,a.y-b.y);
@@ -6440,7 +6459,8 @@ function initPatternComparison(){
   canvas.addEventListener('pointermove',e=>{
    if(!patternComparison||!pointers.has(e.pointerId))return;
    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-   if(pointers.size===2){
+   if(tapX!==null&&Math.abs(e.clientX-tapX)>7)tapMoved=true;
+   if(pointers.size===2){tapMoved=true;
     const [a,b]=[...pointers.values()];
     const dist=Math.hypot(a.x-b.x,a.y-b.y);
     if(lastDistance>0&&Math.abs(dist-lastDistance)>=12){
@@ -6459,9 +6479,22 @@ function initPatternComparison(){
    }
   });
   const endPointer=e=>{
+   // A simple tap inspects the candle like the original crosshair. Dragging
+   // moves through historical bars; pinch zoom is never treated as a tap.
+   if(e.type==='pointerup'&&!tapMoved&&pointers.size===1&&patternComparison){
+    const view=patternCompareView(which),rect=canvas.getBoundingClientRect();
+    if(view&&rect.width>0){
+     const fraction=Math.max(0,Math.min(1,
+      (e.clientX-rect.left-6)/(rect.width-76)));
+     view.inspectIndex=Math.max(0,Math.min(patternComparison.bars.length-1,
+      view.index-view.count+1+Math.floor(fraction*view.count)));
+     renderPatternComparison();
+    }
+   }
    pointers.delete(e.pointerId);
    lastDistance=0;
    if(pointers.size===1)lastX=[...pointers.values()][0].x;
+   else tapX=null;
   };
   canvas.addEventListener('pointerup',endPointer);
   canvas.addEventListener('pointercancel',endPointer);
