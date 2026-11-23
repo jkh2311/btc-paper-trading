@@ -6575,8 +6575,9 @@ function renderPatternComparisonRankButtons(){
 }
 function openPatternComparison(tf,bars,matches,rank){
  if(!bars?.length||!$('patternCompare'))return;
- let currentIndex=bars.length-1;
- while(currentIndex>=0&&nextCandleTime(tf,bars[currentIndex].t,1)>Date.now())currentIndex--;
+ // Match ranking uses only closed candles; the current comparison
+ // shows the latest live bar as the primary chart does.
+ const currentIndex=bars.length-1;
  const match=matches?.[rank-1];
  if(currentIndex<0||!Array.isArray(matches)||!matches.length||
     !match||match.index>=currentIndex)return;
