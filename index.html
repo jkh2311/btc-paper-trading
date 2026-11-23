@@ -6295,12 +6295,17 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  const futureCount=futureEnabled?
   Math.min(500,Math.max(maForecastBars,25,futureShift+futureSlots+5)):0;
  const scenario=futureEnabled?projectedPricePattern(forecastInput,futureCount,tf,forecastNow):null;
- const projectedMa=futureEnabled&&chartIndicators.maForecast&&scenario?
+ // The comparison forecasts are independent of the primary chart's
+ // MA/BB visibility preferences; changing this view never changes them.
+ const projectedMa=futureEnabled&&scenario?
   projectedMaSeries(forecastInput,futureCount,tf,forecastNow):null;
- const projectedBb=futureEnabled&&chartIndicators.bbForecast&&scenario?
+ const projectedBb=futureEnabled&&scenario?
   projectedBollingerSeries(forecastInput,futureCount,tf,forecastNow):null;
  let low=Infinity,high=-Infinity;
  for(let i=0;i<n;i++){
+  // Historical prices far outside the viewport must not flatten a future-
+  // only zoomed view when the user swipes hundreds of candles to the right.
+  if(X(i)<left-pw/slots||X(i)>left+pw+pw/slots)continue;
   const bar=visible[i];low=Math.min(low,bar.l);high=Math.max(high,bar.h);
   if(bb[i]){low=Math.min(low,bb[i].lower);high=Math.max(high,bb[i].upper)}
   for(const arr of ma)if(Number.isFinite(arr[i])){low=Math.min(low,arr[i]);high=Math.max(high,arr[i])}
@@ -6308,8 +6313,8 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  if(scenario){
   // Include visible forecast lines in the price scale, just as the real
   // chart's future region does; never replace historical market candles.
-  const first=Math.max(0,Math.floor(futureShift-futureSlots)),
-   last=Math.min(futureCount,Math.ceil(futureShift+futureSlots));
+  const first=Math.max(0,Math.floor(futureShift-n-1)),
+   last=Math.min(futureCount,Math.ceil(futureShift+futureSlots+2));
   const bounds=[];
   for(let k=first;k<=last;k++){
    bounds.push(scenario.prices[k]);
@@ -6321,7 +6326,11 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
    low=Math.min(low,value);high=Math.max(high,value);
   }
  }
- if(!(high>low)){low=visible[0].c*.97;high=visible[0].c*1.03}
+ if(!Number.isFinite(low)||!Number.isFinite(high)){
+  const center=scenario?.prices[Math.min(futureCount,Math.max(0,futureShift))]||visible.at(-1).c;
+  low=center*.97;high=center*1.03;
+ }
+ if(!(high>low)){low=visible.at(-1).c*.97;high=visible.at(-1).c*1.03}
  const pad=(high-low)*.06;low-=pad;high+=pad;
  const baselineRange=high-low;
  if(priceView){priceView.priceBaselineRange=baselineRange;priceView.pricePlotHeight=pb-pt;}
