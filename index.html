@@ -6332,7 +6332,10 @@ function patternCompareRows(bars,tf,index,config){
 // inspected historical or current candle, with no effect on trade signals.
 function patternCompareStageAt(bars,config,inspectIndex,view){
  if(!Number.isInteger(inspectIndex)||inspectIndex<0||inspectIndex>=bars.length)return null;
- const periods=config.disparity||[20,50,200];
+ // Keep inspection stages identical to the original main chart:
+ // green=20, blue=50, red=200 on EVERY interval. Do not substitute
+ // the shorter weekly/monthly search-feature periods for stage labels.
+ const periods=[20,50,200];
  const key=periods.join(',')+'|'+bars.length+'|'+bars.at(-1)?.t+'|'+bars.at(-1)?.c;
  if(view?.stageCacheKey!==key||view?.stageCacheBars!==bars){
   if(view){
@@ -6981,7 +6984,7 @@ function initPatternComparison(){
      // price scale, never the candle count or the selected historic time.
      const dy=e.clientY-lastY;
      if(Math.abs(dy)>=.8){
-      tapMoved=true;
+      tapMoved=true;clearHold();
       const factor=Math.exp(-dy/Math.max(150,canvas.clientHeight)*2.3);
       view.priceZoom=Math.max(.12,Math.min(20,(view.priceZoom||1)*factor));
       lastY=e.clientY;renderPatternComparison();
