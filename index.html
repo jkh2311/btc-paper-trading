@@ -2824,14 +2824,17 @@ async function loadFullWeekMonthHistory(tf){
    {symbol:'BTCUSDT',interval:tf,limit:1000,startTime:start,endTime:launch-1},'현물');
   if(!spot.length||spot[0].t>candleOpenTime(tf,Date.UTC(2017,7,17)))
    throw Error('2017년 현물 시작 구간을 확인할 수 없습니다');
-  if($('tf').value!==tf)return false;
-  // Futures wins for any common open timestamp.
+  // Search dropdown may request a timeframe different from the one on
+  // screen. Never discard successfully fetched historical candles.
+  // A later explicit click on a search result switches the visible chart.
   candles[tf]=mergeDailyCandles(spot,mergeDailyCandles(future,candles[tf]));
   fullWeekMonthLoaded[tf]=true;
   void saveChartHistorySnapshot(tf,Date.UTC(2017,7,17));
-  if(status)status.textContent=(tf==='1w'?'주봉':'월봉')+
-   ' 전체 과거 연결 완료 · 2017년 이후 현물/선물 기록 · 현재까지 탐색 가능';
-  resetStableChartScale();draw();drawRmi();
+  if($('tf').value===tf){
+   if(status)status.textContent=(tf==='1w'?'주봉':'월봉')+
+    ' 전체 과거 연결 완료 · 2017년 이후 현물/선물 기록 · 현재까지 탐색 가능';
+   resetStableChartScale();draw();drawRmi();
+  }
   return true;
  }catch(e){
   console.warn(tf+' 전체 과거 조회 실패',e);
