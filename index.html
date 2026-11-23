@@ -6313,15 +6313,22 @@ function patternCompareSetIndex(which,index){
  if(!view||!state)return;
  const i=Math.round(Number(index));
  if(!Number.isFinite(i))return;
- view.index=Math.max(0,Math.min(state.bars.length-1,i));
- if(view.index<Math.max(state.config.ma.at(-1),state.config.bb)+2)
-  view.index=Math.min(state.bars.length-1,Math.max(state.config.ma.at(-1),state.config.bb)+2);
+ const warmup=Math.max(state.config.bb,...state.config.ma,
+   state.config.rmiLength+state.config.rmiMomentum)+2;
+ // Always leave room for the selected number of visible candles AND MA
+ // warmup; otherwise panning near the oldest archived candle goes blank.
+ const firstAllowed=Math.min(state.bars.length-1,warmup+view.count-1);
+ view.index=Math.max(firstAllowed,Math.min(state.bars.length-1,i));
  renderPatternComparison();
 }
 function patternCompareSetCount(which,count){
  const view=patternCompareView(which);if(!view)return;
- view.count=Math.max(10,Math.min(300,Math.round(count)));
- renderPatternComparison();
+ const minWarmup=Math.max(patternComparison.config.bb,
+   ...patternComparison.config.ma,
+   patternComparison.config.rmiLength+patternComparison.config.rmiMomentum)+2;
+ const maxCount=Math.max(10,Math.min(300,patternComparison.bars.length-minWarmup));
+ view.count=Math.max(10,Math.min(maxCount,Math.round(count)));
+ patternCompareSetIndex(which,view.index);
 }
 function patternCompareLocalInputDate(t){
  const d=new Date(t+9*3600000);
