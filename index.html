@@ -6350,18 +6350,14 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  // Past matches use ONLY candles available at that historical timestamp.
  // Supplying the past timestamp as "now" makes partial-bar detection
  // identical to a real historical replay, with no look-ahead candles.
- const forecastInput=futureEnabled?bars.slice(0,index+1):null;
- const forecastNow=futureEnabled&&index<bars.length-1?
-  nextCandleTime(tf,bars[index].t,1)+1000:Date.now();
  const futureCount=futureEnabled?
-  Math.min(500,Math.max(maForecastBars,25,futureShift+futureSlots+5)):0;
- const scenario=futureEnabled?projectedPricePattern(forecastInput,futureCount,tf,forecastNow):null;
- // The comparison forecasts are independent of the primary chart's
- // MA/BB visibility preferences; changing this view never changes them.
- const projectedMa=futureEnabled&&scenario?
-  projectedMaSeries(forecastInput,futureCount,tf,forecastNow):null;
- const projectedBb=futureEnabled&&scenario?
-  projectedBollingerSeries(forecastInput,futureCount,tf,forecastNow):null;
+  Math.min(PATTERN_COMPARE_MAX_FUTURE,Math.max(5,Math.floor(priceView?.forecastBars||50))):0;
+ // This comparison's price path is based on the selected rank's ACTUAL
+ // subsequent market closes, rather than the main chart's independent
+ // forward model (which remains untouched).
+ const scenario=futureEnabled?priceView?.replayScenario:null;
+ const projectedMa=scenario?.ma||[];
+ const projectedBb=scenario?.bb?.length?{values:scenario.bb}:null;
  let low=Infinity,high=-Infinity;
  for(let i=0;i<n;i++){
   // Historical prices far outside the viewport must not flatten a future-
@@ -6444,11 +6440,10 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
   ctx.fillStyle='#a4c0e5';ctx.font='bold 10px -apple-system,sans-serif';
   ctx.textAlign='center';
   if(boundary<left+pw)ctx.fillText(
-    index<bars.length-2?'과거 기준 미래 · 예상':'미래 · 예상',
+    priceView?.historical?'선택일 이후 · 실제':'과거 유사 흐름 · 시나리오',
     Math.max(left+40,Math.min(left+pw-40,(boundary+left+pw)/2)),pt+15);
   if(scenario){
-   const offset=scenario.anchorIndex-index;
-   const F=k=>X(n-1)+offset*pw/slots+k*pw/slots;
+   const F=k=>X(n-1)+k*pw/slots;
    const forecastLine=(values,color,lineWidth=1.4)=>{
     if(!values?.length)return;
     ctx.strokeStyle=color;ctx.lineWidth=lineWidth;ctx.setLineDash([5,5]);
@@ -6465,14 +6460,29 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
     if(active)ctx.stroke();
     ctx.setLineDash([]);
    };
-   forecastLine(scenario.prices,'rgba(235,240,255,.72)',1.2);
-   for(const line of projectedMa||[])forecastLine(line.values,line.color,1.7);
-   if(projectedBb?.values)for(const key of ['upper','mid','lower'])
-    forecastLine(projectedBb.values.map(v=>v[key]),
-     key==='mid'?'rgba(146,225,202,.95)':'rgba(97,186,168,.85)',1.4);
+   if(priceView?.historical){
+    // Replay genuine OHLC candles AFTER the selected historical timestamp,
+    // so the lower chart cannot accidentally display today's chart data.
+    for(let k=1;k<=scenario.actual.length;k++){
+     const v=scenario.actual[k-1];
+     if(!v||F(k)<left-12||F(k)>left+pw+12)continue;
+     drawDimensionCandle(ctx,v,F(k),pw/slots,Y);
+    }
+    forecastLine(scenario.prices,'rgba(228,233,245,.54)',1);
+   }else{
+    // Historical subsequent percentage change is re-anchored to today's
+    // close; its direction agrees with the real historical continuation.
+    forecastLine(scenario.prices,'rgba(255,215,128,.94)',2.1);
+   }
+   if(show.ma!==false)for(const line of projectedMa)
+    forecastLine(line.values,line.color,1.7);
+   if(show.bb!==false&&projectedBb?.values)
+    for(const key of ['upper','mid','lower'])
+     forecastLine(projectedBb.values.map(v=>v[key]),
+      key==='mid'?'rgba(146,225,202,.95)':'rgba(97,186,168,.85)',1.4);
   }else{
    ctx.fillStyle='#9aacc5';
-   ctx.fillText('예측 계산에 필요한 과거 데이터 부족',
+   ctx.fillText('해당 과거 순위의 이후 가격 데이터가 없어',
     left+pw/2,pt+34,pw-8);
   }
  }
