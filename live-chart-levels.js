@@ -162,33 +162,6 @@ function priceAt(y){
  const local=y-rect.top;
  return s?s.hi-(local-s.top)/(s.priceBottom-s.top)*(s.hi-s.lo):NaN;
 }
-// IPhone PWA-safe confirmation. No exchange mutation before explicit tap.
-function confirmProtectionReplacement(details){
- return new Promise(resolve=>{
-  const existing=document.getElementById('realStopReplacementConfirm');
-  if(existing)existing.remove();
-  const wrap=document.createElement('div');wrap.id='realStopReplacementConfirm';
-  wrap.style.cssText='position:fixed;inset:0;z-index:100120;display:flex;align-items:center;justify-content:center;background:rgba(2,9,19,.91);padding:16px';
-  const card=document.createElement('div');
-  card.style.cssText='width:min(100%,420px);max-height:86dvh;overflow:auto;border-radius:15px;padding:18px;background:#172b43;border:1px solid #6889aa;color:#edf6ff;box-shadow:0 18px 65px #000b';
-  const title=document.createElement('h3');title.textContent=details.title;
-  title.style.cssText='margin:0 0 12px;font-size:18px';
-  const info=document.createElement('p');info.textContent=details.message;
-  info.style.cssText='white-space:pre-line;font-size:13px;line-height:1.7;color:#ceddea';
-  const alert=document.createElement('p');alert.textContent='실제 바이낸스 주문 변경입니다. 기존 주문 취소와 새 주문 등록 사이에 보호 공백이 생길 수 있습니다. 실패하거나 연결이 끊기면 바이낸스 앱에서 즉시 손절 주문을 확인하세요.';
-  alert.style.cssText='font-size:12px;line-height:1.6;color:#ffd29a';
-  const actions=document.createElement('div');actions.style.cssText='display:flex;gap:10px;margin-top:16px';
-  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='취소';
-  const yes=document.createElement('button');yes.type='button';yes.textContent='기존 손절 취소 후 새 가격 등록';
-  for(const button of [cancel,yes])button.style.cssText='flex:1;min-height:48px;border-radius:8px;border:1px solid #54799b;background:#2c4564;color:white;font-size:13px;padding:8px';
-  yes.style.background='#0e7364';yes.style.borderColor='#56cbb4';
-  const close=ok=>{wrap.remove();resolve(ok)};
-  cancel.addEventListener('click',()=>close(false));
-  yes.addEventListener('click',()=>close(true));
-  actions.append(cancel,yes);card.append(title,info,alert,actions);wrap.append(card);
-  document.body.append(wrap);cancel.focus({preventScroll:true});
- });
-}
 function matchingNormalStop(o,p,kind){
  // Older ordinary conditional stop orders are a separate Binance list.
  const expectedSide=side(p)==='LONG'?'SELL':'BUY';
@@ -283,18 +256,13 @@ async function moveProtection(l,raw){
   actionNotice('⚠ 손절 주문 변경 전 검사 실패 · '+String(e?.message||e),true);
   return false;
  }
- const existingDescription=allOld.length?
-  allOld.map(o=>fmt(num(o.triggerPrice??o.stopPrice))+' USDT').join(', '):
-  '없음';
- const accepted=await confirmProtectionReplacement({
-  title:s+' '+(kind==='sl'?'손절':'익절')+' 주문 교체',
-  message:'현재 활성 보호주문 '+allOld.length+'개 · '+existingDescription+
-   '\n새 보호가격 '+fmt(info.snapped)+' USDT'+
-   '\n종류 '+info.oldType+' · 수량 '+fmt(info.qty)+' BTC'+
-   '\n대상: '+s+' '+p.side+' BTCUSDT 주문만 (익절과 반대 포지션 제외)'+
-   '\n모든 이전 '+(kind==='sl'?'손절':'익절')+' 주문을 취소 확인한 후 새 주문 1개만 등록합니다.'
- });
- if(!accepted){actionNotice('보호 주문 변경을 취소했습니다',true);return false;}
+ // The user already explicitly set the stop price by dragging/releasing
+ // the live chart line or pressing the change button in the position editor.
+ // Do not add a second full-screen confirmation dialog here.
+ // Exchange inventory, position, order direction and price are checked above;
+ // below, cancel/verify ALL old matching orders before creating ONE new order.
+ actionNotice('실전 '+s+' '+(kind==='sl'?'손절':'익절')+
+  ' '+info.snapped+' USDT 변경 요청 · 기존 '+allOld.length+'개 취소 확인 후 새 주문 등록');
  requestBusy=true;window.btcProtectionEditBusy=true;
  const reqId='btcp'+(kind==='sl'?'s':'t')+s[0]+Date.now().toString(36);
  const isLimit=['STOP','TAKE_PROFIT'].includes(info.oldType);
