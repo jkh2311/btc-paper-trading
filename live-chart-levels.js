@@ -345,7 +345,9 @@ async function moveProtection(l,raw){
   if(found.length!==1||final.algo.length!==1||final.normal.length!==0||
     Math.abs(num(found[0].triggerPrice)-num(info.snapped))>Math.max(info.step/10,1e-8))
    throw Error('신규 가격으로 단일 활성 주문임을 확인하지 못했습니다');
-  algos=(await signed('GET','/fapi/v1/openAlgoOrders',{symbol})).filter(o=>o.symbol===symbol);
+  const updatedAlgos=openAlgoList(await signed('GET','/fapi/v1/openAlgoOrders',{symbol}));
+  if(!Array.isArray(updatedAlgos))throw Error('신규 주문 활성 확인 후 목록 새로고침 실패');
+  algos=updatedAlgos.filter(o=>o.symbol===symbol);
   readStamp=Date.now();algoError='';
   redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));
   actionNotice('✅ 이전 주문 '+allOld.length+'개 취소 · 새 '+(kind==='sl'?'손절':'익절')+
