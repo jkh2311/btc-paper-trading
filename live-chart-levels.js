@@ -375,8 +375,63 @@ window.btcRequestRealProtectionChange=async({side:direction,positionSide,amount,
  return {ok:verified,message:verified?'바이낸스 보호 주문 변경 및 확인 완료':
   (actionError?actionMessage:'변경이 확인되지 않았습니다. 바이낸스 주문 상태를 다시 확인해 주세요.')};
 };
+// Confirm ONLY live-chart TP/SL drag edits. The position-tab explicit
+// submit action continues using the same guarded Binance replacement engine
+// without a second confirmation. No order is touched before approval.
+let chartDragConfirmOpen=false;
+function confirmChartProtectionDrag(level,newPrice){
+ return new Promise(resolve=>{
+  if(chartDragConfirmOpen){resolve(false);return;}
+  chartDragConfirmOpen=true;
+  const overlay=document.createElement('div');
+  overlay.id='btcChartProtectionDragConfirm';
+  overlay.setAttribute('role','presentation');
+  overlay.style.cssText='position:fixed;inset:0;z-index:100125;background:rgba(2,10,23,.83);display:flex;align-items:center;justify-content:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom))';
+  const panel=document.createElement('div');
+  panel.setAttribute('role','dialog');
+  panel.setAttribute('aria-modal','true');
+  panel.setAttribute('aria-label','차트 손절·익절 가격 변경 확인');
+  panel.style.cssText='width:min(100%,410px);border:1px solid #6688a8;border-radius:15px;background:#172b44;color:#eef6ff;padding:18px;box-shadow:0 15px 55px #000a';
+  const title=document.createElement('strong');
+  title.textContent=level.side+' '+(level.kind==='sl'?'손절':'익절')+' 가격을 변경할까?';
+  title.style.cssText='display:block;font-size:18px;margin-bottom:15px';
+  const prices=document.createElement('p');
+  prices.textContent=fmt(level.price)+' USDT  →  '+fmt(newPrice)+' USDT';
+  prices.style.cssText='font-size:18px;font-weight:700;color:#b8f7e6;margin:4px 0 12px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere';
+  const caption=document.createElement('p');
+  caption.textContent='변경을 누르면 바이낸스의 기존 '+(level.kind==='sl'?'손절':'익절')+' 주문 취소 확인 후 새 가격 등록을 시도합니다. 잠시 보호 공백이 생길 수 있습니다.';
+  caption.style.cssText='font-size:12px;line-height:1.65;color:#bdd0e5;margin:0 0 16px';
+  const actions=document.createElement('div');
+  actions.style.cssText='display:flex;gap:9px';
+  const no=document.createElement('button'),yes=document.createElement('button');
+  no.type=yes.type='button';no.textContent='취소';yes.textContent='변경';
+  for(const btn of [no,yes])btn.style.cssText='flex:1;min-height:47px;border:1px solid #6e8fac;border-radius:9px;background:#294363;color:#fff;font-size:15px;font-weight:650';
+  yes.style.background='#087c6c';yes.style.borderColor='#55c8b2';
+  const previousFocus=document.activeElement;
+  const finishConfirm=ok=>{
+   document.removeEventListener('keydown',onKey,true);
+   overlay.remove();chartDragConfirmOpen=false;
+   if(previousFocus?.isConnected&&typeof previousFocus.focus==='function')
+    previousFocus.focus({preventScroll:true});
+   resolve(ok);
+  };
+  const onKey=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();finishConfirm(false)}};
+  no.addEventListener('click',()=>finishConfirm(false),{once:true});
+  yes.addEventListener('click',()=>finishConfirm(true),{once:true});
+  document.addEventListener('keydown',onKey,true);
+  actions.append(no,yes);panel.append(title,prices,caption,actions);
+  overlay.append(panel);document.body.append(overlay);
+  no.focus({preventScroll:true});
+ });
+}
+async function confirmThenMoveChartProtection(level,price){
+ const approved=await confirmChartProtectionDrag(level,price);
+ if(!approved){actionNotice('차트 손절·익절 가격 변경 취소 · 기존 주문 유지');return;}
+ if(document.hidden){actionNotice('앱이 백그라운드여서 보호 가격 변경을 중단했습니다',true);return;}
+ await moveProtection(level,price);
+}
 function start(x,y){
- if(requestBusy||document.hidden)return false;
+ if(requestBusy||chartDragConfirmOpen||document.hidden)return false;
  const l=touchHit(x,y);if(!l)return false;
  drag={level:l,startY:y,price:l.price,moved:false};
  actionNotice('↕ '+l.side+' '+(l.kind==='sl'?'손절':'익절')+'선 선택됨 · 위아래로 이동 후 놓으면 변경 확인창이 뜹니다');
@@ -394,8 +449,8 @@ function finish(cancel=false){
  const d=drag;drag=null;redraw();
  if(cancel||!d)return;
  if(d.moved&&Math.abs(d.price-d.level.price)>=.01){
-  actionNotice('보호 가격 '+fmt(d.price)+' USDT · 주문 변경 확인 대기');
-  void moveProtection(d.level,d.price);return;}
+  actionNotice('손절·익절 가격 변경 확인 대기 · 변경을 누르기 전에는 거래소 주문 유지');
+  void confirmThenMoveChartProtection(d.level,d.price);return;}
  // A tap opens a precise-price editor; drag still offers direct placement.
  const requested=prompt(d.level.side+' '+(d.level.kind==='sl'?'손절':'익절')+
   ' 가격 입력 (USDT) · 바이낸스 실제 조건부 주문을 변경합니다',String(Math.round(d.level.price*10)/10));
