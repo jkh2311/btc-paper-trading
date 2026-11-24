@@ -255,7 +255,8 @@ function editRealProtection(p,side,kind){
  const meta=make('p','포지션 '+fmt(size,8)+' BTC · 진입가 '+fmt(p.entry,2)+' USDT');
  meta.style.cssText='font-size:12px;line-height:1.6;color:#bdd0e5;margin:0 0 9px';
  const currentLabel=make('p',live.fresh?
-  (Number.isFinite(current)&&current>0?'바이낸스 현재 등록 가격 '+fmt(current,2)+' USDT':'거래소 보호 주문 미등록 · 신규 등록'):
+  (!isTp&&live.slCount>1?'⚠ 동일 포지션 손절 '+live.slCount+'개 중복 · 교체 확인 시 기존 손절 모두 취소':
+   Number.isFinite(current)&&current>0?'바이낸스 현재 등록 가격 '+fmt(current,2)+' USDT':'거래소 보호 주문 미등록 · 신규 등록'):
   '바이낸스 보호 주문 최신 조회 필요 · 확인 전 변경 불가');
  currentLabel.style.cssText='font-size:12px;color:#c8d9ed;line-height:1.5;margin:0 0 13px';
  const label=make('label',name+' 목표 가격 (USDT)');
@@ -313,9 +314,11 @@ function editRealProtection(p,side,kind){
    live=window.btcRealProtectionSnapshot?.(p)||{fresh:false};
    current=isTp?live.tp:live.sl;
    currentLabel.textContent=live.fresh?
-    (Number.isFinite(current)&&current>0?
-     '바이낸스 현재 등록 가격 '+fmt(current,2)+' USDT':
-     '보호 주문 미등록 · 새 주문 등록 가능'):
+    (!isTp&&live.slCount>1?'⚠ 동일 포지션 손절 '+live.slCount+
+     '개 중복 · 교체 확인 시 기존 손절 모두 취소':
+     Number.isFinite(current)&&current>0?
+      '바이낸스 현재 등록 가격 '+fmt(current,2)+' USDT':
+      '보호 주문 미등록 · 새 주문 등록 가능'):
     '바이낸스 조회 실패 · '+(result?.message||'API 연결 확인 필요');
    if(!input.value.trim()&&Number.isFinite(current)&&current>0)
     input.value=String(current);
@@ -450,7 +453,8 @@ function render(){
   const expected=(kind,price)=>{
    const isTp=kind==='tp';
    const box=make('div',undefined,isTp?'tp':'sl');
-   box.append(make('small',isTp?'익절 시 예상 손익':'손절 시 예상 손익'));
+   box.append(make('small',isTp?'익절 시 예상 손익':
+     '손절 시 예상 손익'+(protection.slCount>1?' · ⚠ '+protection.slCount+'개 중복':'')));
    const valid=protection.fresh&&Number.isFinite(price)&&price>0&&p.entry>0&&size>0;
    const signedSize=selection==='LONG'?size:-size;
    const gross=valid?(price-p.entry)*signedSize:NaN;
