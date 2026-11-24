@@ -3424,11 +3424,27 @@ function paintLivePrice(){
     el.classList.toggle('pnl-positive',pnl>0);el.classList.toggle('pnl-negative',pnl<0);
   }
 }
+let patternComparePaintQueued=false,lastPatternComparePaintAt=0;
 function scheduleLivePaint(){
   if(document.visibilityState==='hidden')return;
   if(!pricePaintQueued){
     pricePaintQueued=true;
     pricePaintTimer=setTimeout(paintLivePrice,Math.max(0,80-(Date.now()-lastPricePaintAt)));
+  }
+  // The fullscreen comparison is its own canvas. Repaint it from the
+  // exact same websocket trade stream instead of waiting 12 seconds for
+  // an independent timer; throttle to avoid iPhone rendering overload.
+  if(patternComparison&&!$('patternCompare')?.hidden&&!patternComparePaintQueued){
+    patternComparePaintQueued=true;
+    setTimeout(()=>{
+      patternComparePaintQueued=false;
+      if(patternComparison&&!$('patternCompare')?.hidden&&
+         document.visibilityState==='visible'){
+       refreshPatternComparisonCandles();
+       renderPatternComparison();
+      }
+    },Math.max(0,260-(Date.now()-lastPatternComparePaintAt)));
+    lastPatternComparePaintAt=Date.now();
   }
   if($('page-chart').classList.contains('active')&&!chartPaintQueued){
     chartPaintQueued=true;
@@ -6720,12 +6736,35 @@ function patternCompareNearestIndex(bars,t){
 // OHLCV without changing the historical comparison anchor or placing orders.
 function refreshPatternComparisonCandles(){
  const state=patternComparison;if(!state||demo)return;
- const live=state.tf==='1m'?(minuteChartArchive?.length?minuteChartArchive:candles['1m']):
-  candles[state.tf];
- if(!Array.isArray(live)||!live.length)return;
- const old=state.bars,oldLast=old.at(-1),newLast=live.at(-1);
- if(!newLast||!oldLast||newLast.t<oldLast.t)return;
- if(newLast.t===oldLast.t&&newLast.c===oldLast.c&&newLast.h===oldLast.h&&newLast.l===oldLast.l)return;
+ // Prefer whichever live source has the newest complete/in-progress
+ // candle; the 1m archive and normal timeframe arrays may update at
+ // different rates. Keep ALL historic ranking snapshots untouched.
+ const main=candles[state.tf];
+ const archive=state.tf==='1m'?minuteChartArchive:null;
+ let live=Array.isArray(main)&&main.length?main:null;
+ if(Array.isArray(archive)&&archive.length&&
+    (!live||archive.at(-1).t>live.at(-1).t))live=archive;
+ if(!live?.length)return;
+ const old=state.bars,oldLast=old.at(-1),rawLast=live.at(-1);
+ if(!rawLast||!oldLast||rawLast.t<oldLast.t)return;
+ // The live trade websocket updates the main candle before this callback.
+ // Copy the newest actual price into this comparison's own snapshot.
+ let newLast=rawLast;
+ if(last>0&&Date.now()-lastTickAt<8000&&latestTradeEventAt>0&&
+    candleOpenTime(state.tf,latestTradeEventAt)===rawLast.t){
+  newLast={...rawLast,c:last,h:Math.max(rawLast.h,last),
+   l:Math.min(rawLast.l,last)};
+ }
+ if(newLast.t===oldLast.t){
+  if(newLast.c!==oldLast.c||newLast.h!==oldLast.h||
+     newLast.l!==oldLast.l||newLast.v!==oldLast.v){
+   // No expensive history merge or index remap on every tick.
+   old[old.length-1]={...oldLast,...newLast};
+   const current=state.views.current;
+   current.replayKey=null;
+  }
+  return;
+ }
  const anchorTimes={};
  for(const which of ['current','historical']){
   const view=state.views[which];
@@ -6737,6 +6776,7 @@ function refreshPatternComparisonCandles(){
  }
  const rankedTimes=state.matches.map(m=>old[m.index]?.t??m.time);
  const merged=mergeDailyCandles(old,live);
+ if(merged.at(-1)?.t===newLast.t)merged[merged.length-1]={...merged.at(-1),...newLast};
  if(!merged.length)return;
  state.bars=merged;
  // Rebase EVERY rank after new candles or restored cache rows are merged.
