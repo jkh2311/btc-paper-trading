@@ -238,8 +238,8 @@ function normalize(details){
 // NEVER changed locally: the shared chart-protection engine must confirm them.
 function editRealProtection(p,side,kind){
  const isTp=kind==='tp',name=isTp?'익절':'손절';
- const live=window.btcRealProtectionSnapshot?.(p)||{fresh:false};
- const current=isTp?live.tp:live.sl;
+ let live=window.btcRealProtectionSnapshot?.(p)||{fresh:false};
+ let current=isTp?live.tp:live.sl;
  const size=Math.abs(p.amount),signedSize=side==='LONG'?size:-size;
  const margin=Number.isFinite(p.margin)&&p.margin>0?p.margin:
   p.entry>0&&p.leverage>0?size*p.entry/p.leverage:NaN;
@@ -271,6 +271,9 @@ function editRealProtection(p,side,kind){
  warning.style.cssText='font-size:11px;line-height:1.65;color:#e2c69b;margin:8px 0 14px';
  const error=make('p');error.setAttribute('role','status');
  error.style.cssText='min-height:20px;font-size:12px;white-space:pre-line;color:#ffb3bc;line-height:1.5';
+ const refreshProtection=make('button','바이낸스 보호 주문 새로고침');
+ refreshProtection.type='button';
+ refreshProtection.style.cssText='width:100%;min-height:34px;margin:0 0 9px;padding:6px;background:#263f5d;border:1px solid #55799d;border-radius:8px;color:#edf6ff;font-size:12px';
  const buttons=make('div');buttons.style.cssText='display:flex;gap:10px';
  const cancel=make('button','취소');cancel.type='button';
  const apply=make('button','바이낸스 '+name+' 가격 변경');apply.type='button';
@@ -297,7 +300,31 @@ function editRealProtection(p,side,kind){
   apply.disabled=!allowed||!live.fresh;
   return {price,allowed};
  }
- let closed=false,sending=false;
+ let closed=false,sending=false,refreshBusy=false;
+ async function refreshExchangeProtection(){
+  if(closed||sending||refreshBusy)return;
+  refreshBusy=true;refreshProtection.disabled=true;
+  currentLabel.textContent='바이낸스 실제 보호 주문 조회 중…';
+  try{
+   if(typeof window.btcRefreshRealProtection!=='function')
+    throw Error('실전 보호 주문 조회 모듈이 연결되지 않았습니다');
+   const result=await window.btcRefreshRealProtection();
+   if(closed)return;
+   live=window.btcRealProtectionSnapshot?.(p)||{fresh:false};
+   current=isTp?live.tp:live.sl;
+   currentLabel.textContent=live.fresh?
+    (Number.isFinite(current)&&current>0?
+     '바이낸스 현재 등록 가격 '+fmt(current,2)+' USDT':
+     '보호 주문 미등록 · 새 주문 등록 가능'):
+    '바이낸스 조회 실패 · '+(result?.message||'API 연결 확인 필요');
+   if(!input.value.trim()&&Number.isFinite(current)&&current>0)
+    input.value=String(current);
+   compute();
+  }catch(e){
+   if(!closed)currentLabel.textContent='보호 주문 조회 실패 · '+String(e?.message||e);
+  }finally{refreshBusy=false;refreshProtection.disabled=false;}
+ }
+ refreshProtection.addEventListener('click',()=>{void refreshExchangeProtection()});
  function dismiss(){if(closed||sending)return;closed=true;overlay.remove();document.removeEventListener('keydown',keyHandler,true);}
  const keyHandler=e=>{if(e.key==='Escape'&&!sending){e.preventDefault();dismiss()}};
  document.addEventListener('keydown',keyHandler,true);
@@ -324,9 +351,11 @@ function editRealProtection(p,side,kind){
   error.textContent=response?.message||'바이낸스 주문 상태를 확인한 후 다시 시도하세요.';
   input.disabled=false;cancel.disabled=false;compute();
  };
- dialog.append(title,meta,currentLabel,label,projection,warning,error,buttons);
+ dialog.append(title,meta,currentLabel,refreshProtection,label,projection,warning,error,buttons);
  buttons.append(cancel,apply);
  overlay.append(dialog);document.body.append(overlay);compute();input.focus();
+ // Never allow changes based on an expired exchange-protection snapshot.
+ if(!live.fresh)void refreshExchangeProtection();
 }
 function render(){
  root.replaceChildren();
