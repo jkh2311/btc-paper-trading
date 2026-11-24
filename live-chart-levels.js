@@ -109,7 +109,7 @@ window.btcDrawLiveLevels=(ctx,scale)=>{
  }
 };
 async function readAlgos(){
- if(readBusy||requestBusy||document.hidden||!creds()?.apiKey)return;
+ if(readBusy||requestBusy||document.hidden||!creds()?.apiKey)return false;
  readBusy=true;const id=++epoch;
  try{
   const r=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
@@ -117,10 +117,16 @@ async function readAlgos(){
   if(!a)throw Error('조건부 주문 응답 형식 오류');
   if(id===epoch){algos=a.filter(o=>o.symbol===symbol);algoError='';readStamp=Date.now();
    if(positions.length)note('실전 진입선 / 손절·익절선 · 손절·익절선 길게 누르거나 드래그하여 실제 가격 변경');
-   redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));}
- }catch(e){if(id===epoch){algoError=String(e?.message||e);if(!actionMessage)note('⚠ 보호 주문 조회 실패 · '+algoError,true);redraw();}}
+   redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));return true;}
+ }catch(e){if(id===epoch){algoError=String(e?.message||e);note('⚠ 보호 주문 조회 실패 · '+algoError,true);redraw();}return false;}
  finally{readBusy=false;}
 }
+window.btcRefreshRealProtection=async()=>{
+ const ok=await readAlgos();
+ return {ok:ok===true,fresh:!algoError&&Date.now()-readStamp<15000,
+  message:ok===true?'바이낸스 보호주문 조회 완료':
+   (algoError||'API 잠금 또는 보호주문 조회 진행 중 · 잠시 후 다시 시도해 줘')};
+};
 document.addEventListener('btc:real-account-updated',e=>{
  const d=e.detail;if(!d||!Array.isArray(d.positions)||!Number.isFinite(d.at))return;
  positions=d.positions.map(p=>({...p,amount:num(p.amount),entry:num(p.entry),mark:num(p.mark)}))
@@ -135,9 +141,9 @@ function scaleNow(){return window.btcLiveScale||null;}
 function touchHit(x,y){
  const scale=scaleNow();if(!scale||!positions.length||document.hidden)return null;
  const rect=chart.getBoundingClientRect(),px=x-rect.left,py=y-rect.top;
- if(px<0||px>scale.plotW||py<scale.top-26||py>scale.priceBottom+26||!(scale.hi>scale.lo))return null;
+ if(px<0||px>scale.plotW||py<scale.top-35||py>scale.priceBottom+35||!(scale.hi>scale.lo))return null;
  return levels().filter(l=>l.kind!=='entry'&&chartVisible(l.kind)).map(l=>({l,dist:Math.abs(py-(scale.top+(scale.hi-l.price)/(scale.hi-scale.lo)*(scale.priceBottom-scale.top)))}))
-  .filter(x=>x.dist<=26).sort((a,b)=>a.dist-b.dist||(b.l.active?1:0)-(a.l.active?1:0))[0]?.l||null;
+  .filter(x=>x.dist<=35).sort((a,b)=>a.dist-b.dist||(b.l.active?1:0)-(a.l.active?1:0))[0]?.l||null;
 }
 // The parent chart drawing tool must defer when an actual TP/SL line is hit.
 window.btcRealProtectionHit=(x,y)=>!!touchHit(x,y);
@@ -154,7 +160,11 @@ async function moveProtection(l,raw){
  if(!(mark>0&&targetRaw>0))return note('현재 마크가 확인 후 다시 시도하세요',true);
  const valid=s==='LONG'?(kind==='sl'?targetRaw<mark:targetRaw>mark):(kind==='sl'?targetRaw>mark:targetRaw<mark);
  if(!valid)return note('손절·익절 가격이 현재 마크가의 잘못된 방향입니다',true);
- if(algoError||Date.now()-readStamp>15000)return note('바이낸스 조건부 주문이 최신 상태가 아닙니다. 재조회 후 시도하세요.',true);
+ if(algoError||Date.now()-readStamp>15000){
+   const ok=await readAlgos();
+   if(!ok||algoError||Date.now()-readStamp>15000)
+    return note('바이낸스 조건부 주문 최신 조회 실패 · '+(algoError||'API 연결을 확인해 주세요'),true);
+  }
  let tick='0.1',marketLot=null;
  try{
   const r=await fetch(api+'/fapi/v1/exchangeInfo?symbol='+symbol,{cache:'no-store'});
@@ -196,29 +206,35 @@ async function moveProtection(l,raw){
    (kind==='sl'?Number(snapped)>liveMark:Number(snapped)<liveMark);
   if(!(liveMark>0&&validNow))throw Error('마크가 변동으로 지정 가격이 유효하지 않습니다');
     const oldType=String(current?.orderType||current?.type||'');
-  const limitKind=oldType==='STOP'||oldType==='TAKE_PROFIT'||!current;
-  const type=current?oldType:(kind==='sl'?'STOP':'TAKE_PROFIT');
+  const limitKind=oldType==='STOP'||oldType==='TAKE_PROFIT';
+  // Missing protection must register as market close-all, not a stop-limit
+  // that can remain unfilled after the stop is triggered.
+  const type=current?oldType:(kind==='sl'?'STOP_MARKET':'TAKE_PROFIT_MARKET');
   if(current&&!['STOP','TAKE_PROFIT','STOP_MARKET','TAKE_PROFIT_MARKET'].includes(type))
    throw Error('지원되지 않는 거래소 보호주문 종류 · 변경 중단');
   const newId='btcp'+(kind==='sl'?'s':'t')+s[0]+Date.now().toString(36);
   const req={algoType:'CONDITIONAL',symbol,side:s==='LONG'?'SELL':'BUY',positionSide:p.side,type,
    triggerPrice:snapped,workingType:current?.workingType||'MARK_PRICE',clientAlgoId:newId};
-  if(limitKind){
+  const closeAll=current?.closePosition===true||
+   current?.closePosition==='true'||current?.closePosition===1;
+  if(limitKind||current&&!closeAll){
+   // Preserve the existing exchange order's execution type and quantity.
    const qty=Math.abs(Number(live.positionAmt)),oldQty=num(current?.quantity);
    if(!(qty>0)||current&&(!(oldQty>0)||oldQty>qty+1e-8))
-    throw Error('바이낸스 지정가 청산 수량 확인 실패 · 주문 교체 중단');
+    throw Error('기존 보호주문의 유효한 청산 수량을 확인할 수 없어 변경을 중단합니다');
    const qtyStep=num(marketLot?.stepSize),qtyMin=num(marketLot?.minQty);
    const useQty=current?oldQty:qty;
    if(!(qtyStep>0&&qtyMin>0&&useQty>=qtyMin&&
      Math.abs(useQty/qtyStep-Math.round(useQty/qtyStep))<1e-6))
-    throw Error('지정가 보호주문 수량 단위 불일치 · 변경 중단');
+    throw Error('바이낸스 손절 주문의 수량 단위가 맞지 않아 변경을 중단합니다');
    req.quantity=String(useQty);
-   req.price=snapped;req.timeInForce=current?.timeInForce||'GTC';
+   if(limitKind){
+    req.price=snapped;
+    req.timeInForce=current?.timeInForce||'GTC';
+   }
    if(p.side==='BOTH')req.reduceOnly='true';
   }else{
-   // Keep the existing market-style Close-All semantics (no quantity).
-   if(!(current?.closePosition===true||current?.closePosition==='true'))
-    throw Error('현재 시장가 보호주문이 전체 청산 주문인지 확인되지 않습니다');
+   // Existing market close-all order or missing TP/SL being registered.
    req.closePosition='true';
   }
   // Binance -4130 rejects a second GTE closePosition conditional order in
@@ -331,8 +347,11 @@ window.btcRequestRealProtectionChange=async({side:direction,positionSide,amount,
  const pos=positions.find(p=>p.side===positionSide&&side(p)===direction&&
   Math.abs(num(p.amount)-Number(amount))<1e-8);
  if(!pos)return {ok:false,message:'실제 포지션 수량 또는 방향이 변경되었습니다. 계좌 새로고침 후 다시 시도하세요.'};
- if(algoError||Date.now()-readStamp>15000)
-  return {ok:false,message:'거래소 보호 주문 조회가 최신 상태가 아닙니다. 새로고침 후 다시 시도하세요.'};
+ if(algoError||Date.now()-readStamp>15000){
+  const ok=await readAlgos();
+  if(!ok||algoError||Date.now()-readStamp>15000)
+   return {ok:false,message:'바이낸스 보호주문 조회 실패 · '+(algoError||'API 잠금이나 네트워크를 확인해 주세요')};
+ }
  const current=getProtection(pos,kind);
  const oldPrice=num(current?.triggerPrice);
  if(Number.isFinite(oldPrice)&&Math.abs(oldPrice-target)<1e-8)
@@ -345,7 +364,7 @@ window.btcRequestRealProtectionChange=async({side:direction,positionSide,amount,
   num(active?.triggerPrice)>0&&Math.abs(num(active.triggerPrice)-target)<=
     Math.max(1e-6,target*.00001);
  return {ok:verified,message:verified?'바이낸스 보호 주문 변경 및 확인 완료':
-  '변경이 확인되지 않았습니다. 차트 안내와 바이낸스 주문 상태를 확인하세요.'};
+  (actionError?actionMessage:'변경이 확인되지 않았습니다. 바이낸스 주문 상태를 다시 확인해 주세요.')};
 };
 function start(x,y){
  if(requestBusy||document.hidden)return false;
