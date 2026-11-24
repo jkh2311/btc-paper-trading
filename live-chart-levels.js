@@ -51,7 +51,9 @@ window.btcRealProtectionSnapshot=position=>{
  const fresh=!algoError&&Date.now()-readStamp<16000;
  if(!fresh)return {fresh:false,tp:null,sl:null};
  const tp=getProtection(current,'tp'),sl=getProtection(current,'sl');
- return {fresh:true,tp:tp?num(tp.triggerPrice):null,sl:sl?num(sl.triggerPrice):null};
+ return {fresh:true,tp:tp?num(tp.triggerPrice):null,sl:sl?num(sl.triggerPrice):null,
+  slCount:algos.filter(a=>matching(a,current,'sl')).length,
+  tpCount:algos.filter(a=>matching(a,current,'tp')).length};
 };
 function levels(){
  const list=[];
@@ -116,7 +118,15 @@ async function readAlgos(){
   const a=openAlgoList(r);
   if(!a)throw Error('조건부 주문 응답 형식 오류');
   if(id===epoch){algos=a.filter(o=>o.symbol===symbol);algoError='';readStamp=Date.now();
-   if(positions.length)note('실전 진입선 / 손절·익절선 · 손절·익절선 길게 누르거나 드래그하여 실제 가격 변경');
+   if(positions.length){
+    const duplicates=positions.flatMap(p=>{
+     const sl=algos.filter(a=>matching(a,p,'sl'));
+     return sl.length>1?[side(p)+' 손절 '+sl.length+'개']:[];
+    });
+    if(duplicates.length)note('⚠ 바이낸스 중복 손절 감지 · '+duplicates.join(' / ')+
+     ' · 손절가 교체 시 기존 동일 방향 주문을 모두 취소 확인 후 하나만 등록',true);
+    else note('실전 진입선 / 손절·익절선 · 손절·익절선 길게 누르거나 드래그하여 실제 가격 변경');
+   }
    redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));return true;}
  }catch(e){if(id===epoch){algoError=String(e?.message||e);note('⚠ 보호 주문 조회 실패 · '+algoError,true);redraw();}return false;}
  finally{readBusy=false;}
