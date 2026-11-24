@@ -155,7 +155,8 @@ function priceAt(y){
 async function moveProtection(l,raw){
  if(requestBusy)return;
  actionMessage='';actionError=false;
- const s=l.side,p=l.p,kind=l.kind,current=getProtection(p,kind);
+ const s=l.side,p=l.p,kind=l.kind;
+  let current=getProtection(p,kind);
  const mark=num(p.mark),targetRaw=raw;
  if(!(mark>0&&targetRaw>0))return note('현재 마크가 확인 후 다시 시도하세요',true);
  const valid=s==='LONG'?(kind==='sl'?targetRaw<mark:targetRaw>mark):(kind==='sl'?targetRaw>mark:targetRaw<mark);
@@ -164,6 +165,9 @@ async function moveProtection(l,raw){
    const ok=await readAlgos();
    if(!ok||algoError||Date.now()-readStamp>15000)
     return note('바이낸스 조건부 주문 최신 조회 실패 · '+(algoError||'API 연결을 확인해 주세요'),true);
+   // Fresh exchange orders may differ from the cached drag hit target.
+   // Never cancel/register based on a stale old algo ID.
+   current=getProtection(p,kind);
   }
  let tick='0.1',marketLot=null;
  try{
