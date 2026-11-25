@@ -6357,6 +6357,32 @@ function patternProjectToTimeframe(sourceBars,sourceIndex,sourceRank,sourceTf,
   // close; use the fixed source scenario's RELATIVE subsequent movement.
   prices.push(currentClose*(projected/base.prices[0]));
  }
+ // Build scenario-only OHLC for a target candle by aggregating the
+ // original source forecast knots within the target time boundary.
+ // These are NOT market OHLC candles, and fine periods have no invented
+ // intra-source variation beyond straight-line interpolation.
+ const projectedOhlc=[];
+ const sourcePriceAt=t=>{
+  if(t<=sourceTimes[0])return base.prices[0];
+  if(t>=sourceTimes.at(-1))return base.prices.at(-1);
+  let low=0,high=sourceTimes.length-1;
+  while(low+1<high){const m=(low+high)>>1;
+   if(sourceTimes[m]<t)low=m;else high=m;
+  }
+  const frac=(t-sourceTimes[low])/(sourceTimes[high]-sourceTimes[low]);
+  return base.prices[low]+(base.prices[high]-base.prices[low])*frac;
+ };
+ let prevPrice=currentClose,prevTime=Math.max(sourceStart,targetStart);
+ for(let k=1;k<prices.length;k++){
+  const time=nextCandleTime(targetTf,targetStart,k),points=[prevPrice,prices[k]];
+  for(let j=1;j<sourceTimes.length;j++){
+   if(sourceTimes[j]>prevTime&&sourceTimes[j]<=time)
+    points.push(currentClose*base.prices[j]/base.prices[0]);
+  }
+  projectedOhlc.push({t:time,o:prevPrice,c:prices[k],
+   h:Math.max(...points),l:Math.min(...points),projected:true});
+  prevPrice=prices[k];prevTime=time;
+ }
  const ma=[];
  const periods=targetTf==='1M'||targetTf==='1w'?
   indicatorPatternConfig(targetTf).ma:
@@ -6387,7 +6413,8 @@ function patternProjectToTimeframe(sourceBars,sourceIndex,sourceRank,sourceTf,
    bb.push({mid,upper:mid+2*sd,lower:mid-2*sd});
   }
  }
- return {prices,ma,bb,actual:[],available:prices.length-1,historical:false,
+ return {prices,ma,bb,actual:[],ohlc:projectedOhlc,
+  available:prices.length-1,historical:false,
   originalTf:sourceTf,displayTf:targetTf,interpolated:finer,
   sourceAvailable:base.available,sourceEnd:endTime,
   truncated:prices.length-1===maxOutput&&
@@ -6598,6 +6625,26 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
     }
     forecastLine(scenario.prices,'rgba(228,233,245,.54)',1);
    }else{
+    // Scenario-only target candles use source-forecast OHLC envelopes.
+    // Render transparently with dashed edges to distinguish projections
+    // from actual Binance candles, and show the original dashed path.
+    if(scenario.ohlc?.length){
+     const candleW=Math.max(1.3,Math.min(9,pw/slots*.56));
+     for(let k=1;k<=scenario.ohlc.length&&k<=futureCount;k++){
+      const v=scenario.ohlc[k-1],x=F(k);
+      if(x<left-10||x>left+pw+10)continue;
+      const up=v.c>=v.o;
+      ctx.save();ctx.strokeStyle=up?'rgba(104,226,186,.85)':
+       'rgba(255,140,158,.85)';
+      ctx.fillStyle=up?'rgba(48,178,137,.16)':'rgba(240,91,113,.16)';
+      ctx.lineWidth=1;ctx.setLineDash([2,3]);
+      ctx.beginPath();ctx.moveTo(x,Y(v.h));ctx.lineTo(x,Y(v.l));ctx.stroke();
+      const y0=Math.min(Y(v.o),Y(v.c)),bodyH=Math.max(1.3,Math.abs(Y(v.o)-Y(v.c)));
+      ctx.fillRect(x-candleW/2,y0,candleW,bodyH);
+      ctx.strokeRect(x-candleW/2,y0,candleW,bodyH);
+      ctx.restore();
+     }
+    }
     // Historical subsequent percentage change is re-anchored to today's
     // close; its direction agrees with the real historical continuation.
     forecastLine(scenario.prices,'rgba(255,215,128,.94)',2.1);
@@ -6873,6 +6920,14 @@ async function choosePatternCurrentDisplay(tf){
   view.inspectIndex=null;view.inspectFutureOffset=null;view.inspectPrice=null;
   view.replayKey=null;view.replaySource=null;
   renderPatternComparison();
+  const replay=view.replayScenario;
+  if(status)status.textContent=tf===state.tf?
+   '원본 '+SIMILAR_PATTERN_LABELS[tf]+' 예측 그대로 표시':
+   '원본 '+SIMILAR_PATTERN_LABELS[state.tf]+' → '+SIMILAR_PATTERN_LABELS[tf]+
+    ' · 이후 '+(replay?.available||0)+'봉'+
+    (replay?.interpolated?' · 중간 경로는 선형 보간':' · 원본 흐름을 시간대로 집계')+
+    (replay?.truncated?' · 표시 최대 2000봉까지':'')+
+    (!(replay?.available>0)?' · 예측 기간이 짧아 완성 구간 없음':'');
  }catch(e){
   if(requestId===state.displayRequestId&&patternComparison===state){
    if(status)status.textContent='시간봉 전환 실패: '+String(e?.message||e);
