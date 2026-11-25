@@ -6874,8 +6874,14 @@ function refreshPatternCurrentTarget(){
  if(tf===state.tf)return;
  let updated=candles[tf]||[];
  if(tf==='1m'&&minuteChartArchive?.length){
-  if(!updated.length||minuteChartArchive.at(-1).t>=updated.at(-1).t){
-   updated=minuteChartArchive;
+  const archival=minuteChartArchive,archLast=archival.at(-1),liveLast=updated.at(-1);
+  if(!liveLast||archLast.t>liveLast.t)updated=archival;
+  else if(archLast.t===liveLast.t){
+   // The historic archive can lag the exchange's in-progress minute bar.
+   // Preserve archived history while displaying the fresher websocket OHLC.
+   updated=(archLast.c!==liveLast.c||archLast.h!==liveLast.h||
+    archLast.l!==liveLast.l||archLast.v!==liveLast.v)?
+    [...archival.slice(0,-1),{...archLast,...liveLast}]:archival;
   }
  }
  if(!Array.isArray(updated)||!updated.length)return;
