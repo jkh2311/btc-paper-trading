@@ -6758,26 +6758,30 @@ function patternCompareView(which){
 }
 function patternCompareLimit(view){
  if(!patternComparison||!view)return 0;
- return Math.max(0,Math.min(patternComparison.bars.length-1,view.index));
+ const source=view===patternComparison.views.current?
+  patternDisplayBars(patternComparison):patternComparison.bars;
+ return Math.max(0,Math.min(source.length-1,view.index));
 }
 function patternCompareSetIndex(which,index){
  const state=patternComparison,view=patternCompareView(which);
  if(!view||!state)return;
  const i=Math.round(Number(index));
  if(!Number.isFinite(i))return;
- const warmup=Math.max(state.config.bb,...state.config.ma,
-   state.config.rmiLength+state.config.rmiMomentum)+2;
- // Always leave room for the selected number of visible candles AND MA
- // warmup; otherwise panning near the oldest archived candle goes blank.
- const firstAllowed=Math.min(state.bars.length-1,warmup+view.count-1);
+ const source=which==='current'?patternDisplayBars(state):state.bars;
+ if(!source?.length)return;
+ const config=which==='current'?
+  indicatorPatternConfig(patternDisplayTf(state)):state.config;
+ const warmup=Math.max(config.bb,...config.ma,
+   config.rmiLength+config.rmiMomentum)+2;
+ const firstAllowed=Math.min(source.length-1,warmup+view.count-1);
  if(which==='historical'){
   // Historical pane is a normal, unprojected market chart: scroll freely
   // across EVERY genuine candle available for the chosen timeframe.
-  view.index=Math.max(firstAllowed,Math.min(state.bars.length-1,i));
+  view.index=Math.max(firstAllowed,Math.min(source.length-1,i));
   view.futureShift=0;
  }else{
   // Only the current pane uses the selected rank's future analogue path.
-  const anchor=Math.max(firstAllowed,Math.min(state.bars.length-1,view.baseIndex));
+  const anchor=Math.max(firstAllowed,Math.min(source.length-1,view.baseIndex));
   // Permit inspecting future TIMES beyond the historical analogue's
   // available subsequent candles. Those extra slots are EMPTY, never
   // invented future prices. Horizontally scroll up to 2,000 future bars.
@@ -6790,12 +6794,12 @@ function patternCompareSetIndex(which,index){
 }
 function patternCompareSetCount(which,count){
  const view=patternCompareView(which);if(!view)return;
- const minWarmup=Math.max(patternComparison.config.bb,
-   ...patternComparison.config.ma,
-   patternComparison.config.rmiLength+patternComparison.config.rmiMomentum)+2;
- // Never jump away from the inspected historical match when zooming out.
- // Limit the visible count to bars with enough preceding indicator warmup.
- const maxCount=Math.max(10,Math.min(300,patternComparison.bars.length-minWarmup,
+ const config=which==='current'?
+  indicatorPatternConfig(patternDisplayTf(patternComparison)):patternComparison.config;
+ const source=which==='current'?patternDisplayBars(patternComparison):patternComparison.bars;
+ const minWarmup=Math.max(config.bb,...config.ma,
+   config.rmiLength+config.rmiMomentum)+2;
+ const maxCount=Math.max(10,Math.min(300,source.length-minWarmup,
   view.index-minWarmup+1));
  view.count=Math.max(10,Math.min(maxCount,Math.round(count)));
  patternCompareSetIndex(which,view.index+(view.futureShift||0));
@@ -6814,6 +6818,70 @@ function patternCompareNearestIndex(bars,t){
 }
 // Keep the "current" comparison in sync with the main chart's latest real
 // OHLCV without changing the historical comparison anchor or placing orders.
+// Update only the visual source of the upper chart, independent of the
+// source timeframe used to rank historical examples. Preserve scroll if the
+// user is looking at older target candles; follow newest when at newest.
+function refreshPatternCurrentTarget(){
+ const state=patternComparison;if(!state)return;
+ const view=state.views.current,tf=view.displayTf||state.tf;
+ if(tf===state.tf)return;
+ let updated=candles[tf]||[];
+ if(tf==='1m'&&minuteChartArchive?.length){
+  if(!updated.length||minuteChartArchive.at(-1).t>=updated.at(-1).t){
+   updated=minuteChartArchive;
+  }
+ }
+ if(!Array.isArray(updated)||!updated.length)return;
+ const previous=view.displayBars||[];
+ if(previous===updated)return;
+ const oldLast=previous.at(-1),lastNew=updated.at(-1);
+ if(oldLast&&lastNew&&lastNew.t<oldLast.t)return;
+ if(oldLast&&lastNew&&oldLast.t===lastNew.t&&oldLast.c===lastNew.c)return;
+ const wasAtEnd=!oldLast||view.index>=previous.length-1;
+ const oldIndexTime=previous[view.index]?.t;
+ const oldBaseTime=previous[view.baseIndex]?.t;
+ view.displayBars=updated;
+ view.index=wasAtEnd?updated.length-1:Number.isFinite(oldIndexTime)?
+  patternCompareNearestIndex(updated,oldIndexTime):updated.length-1;
+ view.baseIndex=Number.isFinite(oldBaseTime)?
+  patternCompareNearestIndex(updated,oldBaseTime):updated.length-1;
+ view.replayKey=null;
+}
+async function choosePatternCurrentDisplay(tf){
+ const state=patternComparison,status=$('patternCompareDisplayTfStatus');
+ if(!state||!SIMILAR_PATTERN_LABELS[tf])return;
+ const view=state.views.current,selector=$('patternCompareDisplayTf');
+ const requestId=state.displayRequestId=(state.displayRequestId||0)+1;
+ if(selector)selector.disabled=true;
+ if(status)status.textContent=SIMILAR_PATTERN_LABELS[state.tf]+' 원본 예측 → '+SIMILAR_PATTERN_LABELS[tf]+' 변환 중…';
+ try{
+  let bars=tf===state.tf?state.bars:tf==='1m'&&minuteChartArchive?.length?
+   minuteChartArchive:candles[tf]||[];
+  const config=indicatorPatternConfig(tf);
+  const required=Math.max(...config.ma,config.bb)+config.window+2;
+  if(!Array.isArray(bars)||bars.length<required){
+   bars=await loadIndicatorPatternHistory(tf);
+  }
+  if(requestId!==state.displayRequestId||patternComparison!==state)return;
+  if(!Array.isArray(bars)||bars.length<config.window+2)
+   throw Error('해당 봉의 실제 캔들 데이터가 부족해');
+  view.displayTf=tf;
+  view.displayBars=tf===state.tf?null:bars;
+  view.index=bars.length-1;view.baseIndex=view.index;
+  view.count=Math.min(config.window,bars.length-1);
+  view.futureShift=0;view.priceZoom=1;view.pricePan=0;
+  view.inspectIndex=null;view.inspectFutureOffset=null;view.inspectPrice=null;
+  view.replayKey=null;view.replaySource=null;
+  renderPatternComparison();
+ }catch(e){
+  if(requestId===state.displayRequestId&&patternComparison===state){
+   if(status)status.textContent='시간봉 전환 실패: '+String(e?.message||e);
+   if(selector)selector.value=view.displayTf||state.tf;
+  }
+ }finally{
+  if(requestId===state.displayRequestId&&patternComparison===state&&selector)selector.disabled=false;
+ }
+}
 function refreshPatternComparisonCandles(){
  const state=patternComparison;if(!state||demo)return;
  // Prefer whichever live source has the newest complete/in-progress
@@ -6869,6 +6937,7 @@ function refreshPatternComparisonCandles(){
  updatePatternCompareHistorySnapshot();
  for(const which of ['current','historical']){
   const view=state.views[which],saved=anchorTimes[which];
+  if(which==='current'&&view.displayTf&&view.displayTf!==state.tf)continue;
   if(which==='current'&&saved.index===oldLast.t)
    view.index=merged.length-1;
   else if(Number.isFinite(saved.index))
@@ -6879,50 +6948,57 @@ function refreshPatternComparisonCandles(){
 }
 function renderPatternComparison(){
  const state=patternComparison;if(!state||$('patternCompare')?.hidden)return;
+ refreshPatternCurrentTarget();
  for(const [which,canvasId,labelId] of [
   ['current','patternCompareCurrentCanvas','patternCompareCurrentLabel'],
   ['historical','patternCompareHistoricalCanvas','patternCompareHistoricalLabel']
  ]){
-  const view=state.views[which],config={...state.config,window:view.count},
-   index=patternCompareLimit(view);
-  // Both panes use real market candles. The historical pane NEVER draws
-  // prediction lines or a projected area and is free to pan from the
-  // oldest available record to the newest one.
-  const source=state.bars;
-  const bar=source[index];if(!bar)continue;
+  const view=state.views[which],displayTf=which==='current'?
+   patternDisplayTf(state):state.tf;
+  const config={...indicatorPatternConfig(displayTf),window:view.count};
+  const source=which==='current'?patternDisplayBars(state):state.bars;
+  if(!source?.length)continue;
+  const index=patternCompareLimit(view),bar=source[index];
+  if(!bar)continue;
   let replay=null;
   if(which==='current'){
-   const replayKey=[index,state.match.index,state.forecastBars,
+   const sourceIndex=state.bars.length-1;
+   const replayKey=[index,displayTf,state.match.index,state.forecastBars,
+    state.bars.length,state.bars.at(-1)?.t,state.bars.at(-1)?.c,
     source.length,source.at(-1)?.t,source.at(-1)?.c].join('|');
    if(view.replayKey!==replayKey||view.replaySource!==source){
-    view.replayScenario=patternReplaySeries(source,index,state.match.index,
-     state.forecastBars,state.tf,false);
-    view.replayKey=replayKey;
-    view.replaySource=source;
+    view.replayScenario=displayTf===state.tf?
+     patternReplaySeries(state.bars,index,state.match.index,
+      state.forecastBars,state.tf,false):
+     patternProjectToTimeframe(state.bars,sourceIndex,state.match.index,
+      state.tf,source,index,displayTf,state.forecastBars);
+    view.replayKey=replayKey;view.replaySource=source;
    }
    replay=view.replayScenario;
   }else{
-   view.replayScenario=null;
-   view.replayKey=null;
-   view.replaySource=null;
+   view.replayScenario=null;view.replayKey=null;view.replaySource=null;
   }
-  view.forecastBars=state.forecastBars;
+  view.forecastBars=which==='current'&&displayTf!==state.tf?
+   (replay?.available||0):state.forecastBars;
   view.historical=which==='historical';
   view.futureEnabled=which==='current';
-  paintPatternCompareCanvas(canvasId,source,state.tf,index,config,
+  paintPatternCompareCanvas(canvasId,source,displayTf,index,config,
    view.inspectIndex,view.show,view);
   const fmt=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',
    year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',
    minute:'2-digit',hour12:false});
-  const inspected=Number.isInteger(view.inspectIndex)?state.bars[view.inspectIndex]:null;
-  $(labelId).textContent=SIMILAR_PATTERN_LABELS[state.tf]+' · '+
+  const inspected=Number.isInteger(view.inspectIndex)?source[view.inspectIndex]:null;
+  $(labelId).textContent=(which==='current'&&displayTf!==state.tf?
+   '원본 '+SIMILAR_PATTERN_LABELS[state.tf]+' → 표시 '+SIMILAR_PATTERN_LABELS[displayTf]:
+   SIMILAR_PATTERN_LABELS[displayTf])+' · '+
    fmt.format(new Date(bar.t))+' KST · '+view.count+'봉'+
    (view.futureShift?' · 이후 +'+view.futureShift+'봉':'')+
    (which==='historical'?
     ' · '+state.rank+'위 검색 결과 · 실제 과거 전체 차트 · 유사도 '+
      state.match.similarity.toFixed(1)+'점':
-    ' · '+state.rank+'위 실제 이후 변동률 반영')+
-   (replay?' · 이후 자료 '+replay.available+'봉':'')+
+    ' · '+state.rank+'위 원본 유사 흐름을 '+SIMILAR_PATTERN_LABELS[displayTf]+'에 변환')+
+   (replay?' · 이후 자료 '+replay.available+'봉'+
+    (replay.interpolated?' (중간값 보간)':''):'')+
    (inspected?' · 선택 종가 '+inspected.c.toLocaleString('en-US',{maximumFractionDigits:2}):'');
 
  }
@@ -6985,6 +7061,7 @@ function openPatternComparison(tf,bars,matches,rank){
   forecastBars:patternCompareFutureBars,
   views:{
    current:{index:currentIndex,baseIndex:currentIndex,count:config.window,
+    displayTf:tf,displayBars:null,
     show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0,
     futureEnabled:true,futureShift:0},
    historical:{index:match.index,baseIndex:match.index,count:config.window,
@@ -6993,6 +7070,9 @@ function openPatternComparison(tf,bars,matches,rank){
   }
  };
  $('patternCompareHistoricalTitle').textContent='과거 실제 차트 ('+rank+'위)';
+ const displaySelect=$('patternCompareDisplayTf');
+ if(displaySelect)displaySelect.value=tf;
+ $('patternCompareDisplayTfStatus').textContent='';
  renderPatternComparisonRankButtons();
  updatePatternCompareHistorySnapshot();
  const forecastInput=$('patternForecastBars');
@@ -7009,6 +7089,9 @@ function openPatternComparison(tf,bars,matches,rank){
 }
 function initPatternComparison(){
  $('patternCompareClose')?.addEventListener('click',closePatternComparison);
+ $('patternCompareDisplayTf')?.addEventListener('change',e=>{
+  void choosePatternCurrentDisplay(e.target.value);
+ });
  $('patternForecastBars')?.addEventListener('change',e=>{
   const requested=Math.round(Number(e.target.value));
   if(!Number.isFinite(requested))return;
@@ -7064,7 +7147,8 @@ function initPatternComparison(){
     view.inspectFutureOffset=Math.max(1,Math.min(PATTERN_COMPARE_MAX_FUTURE,index-view.index));
    }else{
     view.inspectFutureOffset=null;
-    view.inspectIndex=Math.max(0,Math.min(state.bars.length-1,index));
+    const source=which==='current'?patternDisplayBars(state):state.bars;
+    view.inspectIndex=Math.max(0,Math.min(source.length-1,index));
    }
    renderPatternComparison();
   };
@@ -7195,7 +7279,10 @@ function initPatternComparison(){
    const view=patternCompareView(which);if(!view)return;
    const rect=canvas.getBoundingClientRect();
    if(e.clientX-rect.left>=rect.width-71){view.priceZoom=1;view.pricePan=0;}
-   else {view.count=patternComparison.config.window;view.index=view.baseIndex;view.futureShift=0;}
+   else {view.count=which==='current'?
+     indicatorPatternConfig(patternDisplayTf(patternComparison)).window:
+     patternComparison.config.window;
+     view.index=view.baseIndex;view.futureShift=0;}
    renderPatternComparison();
   });
   canvas.addEventListener('pointerup',endPointer);
