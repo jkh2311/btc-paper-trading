@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261125-forecast-tf-convert-v325"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261125-weak-match-reset-v326"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -7082,9 +7082,15 @@ function setPatternComparisonRank(rank){
  // Preserve the user's current-chart zoom, but avoid a blank future viewport.
  const current=state.views.current;
  current.futureShift=Math.min(current.futureShift||0,PATTERN_COMPARE_MAX_FUTURE);
+ // Standardize the two views to the same original comparison horizon
+ // whenever a new historical rank is selected. User can zoom afterwards.
+ current.count=state.views.current.displayTf===state.tf?
+  state.config.window:
+  indicatorPatternConfig(state.views.current.displayTf).window;
  const previous=state.views.historical;
  state.views.historical={
   ...previous,index:selected.index,baseIndex:selected.index,
+  count:state.config.window,
   inspectIndex:null,priceZoom:1,pricePan:0,futureShift:0,futureEnabled:false
  };
  $('patternCompareHistoricalTitle').textContent='과거 실제 차트 ('+rank+'위)';
@@ -7389,7 +7395,11 @@ function initIndicatorPatternSearch(){
   if(demo){status.textContent='실제 과거 시세 조회 모드에서 검색할 수 있어.';return}
   const tf=tfSelect.value,config=indicatorPatternConfig(tf);
   indicatorPatternSearchBusy=true;btn.disabled=true;tfSelect.disabled=true;
+  // A new search must never leave a previous rank, scenario or controls
+  // visible, including while new historical candles are loading.
+  closePatternComparison();
   resultsEl.replaceChildren();
+  status.textContent='이전 검색 결과 초기화 · 새 검색 시작…';
   try{
    status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 과거 캔들 기록 확인 중…';
    let bars=await loadIndicatorPatternHistory(tf);
@@ -7411,9 +7421,13 @@ function initIndicatorPatternSearch(){
    });
    if(!matches.length)throw Error('유효한 연속 '+config.window+
     '봉 구간이 부족해. 누락된 과거 캔들 조회를 확인해 줘.');
+   const best=matches[0]?.similarity||0;
+   const weak=best<55;
    status.textContent=config.name+' · 과거 '+bars.length.toLocaleString()+
     '개 캔들 검색 ('+asKst(firstAvailable)+' ~ '+asKst(lastAvailable)+
-    ') · 유사 TOP '+matches.length+' · 누르면 비교 차트 표시';
+    ') · '+(weak?'⚠ 충분히 닮은 구간을 찾지 못함 (최고 '+best.toFixed(1)+
+    '점) · 아래는 상대적으로 가까운 후보일 뿐이야':
+    '유사 TOP '+matches.length+' · 누르면 비교 차트 표시');
    for(const [index,match] of matches.entries()){
     const button=document.createElement('button');
     button.type='button';
@@ -7422,7 +7436,9 @@ function initIndicatorPatternSearch(){
     const out=match.returns.map(x=>x.bars+'봉 '+(x.percent>=0?'+':'')+
      x.percent.toFixed(1)+'%').join(' · ');
     button.textContent=(index+1)+'위 · '+dt+' KST · 유사도 '+
-     match.similarity.toFixed(1)+'점\n이후 실제 변화: '+out;
+     match.similarity.toFixed(1)+'점'+
+     (match.similarity<55?' · ⚠ 유사도 부족':'')+
+     '\n이후 실제 변화: '+out;
     button.style.whiteSpace='pre-line';
     button.addEventListener('click',()=>{
      openPatternComparison(tf,bars,matches,index+1);
