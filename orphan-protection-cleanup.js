@@ -97,7 +97,11 @@ async function clean(){
   const orders=array(await signed('GET','/fapi/v1/openOrders',{symbol}));
   const algos=array(await signed('GET','/fapi/v1/openAlgoOrders',{symbol}));
   if(!orders||!algos)throw Error('활성 주문 목록 검증 실패');
-  if(orders.some(openEntry)){
+  // A conditional entry may also be waiting in the algo-order book.
+  // Do not remove its prospective exits while a new entry can still fill.
+  const pendingAlgoEntry=algos.some(o=>o?.symbol===symbol&&!protectedExit(o)&&
+   ['NEW','ACTIVE','PENDING_NEW'].includes(String(o.algoStatus||o.status||'NEW')));
+  if(orders.some(openEntry)||pendingAlgoEntry){
    notice('미체결 신규 진입 주문 있음 · 이전 익절/손절 자동 취소 보류');
    return;
   }
