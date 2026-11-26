@@ -936,7 +936,13 @@ function showOpenOrders(orders,error=''){
   cancel.disabled=orderCancelBusy||!!orderListError;
   cancel.style.cssText='flex-shrink:0;padding:8px 10px;font-size:12px';
   cancel.onclick=()=>void cancelSingleOrder(o.orderId);
-  row.append(info,cancel);orderList.append(row);
+  const actions=document.createElement('div');actions.style.cssText='display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;flex-shrink:0;max-width:42%';
+  if(reservationEditEligible(o)){
+   const edit=document.createElement('button');edit.type='button';edit.textContent='수정';
+   edit.style.cssText='padding:8px 10px;font-size:12px';edit.disabled=orderCancelBusy||busy;
+   edit.onclick=()=>void openReservationPriceEditor([String(o.orderId)]);actions.append(edit);
+  }
+  actions.append(cancel);row.append(info,actions);orderList.append(row);
  }
 }
 async function fetchOpenOrders(){
@@ -954,6 +960,70 @@ async function updateOpenOrders(){
   if(generation===orderReadGeneration&&!orderCancelBusy)showOpenOrders([],String(e?.message||e));
  }
 }
+// Only opening LIMIT orders, never reduce-only/closing/conditional orders.
+function reservationEditEligible(o){
+ return !!o&&o.symbol===symbol&&o.type==='LIMIT'&&['NEW','PARTIALLY_FILLED'].includes(o.status)&&
+ ['BUY','SELL'].includes(o.side)&&
+ (o.positionSide==='BOTH'||o.positionSide===(o.side==='BUY'?'LONG':'SHORT'))&&
+ o.reduceOnly!==true&&o.reduceOnly!=='true'&&o.closePosition!==true&&o.closePosition!=='true'&&
+ Number.isSafeInteger(Number(o.orderId))&&Number(o.price)>0&&Number(o.origQty)>Number(o.executedQty||0);
+}
+let reservationEditorOpen=false;
+function reservationEditDialog(orders){
+ return new Promise(resolve=>{
+  const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;z-index:101000;background:rgba(3,9,19,.86);display:flex;align-items:center;justify-content:center;padding:14px';
+  const panel=document.createElement('div');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.style.cssText='width:min(100%,440px);max-height:90dvh;overflow:auto;background:#14263e;border:1px solid #6486aa;border-radius:14px;padding:16px;color:#e7f3ff';
+  const title=document.createElement('h3');title.textContent='예약진입 가격 수정';
+  const select=document.createElement('select');select.style.cssText='width:100%;font-size:16px;margin:8px 0;padding:8px';
+  for(const o of orders){const opt=document.createElement('option');opt.value=String(o.orderId);opt.textContent=(o.side==='BUY'?'LONG':'SHORT')+' · '+fmt(o.price)+' USDT · #'+o.orderId;select.append(opt);}
+  const detail=document.createElement('p'),input=document.createElement('input');input.type='number';input.inputMode='decimal';input.step='any';input.min='0';input.style.cssText='width:100%;font-size:18px;padding:10px;box-sizing:border-box';input.setAttribute('aria-label','변경할 지정가 USDT');
+  const note=document.createElement('p');note.style.cssText='font-size:12px;color:#f5cd91';note.textContent='기존 주문 방향과 총수량 유지. 가격 변경 시 주문 우선순위가 재설정될 수 있으며 Post Only 주문은 거래소에서 취소될 수 있습니다. 기존 익절·손절 설정은 유지됩니다.';
+  const error=document.createElement('p');error.style.color='#ff819b';
+  const actions=document.createElement('div');actions.style.cssText='display:flex;gap:8px';
+  const yes=document.createElement('button'),no=document.createElement('button');yes.type=no.type='button';yes.textContent='가격 수정 확인';no.textContent='닫기';yes.style.cssText='flex:1;background:#126c58;color:white;padding:10px';
+  let finished=false;const finish=v=>{if(finished)return;finished=true;overlay.remove();document.removeEventListener('keydown',onKey,true);resolve(v);};
+  const onKey=e=>{if(e.key==='Escape')finish(null);};
+  const sync=()=>{const o=orders.find(v=>String(v.orderId)===select.value);if(!o)return;input.value=String(o.price);detail.textContent='기존 '+fmt(o.price)+' USDT · 총 '+fmt(o.origQty)+' BTC · 미체결 '+fmt(Number(o.origQty)-Number(o.executedQty||0))+' BTC';error.textContent='';};
+  select.onchange=sync;no.onclick=()=>finish(null);yes.onclick=()=>{const o=orders.find(v=>String(v.orderId)===select.value),price=Number(input.value);if(!o||!Number.isFinite(price)||price<=0||price===Number(o.price)){error.textContent='기존 가격과 다른 유효한 지정가를 입력하세요.';return;}finish({order:o,price});};
+  actions.append(yes,no);panel.append(title,select,detail,input,note,error,actions);overlay.append(panel);document.body.append(overlay);document.addEventListener('keydown',onKey,true);sync();
+ });
+}
+async function openReservationPriceEditor(ids){
+ if(reservationEditorOpen||orderCancelBusy||busy||!credentialsSafeSilent())return;
+ reservationEditorOpen=true;orderCancelBusy=true;
+ const accountId=stageAccountId();
+ let sent=false;
+ try{
+  const before=await fetchOpenOrders(),orders=before.filter(o=>ids.includes(String(o.orderId))&&reservationEditEligible(o));
+  if(!orders.length){showOpenOrders(before);alert('수정 가능한 미체결 진입 주문이 없습니다.');return;}
+  const chosen=await reservationEditDialog(orders);if(!chosen)return;
+  if(accountId!==stageAccountId()||!credentialsSafeSilent()||busy)throw Error('계좌 또는 주문 상태 변경 · 수정 미전송');
+  const f=await filters(),latest=await fetchOpenOrders(),target=latest.find(o=>String(o.orderId)===String(chosen.order.orderId));
+  if(!reservationEditEligible(target)||['price','origQty','executedQty','side','positionSide','timeInForce'].some(k=>String(target[k])!==String(chosen.order[k])))throw Error('주문 상태가 변경되었습니다. 최신 목록에서 다시 확인하세요. 수정 미전송');
+  const tick=Number(f.price.tickSize),digits=Math.min(8,(String(f.price.tickSize).split('.')[1]||'').length);
+  if(!(tick>0))throw Error('호가 단위 확인 실패 · 수정 미전송');
+  const rounded=Number((Math.round(chosen.price/tick)*tick).toFixed(digits));
+  if(!(rounded>0)||Math.abs(rounded-chosen.price)>tick*1e-6||rounded===Number(target.price)||
+    (Number(f.price.minPrice)>0&&rounded<Number(f.price.minPrice))||(Number(f.price.maxPrice)>0&&rounded>Number(f.price.maxPrice)))throw Error('거래소 호가 단위 '+tick+'에 맞는 가격을 입력하세요. 수정 미전송');
+  const recs=stageRecords(),side=target.side==='BUY'?'LONG':'SHORT',record=(recs[side]||[]).find(x=>String(x.id)===String(target.orderId));
+  if(record&&Number(record.tpPrice)>0&&Number(record.slPrice)>0&&!(side==='LONG'?Number(record.slPrice)<rounded&&rounded<Number(record.tpPrice):Number(record.tpPrice)<rounded&&rounded<Number(record.slPrice)))throw Error('기존 익절·손절 가격 범위를 벗어났습니다. 수정 미전송');
+  if(accountId!==stageAccountId()||!credentialsSafeSilent()||busy)throw Error('계좌 상태 변경 · 수정 미전송');
+  sent=true;
+  const response=await signed('PUT','/fapi/v1/order',{symbol,orderId:String(target.orderId),side:target.side,quantity:String(target.origQty),price:rounded.toFixed(digits)});
+  if(String(response?.orderId)!==String(target.orderId)||Number(response.price)!==rounded)throw Error('거래소 수정 결과 확인 필요');
+  // Preserve all existing protection and stage metadata; only update the reservation price.
+  if(record&&Number(record.reservationPrice)>0&&accountId===stageAccountId()){
+   try{const all=JSON.parse(localStorage.getItem(stageLedgerKey)||'{}'),item=all[accountId]?.[side]?.find(x=>String(x.id)===String(target.orderId));if(item){item.reservationPrice=rounded;localStorage.setItem(stageLedgerKey,JSON.stringify(all));}}catch(_){}
+  }
+  const after=await fetchOpenOrders();showOpenOrders(after);
+  const active=after.find(x=>String(x.orderId)===String(target.orderId));
+  alert(active&&Number(active.price)===rounded?'예약진입 가격 수정 확인 · '+fmt(rounded)+' USDT':'거래소 응답 확인 · 미체결 목록에서 주문 상태가 변경되었습니다. 바이낸스에서 확인하세요.');
+ }catch(e){
+  if(sent){try{showOpenOrders(await fetchOpenOrders());}catch(_){clearReservationLevels();}}
+  alert((sent?'수정 요청 결과 확인 필요 · 바이낸스에서 확인 후 재시도하세요. ':'')+String(e?.message||e));
+ }finally{reservationEditorOpen=false;orderCancelBusy=false;void updateOpenOrders();}
+}
+window.btcOpenReservationPriceEditor=ids=>void openReservationPriceEditor(ids);
 async function cancelSingleOrder(orderId){
  if(orderCancelBusy||busy||orderListError)return;
  // Recheck the order directly before asking for permission to cancel it.
