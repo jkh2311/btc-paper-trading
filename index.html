@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-compact-comparison-v346"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-pattern-entry-live-v347"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -7300,6 +7300,7 @@ function refreshPatternComparisonCandles(){
 function renderPatternComparison(){
  const state=patternComparison;if(!state||$('patternCompare')?.hidden)return;
  refreshPatternCurrentTarget();
+ patternEntryLiveHeader();
  for(const [which,canvasId,labelId] of [
   ['current','patternCompareCurrentCanvas','patternCompareCurrentLabel'],
   ['historical','patternCompareHistoricalCanvas','patternCompareHistoricalLabel']
@@ -7357,6 +7358,7 @@ function renderPatternComparison(){
 }
 function closePatternComparison(){
  if($('patternCompare')?.hidden)return;
+ if(patternEntrySession)closePatternEntry();
  $('patternCompare').hidden=true;patternComparison=null;
  document.body.style.overflow=patternCompareBodyOverflow;
  saveLastVisibleScreen(true);
@@ -7444,7 +7446,235 @@ function openPatternComparison(tf,bars,matches,rank){
  requestAnimationFrame(renderPatternComparison);
  $('patternCompareClose')?.focus({preventScroll:true});
 }
+// v347: Order entry initiated ONLY by a second tap on the current
+// comparison chart's pinned horizontal PRICE guide. Historical chart and
+// projected candles NEVER trigger automatic exchange trading.
+let patternEntrySession=null;
+function patternEntryLiveHeader(){
+ const state=patternComparison;
+ if(!state||$('patternCompare')?.hidden)return;
+ const tf=patternDisplayTf(state),now=Date.now(),lastValue=Number(last);
+ const quote=$('patternCompareLiveQuote'),timer=$('patternCompareCandleCountdown');
+ if(quote){
+  const fresh=demo?lastValue>0:lastValue>0&&now-lastTickAt<8500;
+  quote.textContent=fresh?'₿ '+fmt(lastValue)+(demo?' 모의':' 실시간'):'실시간 시세 연결 확인 중';
+  quote.style.color=fresh?'#63e4b8':'#f5bb75';
+ }
+ if(timer){
+  const to=nextCandleTime(tf,now),left=Math.max(0,Math.ceil((to-now)/1000));
+  const hh=Math.floor(left/3600),mm=Math.floor((left%3600)/60),ss=left%60;
+  timer.textContent=(hh?String(hh).padStart(2,'0')+':':'')+
+   String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+  timer.title=SIMILAR_PATTERN_LABELS[tf]+' 현재 진행 봉 마감까지 남은 시간';
+ }
+}
+function patternEntryLevels(side,price,count,gap){
+ if(!['LONG','SHORT'].includes(side)||!Number.isInteger(count)||count<1||count>6||
+    !(price>0)||!(Number.isFinite(gap)&&gap>=0&&gap<=3))return null;
+ const sign=side==='LONG'?-1:1;
+ const prices=Array.from({length:count},(_,i)=>Number((price*(1+sign*gap*i/100)).toFixed(2)));
+ return prices.every(v=>v>0)?prices:null;
+}
+function patternEntryForm(){
+ const mode=$('patternEntryMode')?.value,price=Number($('patternEntryPrice')?.value),
+ count=Number($('patternEntryStages')?.value),gap=Number($('patternEntryGap')?.value),
+ margin=Number($('patternEntryMargin')?.value),
+ tp=Number($('patternEntryTp')?.value),sl=Number($('patternEntrySl')?.value);
+ return {mode,price,count,gap,margin,tp,sl,side:patternEntrySession?.side||null,
+  prices:patternEntryLevels(patternEntrySession?.side,price,count,gap)};
+}
+function patternEntryMessage(message){if($('patternEntryMessage'))$('patternEntryMessage').textContent=message;}
+function closePatternEntry(){
+ $('patternCompareEntryModal').hidden=true;
+ document.body.classList.remove('pattern-compare-real-order');
+ patternEntrySession=null;
+}
+function openPatternEntry(price){
+ if(!patternComparison||$('patternCompare')?.hidden||!(price>0)||!Number.isFinite(price))return;
+ patternEntrySession={side:null,realDone:new Set(),realPending:null};
+ $('patternEntryMode').value='paper';
+ $('patternEntryPrice').value=Number(price.toFixed(2));
+ $('patternEntryStages').value=String(Math.max(1,Math.min(6,pyramidEntryCount())));
+ $('patternEntryGap').value='0.2';
+ $('patternEntryMargin').value='50';
+ $('patternEntryTp').value='1';
+ $('patternEntrySl').value='1';
+ $('patternCompareEntryModal').hidden=false;
+ patternEntryMessage('');
+ renderPatternEntry();
+}
+function renderPatternEntry(){
+ const entry=patternEntrySession,modal=$('patternCompareEntryModal');
+ if(!entry||modal?.hidden)return;
+ const form=patternEntryForm(),live=form.mode==='real';
+ $('patternEntryMarginLabel').hidden=live;
+ $('patternEntryTpLabel').hidden=!live;
+ $('patternEntrySlLabel').hidden=!live;
+ $('patternEntryLong').setAttribute('aria-pressed',String(entry.side==='LONG'));
+ $('patternEntryShort').setAttribute('aria-pressed',String(entry.side==='SHORT'));
+ const valid=!!form.prices&&(!live?
+  form.margin>=.1&&form.margin<=100:
+  form.tp>=.1&&form.tp<=99&&form.sl>=.05&&form.sl<=10);
+ const apply=$('patternEntryApply'),list=$('patternEntryStageList');
+ apply.disabled=!valid;
+ apply.textContent=!entry.side?'롱 또는 숏 선택':live?
+  '실전 '+(entry.realDone.has(0)?'다음 단계':'1단계')+' 주문창 열기':
+  form.count+'단계 모의 지정가 일괄 예약';
+ list.replaceChildren();
+ if(!valid){
+  $('patternEntryPreview').textContent='진입 방향·지정가·단계수·비율을 확인해 주세요.';
+  return;
+ }
+ const lev=Number($('lev')?.value),free=paperFreeMargin();
+ const weight=Array.from({length:form.count},(_,i)=>1+.2*i),
+  weightSum=weight.reduce((a,b)=>a+b,0);
+ const budget=free*form.margin/100;
+ $('patternEntryPreview').textContent=live?
+  '실전 · 기존 바이낸스 검증 주문창 사용 · 설정의 레버리지/증거금 비율 적용\n각 단계를 개별 확인 후 제출합니다. 주문창 열기는 주문 전송이 아닙니다.':
+  '모의 · 사용 가능 '+fmt(free)+' USDT · 총 예약 증거금 '+fmt(budget)+
+  ' USDT · '+(Number.isFinite(lev)?lev+'배':'레버리지 확인')+
+  ' · 실제 바이낸스 주문 없음';
+ for(let i=0;i<form.prices.length;i++){
+  const row=document.createElement(live?'button':'div');
+  if(live){row.type='button';row.dataset.stage=String(i);row.disabled=entry.realDone.has(i);
+   row.addEventListener('click',()=>openPatternEntryRealStage(i));}
+  const percent=live?'':(' · 증거금 '+fmt(budget*weight[i]/weightSum)+' USDT');
+  row.textContent=(i+1)+'/'+form.count+' · '+fmt(form.prices[i])+' USDT'+percent+
+   (live?(entry.realDone.has(i)?' · 주문 접수됨':' · 실전 확인창'):'');
+  list.appendChild(row);
+ }
+}
+function submitPatternEntryPaper(){
+ const f=patternEntryForm();
+ if(!f.prices||f.mode!=='paper'||!(f.margin>=.1&&f.margin<=100))return;
+ const lev=Number($('lev').value),stop=Number($('stop').value),
+ rr=Number($('rr').value),free=paperFreeMargin();
+ const cap=pyramidEntryCount(),already=
+  hedgePositions[f.side].filter(p=>!p.autoStrategy).length+
+  pendingOrders.filter(p=>p.side===f.side).length;
+ if(already+f.count>cap){
+  patternEntryMessage('현재 진입 설정 '+cap+'단계 한도 중 '+already+
+   '단계 사용 중 · '+f.count+'건을 예약할 수 없어요.');return;
+ }
+ const opposite=f.side==='LONG'?'SHORT':'LONG';
+ if(paperMode()==='oneway'&&(hedgePositions[opposite].length||
+    pendingOrders.some(p=>p.side===opposite))){
+  patternEntryMessage('단방향 계좌의 반대 포지션/예약이 있어 자동 전환을 피하려고 중지했어요.');return;
+ }
+ if(!(lev>0&&stop>=.1&&stop<=100&&rr>=.1&&rr<=100&&free>0)){
+  patternEntryMessage('모의 잔고, 레버리지, 익절·손절 설정을 확인해 주세요.');return;
+ }
+ const budget=free*f.margin/100;
+ const weights=f.prices.map((_,i)=>1+.2*i),sum=weights.reduce((a,b)=>a+b,0);
+ const stamp=Date.now(),pattern=capturePaperEntryPattern(patternDisplayTf(patternComparison));
+ const orders=f.prices.map((price,i)=>{
+  const margin=budget*weights[i]/sum,notional=margin*lev;
+  return {id:'manual-limit-'+paperPositionId(),side:f.side,price,createdAt:stamp+i,
+   notional,margin,qty:notional/price,leverage:lev,
+   stopPct:stop/(100*lev),rr,roiMode:true,
+   entryPattern:pattern};
+ });
+ if(orders.some(o=>!(o.qty>0&&o.notional>.01&&o.margin>0&&
+   Number.isFinite(o.qty)))||budget>paperFreeMargin()+1e-7){
+  patternEntryMessage('주문 수량/증거금 검증 실패 · 예약하지 않았어요.');return;
+ }
+ const sentence='가상 '+f.side+' 지정가 '+f.count+'건을 예약할까요?\n'+
+  f.prices.map((v,i)=>(i+1)+'단계 '+fmt(v)+' USDT').join(' · ')+
+  '\n총 증거금 '+fmt(budget)+' USDT ('+lev+'배)\n실전 바이낸스 주문은 전송하지 않습니다.';
+ if(!confirm(sentence))return;
+ // Once the whole ladder is validated, commit all reservations atomically
+ // to the existing paper order list; existing process() owns fills.
+ pendingOrders.push(...orders);
+ add('유사 비교창 가상 '+f.side+' 지정가 '+orders.length+'단계 예약 · 총 증거금 '+
+  fmt(budget)+' USDT');
+ savePaperState();render();process();
+ closePatternEntry();
+}
+function openPatternEntryRealStage(index){
+ const f=patternEntryForm(),state=patternEntrySession;
+ if(!state||f.mode!=='real'||!f.prices||!Number.isInteger(index)||
+    index<0||index>=f.count||state.realDone.has(index))return;
+ if(!(f.tp>=.1&&f.tp<=99&&f.sl>=.05&&f.sl<=10)){
+  patternEntryMessage('실전 익절·손절 비율을 확인해 주세요.');return;
+ }
+ const saved=typeof getApiCredentials==='function'?getApiCredentials():null;
+ if(!saved?.apiKey||!saved?.apiSecret){
+  patternEntryMessage('실전 API 잠금 해제 후 주문창을 열 수 있어요. 주문은 전송되지 않았어요.');
+  return;
+ }
+ const price=f.prices[index],up=f.side==='LONG',tpPrice=Number((price*(1+(up?1:-1)*f.tp/100)).toFixed(2)),
+  slPrice=Number((price*(1+(up?-1:1)*f.sl/100)).toFixed(2));
+ if(!(tpPrice>0&&slPrice>0)){patternEntryMessage('익절·손절 가격이 유효하지 않습니다.');return;}
+ state.realPending={index,price,side:f.side};
+ $('patternCompareEntryModal').hidden=true;
+ document.body.classList.add('pattern-compare-real-order');
+ // Reuse the existing signed Binance LIMIT/GTX handler and its checks:
+ // leverage, lot/tick size, available margin, stage ledger, TP/SL direction.
+ document.dispatchEvent(new CustomEvent('btc:chart-price-limit-entry',{
+  detail:{symbol:'BTCUSDT',side:f.side,price,tpPrice,slPrice,
+   tpPercent:f.tp,slPercent:f.sl,stageCount:f.count}
+ }));
+ if($('entrySheet')?.style.display!=='block'){
+  $('patternCompareEntryModal').hidden=false;
+  document.body.classList.remove('pattern-compare-real-order');
+  state.realPending=null;
+  patternEntryMessage('기존 바이낸스 실전 주문창을 열 수 없습니다. API 연결을 확인하세요.');
+ }
+}
+function initPatternEntry(){
+ for(const id of ['patternEntryPrice','patternEntryStages','patternEntryGap',
+  'patternEntryMargin','patternEntryTp','patternEntrySl']){
+  $(id)?.addEventListener('input',()=>{if(patternEntrySession)patternEntrySession.realDone.clear();renderPatternEntry()});
+ }
+ $('patternEntryMode').addEventListener('change',()=>{if(patternEntrySession)patternEntrySession.realDone.clear();renderPatternEntry()});
+ for(const [id,side] of [['patternEntryLong','LONG'],['patternEntryShort','SHORT']]){
+  $(id).addEventListener('click',()=>{
+   if(!patternEntrySession)return;
+   if(patternEntrySession.side!==side)patternEntrySession.realDone.clear();
+   patternEntrySession.side=side;
+   renderPatternEntry();
+  });
+ }
+ $('patternEntryApply').addEventListener('click',()=>{
+  if(!patternEntrySession)return;
+  if($('patternEntryMode').value==='paper')submitPatternEntryPaper();
+  else{
+   const index=Array.from({length:Math.max(1,Math.min(6,Number($('patternEntryStages').value)||1))},
+    (_,i)=>i).find(i=>!patternEntrySession.realDone.has(i));
+   if(index===undefined){patternEntryMessage('선택한 단계가 모두 접수됐어요. 바이낸스 주문내역에서 확인하세요.');return;}
+   openPatternEntryRealStage(index);
+  }
+ });
+ $('patternEntryClose').addEventListener('click',closePatternEntry);
+ $('patternEntryCancel').addEventListener('click',closePatternEntry);
+ $('patternCompareEntryModal').addEventListener('click',e=>{
+  if(e.target===$('patternCompareEntryModal'))closePatternEntry();
+ });
+ $('sheetCancel')?.addEventListener('click',()=>{
+  if(!patternEntrySession||!document.body.classList.contains('pattern-compare-real-order'))return;
+  setTimeout(()=>{
+   if(!patternEntrySession||$('patternCompare')?.hidden)return;
+   document.body.classList.remove('pattern-compare-real-order');
+   $('patternCompareEntryModal').hidden=false;
+   renderPatternEntry();
+  },50);
+ });
+ document.addEventListener('btc:manual-entry-placed',e=>{
+  const st=patternEntrySession,step=st?.realPending;
+  if(!step||e.detail?.side!==step.side)return;
+  st.realDone.add(step.index);
+  st.realPending=null;
+  // Close the real order editor AFTER the exchange has confirmed the
+  // order ID. Next stage requires a NEW explicit human action.
+  setTimeout(()=>{$('sheetCancel')?.click();},120);
+ });
+ setInterval(()=>{
+  if(patternComparison&&!$('patternCompare')?.hidden&&document.visibilityState!=='hidden')
+   patternEntryLiveHeader();
+ },1000);
+}
 function initPatternComparison(){
+ initPatternEntry();
  $('patternCompareClose')?.addEventListener('click',closePatternComparison);
  $('patternCompareDisplayTf')?.addEventListener('change',e=>{
   void choosePatternCurrentDisplay(e.target.value);
