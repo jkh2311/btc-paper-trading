@@ -7607,21 +7607,27 @@ function renderPatternEntry(){
  $('patternEntryShort').setAttribute('aria-pressed',String(entry.side==='SHORT'));
  const valid=!!form.prices&&form.protections?.every(Boolean)&&
   (live||form.margin>=.1&&form.margin<=100);
+ const submitted=live&&entry.realDone.size>0;
+ // A confirmed real step must never be re-enabled by editing the form.
+ for(const id of ['patternEntryMode','patternEntryPrice','patternEntryStages',
+  'patternEntryMargin','patternEntryTp','patternEntrySl'])
+  $(id).disabled=submitted;
+ $('patternEntryLong').disabled=submitted;
+ $('patternEntryShort').disabled=submitted;
  const apply=$('patternEntryApply'),list=$('patternEntryStageList');
  apply.disabled=!valid;
  apply.textContent=!entry.side?'롱 또는 숏 선택':live?
   '실전 '+(entry.realDone.has(0)?'다음 단계':'1단계')+' 주문창 열기':
   form.count+'단계 모의 지정가 일괄 예약';
  list.replaceChildren();
- if(!valid){
+ if(!valid)
   $('patternEntryPreview').textContent='진입 방향·각 단계 지정가·익절가격·손절가격을 확인해 주세요.\n롱: 손절 < 진입 < 익절 / 숏: 익절 < 진입 < 손절';
-  return;
- }
+ if(!form.prices)return;
  const lev=Number($('lev')?.value),free=paperFreeMargin();
  const weight=Array.from({length:form.count},(_,i)=>1+.2*i),
   weightSum=weight.reduce((a,b)=>a+b,0);
  const budget=free*form.margin/100;
- $('patternEntryPreview').textContent=live?
+ if(valid)$('patternEntryPreview').textContent=live?
   '실전 · 기존 바이낸스 검증 주문창 사용 · 설정의 레버리지/증거금 비율 적용\n각 단계를 개별 확인 후 제출합니다. 주문창 열기는 주문 전송이 아닙니다.':
   '모의 · 사용 가능 '+fmt(free)+' USDT · 총 예약 증거금 '+fmt(budget)+
   ' USDT · '+(Number.isFinite(lev)?lev+'배':'레버리지 확인')+
@@ -7635,18 +7641,19 @@ function renderPatternEntry(){
   field.type='number';field.min='0.1';field.step='0.1';
   field.inputMode='decimal';field.value=String(form.prices[i]);
   field.setAttribute('aria-label',(i+1)+'단계 지정가 USDT');
-  field.disabled=entry.realDone.has(i);
+  field.disabled=submitted;
   field.addEventListener('change',()=>{
    const v=Number(field.value);
    if(!(v>0&&Number.isFinite(v))){patternEntryMessage('단계별 지정가는 0보다 커야 해요.');return;}
+   if(entry.realDone.size){patternEntryMessage('이미 접수된 실전 단계는 수정할 수 없어요.');return;}
    entry.stagePrices[i]=v;
    if(i===0)$('patternEntryPrice').value=String(v);
-   entry.realDone.clear();patternEntryMessage('');renderPatternEntry();
+   patternEntryMessage('');renderPatternEntry();
   });
   label.appendChild(field);row.appendChild(label);
   if(live){
    const button=document.createElement('button');button.type='button';
-   button.disabled=entry.realDone.has(i)||!form.protections?.[i];
+   button.disabled=entry.realDone.has(i)||!form.protections?.[i]||!!entry.realPending;
    button.textContent=entry.realDone.has(i)?'접수됨':'실전 확인';
    button.addEventListener('click',()=>openPatternEntryRealStage(i));
    row.appendChild(button);
@@ -7708,8 +7715,9 @@ function submitPatternEntryPaper(){
 }
 function openPatternEntryRealStage(index){
  const f=patternEntryForm(),state=patternEntrySession;
- if(!state||f.mode!=='real'||!f.prices||!Number.isInteger(index)||
-    index<0||index>=f.count||state.realDone.has(index))return;
+ if(!state||f.mode!=='real'||!f.prices||state.realPending||
+    !Number.isInteger(index)||index<0||index>=f.count||
+    state.realDone.has(index))return;
  if(!f.protections?.[index]){
   patternEntryMessage('이 단계의 진입가에 맞는 익절·손절 절대가격을 입력해 주세요.');return;
  }
@@ -7741,6 +7749,9 @@ function initPatternEntry(){
   'patternEntryMargin','patternEntryTp','patternEntrySl']){
   $(id)?.addEventListener('change',()=>{
    if(!patternEntrySession)return;
+   if(patternEntrySession.realDone.size){
+    patternEntryMessage('이미 등록한 실전 단계는 변경할 수 없어요.');return;
+   }
    if(id==='patternEntryPrice'){
     const value=Number($('patternEntryPrice').value);
     if(value>0)patternEntrySession.stagePrices[0]=value;
@@ -7748,10 +7759,16 @@ function initPatternEntry(){
    patternEntrySession.realDone.clear();renderPatternEntry();
   });
  }
- $('patternEntryMode').addEventListener('change',()=>{if(patternEntrySession)patternEntrySession.realDone.clear();renderPatternEntry()});
+ $('patternEntryMode').addEventListener('change',()=>{
+  if(!patternEntrySession)return;
+  if(patternEntrySession.realDone.size){
+   $('patternEntryMode').value='real';return;
+  }
+  renderPatternEntry();
+ });
  for(const [id,side] of [['patternEntryLong','LONG'],['patternEntryShort','SHORT']]){
   $(id).addEventListener('click',()=>{
-   if(!patternEntrySession)return;
+   if(!patternEntrySession||patternEntrySession.realDone.size)return;
    if(patternEntrySession.side!==side){
     patternEntrySession.realDone.clear();
     $('patternEntryTp').value='';$('patternEntrySl').value='';
