@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-dual-stack-compact-v334"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-binance-rest-guard-v335"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1865,22 +1865,45 @@ html.dual-chart-panel #page-chart #chart{
 }
 </style></head><script>
 (function(){
- const p=new URLSearchParams(location.search);
- const embedded=p.get('dual_chart_panel')==='1';
+ 'use strict';
+ const embedded=new URLSearchParams(location.search).get('dual_chart_panel')==='1';
  window.HANINE_DUAL_CHART_PANEL=embedded;
- if(!embedded)return;
- document.documentElement.classList.add('dual-chart-panel');
- // Panels share the exact chart code but must never initiate real Binance
- // mutations through duplicated scripts/buttons or an unlocked API key.
+ if(embedded)document.documentElement.classList.add('dual-chart-panel');
+ const KEY='hanine-binance-rest-backoff-v1';
  const nativeFetch=window.fetch.bind(window);
- window.fetch=function(input,init){
+ let blockedUntil=0;
+ try{blockedUntil=Number(localStorage.getItem(KEY))||0}catch(_){}
+ const isBinance=url=>/^(?:https?:)?\/\/(?:[\w-]+\.)?(?:binance\.com|binance\.us)\//i.test(url);
+ const privateRequest=(url,init,input)=>{
+  const h=new Headers(init?.headers||input?.headers||{});
+  return h.has('X-MBX-APIKEY')||
+   /(?:\?|&)signature=/i.test(url)||
+   /\/fapi\/v\d+\/(?:account|balance|positionRisk|openOrders|openOrder|order|openAlgoOrders|algoOrder|commissionRate|income|positionSide|leverage|marginType|allOrders|allAlgoOrders|userTrades|listenKey)/i.test(url);
+ };
+ window.btcBinanceRequestBackoff=()=>Math.max(0,blockedUntil-Date.now());
+ window.fetch=async function(input,init){
   const url=String(typeof input==='string'?input:input?.url||'');
   const method=String(init?.method||input?.method||'GET').toUpperCase();
-  if(/^(POST|DELETE|PUT|PATCH)$/.test(method)&&
-     (/binance\.(com|us)/i.test(url)||/\/fapi\/|\/dapi\//i.test(url)))
-   return Promise.reject(new Error('분할 비교차트는 분석 전용입니다. 실전 주문은 원래 차트에서 진행해 주세요.'));
-  return nativeFetch(input,init);
+  if(!isBinance(url))return nativeFetch(input,init);
+  if(embedded&&privateRequest(url,init,input))
+   throw new Error('비교차트에서는 바이낸스 실계좌 조회/주문을 실행하지 않습니다');
+  if(embedded&&/^(POST|DELETE|PUT|PATCH)$/.test(method))
+   throw new Error('비교차트는 분석 전용입니다. 원래 차트에서 주문해 주세요');
+  if(method==='GET'&&Date.now()<blockedUntil)
+   throw new Error('바이낸스 IP 제한 · '+new Date(blockedUntil).toLocaleString('ko-KR')+'까지 조회 중지');
+  const response=await nativeFetch(input,init);
+  if(method==='GET'&&(response.status===418||response.status===429)){
+   let data=null;try{data=await response.clone().json()}catch(_){}
+   let until=Number(String(data?.msg||'').match(/banned until\s+(\d{13})/i)?.[1]);
+   if(!(until>Date.now()))until=Date.now()+Math.max(60000,(Number(response.headers.get('Retry-After'))||60)*1000);
+   blockedUntil=Math.max(blockedUntil,until);
+   try{localStorage.setItem(KEY,String(blockedUntil))}catch(_){}
+  }
+  return response;
  };
+ window.addEventListener('storage',e=>{
+  if(e.key===KEY&&Number(e.newValue)>blockedUntil)blockedUntil=Number(e.newValue);
+ });
 })();
 </script><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
@@ -8146,7 +8169,7 @@ function initDualChartLayout(){
   url.searchParams.set('dual_chart_panel','1');
   url.searchParams.set('dual_tf',tf);
   url.searchParams.set('dual_instance',String(panel));
-  url.searchParams.set('app_refresh','v334');
+  url.searchParams.set('app_refresh','v335');
   return url.toString();
  }
  function show(){
@@ -9620,6 +9643,7 @@ function showVaultStatus(message){
    '🔒 이 앱에 저장된 API 키 없음 · 암호화 저장 또는 백업 복원 필요');
 }
 function getApiCredentials(){
+  if(window.HANINE_DUAL_CHART_PANEL)return null;
   const apiKey=$('myBinanceKey').value.trim(),apiSecret=$('myBinanceSecret').value.trim();
   if(apiKey&&apiSecret)return {apiKey,apiSecret};
   return unlockedApiCredentials;
@@ -9863,7 +9887,7 @@ async function ensureStoredApiCredentials(){
  return getApiCredentials();
 }
 async function refreshRealBinanceAccount(){
-  if(realAccountBusy)return;
+  if(window.HANINE_DUAL_CHART_PANEL||realAccountBusy||window.btcBinanceRequestBackoff?.()>0)return;
   const saved=await ensureStoredApiCredentials();
   if(!saved?.apiKey||!saved?.apiSecret){
     $('realPositions').textContent=localStorage.getItem(apiVaultStorageKey)?
