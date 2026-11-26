@@ -1740,6 +1740,42 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
 .patternCompare .historical #patternCompareHistoricalTf{flex:0 0 auto;min-width:60px;max-width:90px;height:19px;min-height:19px;padding:0 3px;border:1px solid #638aa8;border-radius:5px;background:#223d5b;color:#e5f5ff;font-size:11px}
 .patternCompare .historical #patternCompareHistoricalStatus{display:inline!important;overflow:hidden;max-width:48%;text-overflow:ellipsis;white-space:nowrap;font-size:9px;color:#ecc889}
 .patternCompare .historical #patternCompareHistoricalStatus:empty{display:none!important}
+
+/* v354: a native-height historical timeframe selector, never clipped by
+   the former 19px compact-chart title row. Only the lower pane changes. */
+.patternCompare .historical>div:first-child{
+ position:relative!important;display:flex!important;align-items:center!important;
+ flex-wrap:nowrap!important;flex:0 0 36px!important;
+ height:36px!important;min-height:36px!important;max-height:36px!important;
+ overflow:visible!important;gap:5px!important;padding:0 3px!important;
+ margin:0!important;
+}
+.patternCompare .historical #patternCompareHistoricalTitle{
+ display:block!important;flex:0 1 auto!important;min-width:0!important;
+ max-width:48%!important;overflow:hidden!important;text-overflow:ellipsis!important;
+ white-space:nowrap!important;line-height:1.25!important;font-size:11px!important;
+ padding:4px 6px!important;
+}
+.patternCompare .historical .patternHistoricalTfControl{
+ flex:0 0 auto!important;margin-left:auto!important;white-space:nowrap!important;
+ font-size:11px!important;line-height:1.2!important
+}
+.patternCompare .historical #patternCompareHistoricalTf{
+ flex:0 0 auto!important;width:88px!important;max-width:88px!important;
+ height:30px!important;min-height:30px!important;max-height:30px!important;
+ line-height:1.2!important;font-size:13px!important;padding:3px 7px!important;
+ border-radius:7px!important;position:relative!important;z-index:1!important;
+ appearance:auto!important;-webkit-appearance:menulist!important;
+}
+.patternCompare .historical #patternCompareHistoricalStatus:not(:empty){
+ position:absolute!important;top:35px!important;right:3px!important;
+ display:block!important;width:max-content!important;max-width:95%!important;
+ overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+ padding:3px 6px!important;font-size:10px!important;line-height:1.3!important;
+ border-radius:5px!important;background:rgba(15,35,57,.98)!important;
+ border:1px solid #456585!important;z-index:5!important;
+ pointer-events:none!important;
+}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
