@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-compare-fib-pan-v344"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-last-view-compare-signals-v345"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -6621,6 +6621,67 @@ function drawPatternCompareProjectedFib(ctx,levels,X,Y,first,last,left,right,top
  }
  ctx.restore();
 }
+// Read-only signal annotations for both panes of the similar-pattern
+// comparison. Uses the EXACT same closed-candle RMI and disparity event
+// functions as the main chart; never evaluates predicted future candles.
+function drawPatternCompareSignals(ctx,bars,tf,start,end,X,Y,left,right,top,bottom){
+ if(!Array.isArray(bars)||end<=start||bars.length<23)return;
+ const duration=candleDuration[tf]||60000,asOf=Date.now()-1800;
+ const events=[];
+ const rmi=chartRmiZoneMarkers(bars,start,end,asOf,tf);
+ for(const mark of rmi){
+  if(mark.side!=='LONG'&&mark.side!=='SHORT')continue;
+  const i=patternCompareNearestIndex(bars,mark.barTime);
+  if(bars[i]?.t!==mark.barTime||i<start||i>=end)continue;
+  events.push({i,side:mark.side,aggressive:!!mark.aggressive,type:'rmi'});
+ }
+ if(chartIndicators.disparity&&end>201){
+  const offset=Math.max(0,start-500),source=bars.slice(offset,end);
+  const d20=disparitySeries(source,20),d50=disparitySeries(source,50),
+   d200=disparitySeries(source,200);
+  let last=end-1;
+  if(last===bars.length-1&&nextCandleTime(tf,bars[last].t,1)>asOf)last--;
+  for(const item of disparityTransitionEvents(d20,d50,d200,last-offset)){
+   if(item.label!=='상승 전환 2단계'&&item.label!=='하락 전환 2단계')continue;
+   const i=offset+Math.ceil(item.index);
+   if(i<start||i>=end||!bars[i])continue;
+   events.push({i,side:item.label==='상승 전환 2단계'?'LONG':'SHORT',type:'stage'});
+  }
+ }
+ if(!events.length)return;
+ events.sort((a,b)=>a.i-b.i);
+ const markerW=Math.max(1,(right-left)/Math.max(1,end-start));
+ const lastStage={LONG:-999,SHORT:-999},lastRmi={LONG:-999,SHORT:-999};
+ ctx.save();ctx.beginPath();ctx.rect(left,top,right-left,bottom-top);ctx.clip();
+ ctx.textAlign='center';
+ for(const mark of events){
+  if(mark.type==='stage'&&mark.i-lastStage[mark.side]<3)continue;
+  if(mark.type==='rmi'&&!mark.aggressive&&mark.i-lastRmi[mark.side]<3)continue;
+  if(mark.type==='stage')lastStage[mark.side]=mark.i;
+  else lastRmi[mark.side]=mark.i;
+  const x=X(mark.i-start),bar=bars[mark.i];
+  if(x<left+22||x>right-22)continue;
+  const up=mark.side==='LONG',stage=mark.type==='stage';
+  const color=stage?(up?'#78efb7':'#ff91a6'):
+   mark.aggressive?'#ffd769':up?'#56e9a4':'#ff829a';
+  const anchor=up?Y(bar.l)+(stage?28:14):Y(bar.h)-(stage?28:14);
+  const y=Math.max(top+22,Math.min(bottom-19,anchor));
+  const label=stage?(up?'모의 롱 · 2단계':'모의 숏 · 2단계'):
+   mark.aggressive?'적극롱신호':mark.side;
+  ctx.fillStyle=color;ctx.strokeStyle='#091521';ctx.lineWidth=2.7;
+  ctx.font='bold 13px -apple-system,sans-serif';
+  ctx.strokeText(up?'▲':'▼',x,y);ctx.fillText(up?'▲':'▼',x,y);
+  ctx.font='bold 9px -apple-system,sans-serif';
+  const ty=y+(up?12:-12);
+  if(stage){
+   const w=ctx.measureText(label).width+7;
+   ctx.fillStyle='rgba(5,18,34,.87)';ctx.fillRect(x-w/2,ty-10,w,13);
+   ctx.fillStyle=color;
+  }
+  ctx.strokeText(label,x,ty);ctx.fillText(label,x,ty);
+ }
+ ctx.restore();
+}
 function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,visibleIndicators=null,priceView=null){
  const canvas=$(id);if(!canvas)return;
  const rect=canvas.getBoundingClientRect(),width=Math.max(260,Math.floor(rect.width)),height=Math.max(240,Math.floor(rect.height)),dpr=Math.min(3,window.devicePixelRatio||1);
@@ -6820,6 +6881,8 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  // Reuse the primary chart candle renderer, including its selected 2D
  // or dimensional style, rather than a separate palette/body algorithm.
  visible.forEach((bar,i)=>drawDimensionCandle(ctx,bar,X(i),pw/slots,Y));
+ // Actual market candles only. Future analogue projections never emit signals.
+ drawPatternCompareSignals(ctx,bars,tf,index-n+1,index+1,X,Y,left,left+pw,pt,pb);
  ctx.restore();
  // Same up/down volume histogram convention as the main chart.
  const futureActual=priceView?.historical&&scenario?.actual?scenario.actual:[];
