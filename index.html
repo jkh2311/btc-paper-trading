@@ -7235,6 +7235,73 @@ function patternHistoricalData(state){
  return view?.displayTf&&view.displayTf!==state.tf?
   (view.displayBars||[]):state.bars;
 }
+// Comparison-only request for an OLD 1-minute historical match.
+// The main live signal/order feed and two-month 1m archive stay unchanged.
+// Read the date-scoped IndexedDB chart-segment cache before contacting
+// Binance. One <=1000 candle public request, only on explicit selection.
+let patternHistoricMinuteCooldownUntil=0;
+const patternHistoricMinuteInFlight=new Map();
+function cachedPatternHistoricalMinuteWindow(matchTime,minBefore=235){
+ const target=candleOpenTime('1m',matchTime);
+ const lists=[
+  cachedSegmentFor('1m',target)?.bars,
+  minuteChartArchive,
+  candles['1m']
+ ];
+ for(const bars of lists){
+  const i=patternHistoricalAnchorIndex(bars,'1m',target);
+  if(i>=minBefore&&i<bars.length)return bars;
+ }
+ return null;
+}
+async function loadPatternHistoricalMinuteWindow(matchTime){
+ const target=candleOpenTime('1m',matchTime);
+ if(!Number.isFinite(target)||target<=0||target>Date.now()+60000)
+  throw Error('유사 시점 날짜 오류');
+ const fromCache=cachedPatternHistoricalMinuteWindow(target);
+ if(fromCache)return fromCache;
+ if(patternHistoricMinuteInFlight.has(target))
+  return patternHistoricMinuteInFlight.get(target);
+ if(Date.now()<patternHistoricMinuteCooldownUntil)
+  throw Error('거래소 요청 제한 중 · 잠시 후 다시 1분봉을 선택해 주세요');
+ if(demo)throw Error('실제 선물 1분봉 조회는 실시간 연결에서 사용할 수 있어요');
+ const task=(async()=>{
+  // 620 warm-up candles + actual match candle + up to 300 subsequent
+  // candles, a single 921-bar query, well below Binance's 1000 cap.
+  const start=target-620*60000,end=target+300*60000;
+  const url='https://fapi.binance.com/fapi/v1/klines?'+
+   new URLSearchParams({symbol:'BTCUSDT',interval:'1m',limit:'1000',
+    startTime:String(start),endTime:String(end)});
+  const response=await fetch(url,{cache:'no-store',
+   signal:AbortSignal.timeout(18000)});
+  if(!response.ok){
+   if(response.status===429||response.status===418){
+    patternHistoricMinuteCooldownUntil=Date.now()+120000;
+    throw Error('바이낸스 1분봉 조회 제한 ('+response.status+') · 2분 후 다시 선택해 주세요');
+   }
+   throw Error('과거 1분봉 조회 HTTP '+response.status);
+  }
+  const raw=await response.json();
+  if(!Array.isArray(raw))throw Error('거래소 1분봉 응답이 올바르지 않아요');
+  const bars=normalizeChartCacheBars(raw.map(v=>({
+   t:Number(v[0]),o:Number(v[1]),h:Number(v[2]),l:Number(v[3]),
+   c:Number(v[4]),v:Number(v[5])})));
+  const index=patternHistoricalAnchorIndex(bars,'1m',target);
+  if(index<250)throw Error('거래소에서 해당 날짜 주변의 1분봉을 충분히 받지 못했어요');
+  // A data gap must not be depicted as genuine contiguous 1m history.
+  for(let i=Math.max(1,index-220);i<=index;i++){
+   if(bars[i].t-bars[i-1].t!==60000)
+    throw Error('거래소 1분봉에 누락이 있어 차트를 표시하지 않았어요');
+  }
+  // Keep date-specific historical segments separate from the ordinary
+  // archive: never disturb live chart, WS cache, or trading indicators.
+  await saveCachedChartSegment({tf:'1m',bars});
+  return cachedSegmentFor('1m',target)?.bars||bars;
+ })();
+ patternHistoricMinuteInFlight.set(target,task);
+ try{return await task}
+ finally{patternHistoricMinuteInFlight.delete(target)}
+}
 // Explicit lower-pane timeframe selection; no similarity re-search or orders.
 async function choosePatternHistoricalDisplay(tf){
  const state=patternComparison,selector=$('patternCompareHistoricalTf'),
@@ -7249,14 +7316,17 @@ async function choosePatternHistoricalDisplay(tf){
   const matchTime=patternHistoricalMatchTime(state);
   if(!Number.isFinite(matchTime))throw Error('유사 시점 확인 실패');
   let bars=tf===state.tf?state.bars:
-   tf==='1m'&&minuteChartArchive?.length?minuteChartArchive:candles[tf]||[];
+   tf==='1m'?(cachedSegmentFor('1m',matchTime)?.bars||
+     minuteChartArchive||candles['1m']||[]):candles[tf]||[];
   const config=indicatorPatternConfig(tf);
   const warmup=Math.max(config.bb,...config.ma,
    config.rmiLength+config.rmiMomentum)+2;
   let i=patternHistoricalAnchorIndex(bars,tf,matchTime);
   if(!Array.isArray(bars)||i<warmup+10){
-   // Fetch only after an explicit user choice (never a screen-refresh timer).
-   bars=await loadIndicatorPatternHistory(tf);
+   // Download the selected 1-minute DATE only, not two months starting
+   // from today. Other timeframes retain the existing history loaders.
+   bars=tf==='1m'?await loadPatternHistoricalMinuteWindow(matchTime):
+    await loadIndicatorPatternHistory(tf);
    i=patternHistoricalAnchorIndex(bars,tf,matchTime);
   }
   if(requestId!==state.historicalDisplayRequestId||patternComparison!==state)return;
