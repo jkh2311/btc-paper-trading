@@ -181,11 +181,10 @@ function stageRecords(){
 }
 function saveStageRecord(side,order,protection=null){
  const all=stageRecords(),entries=Array.isArray(all[side])?all[side]:[];
- entries.push({id:String(order.orderId),time:Date.now(),stop:Number(protection?.slPercent||$('stop').value),
-  rr:Number($('rr').value),roiMode:!protection,leverage:Number($('lev').value),
-  ...(protection?{tpPrice:Number(protection.tpPrice),slPrice:Number(protection.slPrice),
-   reservationPrice:Number(order.price),tpPercent:Number(protection.tpPercent),
-   slPercent:Number(protection.slPercent)}:{})});all[side]=entries.slice(-20);
+ const roi=protection?.protectionMode==='roi';
+ entries.push({id:String(order.orderId),time:Date.now(),stop:Number(roi?protection.slRoi:protection?.slPercent||$('stop').value),
+  rr:Number(roi?protection.tpRoi:$('rr').value),roiMode:roi||!protection,leverage:Number(roi?protection.leverage:$('lev').value),
+  ...(protection?{reservationPrice:Number(order.price),...(roi?{}:{tpPrice:Number(protection.tpPrice),slPrice:Number(protection.slPrice),tpPercent:Number(protection.tpPercent),slPercent:Number(protection.slPercent)})}:{})});all[side]=entries.slice(-20);
  try{const base=JSON.parse(localStorage.getItem(stageLedgerKey)||'{}');base[stageAccountId()]=all;localStorage.setItem(stageLedgerKey,JSON.stringify(base));}
  catch(_){}
 }
@@ -260,7 +259,7 @@ document.addEventListener('btc:chart-price-limit-entry',e=>{
   const requested=Number(data.stageCount);
   chartRequestedStageCount=Number.isInteger(requested)&&requested>=1&&requested<=6?requested:null;
   const pp={tpPrice:Number(data.tpPrice),slPrice:Number(data.slPrice),
-   tpPercent:Number(data.tpPercent),slPercent:Number(data.slPercent),side:data.side,protectionMode:data.protectionMode==='percent'?'percent':'price'};
+   tpPercent:Number(data.tpPercent),slPercent:Number(data.slPercent),side:data.side,protectionMode:data.protectionMode==='roi'?'roi':'price',tpRoi:Number(data.tpRoi),slRoi:Number(data.slRoi),leverage:Number(data.leverage)};
   if([pp.tpPrice,pp.slPrice,pp.tpPercent,pp.slPercent].every(v=>Number.isFinite(v)&&v>0)){
    chartProtectionPlan=pp;
    reservationProtectionLabel.style.display='block';
@@ -295,18 +294,20 @@ if(limitInput){
  limitInput.addEventListener('input',()=>{
   sheetPriceEdited=true;
   quoteState.textContent='직접 입력한 지정가 고정 · 현재가는 계속 표시';
-  if(chartProtectionPlan?.protectionMode==='percent')paintChartReservationProtection(Number(limitInput.value));
+  if(chartProtectionPlan?.protectionMode==='roi')paintChartReservationProtection(Number(limitInput.value));
  });
 }
 const limitOrderSelected=()=>document.querySelector('input[name="orderType"]:checked')?.value!=='market';
 const isSheetOpen=()=>{const e=$('entrySheet');return !!e&&e.style.display!=='none'&&e.dataset.realSide;};
 function chartReservationTargets(plan,price){
  if(!plan||!Number.isFinite(price)||!(price>0))return null;
- if(plan.protectionMode!=='percent')return {tpPrice:plan.tpPrice,slPrice:plan.slPrice};
- const tp=plan.tpPercent,sl=plan.slPercent;
- if(!['LONG','SHORT'].includes(plan.side)||!Number.isFinite(tp)||!Number.isFinite(sl)||!(tp>0&&tp<=99&&sl>=.05&&sl<=10))return null;
+ if(plan.protectionMode!=='roi')return {tpPrice:plan.tpPrice,slPrice:plan.slPrice};
+ const tp=plan.tpRoi,sl=plan.slRoi,lev=plan.leverage;
+ if(!['LONG','SHORT'].includes(plan.side)||!Number.isInteger(lev)||lev<1||lev>100||
+    !Number.isFinite(tp)||!Number.isFinite(sl)||!(tp>=.1&&tp<=100&&sl>=.1&&sl<=100))return null;
  const sign=plan.side==='LONG'?1:-1;
- return {tpPrice:price*(1+sign*tp/100),slPrice:price*(1-sign*sl/100)};
+ const tpPrice=price*(1+sign*tp/(100*lev)),slPrice=price*(1-sign*sl/(100*lev));
+ return tpPrice>0&&slPrice>0?{tpPrice,slPrice}:null;
 }
 function paintChartReservationProtection(price){
  const plan=chartProtectionPlan;if(!chartLimitPriceMode||!plan)return;
@@ -314,8 +315,8 @@ function paintChartReservationProtection(price){
  if(!targets){reservationProtectionLabel.textContent='현재가 확인 중 · 익절/손절 예상가격 대기';return;}
  reservationProtectionLabel.textContent='예약 '+plan.side+
   (chartRequestedStageCount?' · 비교창 '+chartRequestedStageCount+'단계 중 1건씩 확정':'')+
-  (plan.protectionMode==='percent'?' · BTC 가격 변동률 (ROI 아님)':' · 절대가격 고정')+
-  ' · 익절 '+targets.tpPrice.toFixed(1)+' USDT ('+plan.tpPercent.toFixed(2)+'%) / 손절 '+targets.slPrice.toFixed(1)+' USDT ('+plan.slPercent.toFixed(2)+'%). 체결 이후 보호 주문 등록은 앱 연결 상태에서 확인이 필요합니다.';
+  (plan.protectionMode==='roi'?' · '+plan.leverage+'배 · 증거금 ROI (수수료/펀딩 제외, 체결 평균가 기준 재계산)':' · 절대가격 고정')+
+  ' · 익절 '+targets.tpPrice.toFixed(1)+' USDT ('+(plan.protectionMode==='roi'?plan.tpRoi:plan.tpPercent).toFixed(2)+'%) / 손절 '+targets.slPrice.toFixed(1)+' USDT ('+(plan.protectionMode==='roi'?plan.slRoi:plan.slPercent).toFixed(2)+'%). 체결 이후 보호 주문 등록은 앱 연결 상태에서 확인이 필요합니다.';
 }
 function freshChartCurrentLimit(quote,tick,digits,now){
  if(!Number.isFinite(quote?.price)||!(quote.price>0)||!Number.isFinite(quote?.at)||
@@ -328,7 +329,7 @@ function followQuote(){
   if(busy)return; // The order path alone sets the final validated price.
   const value=freshChartCurrentLimit(liveQuote,sheetTick>0?sheetTick:.1,sheetTick>0?sheetTickDigits:1,Date.now());
   limitInput.value=value===null?'':String(value);
-  if(chartProtectionPlan?.protectionMode==='percent')paintChartReservationProtection(value);
+  if(chartProtectionPlan?.protectionMode==='roi')paintChartReservationProtection(value);
   quoteState.textContent=value===null?'실시간 시세 연결 확인 중 · 주문 불가':'실시간 현재가 자동 연동 · 최종 주문 전 최신 지정가 확정';
   return;
  }
@@ -474,7 +475,8 @@ async function enter(side){
   if(plan&&plan.side!==side)throw Error('예약진입 방향이 바뀌었습니다. 주문 미전송');
   const lev=val('lev'),count=chartLimitPriceMode&&chartRequestedStageCount!==null?
    chartRequestedStageCount:Number($('pyramidEntryCount')?.value),
-   stop=plan?(plan.protectionMode==='percent'?plan.slPercent:Math.abs(price-Number(plan.slPrice))/price*100):val('stop')/lev;
+   stop=plan?(plan.protectionMode==='roi'?plan.slRoi/plan.leverage:Math.abs(price-Number(plan.slPrice))/price*100):val('stop')/lev;
+  if(plan?.protectionMode==='roi'&&plan.leverage!==lev)throw Error('레버리지 변경 · 예약창에서 ROI 다시 확인 필요 · 주문 미전송');
   if(!Number.isInteger(count)||count<1||count>7)
    throw Error('진입 단계는 설정에서 1~7단계 중 선택해 주세요. 주문 미전송');
   if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
@@ -544,12 +546,13 @@ async function enter(side){
    const tpPrice=snapped(targets.tpPrice),slPrice=snapped(targets.slPrice);
    const tpPercent=Math.abs(tpPrice/basePrice-1)*100;
    const slPercent=Math.abs(slPrice/basePrice-1)*100;
-   if(!(tpPrice>0&&slPrice>0&&tpPercent>0&&tpPercent<=99&&
-    slPercent>=.05&&slPercent<=10&&
+   const roi=plan.protectionMode==='roi';
+   if(!(tpPrice>0&&slPrice>0&&tpPercent>0&&slPercent>0&&
+    (roi?plan.tpRoi>=.1&&plan.tpRoi<=100&&plan.slRoi>=.1&&plan.slRoi<=100:tpPercent<=99&&slPercent>=.05&&slPercent<=10)&&
     (up?tpPrice>basePrice&&slPrice<basePrice:tpPrice<basePrice&&slPrice>basePrice)))
     throw Error('수정한 예약 진입가 기준 TP/SL 방향 또는 손절 비율(0.05~10%)이 잘못됐습니다. 주문 미전송');
    protection={...plan,tpPrice,slPrice,tpPercent,slPercent};
-   if(plan.protectionMode==='percent')paintChartReservationProtection(basePrice);
+   if(plan.protectionMode==='roi')paintChartReservationProtection(basePrice);
   }
   // The second, explicitly labeled REAL LONG/SHORT entry button submits
   // immediately after exchange/account/size checks, without a native confirm.
@@ -868,6 +871,28 @@ function renderSwitchWatch(){
 document.addEventListener('btc:live-switch-state',renderSwitchWatch);
 renderSwitchWatch();
 let listedOrders=null,orderListError='',orderCancelBusy=false,orderReadGeneration=0;
+let reservationLevels=[],reservationAt=0;
+function reservationLevelsFromOrders(orders,records){
+ const result=[];
+ for(const side of ['LONG','SHORT']){
+  const entries=Array.isArray(records?.[side])?records[side]:[];
+  for(const order of orders){
+   const id=String(order.orderId),index=entries.findIndex(e=>String(e.id)===id),price=Number(order.price),remaining=Number(order.origQty)-Number(order.executedQty||0);
+   if(index<0||!(Number(entries[index].reservationPrice)>0)||order.symbol!=='BTCUSDT'||order.type!=='LIMIT'||!['NEW','PARTIALLY_FILLED'].includes(order.status)||order.side!==(side==='LONG'?'BUY':'SELL')||![side,'BOTH'].includes(order.positionSide)||order.reduceOnly===true||order.reduceOnly==='true'||order.closePosition===true||order.closePosition==='true'||!Number.isFinite(price)||price<=0||!Number.isFinite(remaining)||remaining<=0)continue;
+   result.push({id,side,price,stage:index+1});
+  }
+ }
+ return result;
+}
+function publishReservationLevels(orders){
+ const next=reservationLevelsFromOrders(orders,stageRecords()),changed=JSON.stringify(next)!==JSON.stringify(reservationLevels);
+ reservationLevels=next;reservationAt=Date.now();
+ if(changed)document.dispatchEvent(new Event('btc:real-reservation-levels'));
+}
+function clearReservationLevels(){const changed=reservationLevels.length>0;reservationLevels=[];reservationAt=0;if(changed)document.dispatchEvent(new Event('btc:real-reservation-levels'));}
+window.btcRealReservationLevels=()=>credentialsSafeSilent()&&Date.now()-reservationAt<=15000?reservationLevels:[];
+document.addEventListener('btc:real-account-cleared',clearReservationLevels);
+setInterval(()=>{if(reservationLevels.length&&Date.now()-reservationAt>15000)clearReservationLevels();},1000);
 function formatOpenOrder(o){
  const side=o.positionSide==='LONG'?'롱 LONG':o.positionSide==='SHORT'?'숏 SHORT':o.side==='BUY'?'롱 BUY':'숏 SELL';
  const remaining=Math.max(0,Number(o.origQty)-Number(o.executedQty));
@@ -876,11 +901,13 @@ function formatOpenOrder(o){
 function showOpenOrders(orders,error=''){
  if(error){
   orderListError=error;
+  clearReservationLevels();
   orderList.textContent='실제 미체결 주문 조회 실패 · 마지막 목록은 최신 정보가 아닙니다. '+error;
   return;
  }
  orderListError='';
  listedOrders=orders;
+ publishReservationLevels(orders);
  orderList.replaceChildren();
  const title=document.createElement('div');
  title.style.cssText='font-size:13px;font-weight:750;color:#dbe7f8;margin:5px 0 9px';
