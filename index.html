@@ -7277,7 +7277,7 @@ async function choosePatternCurrentDisplay(tf){
   view.displayBars=tf===state.tf?null:bars;
   view.index=bars.length-1;view.baseIndex=view.index;
   view.count=Math.min(config.window,bars.length-1);
-  view.futureShift=0;view.priceZoom=1;view.pricePan=0;
+  view.futureShift=0;view.pastReveal=0;view.priceZoom=1;view.pricePan=0;
   view.inspectIndex=null;view.inspectFutureOffset=null;view.inspectPrice=null;
   view.replayKey=null;view.replaySource=null;
   renderPatternComparison();
@@ -8137,6 +8137,9 @@ async function restoreLastVisibleScreen(){
      view.count=Math.max(10,Math.min(300,Number(row.count)||view.count));
      view.futureShift=name==='current'?
       Math.max(0,Math.min(PATTERN_COMPARE_MAX_FUTURE,Number(row.futureShift)||0)):0;
+     view.pastReveal=name==='current'?
+      Math.max(0,Math.min(Math.max(32,Math.min(160,Math.ceil(view.count*.9))),
+       Number(row.pastReveal)||0)):0;
      view.priceZoom=Math.max(.12,Math.min(20,Number(row.priceZoom)||1));
      view.pricePan=Number.isFinite(row.pricePan)?row.pricePan:0;
      if(row.show&&typeof row.show==='object')
@@ -9964,7 +9967,7 @@ function lastComparisonSnapshot(){
   const timeOf=i=>Number.isInteger(i)?bars[i]?.t:null;
   views[name]={time:timeOf(view.index),base:timeOf(view.baseIndex),
    inspect:timeOf(view.inspectIndex),count:view.count,
-   futureShift:view.futureShift||0,priceZoom:view.priceZoom,
+   futureShift:view.futureShift||0,pastReveal:view.pastReveal||0,priceZoom:view.priceZoom,
    pricePan:view.pricePan,show:view.show};
  }
  const matches=state.matches.slice(0,10).map(m=>({
