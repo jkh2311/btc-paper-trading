@@ -76,6 +76,7 @@ function notice(text,ok=false){
  }));
 }
 function applyBanBackoff(err){
+ window.btcProtectionReadBackoff?.remember(err);
  const msg=String(err?.message||err);
  const ban=Number(msg.match(/banned until\s+(\d{13})/i)?.[1]);
  if(ban>Date.now())banUntil=Math.max(banUntil,ban);
@@ -87,6 +88,7 @@ function isSameActive(a,b){
 }
 async function clean(){
  if(busy||document.hidden||window.btcProtectionEditBusy===true||
+    window.btcProtectionReadBackoff?.active()||
     Date.now()<nextCheck||Date.now()<banUntil)return;
  const c=typeof getApiCredentials==='function'?getApiCredentials():null;
  if(!c?.apiKey||!c?.apiSecret)return;
@@ -142,7 +144,9 @@ async function clean(){
    void window.btcRefreshRealProtection().catch(()=>{});
  }catch(e){
   applyBanBackoff(e);
-  notice('⚠ 익절/손절 자동 정리 보류 · '+String(e?.message||e));
+  const limited=window.btcProtectionReadBackoff?.active();
+  notice(limited?window.btcProtectionReadBackoff.message():
+   '⚠ 익절/손절 자동 정리 보류 · '+String(e?.message||e));
  }finally{busy=false;}
 }
 document.addEventListener('btc:real-account-updated',e=>{
