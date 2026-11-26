@@ -191,7 +191,7 @@ async function protect(side,p,info){
  }}));
 }
 async function run(){
- if(busy||window.btcProtectionEditBusy===true||document.hidden||!getApiCredentials()?.apiKey)return;
+ if(busy||window.btcProtectionEditBusy===true||document.hidden||window.btcProtectionReadBackoff?.active()||!getApiCredentials()?.apiKey)return;
  busy=true;
  try{
   const data=records();
@@ -215,15 +215,19 @@ async function run(){
    const first=fills.sort((a,b)=>a.filledAt-b.filledAt)[0];
    await protect(side,p,first);
   }
- }catch(e){note.textContent='⚠ 실전 익절·손절 확인 실패: '+String(e?.message||e)+
-  '\n바이낸스에서 손절·익절 주문 상태를 확인하세요.';
+ }catch(e){
+  const limited=window.btcProtectionReadBackoff?.remember(e)===true;
+  note.textContent=limited?
+   window.btcProtectionReadBackoff.message():
+   '⚠ 실전 익절·손절 확인 실패: '+String(e?.message||e)+
+   '\n바이낸스에서 손절·익절 주문 상태를 확인하세요.';
   document.dispatchEvent(new CustomEvent('btc:manual-protection-status',{
    detail:{ok:false,message:note.textContent}
   }));
  }
  finally{busy=false;}
 }
-setInterval(run,10000);
+setInterval(run,30000);
 // A filled manual entry deserves prompt real Binance-hosted protection, not
 // only the 10-second periodic supervisor. Limit orders are rechecked without
 // assuming that NEW / PARTIALLY_FILLED is a complete fill.
