@@ -260,15 +260,11 @@ document.addEventListener('btc:chart-price-limit-entry',e=>{
   const requested=Number(data.stageCount);
   chartRequestedStageCount=Number.isInteger(requested)&&requested>=1&&requested<=6?requested:null;
   const pp={tpPrice:Number(data.tpPrice),slPrice:Number(data.slPrice),
-   tpPercent:Number(data.tpPercent),slPercent:Number(data.slPercent),side:data.side};
+   tpPercent:Number(data.tpPercent),slPercent:Number(data.slPercent),side:data.side,protectionMode:data.protectionMode==='percent'?'percent':'price'};
   if([pp.tpPrice,pp.slPrice,pp.tpPercent,pp.slPercent].every(v=>Number.isFinite(v)&&v>0)){
    chartProtectionPlan=pp;
    reservationProtectionLabel.style.display='block';
-   reservationProtectionLabel.textContent='예약 '+data.side+
-    (chartRequestedStageCount?' · 비교창 '+chartRequestedStageCount+'단계 중 1건씩 확정':'')+
-    ' · 익절 '+pp.tpPrice.toFixed(1)+
-    ' USDT ('+pp.tpPercent.toFixed(2)+'%) / 손절 '+pp.slPrice.toFixed(1)+
-    ' USDT ('+pp.slPercent.toFixed(2)+'%). 체결 이후 보호 주문 등록은 앱 연결 상태에서 확인이 필요합니다.';
+   paintChartReservationProtection(data.price);
   }
  }
 });
@@ -299,10 +295,28 @@ if(limitInput){
  limitInput.addEventListener('input',()=>{
   sheetPriceEdited=true;
   quoteState.textContent='직접 입력한 지정가 고정 · 현재가는 계속 표시';
+  if(chartProtectionPlan?.protectionMode==='percent')paintChartReservationProtection(Number(limitInput.value));
  });
 }
 const limitOrderSelected=()=>document.querySelector('input[name="orderType"]:checked')?.value!=='market';
 const isSheetOpen=()=>{const e=$('entrySheet');return !!e&&e.style.display!=='none'&&e.dataset.realSide;};
+function chartReservationTargets(plan,price){
+ if(!plan||!Number.isFinite(price)||!(price>0))return null;
+ if(plan.protectionMode!=='percent')return {tpPrice:plan.tpPrice,slPrice:plan.slPrice};
+ const tp=plan.tpPercent,sl=plan.slPercent;
+ if(!['LONG','SHORT'].includes(plan.side)||!Number.isFinite(tp)||!Number.isFinite(sl)||!(tp>0&&tp<=99&&sl>=.05&&sl<=10))return null;
+ const sign=plan.side==='LONG'?1:-1;
+ return {tpPrice:price*(1+sign*tp/100),slPrice:price*(1-sign*sl/100)};
+}
+function paintChartReservationProtection(price){
+ const plan=chartProtectionPlan;if(!chartLimitPriceMode||!plan)return;
+ const targets=chartReservationTargets(plan,price);
+ if(!targets){reservationProtectionLabel.textContent='현재가 확인 중 · 익절/손절 예상가격 대기';return;}
+ reservationProtectionLabel.textContent='예약 '+plan.side+
+  (chartRequestedStageCount?' · 비교창 '+chartRequestedStageCount+'단계 중 1건씩 확정':'')+
+  (plan.protectionMode==='percent'?' · BTC 가격 변동률 (ROI 아님)':' · 절대가격 고정')+
+  ' · 익절 '+targets.tpPrice.toFixed(1)+' USDT ('+plan.tpPercent.toFixed(2)+'%) / 손절 '+targets.slPrice.toFixed(1)+' USDT ('+plan.slPercent.toFixed(2)+'%). 체결 이후 보호 주문 등록은 앱 연결 상태에서 확인이 필요합니다.';
+}
 function freshChartCurrentLimit(quote,tick,digits,now){
  if(!Number.isFinite(quote?.price)||!(quote.price>0)||!Number.isFinite(quote?.at)||
     now-quote.at<0||now-quote.at>3500||!(tick>0))return null;
@@ -314,6 +328,7 @@ function followQuote(){
   if(busy)return; // The order path alone sets the final validated price.
   const value=freshChartCurrentLimit(liveQuote,sheetTick>0?sheetTick:.1,sheetTick>0?sheetTickDigits:1,Date.now());
   limitInput.value=value===null?'':String(value);
+  if(chartProtectionPlan?.protectionMode==='percent')paintChartReservationProtection(value);
   quoteState.textContent=value===null?'실시간 시세 연결 확인 중 · 주문 불가':'실시간 현재가 자동 연동 · 최종 주문 전 최신 지정가 확정';
   return;
  }
@@ -459,7 +474,7 @@ async function enter(side){
   if(plan&&plan.side!==side)throw Error('예약진입 방향이 바뀌었습니다. 주문 미전송');
   const lev=val('lev'),count=chartLimitPriceMode&&chartRequestedStageCount!==null?
    chartRequestedStageCount:Number($('pyramidEntryCount')?.value),
-   stop=plan?Math.abs(price-Number(plan.slPrice))/price*100:val('stop')/lev;
+   stop=plan?(plan.protectionMode==='percent'?plan.slPercent:Math.abs(price-Number(plan.slPrice))/price*100):val('stop')/lev;
   if(!Number.isInteger(count)||count<1||count>7)
    throw Error('진입 단계는 설정에서 1~7단계 중 선택해 주세요. 주문 미전송');
   if(!confirmedLeverage||confirmedLeverage.value!==lev||confirmedLeverage.apiKey!==cred()?.apiKey)
@@ -524,7 +539,9 @@ async function enter(side){
    // Absolute user-entered protection prices stay fixed even when the
    // limit-entry price is edited in the final order sheet.
    const snapped=v=>Number((Math.round(v/tick)*tick).toFixed(8));
-   const tpPrice=snapped(plan.tpPrice),slPrice=snapped(plan.slPrice);
+   const targets=chartReservationTargets(plan,basePrice);
+   if(!targets)throw Error('익절·손절 변동률 오류 · 주문 미전송');
+   const tpPrice=snapped(targets.tpPrice),slPrice=snapped(targets.slPrice);
    const tpPercent=Math.abs(tpPrice/basePrice-1)*100;
    const slPercent=Math.abs(slPrice/basePrice-1)*100;
    if(!(tpPrice>0&&slPrice>0&&tpPercent>0&&tpPercent<=99&&
@@ -532,6 +549,7 @@ async function enter(side){
     (up?tpPrice>basePrice&&slPrice<basePrice:tpPrice<basePrice&&slPrice>basePrice)))
     throw Error('수정한 예약 진입가 기준 TP/SL 방향 또는 손절 비율(0.05~10%)이 잘못됐습니다. 주문 미전송');
    protection={...plan,tpPrice,slPrice,tpPercent,slPercent};
+   if(plan.protectionMode==='percent')paintChartReservationProtection(basePrice);
   }
   // The second, explicitly labeled REAL LONG/SHORT entry button submits
   // immediately after exchange/account/size checks, without a native confirm.
