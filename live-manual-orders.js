@@ -224,7 +224,7 @@ async function currentManualPositions(){
 // sheet. The displayed live quote is separate from the order's LIMIT price.
 // Editing the LIMIT price freezes only that field, not the moving live quote.
 let sheetQuoteGeneration=0,sheetPriceEdited=false,sheetQuoteBusy=false,sheetQuoteLastAt=0;
-let chartLimitPriceMode=false,entrySheetOriginalPosition=null,chartProtectionPlan=null;
+let chartLimitPriceMode=false,entrySheetOriginalPosition=null,chartProtectionPlan=null,chartRequestedStageCount=null;
 const reservationProtectionLabel=document.createElement('div');
 reservationProtectionLabel.id='realReservationProtectionPreview';
 reservationProtectionLabel.style.cssText='display:none;margin:7px 0 10px;padding:10px;border:1px solid #3c708b;background:#0b253a;border-radius:9px;font-size:12px;line-height:1.6;color:#b7e9d8';
@@ -237,7 +237,7 @@ function restoreChartLimitSheet(){
   if(parent?.isConnected)parent.insertBefore(sh,next?.parentNode===parent?next:null);
   entrySheetOriginalPosition=null;
  }
- chartLimitPriceMode=false;chartProtectionPlan=null;reservationProtectionLabel.style.display='none';
+ chartLimitPriceMode=false;chartProtectionPlan=null;chartRequestedStageCount=null;reservationProtectionLabel.style.display='none';
  for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.disabled=false;
  if(typeof quoteReset!=='undefined'&&quoteReset)quoteReset.style.display='';
 }
@@ -246,14 +246,19 @@ document.addEventListener('btc:chart-price-limit-entry',e=>{
  if(!data||data.symbol!=='BTCUSDT'||!['LONG','SHORT'].includes(data.side)||
     !Number.isFinite(data.price)||!(data.price>0)||busy)return;
  showSheet(data.side,data.price);
- // Store targets only after the order sheet was successfully opened.
+ // Comparison modal may request 1–6 manual stages; all signed Binance
+ // tick/lot/margin/leverage/stage-ledger safeguards below remain in force.
  if(chartLimitPriceMode){
+  const requested=Number(data.stageCount);
+  chartRequestedStageCount=Number.isInteger(requested)&&requested>=1&&requested<=6?requested:null;
   const pp={tpPrice:Number(data.tpPrice),slPrice:Number(data.slPrice),
    tpPercent:Number(data.tpPercent),slPercent:Number(data.slPercent),side:data.side};
   if([pp.tpPrice,pp.slPrice,pp.tpPercent,pp.slPercent].every(v=>Number.isFinite(v)&&v>0)){
    chartProtectionPlan=pp;
    reservationProtectionLabel.style.display='block';
-   reservationProtectionLabel.textContent='예약 '+data.side+' · 익절 '+pp.tpPrice.toFixed(1)+
+   reservationProtectionLabel.textContent='예약 '+data.side+
+    (chartRequestedStageCount?' · 비교창 '+chartRequestedStageCount+'단계 중 1건씩 확정':'')+
+    ' · 익절 '+pp.tpPrice.toFixed(1)+
     ' USDT ('+pp.tpPercent.toFixed(2)+'%) / 손절 '+pp.slPrice.toFixed(1)+
     ' USDT ('+pp.slPercent.toFixed(2)+'%). 체결 이후 보호 주문 등록은 앱 연결 상태에서 확인이 필요합니다.';
   }
@@ -426,7 +431,8 @@ async function enter(side){
   const plan=chartLimitPriceMode?chartProtectionPlan:null;
   if(chartLimitPriceMode&&!plan)throw Error('예약진입 익절·손절 목표가가 누락됐습니다. 주문 미전송');
   if(plan&&plan.side!==side)throw Error('예약진입 방향이 바뀌었습니다. 주문 미전송');
-  const lev=val('lev'),count=Number($('pyramidEntryCount')?.value),
+  const lev=val('lev'),count=chartLimitPriceMode&&chartRequestedStageCount!==null?
+   chartRequestedStageCount:Number($('pyramidEntryCount')?.value),
    stop=plan?Math.abs(price-Number(plan.slPrice))/price*100:val('stop')/lev;
   if(!Number.isInteger(count)||count<1||count>7)
    throw Error('진입 단계는 설정에서 1~7단계 중 선택해 주세요. 주문 미전송');
