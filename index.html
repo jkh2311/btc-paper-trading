@@ -7772,7 +7772,10 @@ function initPatternComparison(){
       if(!patternComparison||pointers.size!==1||tapMoved)return;
       holdingCrosshair=true;
       if(dragMode==='price')inspectAtPriceY(lastY);
-      else inspectAtX(lastX);
+      else{
+       inspectAtX(lastX);
+       if(which==='current')inspectAtPriceY(lastY);
+      }
      },380);
     }
    }
@@ -7793,7 +7796,10 @@ function initPatternComparison(){
    if(holdingCrosshair&&pointers.size===1){
     lastX=e.clientX;lastY=e.clientY;
     if(dragMode==='price')inspectAtPriceY(e.clientY);
-    else inspectAtX(e.clientX);
+    else{
+     inspectAtX(e.clientX);
+     if(which==='current')inspectAtPriceY(e.clientY);
+    }
     return;
    }
    if(pointers.size===2){tapMoved=true;
@@ -7847,10 +7853,28 @@ function initPatternComparison(){
    // A simple tap inspects the candle like the original crosshair. Dragging
    // moves through historical bars; pinch zoom is never treated as a tap.
    clearHold();
-   // A short single tap CLEARS pinned crosshair/price guides; a long
-   // press creates one. No inspection is created on a short tap.
-   if(e.type==='pointerup'&&!tapMoved&&!holdingCrosshair&&
+   // Tap a second time ON the pinned price line to choose a
+   // 1–6 stage limit reservation. Historical panes remain view-only.
+   let openedReservation=false;
+   if(e.type==='pointerup'&&which==='current'&&!tapMoved&&!holdingCrosshair&&
       pointers.size===1&&patternComparison&&
+      $('patternCompareEntryModal')?.hidden&&
+      (dragMode==='time'||dragMode==='price')){
+    const view=patternCompareView('current'),axis=view?.priceAxisRange;
+    const selected=Number(view?.inspectPrice);
+    if(axis&&Number.isFinite(selected)&&selected>0){
+     const rect=canvas.getBoundingClientRect(),y=e.clientY-rect.top;
+     const plotted=axis.top+(axis.high-selected)/(axis.high-axis.low)*
+      (axis.bottom-axis.top);
+     // Tapping directly on the guide OR its right-hand price label.
+     if(y>=axis.top-14&&y<=axis.bottom+14&&Math.abs(y-plotted)<=27){
+      openedReservation=true;
+      openPatternEntry(selected);
+     }
+    }
+   }
+   if(e.type==='pointerup'&&!tapMoved&&!holdingCrosshair&&
+      pointers.size===1&&patternComparison&&!openedReservation&&
       (dragMode==='time'||dragMode==='price'))
     clearComparisonGuides();
    pointers.delete(e.pointerId);
