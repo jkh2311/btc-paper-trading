@@ -1692,7 +1692,7 @@ body.non-chart-tab #tradeBar{display:none!important}
 .dualChartPane iframe{display:block;flex:1;width:100%;height:100%;min-height:0;border:0;background:#09111f}
 #dualChartLayoutNote{font-size:10px;color:#a6c5dd;padding:4px 10px 6px;text-align:center}
 #dualChartLayoutBtn{min-width:44px;padding:7px 9px;white-space:nowrap}
-@media(max-width:720px) and (orientation:portrait){#dualChartLayoutBody{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr)}}
+@media(max-width:720px) and (orientation:portrait){#dualChartLayoutBody[data-layout="stack"]{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr)}#dualChartLayoutBody[data-layout="columns"]{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:minmax(0,1fr)}}
 @media(max-height:470px){#dualChartLayoutHeader{min-height:39px;padding:2px 6px}#dualChartLayoutHeader button{min-height:29px;padding:4px 8px}#dualChartLayoutNote{display:none}}
 /* Panel mode keeps the exact regular chart and its original indicators/
    gestures/tools while withholding account-changing controls. */
@@ -2044,8 +2044,8 @@ html.dual-chart-panel #signalAlertToast{display:none!important}
 <div id="patternCompare" class="patternCompare" role="dialog" aria-modal="true" aria-label="유사 패턴 비교 차트" hidden><div><header><strong>🔎 유사 패턴 비교 차트</strong><button id="patternCompareClose" type="button" aria-label="닫기">×</button></header><div class="patternForecastSetting"><label for="patternForecastBars">비교창 미래 시나리오 봉수</label><input id="patternForecastBars" type="number" min="5" max="2000" step="1" value="50" inputmode="numeric" aria-label="미래 시나리오 봉수 설정"><span>봉 (5~2000)</span></div><section><div><strong>현재 차트 (기준)</strong><span id="patternCompareCurrentLabel"></span></div><div class="patternDisplayTfRow"><label for="patternCompareDisplayTf">현재 차트 표시봉</label><select id="patternCompareDisplayTf" aria-label="현재 비교 차트 표시 시간봉"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><span id="patternCompareDisplayTfStatus" role="status" aria-live="polite"></span></div><canvas id="patternCompareCurrentCanvas" aria-label="현재 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><nav id="patternCompareRanks" class="patternCompareRanks" aria-label="과거 유사 패턴 순위 선택"></nav><section class="historical"><div><strong id="patternCompareHistoricalTitle">과거 유사 차트</strong><span id="patternCompareHistoricalLabel"></span></div><canvas id="patternCompareHistoricalCanvas" aria-label="과거 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><footer id="patternCompareFoot">이평선 50% · 이격도 30% · 볼린저밴드 15% · RMI 5% · 두 차트는 각각 터치하여 이동·확대</footer></div></div><div id="dualChartLayoutOverlay" hidden role="dialog" aria-modal="true" aria-label="두 차트 레이아웃 비교">
  <div id="dualChartLayoutHeader"><strong>▣ 두 차트 비교</strong><button type="button" data-dual-layout="columns" aria-pressed="true" title="좌우 2분할">◫ 좌우</button><button type="button" data-dual-layout="stack" aria-pressed="false" title="위아래 2분할">▤ 위아래</button><button type="button" id="dualChartLayoutClose">✕ 닫기</button></div>
  <div id="dualChartLayoutBody" data-layout="columns">
-  <section class="dualChartPane"><div class="dualChartPaneTitle"><strong>차트 1</strong><span>독립 시간봉 · 지표 · 확대</span></div><iframe id="dualChartPane1" title="독립된 첫 번째 BTCUSDT 차트" loading="lazy" referrerpolicy="same-origin"></iframe></section>
-  <section class="dualChartPane"><div class="dualChartPaneTitle"><strong>차트 2</strong><span>독립 시간봉 · 지표 · 확대</span></div><iframe id="dualChartPane2" title="독립된 두 번째 BTCUSDT 차트" loading="lazy" referrerpolicy="same-origin"></iframe></section>
+  <section class="dualChartPane"><div class="dualChartPaneTitle"><strong>차트 1</strong><span>독립 시간봉 · 지표 · 확대</span></div><iframe id="dualChartPane1" title="독립된 첫 번째 BTCUSDT 차트" loading="eager" referrerpolicy="same-origin"></iframe></section>
+  <section class="dualChartPane"><div class="dualChartPaneTitle"><strong>차트 2</strong><span>독립 시간봉 · 지표 · 확대</span></div><iframe id="dualChartPane2" title="독립된 두 번째 BTCUSDT 차트" loading="eager" referrerpolicy="same-origin"></iframe></section>
  </div>
  <div id="dualChartLayoutNote">각 차트에서 시간봉·이평·볼밴·피보나치·RMI·이격도·드래그·날짜 이동을 따로 조작해 · 실전 매매는 원래 차트에서</div>
 </div><div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
@@ -7964,7 +7964,7 @@ function initDualChartLayout(){
  const holder=$('dualChartLayoutBody'),frames=[$('dualChartPane1'),$('dualChartPane2')];
  const close=$('dualChartLayoutClose'),buttons=[...modal.querySelectorAll('[data-dual-layout]')];
  let previousFocus=null;
- let chosen='columns';
+ let chosen=window.matchMedia('(orientation:portrait) and (max-width:720px)').matches?'stack':'columns';
  try{const saved=localStorage.getItem('hanine-dual-layout-v1');
   if(saved==='stack'||saved==='columns')chosen=saved;}catch(_){}
  function applyLayout(name){
