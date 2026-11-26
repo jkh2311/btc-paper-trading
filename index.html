@@ -7660,9 +7660,12 @@ function setPatternComparisonRank(rank){
  // Invalidate an old timeframe request if rank changed mid-download.
  state.historicalDisplayRequestId=(state.historicalDisplayRequestId||0)+1;
  $('patternCompareHistoricalTf').disabled=false;
- let historicalTf=patternHistoricalTf(state),historicalBars=patternHistoricalData(state);
- let chosenIndex=patternHistoricalAnchorIndex(historicalBars,historicalTf,
-  patternHistoricalMatchTime(state));
+ const requestedHistoricalTf=patternHistoricalTf(state);
+ let historicalTf=requestedHistoricalTf,historicalBars=patternHistoricalData(state);
+ const selectedTime=patternHistoricalMatchTime(state);
+ if(historicalTf==='1m')
+  historicalBars=cachedSegmentFor('1m',selectedTime)?.bars||historicalBars;
+ let chosenIndex=patternHistoricalAnchorIndex(historicalBars,historicalTf,selectedTime);
  const configCheck=indicatorPatternConfig(historicalTf);
  const warmup=Math.max(configCheck.bb,...configCheck.ma,
   configCheck.rmiLength+configCheck.rmiMomentum)+2;
@@ -7690,6 +7693,10 @@ function setPatternComparisonRank(rank){
  for(const button of $('patternCompareRanks')?.querySelectorAll('button[data-rank]')||[])
   button.setAttribute('aria-pressed',String(Number(button.dataset.rank)===rank));
  renderPatternComparison();
+ // This is a deliberate ranking tap; automatically retrieve the newly
+ // selected old 1m date if the saved chunk belongs to the previous rank.
+ if(requestedHistoricalTf==='1m'&&historicalTf!=='1m')
+  void choosePatternHistoricalDisplay('1m');
 }
 function renderPatternComparisonRankButtons(){
  const state=patternComparison,container=$('patternCompareRanks');
@@ -8388,10 +8395,11 @@ async function restoreLastVisibleScreen(){
        Object.hasOwn(SIMILAR_PATTERN_LABELS,snap.historicalTf)){
      // On iPhone reopen, use ONLY existing cache: never run a fresh
      // multi-year download just to recreate the historical sub-pane.
-     const historic=snap.historicalTf==='1m'&&minuteChartArchive?.length?
-      minuteChartArchive:candles[snap.historicalTf];
+     const matchTime=patternHistoricalMatchTime(patternComparison);
+     const historic=snap.historicalTf==='1m'?
+      cachedSegmentFor('1m',matchTime)?.bars||
+       minuteChartArchive||candles['1m']:candles[snap.historicalTf];
      const historical=patternComparison.views.historical,
-      matchTime=patternHistoricalMatchTime(patternComparison),
       candidate=patternHistoricalAnchorIndex(historic,snap.historicalTf,matchTime);
      const conf=indicatorPatternConfig(snap.historicalTf),
       required=Math.max(conf.bb,...conf.ma,
