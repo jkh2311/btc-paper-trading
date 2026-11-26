@@ -8270,10 +8270,34 @@ async function restoreLastVisibleScreen(){
      $('patternCompareDisplayTf').value=snap.displayTf;
      current.replayKey=null;current.replaySource=null;
     }
+    if(snap.historicalTf&&snap.historicalTf!==tf&&
+       Object.hasOwn(SIMILAR_PATTERN_LABELS,snap.historicalTf)){
+     // On iPhone reopen, use ONLY existing cache: never run a fresh
+     // multi-year download just to recreate the historical sub-pane.
+     const historic=snap.historicalTf==='1m'&&minuteChartArchive?.length?
+      minuteChartArchive:candles[snap.historicalTf];
+     const historical=patternComparison.views.historical,
+      matchTime=patternHistoricalMatchTime(patternComparison),
+      candidate=patternHistoricalAnchorIndex(historic,snap.historicalTf,matchTime);
+     const conf=indicatorPatternConfig(snap.historicalTf),
+      required=Math.max(203,conf.bb,...conf.ma,
+       conf.rmiLength+conf.rmiMomentum)+10;
+     if(candidate>=required){
+      historical.displayTf=snap.historicalTf;
+      historical.displayBars=historic;
+      historical.index=candidate;historical.baseIndex=candidate;
+      $('patternCompareHistoricalTf').value=snap.historicalTf;
+     }else{
+      $('patternCompareHistoricalStatus').textContent='저장된 과거 분봉 기록 없음 · 원본봉 표시';
+     }
+    }
     for(const name of ['current','historical']){
      const row=snap.views?.[name],view=patternComparison?.views[name];
-     const series=name==='current'?patternDisplayBars(patternComparison):bars;
+     const series=name==='current'?patternDisplayBars(patternComparison):
+      patternHistoricalData(patternComparison);
      if(!row||!view||!series?.length)continue;
+     if(name==='historical'&&snap.historicalTf&&
+        snap.historicalTf!==patternHistoricalTf(patternComparison))continue;
      const toIndex=(time,fallback)=>{
       if(!Number.isFinite(time))return fallback;
       return patternCompareNearestIndex(series,time);
