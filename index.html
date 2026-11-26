@@ -7282,11 +7282,13 @@ function renderPatternComparison(){
    (inspected?' · 선택 종가 '+inspected.c.toLocaleString('en-US',{maximumFractionDigits:2}):'');
 
  }
+ saveLastVisibleScreen();
 }
 function closePatternComparison(){
  if($('patternCompare')?.hidden)return;
  $('patternCompare').hidden=true;patternComparison=null;
  document.body.style.overflow=patternCompareBodyOverflow;
+ saveLastVisibleScreen(true);
 }
 // Change only the historical comparison while the overlay stays open.
 // The current chart's zoom, scroll, crosshair and live-candle updates remain.
@@ -7370,6 +7372,7 @@ function openPatternComparison(tf,bars,matches,rank){
  patternCompareBodyOverflow=document.body.style.overflow;
  document.body.style.overflow='hidden';
  $('patternCompare').hidden=false;
+ saveLastVisibleScreen(true);
  requestAnimationFrame(renderPatternComparison);
  $('patternCompareClose')?.focus({preventScroll:true});
 }
@@ -7591,6 +7594,83 @@ function initPatternComparison(){
   },{passive:false});
  }
 }
+// Rehydrate an open comparison from real cached/history candles and exact
+// match timestamps, not a newly fabricated search result or guessed candles.
+async function restoreLastVisibleScreen(){
+ if(restoringViewStarted)return;
+ restoringViewStarted=true;
+ const saved=readLastView();
+ if(!saved)return;
+ restoringLastView=true;
+ try{
+  switchTab(saved.tab);
+  if(saved.mode==='expanded'&&saved.tab==='chart'){
+   $('expandChartBtn')?.click();
+  }else if(saved.mode==='compare'&&saved.comparison?.matches?.length){
+   const snap=saved.comparison,tf=snap.tf;
+   if(!Object.hasOwn(SIMILAR_PATTERN_LABELS,tf))return;
+   switchTab('chart');
+   // Existing chart-history cache is read first by the standard loader.
+   // Never rerun a similarity search or use a stale rank with wrong times.
+   let bars;
+   try{bars=await loadIndicatorPatternHistory(tf)}catch(e){
+    console.warn('마지막 유사 패턴 비교 복원 대기:',e);return;
+   }
+   if(!Array.isArray(bars)||bars.length<230)return;
+   const matches=[];
+   for(const m of snap.matches){
+    if(!Number.isFinite(m.at))return;
+    const index=patternCompareNearestIndex(bars,m.at);
+    if(bars[index]?.t!==m.at)return;
+    matches.push({...m,index});
+   }
+   if(!matches.length)return;
+   const rank=Math.max(1,Math.min(matches.length,Math.floor(snap.rank)||1));
+   openPatternComparison(tf,bars,matches,rank);
+   if(!$('patternCompare')?.hidden){
+    if(Number.isInteger(snap.forecastBars)&&snap.forecastBars>=5&&
+       snap.forecastBars<=PATTERN_COMPARE_MAX_FUTURE){
+     patternComparison.forecastBars=snap.forecastBars;
+     $('patternForecastBars').value=String(snap.forecastBars);
+    }
+    if(snap.displayTf&&snap.displayTf!==tf&&
+       Object.hasOwn(SIMILAR_PATTERN_LABELS,snap.displayTf)){
+     try{await choosePatternCurrentDisplay(snap.displayTf)}catch(_){}
+    }
+    for(const name of ['current','historical']){
+     const row=snap.views?.[name],view=patternComparison?.views[name];
+     const series=name==='current'?patternDisplayBars(patternComparison):bars;
+     if(!row||!view||!series?.length)continue;
+     const toIndex=(time,fallback)=>{
+      if(!Number.isFinite(time))return fallback;
+      return patternCompareNearestIndex(series,time);
+     };
+     view.index=toIndex(row.time,view.index);
+     view.baseIndex=toIndex(row.base,view.baseIndex);
+     view.inspectIndex=Number.isFinite(row.inspect)?
+      toIndex(row.inspect,null):null;
+     view.count=Math.max(10,Math.min(300,Number(row.count)||view.count));
+     view.futureShift=name==='current'?
+      Math.max(0,Math.min(PATTERN_COMPARE_MAX_FUTURE,Number(row.futureShift)||0)):0;
+     view.priceZoom=Math.max(.12,Math.min(20,Number(row.priceZoom)||1));
+     view.pricePan=Number.isFinite(row.pricePan)?row.pricePan:0;
+     if(row.show&&typeof row.show==='object')
+      view.show={...view.show,...row.show};
+    }
+    renderPatternComparison();
+   }
+  }
+ }finally{
+  restoringLastView=false;
+  saveLastVisibleScreen(true);
+ }
+}
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden)saveLastVisibleScreen(true);
+});
+window.addEventListener('pagehide',()=>saveLastVisibleScreen(true));
+// iOS may re-create the page after sleep. Restore once after all chart
+// handlers are initialized; normal background->foreground preserves state.
 function initIndicatorPatternSearch(){
  const btn=$('indicatorPatternSearch'),tfSelect=$('indicatorPatternTf'),
   status=$('indicatorPatternStatus'),resultsEl=$('indicatorPatternMatches'),
@@ -9374,7 +9454,50 @@ function drawOi(){const cv=$('oiChart');if($('oiPanel').hidden)return;const rect
 function renderOi(){const status=$('oiStatus'),value=$('oiValue');value.textContent=oiCurrent!==null?'현재 '+formatOi(oiCurrent)+' BTC':'BTCUSDT · OI --';status.textContent=oiError?'OI 조회 실패 · '+oiError:oiHistory.length?'바이낸스 BTCUSDT 선물 · '+oiPeriod+' 간격 · 최근 '+oiHistory.length+'개 · 과거 최대 약 30일':oiLoading?'OI 조회 중…':'OI 데이터 대기';drawOi()}
 async function updateOi(){if(oiLoading)return;oiLoading=true;oiError='';renderOi();try{const [now,hist]=await Promise.all([fetch('https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT',{cache:'no-store'}),fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period='+oiPeriod+'&limit=90',{cache:'no-store'})]);if(!now.ok||!hist.ok)throw Error('HTTP '+(!now.ok?now.status:hist.status));const current=await now.json(),rows=await hist.json(),v=Number(current.openInterest);if(!Number.isFinite(v)||!Array.isArray(rows))throw Error('응답 형식 오류');oiCurrent=v;oiHistory=rows.map(d=>({timestamp:Number(d.timestamp),value:Number(d.sumOpenInterest)})).filter(d=>Number.isFinite(d.timestamp)&&Number.isFinite(d.value)).sort((a,b)=>a.timestamp-b.timestamp);oiUpdated=Date.now()}catch(e){oiError=e.message||'네트워크 오류'}finally{oiLoading=false;renderOi()}}
 $('oiToggle').addEventListener('click',()=>{const p=$('oiPanel'),show=p.hidden;p.hidden=!show;$('oiToggle').textContent=show?'OI 미결제약정 닫기 ▴':'OI 미결제약정 보기 ▾';$('oiToggle').setAttribute('aria-expanded',String(show));if(show){if(!oiHistory.length)updateOi();else renderOi()}requestAnimationFrame(()=>{draw();drawRmi();drawOi()})});
-function switchTab(name){for(const el of document.querySelectorAll('.tab-page'))el.classList.toggle('active',el.id==='page-'+name);for(const el of document.querySelectorAll('.nav-btn'))el.classList.toggle('active',el.dataset.tab===name);document.body.classList.toggle('non-chart-tab',name!=='chart');$('tradeBar').classList.toggle('hidden',name!=='chart');if(name==='position')updatePosition();if(name==='chart')requestAnimationFrame(()=>{draw();drawRmi();drawOi();paintLivePrice()});}
+// v345. Remember the LAST visible screen; no API keys or private positions
+// are stored here. iOS can suspend or discard a PWA while the screen is off.
+const HANINE_LAST_VIEW_KEY='hanine-last-screen-v345';
+const HANINE_TABS=new Set(['chart','position','history','liquidation','settings']);
+let restoringLastView=false,lastViewSavedAt=0,restoringViewStarted=false;
+function readLastView(){
+ try{
+  const value=JSON.parse(localStorage.getItem(HANINE_LAST_VIEW_KEY)||'null');
+  return value&&value.version===1&&HANINE_TABS.has(value.tab)?value:null;
+ }catch(_){return null;}
+}
+function lastComparisonSnapshot(){
+ const state=patternComparison;
+ if(!state||$('patternCompare')?.hidden)return null;
+ const views={};
+ for(const name of ['current','historical']){
+  const view=state.views[name],bars=name==='current'?patternDisplayBars(state):state.bars;
+  if(!view||!Array.isArray(bars))continue;
+  const timeOf=i=>Number.isInteger(i)?bars[i]?.t:null;
+  views[name]={time:timeOf(view.index),base:timeOf(view.baseIndex),
+   inspect:timeOf(view.inspectIndex),count:view.count,
+   futureShift:view.futureShift||0,priceZoom:view.priceZoom,
+   pricePan:view.pricePan,show:view.show};
+ }
+ const matches=state.matches.slice(0,10).map(m=>({
+  ...m,at:state.bars[m.index]?.t
+ })).filter(m=>Number.isFinite(m.at));
+ return {tf:state.tf,rank:state.rank,forecastBars:state.forecastBars,
+  displayTf:patternDisplayTf(state),matches,views};
+}
+function saveLastVisibleScreen(force=false){
+ if(restoringLastView)return;
+ const now=Date.now();
+ if(!force&&now-lastViewSavedAt<1600)return;
+ const tab=document.querySelector('.nav-btn.active')?.dataset.tab||'chart';
+ if(!HANINE_TABS.has(tab))return;
+ const compare=!$('patternCompare')?.hidden;
+ const expanded=!$('expandedChartOverlay')?.hidden;
+ const value={version:1,tab,mode:compare?'compare':expanded?'expanded':'tab',
+  savedAt:now,comparison:compare?lastComparisonSnapshot():null};
+ try{localStorage.setItem(HANINE_LAST_VIEW_KEY,JSON.stringify(value));
+  lastViewSavedAt=now;}catch(_){}
+}
+function switchTab(name){if(!HANINE_TABS.has(name))return;for(const el of document.querySelectorAll('.tab-page'))el.classList.toggle('active',el.id==='page-'+name);for(const el of document.querySelectorAll('.nav-btn'))el.classList.toggle('active',el.dataset.tab===name);document.body.classList.toggle('non-chart-tab',name!=='chart');$('tradeBar').classList.toggle('hidden',name!=='chart');if(name==='position')updatePosition();if(name==='chart')requestAnimationFrame(()=>{draw();drawRmi();drawOi();paintLivePrice()});saveLastVisibleScreen(true);}
 for(const el of document.querySelectorAll('.nav-btn'))el.addEventListener('click',()=>switchTab(el.dataset.tab));$('settingsTop').onclick=()=>switchTab('settings');
 
 
@@ -10512,6 +10635,7 @@ function initSignalAlerts(){
     tradeHome.parentNode && overlay.appendChild(tradeBar);
     overlay.hidden=false;
     document.body.classList.add('chart-focus-mode');
+    saveLastVisibleScreen(true);
     openButton.setAttribute('aria-expanded','true');
     closeButton.focus({preventScroll:true});
     redraw();
@@ -10525,6 +10649,7 @@ function initSignalAlerts(){
     tradeHome.parentNode.insertBefore(tradeBar,tradeHome.nextSibling);
     overlay.hidden=true;
     document.body.classList.remove('chart-focus-mode');
+    saveLastVisibleScreen(true);
     openButton.setAttribute('aria-expanded','false');
     if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus({preventScroll:true});
     redraw();
@@ -10536,7 +10661,8 @@ function initSignalAlerts(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden){event.preventDefault();close()}});
 })();
 
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();render();void restoreChartHistoryCache();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();render();void restoreChartHistoryCache();refresh();
+setTimeout(()=>{void restoreLastVisibleScreen().catch(e=>console.warn('마지막 화면 복구 실패',e))},350);loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
 setInterval(pollAutoPaperMinute,5000);
 setInterval(()=>{
   if(!autoPendingLimit)return;
