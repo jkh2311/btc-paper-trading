@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-dual-native-charts-v329"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-dual-chart-clean-v330"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1689,17 +1689,28 @@ body.non-chart-tab #tradeBar{display:none!important}
 #dualChartLayoutBody[data-layout="stack"]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr)}
 .dualChartPane{min-height:0;min-width:0;display:flex;flex-direction:column;border:1px solid #456787;border-radius:9px;background:#0b182b;overflow:hidden}
 .dualChartPaneTitle{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:11px;min-height:28px;padding:4px 9px;background:#1b304a;color:#d9eafa}
-.dualChartPane iframe{display:block;flex:1;width:100%;height:100%;min-height:0;border:0;background:#09111f}
+.dualChartPane iframe{display:block;flex:1 1 0;width:100%;height:0;min-height:0;min-width:0;border:0;background:#09111f}
 #dualChartLayoutNote{font-size:10px;color:#a6c5dd;padding:4px 10px 6px;text-align:center}
 #dualChartLayoutBtn{min-width:44px;padding:7px 9px;white-space:nowrap}
 @media(max-width:720px) and (orientation:portrait){#dualChartLayoutBody[data-layout="stack"]{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr)}#dualChartLayoutBody[data-layout="columns"]{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:minmax(0,1fr)}}
 @media(max-height:470px){#dualChartLayoutHeader{min-height:39px;padding:2px 6px}#dualChartLayoutHeader button{min-height:29px;padding:4px 8px}#dualChartLayoutNote{display:none}}
-/* Panel mode keeps the exact regular chart and its original indicators/
-   gestures/tools while withholding account-changing controls. */
-html.dual-chart-panel body{padding:0!important;margin:0!important;overflow-y:auto!important;overflow-x:hidden!important;background:#09111f}
+/* v330: clean native chart-only comparison viewport. An iframe's own
+   100dvh equals the parent's pane viewport, NOT the entire device. Prevent
+   old mobile page-height rules from leaving a tiny chart atop blank space. */
+#dualChartLayoutNote{display:none!important}
+.dualChartPaneTitle{min-height:23px!important;height:23px!important;font-size:11px!important;padding:2px 7px!important}
+.dualChartPaneTitle span{display:none!important}
+html.dual-chart-panel,html.dual-chart-panel body{
+ width:100%!important;height:100%!important;min-height:0!important;
+ max-height:100%!important;margin:0!important;padding:0!important;
+ overflow:hidden!important;background:#09111f!important
+}
+html.dual-chart-panel body{height:100dvh!important;display:flex!important;flex-direction:column!important}
 html.dual-chart-panel .app-header,
 html.dual-chart-panel .bottom-nav,
+html.dual-chart-panel nav,
 html.dual-chart-panel #tradeBar,
+html.dual-chart-panel .trade-bar,
 html.dual-chart-panel .daily-volume,
 html.dual-chart-panel .oi-toolbar,
 html.dual-chart-panel #oiPanel,
@@ -1712,19 +1723,91 @@ html.dual-chart-panel #dualChartLayoutBtn,
 html.dual-chart-panel #candleTime,
 html.dual-chart-panel #quickCloseControls,
 html.dual-chart-panel #quickSwitchOpen,
-html.dual-chart-panel .price-panel .quote-wrap{display:none!important}
-html.dual-chart-panel main{padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
-html.dual-chart-panel #page-chart{padding:0!important;margin:0!important;display:block!important}
-html.dual-chart-panel .price-panel{padding:3px 5px!important;margin:0!important;min-height:0!important}
-html.dual-chart-panel .price-panel .tf-tabs{display:flex!important;margin:0!important}
-html.dual-chart-panel #tf{max-width:175px!important}
-html.dual-chart-panel .chart-panel{margin:0!important;border-radius:0!important}
-html.dual-chart-panel #chart{height:clamp(220px,51dvh,780px)!important;min-height:210px!important}
-html.dual-chart-panel #rmiChart{height:118px!important}
-html.dual-chart-panel .chart-tools{margin:3px 3px!important;gap:4px}
-html.dual-chart-panel .chart-tools button{min-height:31px;padding:5px 7px}
+html.dual-chart-panel .price-panel .quote-wrap,
+html.dual-chart-panel .chart-tools,
+html.dual-chart-panel #chartCrosshairPriceTap,
+html.dual-chart-panel #signalAlertToast,
+html.dual-chart-panel #chartDrawingMenu,
+html.dual-chart-panel #chartHint,
+html.dual-chart-panel #selected,
+html.dual-chart-panel #convergenceBanner,
+html.dual-chart-panel #dailyConvergenceStatus,
+html.dual-chart-panel #disparityStageInspector{
+ display:none!important
+}
+html.dual-chart-panel main{
+ display:flex!important;flex:1 1 0!important;min-height:0!important;
+ height:100%!important;max-height:100%!important;width:100%!important;
+ max-width:none!important;margin:0!important;padding:0!important;
+ overflow:hidden!important
+}
+html.dual-chart-panel #page-chart{
+ display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+ min-height:0!important;height:100%!important;width:100%!important;
+ margin:0!important;padding:0!important;overflow:hidden!important
+}
+html.dual-chart-panel #page-chart .price-panel{
+ display:flex!important;align-items:center!important;justify-content:flex-end!important;
+ flex:0 0 31px!important;height:31px!important;min-height:31px!important;
+ max-height:31px!important;gap:0!important;margin:0!important;padding:1px 5px!important;
+ background:#13263e!important
+}
+html.dual-chart-panel #page-chart .price-panel .tf-tabs{
+ display:flex!important;flex:0 0 auto!important;width:auto!important;
+ min-width:0!important;max-width:100%!important;margin:0!important;padding:0!important
+}
+html.dual-chart-panel #tf{
+ width:clamp(95px,24vw,150px)!important;max-width:100%!important;
+ height:29px!important;min-height:29px!important;
+ padding:3px 7px!important;font-size:12px!important
+}
+html.dual-chart-panel #page-chart .chart-panel{
+ display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+ min-height:0!important;height:0!important;max-height:none!important;
+ width:100%!important;overflow:hidden!important;
+ margin:0!important;padding:0!important;border:0!important;border-radius:0!important
+}
+html.dual-chart-panel #page-chart #combinedChart{
+ display:flex!important;flex:1 1 0!important;flex-direction:column!important;
+ min-height:0!important;height:0!important;max-height:none!important;
+ width:100%!important;margin:0!important;padding:0!important;overflow:hidden!important
+}
+html.dual-chart-panel #page-chart #chart{
+ display:block!important;flex:1 1 0!important;width:100%!important;
+ height:0!important;min-height:70px!important;max-height:none!important;
+ margin:0!important;padding:0!important;border-radius:0!important
+}
+html.dual-chart-panel #page-chart #chartTimeAxisRow{
+ display:block!important;flex:0 0 27px!important;
+ height:27px!important;min-height:27px!important;max-height:27px!important;
+ width:100%!important
+}
+html.dual-chart-panel #page-chart #chartTimeAxis,
+html.dual-chart-panel #page-chart #chartIndicatorsDock{display:block!important}
+html.dual-chart-panel #page-chart #chartIndicatorToggle{display:block!important;min-height:25px!important;height:25px!important;padding:2px 6px!important}
+html.dual-chart-panel #page-chart #chartIndicatorMenu:not([hidden]){
+ display:block!important;position:fixed!important;z-index:9999!important;
+ top:36px!important;right:5px!important;left:auto!important;
+ width:min(320px,calc(100vw - 12px))!important;
+ max-height:calc(100dvh - 48px)!important;overflow-y:auto!important;
+ overscroll-behavior:contain!important
+}
+html.dual-chart-panel #page-chart #rmiChart{
+ display:block!important;flex:0 0 clamp(82px,23dvh,155px)!important;
+ height:clamp(82px,23dvh,155px)!important;
+ min-height:82px!important;max-height:155px!important;width:100%!important;
+ margin:0!important;padding:0!important
+}
+html.dual-chart-panel #page-chart #focusRmiDivider,
+html.dual-chart-panel #page-chart #combinedChart>.indicator-label{display:none!important}
+html.dual-chart-panel #page-chart #chartTimeJumpControls{max-width:100%!important}
 html.dual-chart-panel #expandedChartOverlay .trade-bar{display:none!important}
-html.dual-chart-panel #signalAlertToast{display:none!important}
+@media(max-width:480px){
+ html.dual-chart-panel #page-chart #rmiChart{
+  flex-basis:clamp(80px,22dvh,120px)!important;
+  height:clamp(80px,22dvh,120px)!important;max-height:120px!important
+ }
+}
 </style></head><script>
 (function(){
  const p=new URLSearchParams(location.search);
@@ -7975,7 +8058,7 @@ function initDualChartLayout(){
   url.searchParams.set('dual_chart_panel','1');
   url.searchParams.set('dual_tf',tf);
   url.searchParams.set('dual_instance',String(panel));
-  url.searchParams.set('app_refresh','v329');
+  url.searchParams.set('app_refresh','v330');
   return url.toString();
  }
  function show(){
