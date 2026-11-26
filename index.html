@@ -7153,13 +7153,81 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
 
 }
 // Independent history navigation; controls never alter the primary chart.
+// Map a match timestamp onto its ACTUAL containing candle in any TF.
+function patternHistoricalAnchorIndex(bars,tf,time){
+ if(!Array.isArray(bars)||!bars.length||!Number.isFinite(time))return -1;
+ let low=0,high=bars.length;
+ while(low<high){const mid=(low+high)>>>1;
+  if(bars[mid].t<=time)low=mid+1;else high=mid;
+ }
+ const i=low-1;
+ if(i<0||!Number.isFinite(bars[i]?.t))return -1;
+ const next=nextCandleTime(tf,bars[i].t,1);
+ return Number.isFinite(next)&&time<next?i:-1;
+}
+function patternHistoricalMatchTime(state){
+ return state?.bars?.[state.match?.index]?.t??null;
+}
+function patternHistoricalTf(state){
+ return state?.views?.historical?.displayTf||state?.tf;
+}
+function patternHistoricalData(state){
+ const view=state?.views?.historical;
+ return view?.displayTf&&view.displayTf!==state.tf?
+  (view.displayBars||[]):state.bars;
+}
+// Explicit lower-pane timeframe selection; no similarity re-search or orders.
+async function choosePatternHistoricalDisplay(tf){
+ const state=patternComparison,selector=$('patternCompareHistoricalTf'),
+  status=$('patternCompareHistoricalStatus');
+ if(!state||!Object.hasOwn(SIMILAR_PATTERN_LABELS,tf))return;
+ const view=state.views.historical,oldTf=patternHistoricalTf(state);
+ const requestId=state.historicalDisplayRequestId=
+  (state.historicalDisplayRequestId||0)+1;
+ if(selector)selector.disabled=true;
+ if(status)status.textContent='불러오는 중';
+ try{
+  const matchTime=patternHistoricalMatchTime(state);
+  if(!Number.isFinite(matchTime))throw Error('유사 시점 확인 실패');
+  let bars=tf===state.tf?state.bars:
+   tf==='1m'&&minuteChartArchive?.length?minuteChartArchive:candles[tf]||[];
+  const config=indicatorPatternConfig(tf);
+  const warmup=Math.max(config.bb,...config.ma,
+   config.rmiLength+config.rmiMomentum,200)+3;
+  let i=patternHistoricalAnchorIndex(bars,tf,matchTime);
+  if(!Array.isArray(bars)||i<warmup+10){
+   // Fetch only after an explicit user choice (never a screen-refresh timer).
+   bars=await loadIndicatorPatternHistory(tf);
+   i=patternHistoricalAnchorIndex(bars,tf,matchTime);
+  }
+  if(requestId!==state.historicalDisplayRequestId||patternComparison!==state)return;
+  if(i<warmup+10)throw Error('해당 날짜의 '+SIMILAR_PATTERN_LABELS[tf]+' 실제 캔들 부족');
+  view.displayTf=tf;view.displayBars=tf===state.tf?null:bars;
+  view.index=i;view.baseIndex=i;
+  view.count=Math.max(10,Math.min(config.window,i-warmup));
+  view.futureEnabled=false;view.futureShift=0;view.inspectIndex=null;
+  view.inspectPrice=null;view.inspectFutureOffset=null;
+  view.priceZoom=1;view.pricePan=0;
+  if(status)status.textContent='';
+  renderPatternComparison();
+  saveLastVisibleScreen(true);
+ }catch(e){
+  if(requestId===state.historicalDisplayRequestId&&patternComparison===state){
+   if(selector)selector.value=oldTf;
+   if(status)status.textContent=String(e?.message||e);
+  }
+ }finally{
+  if(requestId===state.historicalDisplayRequestId&&patternComparison===state&&selector)
+   selector.disabled=false;
+ }
+}
 function patternCompareView(which){
  return patternComparison?.views?.[which]||null;
 }
 function patternCompareLimit(view){
  if(!patternComparison||!view)return 0;
  const source=view===patternComparison.views.current?
-  patternDisplayBars(patternComparison):patternComparison.bars;
+  patternDisplayBars(patternComparison):patternHistoricalData(patternComparison);
  return Math.max(0,Math.min(source.length-1,view.index));
 }
 function patternCompareSetIndex(which,index){
@@ -7167,10 +7235,10 @@ function patternCompareSetIndex(which,index){
  if(!view||!state)return;
  const i=Math.round(Number(index));
  if(!Number.isFinite(i))return;
- const source=which==='current'?patternDisplayBars(state):state.bars;
+ const source=which==='current'?patternDisplayBars(state):patternHistoricalData(state);
  if(!source?.length)return;
- const config=which==='current'?
-  indicatorPatternConfig(patternDisplayTf(state)):state.config;
+ const config=indicatorPatternConfig(which==='current'?
+  patternDisplayTf(state):patternHistoricalTf(state));
  const warmup=Math.max(config.bb,...config.ma,
    config.rmiLength+config.rmiMomentum)+2;
  const firstAllowed=Math.min(source.length-1,warmup+view.count-1);
@@ -7198,9 +7266,10 @@ function patternCompareSetIndex(which,index){
 }
 function patternCompareSetCount(which,count){
  const view=patternCompareView(which);if(!view)return;
- const config=which==='current'?
-  indicatorPatternConfig(patternDisplayTf(patternComparison)):patternComparison.config;
- const source=which==='current'?patternDisplayBars(patternComparison):patternComparison.bars;
+ const config=indicatorPatternConfig(which==='current'?
+  patternDisplayTf(patternComparison):patternHistoricalTf(patternComparison));
+ const source=which==='current'?patternDisplayBars(patternComparison):
+  patternHistoricalData(patternComparison);
  const minWarmup=Math.max(config.bb,...config.ma,
    config.rmiLength+config.rmiMomentum)+2;
  const maxCount=Math.max(10,Math.min(300,source.length-minWarmup,
@@ -7377,9 +7446,10 @@ function renderPatternComparison(){
   ['historical','patternCompareHistoricalCanvas','patternCompareHistoricalLabel']
  ]){
   const view=state.views[which],displayTf=which==='current'?
-   patternDisplayTf(state):state.tf;
+   patternDisplayTf(state):patternHistoricalTf(state);
   const config={...indicatorPatternConfig(displayTf),window:view.count};
-  const source=which==='current'?patternDisplayBars(state):state.bars;
+  const source=which==='current'?patternDisplayBars(state):patternHistoricalData(state);
+  if(which==='historical')view.historicalMatchTime=patternHistoricalMatchTime(state);
   if(!source?.length)continue;
   const index=patternCompareLimit(view),bar=source[index];
   if(!bar)continue;
@@ -7908,7 +7978,7 @@ function initPatternComparison(){
     view.inspectFutureOffset=Math.max(1,Math.min(PATTERN_COMPARE_MAX_FUTURE,index-view.index));
    }else{
     view.inspectFutureOffset=null;
-    const source=which==='current'?patternDisplayBars(state):state.bars;
+    const source=which==='current'?patternDisplayBars(state):patternHistoricalData(state);
     view.inspectIndex=Math.max(0,Math.min(source.length-1,index));
    }
    renderPatternComparison();
