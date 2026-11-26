@@ -7973,7 +7973,8 @@ function initPatternComparison(){
    try{canvas.setPointerCapture(e.pointerId)}catch(_){}
   });
   canvas.addEventListener('pointermove',e=>{
-   if(!patternComparison||!pointers.has(e.pointerId))return;
+   if(!patternComparison||!pointers.has(e.pointerId)||
+      (which==='current'&&!$('patternCompareEntryModal')?.hidden))return;
    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
    if(tapX!==null&&(
      Math.abs(e.clientX-tapX)>8||Math.abs(e.clientY-tapY)>9
