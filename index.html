@@ -7246,7 +7246,10 @@ function refreshPatternCurrentTarget(){
  if(previous===updated)return;
  const oldLast=previous.at(-1),lastNew=updated.at(-1);
  if(oldLast&&lastNew&&lastNew.t<oldLast.t)return;
- if(oldLast&&lastNew&&oldLast.t===lastNew.t&&oldLast.c===lastNew.c)return;
+ if(oldLast&&lastNew&&oldLast.t===lastNew.t&&
+    oldLast.o===lastNew.o&&oldLast.h===lastNew.h&&
+    oldLast.l===lastNew.l&&oldLast.c===lastNew.c&&
+    oldLast.v===lastNew.v)return;
  const wasAtEnd=!oldLast||view.index>=previous.length-1;
  const oldIndexTime=previous[view.index]?.t;
  const oldBaseTime=previous[view.baseIndex]?.t;
