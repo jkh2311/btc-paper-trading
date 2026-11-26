@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-api-vault-singleflight-v338"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-v328-layout-only-v339"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1863,52 +1863,7 @@ html.dual-chart-panel #page-chart .price-panel .tf-tabs{
 html.dual-chart-panel #page-chart #chart{
  flex:1 1 0!important;height:0!important;min-height:58px!important
 }
-</style></head><script>
-(function(){
- 'use strict';
- const embedded=new URLSearchParams(location.search).get('dual_chart_panel')==='1';
- window.HANINE_DUAL_CHART_PANEL=embedded;
- if(embedded)document.documentElement.classList.add('dual-chart-panel');
- const KEY='hanine-binance-rest-backoff-v1';
- const nativeFetch=window.fetch.bind(window);
- let blockedUntil=0;
- try{blockedUntil=Number(localStorage.getItem(KEY))||0}catch(_){}
- const isBinance=url=>/^(?:https?:)?\/\/(?:[\w-]+\.)?(?:binance\.com|binance\.us)\//i.test(url);
- const privateRequest=(url,init,input)=>{
-  const h=new Headers(init?.headers||input?.headers||{});
-  return h.has('X-MBX-APIKEY')||
-   /(?:\?|&)signature=/i.test(url)||
-   /\/fapi\/v\d+\/(?:account|balance|positionRisk|openOrders|openOrder|order|openAlgoOrders|algoOrder|commissionRate|income|positionSide|leverage|marginType|allOrders|allAlgoOrders|userTrades|listenKey)/i.test(url);
- };
- window.btcBinanceRequestBackoff=()=>Math.max(0,blockedUntil-Date.now());
- window.fetch=async function(input,init){
-  const url=String(typeof input==='string'?input:input?.url||'');
-  const method=String(init?.method||input?.method||'GET').toUpperCase();
-  if(!isBinance(url))return nativeFetch(input,init);
-  if(embedded&&privateRequest(url,init,input))
-   throw new Error('비교차트에서는 바이낸스 실계좌 조회/주문을 실행하지 않습니다');
-  if(embedded&&/^(POST|DELETE|PUT|PATCH)$/.test(method))
-   throw new Error('비교차트는 분석 전용입니다. 원래 차트에서 주문해 주세요');
-  // Restrict automatic AUTHENTICATED REST polling during a documented ban.
-  // Public market data (premiumIndex/klines) must never be suppressed by
-  // account/protection-order guards in the ordinary chart.
-  if(method==='GET'&&privateRequest(url,init,input)&&Date.now()<blockedUntil)
-   throw new Error('바이낸스 인증 API 제한 · '+new Date(blockedUntil).toLocaleString('ko-KR')+'까지 자동 계좌 조회 중지');
-  const response=await nativeFetch(input,init);
-  if(method==='GET'&&(response.status===418||response.status===429)){
-   let data=null;try{data=await response.clone().json()}catch(_){}
-   let until=Number(String(data?.msg||'').match(/banned until\s+(\d{13})/i)?.[1]);
-   if(!(until>Date.now()))until=Date.now()+Math.max(60000,(Number(response.headers.get('Retry-After'))||60)*1000);
-   blockedUntil=Math.max(blockedUntil,until);
-   try{localStorage.setItem(KEY,String(blockedUntil))}catch(_){}
-  }
-  return response;
- };
- window.addEventListener('storage',e=>{
-  if(e.key===KEY&&Number(e.newValue)>blockedUntil)blockedUntil=Number(e.newValue);
- });
-})();
-</script><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
+</style><script>(function(){const panel=new URLSearchParams(location.search).get('dual_chart_panel')==='1';window.HANINE_DUAL_CHART_PANEL=panel;if(panel)document.documentElement.classList.add('dual-chart-panel')})();</script></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
  <div class="price-panel"><div class="quote-wrap"><div class="price" id="price">-- USDT</div><div id="funding" class="funding" aria-live="polite">펀딩 조회 중</div></div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select></div><div id="convergenceBanner" class="convergence-banner" hidden role="status"></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
@@ -2027,7 +1982,7 @@ html.dual-chart-panel #page-chart #chart{
 <div id="indicatorPatternMatches" style="display:grid;gap:6px;margin-top:7px"></div>
 </div></div></div></div></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label"><span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas><div id="disparityStageInspector" hidden style="position:absolute;z-index:9;display:none;left:7px;align-items:center;gap:5px;max-width:calc(100% - 98px);font-size:10px;pointer-events:auto"><span id="disparityStageInspectorText" style="background:#091729ec;border:1px solid #6787a2;border-radius:5px;padding:4px 5px;color:#dce8f6;white-space:nowrap"></span><button id="disparityStageSave" type="button" style="font-size:10px;min-width:35px;padding:3px 6px;background:#173c38;color:#8df3ba;border:1px solid #408876;border-radius:5px">저장</button><button id="disparityStageDelete" type="button" hidden style="font-size:10px;min-width:35px;padding:3px 6px;background:#43212d;color:#ff9eb3;border:1px solid #ad5c72;border-radius:5px">삭제</button></div></div></div>
  <div id="candleTime" class="muted candle-info"></div>
- <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button><button id="dualChartLayoutBtn" type="button" aria-label="두 차트 레이아웃 비교 열기" title="차트 두 개 비교">▣ 레이아웃</button></div>
+ <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button><button id="dualChartLayoutBtn" type="button" aria-label="위아래 두 차트 비교 열기" title="위아래 두 차트 비교">▣ 레이아웃</button></div>
  <div id="range" style="display:none"></div><div id="chartHint" style="display:none"></div><p id="selected" style="display:none"></p>
  <div id="entrySheet" class="card" style="display:none"><b id="sheetPrice">실제 BTCUSDT 주문</b><div class="order-types"><label><input type="radio" name="orderType" value="limit" checked> 지정가</label><label><input type="radio" name="orderType" value="market"> 시장가</label></div><label id="limitLabel" for="limitPrice">지정가 (USDT)</label><input id="limitPrice" type="number" min="0.01" step="0.1" inputmode="decimal" placeholder="원하는 진입 가격"><p id="orderHelp" class="muted" style="font-size:11px">지정가 주문은 바이낸스에 실제 전송됩니다.</p><div class="row"><button class="buy" id="sheetLong">롱 진입</button><button class="sell" id="sheetShort">숏 진입</button><button id="sheetCancel">닫기</button></div></div>
  <div class="account-strip"><div><small id="balanceSummaryLabel">실제 사용 가능 잔고</small><strong id="balanceSummary">—</strong></div><div><small id="pnlSummaryLabel">미실현 손익 (원화 추정)</small><strong id="pnlSummary">—</strong></div></div>
@@ -8117,10 +8072,6 @@ function paintChartWeekendRegions(ctx,regions,top,bottom,plotW,layer){
  }
  ctx.restore();
 }
-// A child iframe may change dimensions without a reliable window.resize
-// (iOS PWA when switching columns/rows, rotating, or opening a chart menu).
-// Recalculate canvas drawing buffers only AFTER the actual panel dimensions
-// settle; never share a canvas, view state or order controls across panes.
 function initDualPanelChartResize(){
  if(!window.HANINE_DUAL_CHART_PANEL)return;
  const chart=$('chart'),rmi=$('rmiChart');
@@ -8172,7 +8123,7 @@ function initDualChartLayout(){
   url.searchParams.set('dual_chart_panel','1');
   url.searchParams.set('dual_tf',tf);
   url.searchParams.set('dual_instance',String(panel));
-  url.searchParams.set('app_refresh','v338');
+  url.searchParams.set('app_refresh','v339');
   return url.toString();
  }
  function show(){
@@ -8202,7 +8153,7 @@ function initDualChartLayout(){
  });
 }
 function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min((chartIndicators.maForecast||chartIndicators.bbForecast)?600:400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;
-if(chartJumpSegment?.bars===a)scheduleJumpExtension(a,left,count);let right=72,plotW=w-right-8,top=18,priceBottom=window.HANINE_DUAL_CHART_PANEL?h-8:Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
+if(chartJumpSegment?.bars===a)scheduleJumpExtension(a,left,count);let right=72,plotW=w-right-8,top=18,priceBottom=window.HANINE_DUAL_CHART_PANEL?Math.max(42,h-12):Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
 if((chartJumpSegment||$('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
    Math.abs(verticalPan)<1e-9&&verticalZoom===1){
   // Past 1m prices may be far from today's fixed live-price scale.
@@ -8303,12 +8254,8 @@ if(chartIndicators.bb)for(let [key,color] of [['upper','#63b6a8'],['lower','#63b
 if(!chartJumpSegment)window.btcDailyConvergenceForecast?.render(ctx,{
  bars:a,tf:$('tf').value,left,count,bw,y,top,bottom:priceBottom,plotW
 });
-if(!window.HANINE_DUAL_CHART_PANEL){
- drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);
- drawDisparityStageTwoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);
-}
-if(!window.HANINE_DUAL_CHART_PANEL){ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();paintChartWeekendRegions(ctx,weekendRegions,priceBottom,volBottom,plotW,'background');data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);if(candleDimensionMode==='6d'&&webgl6dScene){return;}else if(candleDimensionMode==='6d')drawSixDVolumeCylinder(ctx,x,bw,volBottom-height,volBottom,v.c>=v.o);else{ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)}});if(webgl6dScene)ctx.drawImage(webgl6dScene,0,0,w,h);ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));}
-paintChartWeekendRegions(ctx,weekendRegions,top,priceBottom,plotW,'labels');drawSixDChartTag(ctx,plotW,top);if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'6h':21600000,'12h':43200000,'1d':86400000,'1w':604800000,'1M':2592000000}[$('tf').value],stamp=new Date(nextCandleTime($('tf').value,a[a.length-1].t,futureCrosshairSlot+1)),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}if(!chartJumpSegment)drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(!chartJumpSegment&&typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&window.btcChartLevelVisible('switch'))window.btcDrawLiveSwitchGuide?.(ctx,{lo,hi,top,priceBottom,plotW,y});window.btcDrawCmeGaps?.(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);if(!window.HANINE_DUAL_CHART_PANEL)drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}syncChartPriceOrderTap(cv,0,NaN,null);const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);syncChartPriceOrderTap(cv,plotW,boxY,crosshairPrice);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);}// Overlay a distinct 265-bars-ahead date ruler when it falls in view.
+drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);
+drawDisparityStageTwoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);if(!window.HANINE_DUAL_CHART_PANEL){ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();paintChartWeekendRegions(ctx,weekendRegions,priceBottom,volBottom,plotW,'background');data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);if(candleDimensionMode==='6d'&&webgl6dScene){return;}else if(candleDimensionMode==='6d')drawSixDVolumeCylinder(ctx,x,bw,volBottom-height,volBottom,v.c>=v.o);else{ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)}});if(webgl6dScene)ctx.drawImage(webgl6dScene,0,0,w,h);ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));}paintChartWeekendRegions(ctx,weekendRegions,top,priceBottom,plotW,'labels');drawSixDChartTag(ctx,plotW,top);if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'6h':21600000,'12h':43200000,'1d':86400000,'1w':604800000,'1M':2592000000}[$('tf').value],stamp=new Date(nextCandleTime($('tf').value,a[a.length-1].t,futureCrosshairSlot+1)),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}if(!chartJumpSegment)drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(!chartJumpSegment&&typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&window.btcChartLevelVisible('switch'))window.btcDrawLiveSwitchGuide?.(ctx,{lo,hi,top,priceBottom,plotW,y});window.btcDrawCmeGaps?.(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);if(!window.HANINE_DUAL_CHART_PANEL)drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}syncChartPriceOrderTap(cv,0,NaN,null);const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);syncChartPriceOrderTap(cv,plotW,boxY,crosshairPrice);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);}// Overlay a distinct 265-bars-ahead date ruler when it falls in view.
 drawChartDateRange(ctx,a,left,count,plotW,top,priceBottom);
 drawSavedChartShapes(ctx,a,left,count,plotW,top,priceBottom);
 // The pre-launch candles have different exchange provenance. Mark the
@@ -9604,16 +9551,7 @@ async function rememberDeviceUnlock(credentials){
  return true;
 }
 let deviceUnlockRestoring=false;
-let deviceUnlockPromise=null;
-// Single-flight device unlock: every caller awaits the SAME IndexedDB
-// operation instead of mistaking a concurrent restore for lost credentials.
 async function restoreDeviceUnlock(){
- if(deviceUnlockPromise)return deviceUnlockPromise;
- const task=restoreDeviceUnlockOnce();
- deviceUnlockPromise=task;
- try{return await task}finally{if(deviceUnlockPromise===task)deviceUnlockPromise=null}
-}
-async function restoreDeviceUnlockOnce(){
  const generation=authGeneration,vault=localStorage.getItem(apiVaultStorageKey);
  if(!vault||unlockedApiCredentials||deviceUnlockRestoring)return;
  deviceUnlockRestoring=true;
@@ -9761,16 +9699,13 @@ $('myVaultDelete').onclick=async()=>{
   showVaultStatus('저장된 API 키 삭제 완료');
 };
 showVaultStatus();
-void restoreDeviceUnlock();
+if(!window.HANINE_DUAL_CHART_PANEL)void restoreDeviceUnlock();
 // A foreground retry can recover a temporarily unavailable iOS IndexedDB
 // key without clearing or replacing the password-encrypted vault.
 function retryStoredApiUnlock(){
  if(window.HANINE_DUAL_CHART_PANEL||document.visibilityState!=='visible')return;
  if(!unlockedApiCredentials&&localStorage.getItem(apiVaultStorageKey))
-  void restoreDeviceUnlock().then(ok=>{
-   if(ok&&document.visibilityState==='visible'&&!realAccountBusy)
-    void refreshRealBinanceAccount();
-  });
+  void restoreDeviceUnlock();
  else if(unlockedApiCredentials&&!realAccountBusy)
   void refreshRealBinanceAccount();
 }
@@ -9891,32 +9826,24 @@ async function enrichRealBinancePositions(data,key,secret){
  }catch(e){console.warn('포지션 상세 추가 조회 실패:',e?.message||e);return data;}
 }
 async function ensureStoredApiCredentials(){
- if(window.HANINE_DUAL_CHART_PANEL)return null;
  let creds=getApiCredentials();
  if(creds?.apiKey&&creds?.apiSecret)return creds;
- if(!localStorage.getItem(apiVaultStorageKey))return null;
- // A fresh iOS PWA page and automatic account checks may race each other.
- // Wait for the full restore rather than a fixed 1.2 second timeout.
- await restoreDeviceUnlock();
+ if(localStorage.getItem(apiVaultStorageKey)){
+  if(deviceUnlockRestoring){
+   // A concurrent app-start restore may still be reading IndexedDB.
+   for(let t=0;t<12&&deviceUnlockRestoring;t++)await new Promise(resolve=>setTimeout(resolve,100));
+  }else await restoreDeviceUnlock();
+ }
  return getApiCredentials();
 }
-window.btcEnsureStoredApiCredentials=ensureStoredApiCredentials;
 async function refreshRealBinanceAccount(){
   if(window.HANINE_DUAL_CHART_PANEL||realAccountBusy)return;
-  // Always restore previously saved credentials, EVEN while Binance's
-  // IP limit is active. A network ban is not an authentication failure.
   const saved=await ensureStoredApiCredentials();
   if(!saved?.apiKey||!saved?.apiSecret){
     $('realPositions').textContent=localStorage.getItem(apiVaultStorageKey)?
-     '기존 API 암호화 저장본은 유지됨 · 자동 연결 복구 중 (필요하면 기존 저장 비밀번호로 잠금 해제, API 키 재입력 불필요)':
-     '이 앱에 저장된 API 키 없음 · 이전 저장 환경과 주소를 확인해 주세요';
+     '암호화 저장된 API 키는 유지 중 · 자동 연결 확인 후 필요하면 비밀번호 잠금 해제':
+     '저장된 API 키가 없어요 · 암호화 저장 또는 백업 복원 필요';
     return;
-  }
-  const backoff=window.btcBinanceRequestBackoff?.()||0;
-  if(backoff>0){
-   $('realAccountUpdated').textContent='✅ 기존 API 연결 정보 유지 · 바이낸스 IP 요청 제한으로 계좌 조회만 일시 중단 ('+
-    new Date(Date.now()+backoff).toLocaleString('ko-KR')+'까지)';
-   return;
   }
   realAccountBusy=true;
   const b=$('realAccountRefresh');b.disabled=true;
@@ -9928,13 +9855,7 @@ async function refreshRealBinanceAccount(){
   }catch(e){
     $('realAccountUpdated').textContent='조회 실패: '+(e?.message||'연결 오류');
     if(liveAccountSnapshot){$('realAccountUpdated').textContent+=' · 이전 조회값 표시 중';}
-    else {
-      // Do not erase the visible position snapshot or suggest replacing API
-      // credentials merely because Binance/network returned an HTTP error.
-      $('realPositions').textContent='계좌 조회 일시 실패 · 저장된 API 키는 유지 중 (재입력 불필요)';
-      $('realAccountUpdated').textContent='조회 실패: '+(e?.message||'연결 오류')+
-       ' · 기존 API 연결 정보 유지';
-    }
+    else {clearRealAccount('실제 계좌 조회 실패 · 설정에서 API 키와 연결을 확인해 주세요.');$('realAccountUpdated').textContent='조회 실패: '+(e?.message||'연결 오류');}
   }finally{b.disabled=false;realAccountBusy=false}
 }
 $('realAccountRefresh').onclick=async()=>{
@@ -10736,10 +10657,8 @@ function initSignalAlerts(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden){event.preventDefault();close()}});
 })();
 
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{if(!window.HANINE_DUAL_CHART_PANEL){savePaperState();saveAutoSignals()}});restorePaperState();syncPyramidStages();initCandleDimensionMode();initDualChartLayout();initDualPanelChartResize();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initDualChartLayout();initDualPanelChartResize();initAutoPaperUi();if(!window.HANINE_DUAL_CHART_PANEL)initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();
 if(window.HANINE_DUAL_CHART_PANEL){
- // Child charts are view-only. Prevent a restored automatic-paper mode
- // from creating duplicate paper trades or changing shared settings.
  autoPaperEnabled=false;autoPendingLimit=null;
  $('autoPaperToggle').disabled=true;
  const requested=new URLSearchParams(location.search).get('dual_tf');
@@ -10760,7 +10679,7 @@ setInterval(()=>{
 },5000);
 timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),p=Math.max(1000,v.c*(1+(Math.random()-.5)*.001));a.push({t:Date.now(),o:v.c,h:Math.max(p,v.c),l:Math.min(p,v.c),c:p,v:Math.round(30+Math.random()*200)});a.shift()}last=candles['1m'].at(-1).c;process();render()}else refresh()},45000);
 
-</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=orders-close-krw-v289"></script><script src="./live-manual-protection.js?v=ban-safe-v335"></script><script src="./live-chart-levels.js?v=ban-safe-v335"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
+</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=orders-close-krw-v289"></script><script src="./live-manual-protection.js?v=protection-position-roi-v287"></script><script src="./live-chart-levels.js?v=drag-price-confirm-v324"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
 <script>
 /* v200: Opt-in foreground-only live switch. Standalone single TP trigger or
  * manual price. No 3-part TP integration. Never auto-arm after reload.
