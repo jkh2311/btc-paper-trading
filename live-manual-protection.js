@@ -192,7 +192,7 @@ async function protect(side,p,info){
 }
 async function run(){
  if(busy||window.btcProtectionEditBusy===true||document.hidden||window.btcProtectionReadBackoff?.active()||!getApiCredentials()?.apiKey)return;
- busy=true;
+ busy=true;lastRun=Date.now();
  try{
   const data=records();
   if(![...data.LONG||[],...data.SHORT||[]].length)return;
@@ -236,7 +236,7 @@ document.addEventListener('btc:manual-entry-placed',()=>{
  for(const delay of [0,1400,3700,7500])
   setTimeout(()=>{if(!document.hidden)void run();},delay);
 });
-document.addEventListener('btc:real-account-updated',()=>{if(Date.now()-lastRun>2500){lastRun=Date.now();void run();}});
+document.addEventListener('btc:real-account-updated',()=>{if(Date.now()-lastRun>30000)void run();});
 document.addEventListener('btc:credentials-unlocked',()=>setTimeout(run,1000));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void run()});
 setTimeout(run,2500);
