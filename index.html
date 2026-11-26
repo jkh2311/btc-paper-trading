@@ -7662,7 +7662,11 @@ async function restoreLastVisibleScreen(){
   }
  }finally{
   restoringLastView=false;
-  saveLastVisibleScreen(true);
+  // Keep the saved comparison snapshot if its real historical candles could
+  // not be loaded (for example while offline or under Binance rate limits).
+  // Do not overwrite the last good screen with an empty chart on failure.
+  if(saved.mode!=='compare'||!$('patternCompare')?.hidden)
+   saveLastVisibleScreen(true);
  }
 }
 document.addEventListener('visibilitychange',()=>{
