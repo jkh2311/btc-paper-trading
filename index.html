@@ -6678,12 +6678,6 @@ function patternCompareIndicatorPath(bars,anchorIndex,count,tf){
  const periods=[5,10,20,40,60,90,120,160,200];
  const validPeriods=periods.filter(p=>closes.length>=p+5);
  if(!validPeriods.length)return null;
- const initial={};
- for(const p of validPeriods){
-  const mean=closes.slice(-p).reduce((a,b)=>a+b,0)/p;
-  const prev=closes.slice(-p-4,-4).reduce((a,b)=>a+b,0)/p;
-  initial[p]={mean,prev};
- }
  const bbN=Math.min(config.bb,closes.length);
  const results=[anchor],working=closes.slice(),decay=Math.max(12,Math.min(160,count*.3));
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -7123,7 +7117,9 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
   ctx.fillStyle='#a4c0e5';ctx.font='bold 10px -apple-system,sans-serif';
   ctx.textAlign='center';
   if(boundary<left+pw)ctx.fillText(
-    priceView?.historical?'선택일 이후 · 실제':'과거 유사 흐름 · 시나리오',
+    priceView?.historical?'선택일 이후 · 실제':
+     scenario?.blend50?'5:5 과거+현재지표 · 시나리오':
+     '과거 유사 흐름 · 시나리오',
     Math.max(left+40,Math.min(left+pw-40,(boundary+left+pw)/2)),pt+15);
   if(scenario){
    const F=k=>X(n-1)+k*pw/slots;
