@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-pattern-live-entry-v356"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-pattern-live-follow-v357"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -2093,7 +2093,7 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
 <div id="patternCompare" class="patternCompare" role="dialog" aria-modal="true" aria-label="유사 패턴 비교 차트" hidden><div><div class="patternCompareCompactToolbar" role="group" aria-label="유사 패턴 비교 설정"><label class="patternCompareTfLabel" for="patternCompareDisplayTf">현재차트</label><div class="patternDisplayTfRow"><label class="patternCompareSrOnly" for="patternCompareDisplayTf">현재 차트 표시봉</label><select id="patternCompareDisplayTf" aria-label="현재 비교 차트 표시 시간봉"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><span id="patternCompareDisplayTfStatus" role="status" aria-live="polite"></span></div><div class="patternForecastSetting"><label for="patternForecastBars">미래비교</label><input id="patternForecastBars" type="number" min="5" max="2000" step="1" value="50" inputmode="numeric" aria-label="미래 비교 봉수 설정"><span class="patternCompareSrOnly">봉 (5~2000)</span></div><button id="patternCompareBlendToggle" type="button" aria-pressed="false" title="유사 패턴 50% + 현재 차트 보조지표 50%">5:5 OFF</button><button id="patternCompareClose" type="button" aria-label="비교창 닫기">✕ 닫기</button></div><section><div><strong>현재 차트</strong><span id="patternCompareLiveQuote" aria-live="off">가격 확인 중</span><span id="patternCompareCandleCountdown">--:--</span><span id="patternCompareCurrentLabel"></span></div><canvas id="patternCompareCurrentCanvas" aria-label="현재 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><nav id="patternCompareRanks" class="patternCompareRanks" aria-label="과거 유사 패턴 순위 선택"></nav><section class="historical"><div><strong id="patternCompareHistoricalTitle">과거 유사 차트</strong><label class="patternHistoricalTfControl" for="patternCompareHistoricalTf">과거봉</label><select id="patternCompareHistoricalTf" aria-label="과거 실제 차트 시간봉 선택"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><span id="patternCompareHistoricalStatus" role="status" aria-live="polite"></span><span id="patternCompareHistoricalLabel"></span></div><canvas id="patternCompareHistoricalCanvas" aria-label="과거 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><footer id="patternCompareFoot">이평선 50% · 이격도 30% · 볼린저밴드 15% · RMI 5% · 두 차트는 각각 터치하여 이동·확대</footer></div></div><div id="patternCompareEntryModal" class="patternCompareEntryModal" role="dialog" aria-modal="true" aria-label="현재 비교 차트 예약 지정가 진입" hidden>
  <div class="patternEntryCard">
  <div class="patternEntryHeader"><strong>BTCUSDT 지정가 예약진입</strong><button id="patternEntryClose" type="button" aria-label="예약 진입 창 닫기">✕ 닫기</button></div>
- <p class="patternEntryHelp">직접 지정가 또는 현재가 지정가를 선택하세요. 현재가는 주문 확인창을 열 때 최신 체결가로 고정됩니다. 최종 확인 전 주문은 전송되지 않습니다.</p>
+ <p class="patternEntryHelp">직접 지정가 또는 현재가 지정가를 선택하세요. 현재가는 실시간으로 갱신되며 최종 진입 확인 후 주문 전 최신 시세를 지정가로 확정합니다. 최종 확인 전 주문은 전송되지 않습니다.</p>
  <div class="patternEntryGrid">
   <label>계정<input id="patternEntryAccount" value="실전 Binance" readonly></label>
   <label>진입 방식<select id="patternEntryMode"><option value="manual">직접 지정가</option><option value="current">현재가 (지정가)</option></select></label>
@@ -7951,6 +7951,27 @@ function patternFreshEntryQuote(){
  const q=patternEntryQuote;
  return !demo&&q&&Date.now()-q.at>=0&&Date.now()-q.at<=3500?Number(q.price.toFixed(1)):null;
 }
+// Refresh only the current-price modal; do not rebuild active controls on every tick.
+function refreshPatternEntryCurrentQuote(){
+ const entry=patternEntrySession;
+ if(!entry||$('patternCompareEntryModal')?.hidden||$('patternEntryMode')?.value!=='current'||entry.realPending)return;
+ const quote=patternFreshEntryQuote(),field=$('patternEntryPrice'),value=quote>0?String(quote):'';
+ if(field.value===value)return;
+ field.value=value;
+ const form=patternEntryForm(),list=$('patternEntryStageList');
+ const rows=Array.from(list.children);
+ if(form.prices&&rows.length!==form.count){renderPatternEntry();return;}
+ const valid=!!form.prices&&form.protections?.every(Boolean);
+ $('patternEntryApply').disabled=!valid||entry.realDone.size>=form.count;
+ $('patternEntryPreview').textContent=!(quote>0)?'실시간 시세 연결 확인 중 · 주문 불가':
+  valid?'실전 · 현재가 지정가 (GTC) · 실시간 자동 갱신\n각 단계의 기존 바이낸스 주문창에서 별도 확인 후 제출합니다.':
+  '진입 방향·익절가격·손절가격을 확인해 주세요.\n롱: 손절 < 진입 < 익절 / 숏: 익절 < 진입 < 손절';
+ rows.forEach((row,i)=>{
+  const input=row.querySelector('input'),button=row.querySelector('button');
+  if(input&&!entry.realDone.has(i))input.value=value;
+  if(button)button.disabled=entry.realDone.has(i)||!form.protections?.[i];
+ });
+}
 function patternRealEntrySnapshot(positions){
  return (Array.isArray(positions)?positions:[]).flatMap(p=>{
   const amount=Number(p.amount),price=Number(p.entry),side=p.side==="LONG"||p.side==="SHORT"?p.side:p.side==="BOTH"?(amount>0?"LONG":"SHORT"):null;
@@ -8039,7 +8060,7 @@ function renderPatternEntry(){
  $('patternEntrySlLabel').hidden=false;
  $('patternEntryLong').setAttribute('aria-pressed',String(entry.side==='LONG'));
  $('patternEntryShort').setAttribute('aria-pressed',String(entry.side==='SHORT'));
- const valid=!!form.prices&&form.protections?.every(Boolean);
+ const valid=!!form.prices&&form.protections?.every(Boolean)&&(!form.current||patternFreshEntryQuote()>0);
  const submitted=entry.realDone.size>0;
  // A confirmed real step must never be re-enabled by editing the form.
  for(const id of ['patternEntryMode','patternEntryPrice','patternEntryStages',
@@ -8049,7 +8070,7 @@ function renderPatternEntry(){
  $('patternEntryLong').disabled=submitted;
  $('patternEntryShort').disabled=submitted;
  const apply=$('patternEntryApply'),list=$('patternEntryStageList');
- apply.disabled=!valid;
+ apply.disabled=!valid||entry.realDone.size>=form.count;
  apply.textContent=!entry.side?'롱 또는 숏 선택':
   '실전 '+(entry.realDone.has(0)?'다음 단계':'1단계')+' 주문창 열기';
  list.replaceChildren();
@@ -8078,7 +8099,7 @@ function renderPatternEntry(){
   });
   label.appendChild(field);row.appendChild(label);
   const button=document.createElement('button');button.type='button';
-  button.disabled=entry.realDone.has(i)||!form.protections?.[i]||!!entry.realPending;
+  button.disabled=entry.realDone.has(i)||!form.protections?.[i]||!!entry.realPending||(form.current&&!(patternFreshEntryQuote()>0));
   button.textContent=entry.realDone.has(i)?'접수됨':'실전 확인';
   button.addEventListener('click',()=>openPatternEntryRealStage(i));
   row.appendChild(button);
@@ -8145,10 +8166,7 @@ function initPatternEntry(){
   if(current){
    patternEntrySession.manualPrice=$('patternEntryPrice').value;
    const quote=patternFreshEntryQuote();
-   if(!(quote>0)){
-    $('patternEntryMode').value='manual';patternEntryMessage('실시간 현재가 연결을 확인한 뒤 다시 선택하세요.');return;
-   }
-   $('patternEntryPrice').value=String(quote);
+   $('patternEntryPrice').value=quote>0?String(quote):'';
   }else if(patternEntrySession.manualPrice!==undefined){
    $('patternEntryPrice').value=patternEntrySession.manualPrice;
   }
@@ -8191,7 +8209,7 @@ function initPatternEntry(){
   const st=patternEntrySession,step=st?.realPending;
   if(!step||e.detail?.side!==step.side)return;
   st.realDone.add(step.index);
-  st.stagePrices[step.index]=step.price;
+  st.stagePrices[step.index]=Number(e.detail?.limitPrice)>0?Number(e.detail.limitPrice):step.price;
   st.realPending=null;
   patternEntryMessage('실전 '+step.side+' '+(step.index+1)+'단계 주문 #'+
    String(e.detail?.orderId||'')+' 접수 확인 · 다음 단계는 별도 확인 후 전송하세요.');
@@ -8199,6 +8217,7 @@ function initPatternEntry(){
   // accidental tap submitting the same stage again.
   setTimeout(()=>{$('sheetCancel')?.click();},0);
  });
+ setInterval(refreshPatternEntryCurrentQuote,150);
  let lastRenderedLiveTick=0,lastRenderedLiveBar=0;
  setInterval(()=>{
   if(!patternComparison||$('patternCompare')?.hidden||
@@ -11636,7 +11655,7 @@ setInterval(()=>{
 },5000);
 timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),p=Math.max(1000,v.c*(1+(Math.random()-.5)*.001));a.push({t:Date.now(),o:v.c,h:Math.max(p,v.c),l:Math.min(p,v.c),c:p,v:Math.round(30+Math.random()*200)});a.shift()}last=candles['1m'].at(-1).c;process();render()}else refresh()},45000);
 
-</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=pattern-live-entry-v356"></script><script src="./market-stats-stream.js?v=343"></script><script src="./protection-read-backoff.js?v=342"></script><script src="./live-manual-protection.js?v=protection-backoff-v342"></script><script src="./live-chart-levels.js?v=read-backoff-v342"></script><script src="./orphan-protection-cleanup.js?v=orphan-backoff-v342"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
+</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=pattern-live-follow-v357"></script><script src="./market-stats-stream.js?v=343"></script><script src="./protection-read-backoff.js?v=342"></script><script src="./live-manual-protection.js?v=protection-backoff-v342"></script><script src="./live-chart-levels.js?v=read-backoff-v342"></script><script src="./orphan-protection-cleanup.js?v=orphan-backoff-v342"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
 <script>
 /* v200: Opt-in foreground-only live switch. Standalone single TP trigger or
  * manual price. No 3-part TP integration. Never auto-arm after reload.
