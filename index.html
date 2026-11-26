@@ -7103,6 +7103,29 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
    ctx.restore();
   }
  }
+ // Historical similarity reference: the candle CONTAINING the
+ // original match timestamp, regardless of the displayed timeframe.
+ if(!futureEnabled&&Number.isFinite(priceView?.historicalMatchTime)){
+  const matchIndex=patternHistoricalAnchorIndex(bars,tf,priceView.historicalMatchTime);
+  const visibleIndex=matchIndex-(index-n+1);
+  if(visibleIndex>=0&&visibleIndex<n){
+   const x=X(visibleIndex),matchTime=priceView.historicalMatchTime;
+   const label='유사 기준 · '+formatter.format(new Date(matchTime))+' KST';
+   ctx.save();
+   ctx.strokeStyle='#f7d68f';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+   ctx.beginPath();ctx.moveTo(x,pt);ctx.lineTo(x,db);ctx.stroke();
+   ctx.setLineDash([]);
+   ctx.font='bold 10px -apple-system,sans-serif';
+   const labelW=Math.min(pw-8,Math.max(85,ctx.measureText(label).width+12));
+   const labelX=Math.max(left+3,Math.min(left+pw-3-labelW,x-labelW/2));
+   ctx.fillStyle='rgba(31,38,53,.96)';
+   ctx.fillRect(labelX,pt+3,labelW,17);
+   ctx.strokeStyle='#cba95e';ctx.strokeRect(labelX+.5,pt+3.5,labelW-1,16);
+   ctx.fillStyle='#ffe6a9';ctx.textAlign='left';
+   ctx.fillText(label,labelX+6,pt+15,labelW-10);
+   ctx.restore();
+  }
+ }
  if(Number.isInteger(inspectIndex)){
   const j=inspectIndex-(index-n+1);
   if(j>=0&&j<n){
@@ -7567,11 +7590,14 @@ function openPatternComparison(tf,bars,matches,rank){
     show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0,
     futureEnabled:true,futureShift:0,pastReveal:0},
    historical:{index:match.index,baseIndex:match.index,count:config.window,
+    displayTf:tf,displayBars:null,
     show:{ma:true,bb:true,rmi:true,disparity:true},priceZoom:1,pricePan:0,
     futureEnabled:false,futureShift:0}
   }
  };
  $('patternCompareHistoricalTitle').textContent='과거 실제 차트 ('+rank+'위)';
+ $('patternCompareHistoricalTf').value=tf;
+ $('patternCompareHistoricalStatus').textContent='';
  const displaySelect=$('patternCompareDisplayTf');
  if(displaySelect)displaySelect.value=tf;
  $('patternCompareDisplayTfStatus').textContent='';
@@ -7896,6 +7922,9 @@ function initPatternComparison(){
  $('patternCompareClose')?.addEventListener('click',closePatternComparison);
  $('patternCompareDisplayTf')?.addEventListener('change',e=>{
   void choosePatternCurrentDisplay(e.target.value);
+ });
+ $('patternCompareHistoricalTf')?.addEventListener('change',e=>{
+  void choosePatternHistoricalDisplay(e.target.value);
  });
  $('patternForecastBars')?.addEventListener('change',e=>{
   const requested=Math.round(Number(e.target.value));
