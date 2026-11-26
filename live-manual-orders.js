@@ -240,6 +240,7 @@ function restoreChartLimitSheet(){
  chartLimitPriceMode=false;chartCurrentLimitMode=false;chartProtectionPlan=null;chartRequestedStageCount=null;reservationProtectionLabel.style.display='none';
  for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.disabled=false;
  if(typeof quoteReset!=='undefined'&&quoteReset)quoteReset.style.display='';
+ if(typeof limitInput!=='undefined'&&limitInput)limitInput.readOnly=false;
 }
 document.addEventListener('btc:chart-price-limit-entry',e=>{
  const data=e.detail;
@@ -252,7 +253,9 @@ document.addEventListener('btc:chart-price-limit-entry',e=>{
   chartCurrentLimitMode=data.currentLimit===true;
   if(chartCurrentLimitMode){
    $('orderHelp').textContent='실전 현재가 지정가 · LIMIT GTC · 즉시 체결 또는 미체결 가능 · 최종 진입 버튼을 눌러야 전송됩니다.';
-   quoteState.textContent='확인창을 열 때의 현재가 고정 · 직접 변경 가능 · 시장가 전환 불가';
+   if(limitInput)limitInput.readOnly=true;
+   sheetPriceEdited=true; // Prevent REST quote fallback; WebSocket only in this mode.
+   displayLiveQuote();
   }
   const requested=Number(data.stageCount);
   chartRequestedStageCount=Number.isInteger(requested)&&requested>=1&&requested<=6?requested:null;
@@ -300,7 +303,20 @@ if(limitInput){
 }
 const limitOrderSelected=()=>document.querySelector('input[name="orderType"]:checked')?.value!=='market';
 const isSheetOpen=()=>{const e=$('entrySheet');return !!e&&e.style.display!=='none'&&e.dataset.realSide;};
+function freshChartCurrentLimit(quote,tick,digits,now){
+ if(!Number.isFinite(quote?.price)||!(quote.price>0)||!Number.isFinite(quote?.at)||
+    now-quote.at<0||now-quote.at>3500||!(tick>0))return null;
+ const value=Number((Math.round(quote.price/tick)*tick).toFixed(digits));
+ return Number.isFinite(value)&&value>0?value:null;
+}
 function followQuote(){
+ if(chartCurrentLimitMode&&isSheetOpen()&&limitInput){
+  if(busy)return; // The order path alone sets the final validated price.
+  const value=freshChartCurrentLimit(liveQuote,sheetTick>0?sheetTick:.1,sheetTick>0?sheetTickDigits:1,Date.now());
+  limitInput.value=value===null?'':String(value);
+  quoteState.textContent=value===null?'실시간 시세 연결 확인 중 · 주문 불가':'실시간 현재가 자동 연동 · 최종 주문 전 최신 지정가 확정';
+  return;
+ }
  if(!isSheetOpen()||!limitOrderSelected()||sheetPriceEdited||!limitInput||
     !(sheetTick>0)||!(liveQuote.price>0)||Date.now()-liveQuote.at>3500)return;
  limitInput.value=(Math.round(liveQuote.price/sheetTick)*sheetTick).toFixed(sheetTickDigits);
@@ -314,7 +330,7 @@ function displayLiveQuote(){
   liveQuote.price.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:2})+' USDT':
   '실시간 연결 확인 중…';
  liveQuoteValue.style.color=fresh?'#6de5bf':'#f5bb75';
- if(fresh)followQuote();
+ if(fresh||chartCurrentLimitMode)followQuote();
 }
 let activeCloseEditor=null;
 document.addEventListener('btc:live-trade-price',e=>{
@@ -427,10 +443,15 @@ function credentialsSafe(){if(!cred()?.apiKey||!cred()?.apiSecret){message('설�
 async function enter(side){
  await run(async()=>{
   if(!account||Date.now()-account.at>30000)throw Error('실제 잔고 조회 후 주문하세요.');
+  const currentFollow=chartCurrentLimitMode,entryGeneration=sheetQuoteGeneration;
+  if(currentFollow&&freshChartCurrentLimit(liveQuote,.1,1,Date.now())===null)throw Error('실시간 현재가 연결 확인 필요 · 주문 미전송');
   const dual=await mode(),f=await filters();
   const type=document.querySelector('input[name="orderType"]:checked')?.value==='market'?'MARKET':'LIMIT';
   const quote=Number(String($('price')?.textContent||'').replace(/[^0-9.]/g,''));
-  const price=type==='LIMIT'?Number($('limitPrice').value):quote;
+  const currentTick=Number(f.price.tickSize),currentDigits=Math.min(8,(String(f.price.tickSize).split('.')[1]||'').length);
+  if(currentFollow&&(!chartCurrentLimitMode||entryGeneration!==sheetQuoteGeneration||!isSheetOpen()))throw Error('주문 확인창 변경 · 주문 미전송');
+  let price=currentFollow?freshChartCurrentLimit(liveQuote,currentTick,currentDigits,Date.now()):type==='LIMIT'?Number($('limitPrice').value):quote;
+  if(currentFollow&&price===null)throw Error('실시간 현재가 연결 확인 필요 · 주문 미전송');
   if(chartLimitPriceMode&&type!=='LIMIT')throw Error('차트 예약진입은 지정가만 가능합니다.');
   if(!(price>0))throw Error('유효한 현재가/지정가가 필요합니다');
   const plan=chartLimitPriceMode?chartProtectionPlan:null;
@@ -468,6 +489,13 @@ async function enter(side){
   // One order is one pyramid stage; repeated manual entries are explicitly separate orders.
   const stageState=await usedManualStages(side,dual),used=stageState.used;
   if(used>=count)throw Error('실계좌 보유/미체결 기준 '+count+'단계 한도에 도달했습니다. 증거금이 남아도 단계 한도를 넘겨 주문하지 않습니다.');
+  if(currentFollow){
+   if(!chartCurrentLimitMode||entryGeneration!==sheetQuoteGeneration||!isSheetOpen())throw Error('주문 확인창 변경 · 주문 미전송');
+   price=freshChartCurrentLimit(liveQuote,currentTick,currentDigits,Date.now());
+   if(price===null)throw Error('실시간 현재가 연결 확인 필요 · 주문 미전송');
+   limitInput.value=price.toFixed(currentDigits);
+   quoteState.textContent='최신 지정가 확정 · 주문 조건 검사 중';
+  }
   const weights=Array.from({length:count},(_,i)=>1+i*.2);
   const lot=type==='MARKET'?f.market:f.lot;
   const allocation=modeSize==='margin'?marginPyramidAllocation({
@@ -483,7 +511,7 @@ async function enter(side){
   const order={symbol,side:side==='LONG'?'BUY':'SELL',positionSide:dual?side:'BOTH',type,quantity:qty,newOrderRespType:'RESULT',
     newClientOrderId:'btcPwa'+Date.now()+Math.floor(Math.random()*10000)};
   if(type==='LIMIT'){
-   const p=roundDown(price,f.price.tickSize);
+   const p=currentFollow?price.toFixed(currentDigits):roundDown(price,f.price.tickSize);
    if(!(Number(p)>0))throw Error('지정가 호가 단위 오류');
    order.price=p;order.timeInForce=chartLimitPriceMode&&!chartCurrentLimitMode?'GTX':'GTC';
   }
@@ -534,7 +562,7 @@ async function enter(side){
    // Pending LIMIT entries are monitored by the existing supervisor.
    document.dispatchEvent(new CustomEvent('btc:manual-entry-placed',{
     detail:{side,orderId:String(response.orderId),status:String(response.status||''),
-     filled:Number(response.executedQty||0)}
+     filled:Number(response.executedQty||0),limitPrice:order.price??null}
    }));
   }
   message('실제 주문 확인 · #'+response.orderId+' · '+response.status+
