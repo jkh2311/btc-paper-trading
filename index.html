@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-pattern-protection-v358"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-pattern-roi-reservations-v359"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -2106,7 +2106,7 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
   <label>진입 방식<select id="patternEntryMode" hidden style="display:none"><option value="manual">직접 지정가</option><option value="current">현재가 (지정가)</option></select><span class="patternEntryChoice"><button type="button" id="patternEntryManualChoice" aria-pressed="true">직접 지정가</button><button type="button" id="patternEntryCurrentChoice" aria-pressed="false">현재가 지정가</button></span></label>
   <label>진입 지정가 (USDT)<input id="patternEntryPrice" inputmode="decimal" type="number" step="0.1" min="0.1"></label>
   <label>진입 횟수<select id="patternEntryStages"><option value="1">1회 · 전량</option><option value="2">2단계</option><option value="3">3단계</option><option value="4">4단계</option><option value="5">5단계</option><option value="6" selected>6단계</option></select></label>
-  <div style="grid-column:1/-1"><div class="patternEntryChoiceLabel">익절·손절 설정 방식</div><div class="patternEntryChoice"><button type="button" id="patternEntryAbsoluteChoice" aria-pressed="true">가격 직접 입력</button><button type="button" id="patternEntryPercentChoice" aria-pressed="false">퍼센트 (%)</button></div></div>
+  <div style="grid-column:1/-1"><div class="patternEntryChoiceLabel">익절·손절 설정 방식</div><div class="patternEntryChoice"><button type="button" id="patternEntryAbsoluteChoice" aria-pressed="true">가격 직접 입력</button><button type="button" id="patternEntryPercentChoice" aria-pressed="false">ROI (%)</button></div></div>
   <label id="patternEntryTpLabel"><span id="patternEntryTpTitle" style="color:#63e4b8">익절가격 (USDT)</span><input id="patternEntryTp" type="number" inputmode="decimal" min="0.1" step="0.1" placeholder="익절할 가격 직접 입력"></label>
   <label id="patternEntrySlLabel"><span id="patternEntrySlTitle" style="color:#ff819b">손절가격 (USDT)</span><input id="patternEntrySl" type="number" inputmode="decimal" min="0.1" step="0.1" placeholder="손절할 가격 직접 입력"></label>
  </div>
@@ -7071,7 +7071,8 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  }
  if(!(high>low)){low=visible.at(-1).c*.97;high=visible.at(-1).c*1.03}
  const realEntries=futureEnabled&&window.btcChartLevelVisible?.('entry')!==false?patternRealEntries:[];
- for(const e of realEntries){low=Math.min(low,e.price);high=Math.max(high,e.price);}
+ const realReservations=futureEnabled?realReservationChartLevels():[];
+ for(const e of [...realEntries,...realReservations]){low=Math.min(low,e.price);high=Math.max(high,e.price);}
  const pad=(high-low)*.06;low-=pad;high+=pad;
  const baselineRange=high-low;
  if(priceView){priceView.priceBaselineRange=baselineRange;priceView.pricePlotHeight=pb-pt;}
@@ -7286,6 +7287,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
   ctx.fillText(last.c.toLocaleString('en-US',{maximumFractionDigits:2}),width-right+4,lastY+4,right-10);
   ctx.restore();
  }
+ drawRealReservationChartLines(ctx,Y,pt,pb,left,left+pw,realReservations);
  // Real filled position entry lines only, never historical comparison or pending orders.
  for(const e of realEntries){
   const y=Y(e.price);if(y<pt||y>pb)continue;
@@ -7951,6 +7953,21 @@ function openPatternComparison(tf,bars,matches,rank){
 // projected candles NEVER trigger automatic exchange trading.
 let patternEntrySession=null,patternEntryQuote=null;
 let patternRealEntries=[];
+function realReservationChartLevels(){return window.btcChartLevelVisible?.('entry')===false?[]:(window.btcRealReservationLevels?.()||[]);}
+function drawRealReservationChartLines(ctx,y,top,bottom,left,right,orders=realReservationChartLevels()){
+ for(const e of orders){
+  const py=y(e.price);if(!Number.isFinite(py)||py<top||py>bottom)continue;
+  const color=e.side==='LONG'?'#41dbad':'#ff819b';
+  const label=e.side+' 예약 '+(e.stage?e.stage+'단계 ':'')+e.price.toLocaleString('en-US',{maximumFractionDigits:2});
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=1.4;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(left,py);ctx.lineTo(right,py);ctx.stroke();ctx.setLineDash([]);
+  ctx.font='bold 10px -apple-system,sans-serif';ctx.textAlign='left';const w=Math.min(right-left-8,ctx.measureText(label).width+10),ty=Math.max(top,Math.min(bottom-16,py-17));
+  if(w>10){ctx.fillStyle='rgba(8,23,42,.94)';ctx.fillRect(left+4,ty,w,16);ctx.fillStyle=color;ctx.fillText(label,left+9,ty+12,w-10);}ctx.restore();
+ }
+}
+document.addEventListener('btc:real-reservation-levels',()=>{
+ if(patternComparison&&!$('patternCompare')?.hidden)renderPatternComparison();
+ window.btcRedrawChart?.();
+});
 document.addEventListener("btc:live-trade-price",e=>{
  const d=e.detail;
  if(d?.symbol==="BTCUSDT"&&Number.isFinite(Number(d.price))&&Number(d.price)>0&&Number.isFinite(Number(d.at)))patternEntryQuote={price:Number(d.price),at:Number(d.at)};
@@ -7973,7 +7990,7 @@ function refreshPatternEntryCurrentQuote(){
  $('patternEntryApply').disabled=!valid||entry.realDone.size>=form.count;
  $('patternEntryPreview').textContent=!(quote>0)?'실시간 시세 연결 확인 중 · 주문 불가':
   valid?'실전 · 현재가 지정가 (GTC) · 실시간 자동 갱신\n각 단계의 기존 바이낸스 주문창에서 별도 확인 후 제출합니다.':
-  form.percent?'BTC 진입가격 대비 변동률 (ROI 아님) · 익절 0초과~99%, 손절 0.05~10%':'진입 방향·익절가격·손절가격을 확인해 주세요.\n롱: 손절 < 진입 < 익절 / 숏: 익절 < 진입 < 손절';
+  form.percent?'증거금 ROI · 설정 레버리지 적용 · 익절/손절 각각 0.1~100%':'진입 방향·익절가격·손절가격을 확인해 주세요.\n롱: 손절 < 진입 < 익절 / 숏: 익절 < 진입 < 손절';
  rows.forEach((row,i)=>{
   const input=row.querySelector('input'),button=row.querySelector('button');
   if(input&&!entry.realDone.has(i))input.value=value;
@@ -8033,13 +8050,14 @@ function patternEntryProtection(side,entry,tp,sl){
     side==='SHORT'&&!(tp<entry&&sl>entry))return null;
  return {tpPrice:tp,slPrice:sl,tpPercent,slPercent};
 }
-function patternEntryPercentProtection(side,entry,tp,sl){
+function patternEntryPercentProtection(side,entry,tp,sl,lev){
  if(!['LONG','SHORT'].includes(side)||!Number.isFinite(entry)||!(entry>0)||
-    !Number.isFinite(tp)||!Number.isFinite(sl)||!(tp>0&&tp<=99&&sl>=.05&&sl<=10))return null;
+    !Number.isInteger(lev)||lev<1||lev>100||!Number.isFinite(tp)||!Number.isFinite(sl)||
+    !(tp>=.1&&tp<=100&&sl>=.1&&sl<=100))return null;
  const sign=side==='LONG'?1:-1;
- const tpPrice=entry*(1+sign*tp/100),slPrice=entry*(1-sign*sl/100);
+ const tpPrice=entry*(1+sign*tp/(100*lev)),slPrice=entry*(1-sign*sl/(100*lev));
  if(!(tpPrice>0&&slPrice>0))return null;
- return {tpPrice,slPrice,tpPercent:tp,slPercent:sl};
+ return {tpPrice,slPrice,tpPercent:tp/lev,slPercent:sl/lev,tpRoi:tp,slRoi:sl,leverage:lev};
 }
 function patternEntryForm(){
  const mode="real",current=$('patternEntryMode')?.value==="current",price=Number($('patternEntryPrice')?.value),
@@ -8049,7 +8067,7 @@ function patternEntryForm(){
  const prices=patternEntryLevels(side,price,count,current?undefined:patternEntrySession?.stagePrices);
  const percent=patternEntrySession?.protectionMode==='percent';
  return {mode,current,price,count,tp,sl,side,prices,percent,
-  protections:prices?.map(p=>percent?patternEntryPercentProtection(side,p,tp,sl):patternEntryProtection(side,p,tp,sl))||null};
+  protections:prices?.map(p=>percent?patternEntryPercentProtection(side,p,tp,sl,Number($('lev')?.value)):patternEntryProtection(side,p,tp,sl))||null};
 }
 function patternEntryMessage(message){if($('patternEntryMessage'))$('patternEntryMessage').textContent=message;}
 function closePatternEntry(){
@@ -8082,11 +8100,11 @@ function renderPatternEntry(){
  for(const [id,active] of [['patternEntryManualChoice',!form.current],['patternEntryCurrentChoice',form.current],['patternEntryAbsoluteChoice',!form.percent],['patternEntryPercentChoice',form.percent]]){
   $(id).setAttribute('aria-pressed',String(active));$(id).disabled=submitted;
  }
- $('patternEntryTpTitle').textContent=form.percent?'익절 (%)':'익절가격 (USDT)';
- $('patternEntrySlTitle').textContent=form.percent?'손절 (%)':'손절가격 (USDT)';
+ $('patternEntryTpTitle').textContent=form.percent?'익절 ROI (%)':'익절가격 (USDT)';
+ $('patternEntrySlTitle').textContent=form.percent?'손절 ROI (%)':'손절가격 (USDT)';
  for(const [id,kind] of [['patternEntryTp','익절'],['patternEntrySl','손절']]){
-  $(id).step=form.percent?'0.01':'0.1';$(id).min=form.percent?'0.01':'0.1';
-  $(id).placeholder=form.percent?kind+' 가격 변동률 (%)':kind+'할 가격 직접 입력';
+  $(id).step='0.1';$(id).min='0.1';
+  $(id).placeholder=form.percent?kind+' 증거금 ROI (%)':kind+'할 가격 직접 입력';
  }
  // A confirmed real step must never be re-enabled by editing the form.
  for(const id of ['patternEntryMode','patternEntryPrice','patternEntryStages',
@@ -8101,7 +8119,7 @@ function renderPatternEntry(){
   '실전 '+(entry.realDone.has(0)?'다음 단계':'1단계')+' 주문창 열기';
  list.replaceChildren();
  if(!valid)
-  $('patternEntryPreview').textContent=form.percent?'BTC 진입가격 대비 변동률 (ROI 아님) · 익절 0초과~99%, 손절 0.05~10% 입력 후 롱 또는 숏 선택':'익절·손절가격 입력 후 롱 또는 숏 선택.\n롱: 손절 < 진입 < 익절 / 숏: 익절 < 진입 < 손절';
+  $('patternEntryPreview').textContent=form.percent?'증거금 ROI · 설정 레버리지 적용 · 익절/손절 각각 0.1~100% 입력 후 롱 또는 숏 선택':'익절·손절가격 입력 후 롱 또는 숏 선택.\n롱: 손절 < 진입 < 익절 / 숏: 익절 < 진입 < 손절';
  if(!form.prices)return;
  if(valid)$('patternEntryPreview').textContent=(form.current?'실전 · 현재가 지정가 (GTC) · 즉시 체결 가능, 미체결 가능':'실전 · 직접 지정가 (Post Only GTX)')+'\n각 단계의 기존 바이낸스 주문창에서 별도 확인 후 제출합니다.';
  for(let i=0;i<form.prices.length;i++){
@@ -8143,7 +8161,7 @@ function openPatternEntryRealStage(index){
   $('patternEntryPrice').value=String(quote);f=patternEntryForm();renderPatternEntry();
  }
  if(!f.protections?.[index]){
-  patternEntryMessage(f.percent?'익절·손절 변동률을 확인해 주세요 (익절 0초과~99%, 손절 0.05~10%).':'이 단계의 진입가에 맞는 익절·손절 절대가격을 입력해 주세요.');return;
+  patternEntryMessage(f.percent?'익절·손절 ROI와 레버리지를 확인해 주세요 (각각 0.1~100%).':'이 단계의 진입가에 맞는 익절·손절 절대가격을 입력해 주세요.');return;
  }
  const saved=typeof getApiCredentials==='function'?getApiCredentials():null;
  if(!saved?.apiKey||!saved?.apiSecret){
@@ -8159,7 +8177,7 @@ function openPatternEntryRealStage(index){
  // leverage, lot/tick size, available margin, stage ledger, TP/SL direction.
  document.dispatchEvent(new CustomEvent('btc:chart-price-limit-entry',{
   detail:{symbol:'BTCUSDT',side:f.side,price,tpPrice,slPrice,
-   tpPercent,slPercent,stageCount:f.count,currentLimit:f.current,protectionMode:f.percent?'percent':'price'}
+   tpPercent,slPercent,stageCount:f.count,currentLimit:f.current,protectionMode:f.percent?'roi':'price',tpRoi:f.percent?f.tp:null,slRoi:f.percent?f.sl:null,leverage:Number($('lev')?.value)}
  }));
  if($('entrySheet')?.style.display!=='block'){
   $('patternCompareEntryModal').hidden=false;
@@ -9157,7 +9175,7 @@ const paperLevels=chartJumpSegment||allLiveLevels.length?[]:paperChartLevels().m
 // Foreground-only switch guide is an overlay, not a price scale anchor.
 // Keeping an off-screen switch target out of autoscale preserves the visible
 // candles and the forward forecast/projection display.
-const levels=[...liveLevels,...paperLevels].filter(p=>Number.isFinite(p)&&p>0);
+const levels=[...liveLevels,...paperLevels,...(chartJumpSegment?[]:realReservationChartLevels().map(e=>e.price))].filter(p=>Number.isFinite(p)&&p>0);
 // While viewing far-back history, an unrelated current open position can
 // be tens of thousands of dollars away. Do not compress historical candles
 // merely to keep that off-screen trading level in the fitted price range.
@@ -9227,7 +9245,7 @@ if(!chartJumpSegment)window.btcDailyConvergenceForecast?.render(ctx,{
  bars:a,tf:$('tf').value,left,count,bw,y,top,bottom:priceBottom,plotW
 });
 drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);
-drawDisparityStageTwoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();paintChartWeekendRegions(ctx,weekendRegions,priceBottom,volBottom,plotW,'background');data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);if(candleDimensionMode==='6d'&&webgl6dScene){return;}else if(candleDimensionMode==='6d')drawSixDVolumeCylinder(ctx,x,bw,volBottom-height,volBottom,v.c>=v.o);else{ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)}});if(webgl6dScene)ctx.drawImage(webgl6dScene,0,0,w,h);ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));paintChartWeekendRegions(ctx,weekendRegions,top,priceBottom,plotW,'labels');drawSixDChartTag(ctx,plotW,top);if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'6h':21600000,'12h':43200000,'1d':86400000,'1w':604800000,'1M':2592000000}[$('tf').value],stamp=new Date(nextCandleTime($('tf').value,a[a.length-1].t,futureCrosshairSlot+1)),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}if(!chartJumpSegment)drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(!chartJumpSegment&&typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&window.btcChartLevelVisible('switch'))window.btcDrawLiveSwitchGuide?.(ctx,{lo,hi,top,priceBottom,plotW,y});window.btcDrawCmeGaps?.(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}syncChartPriceOrderTap(cv,0,NaN,null);const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);syncChartPriceOrderTap(cv,plotW,boxY,crosshairPrice);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);}// Overlay a distinct 265-bars-ahead date ruler when it falls in view.
+drawDisparityStageTwoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();paintChartWeekendRegions(ctx,weekendRegions,priceBottom,volBottom,plotW,'background');data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);if(candleDimensionMode==='6d'&&webgl6dScene){return;}else if(candleDimensionMode==='6d')drawSixDVolumeCylinder(ctx,x,bw,volBottom-height,volBottom,v.c>=v.o);else{ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)}});if(webgl6dScene)ctx.drawImage(webgl6dScene,0,0,w,h);ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));paintChartWeekendRegions(ctx,weekendRegions,top,priceBottom,plotW,'labels');drawSixDChartTag(ctx,plotW,top);if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms={'1m':60000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'6h':21600000,'12h':43200000,'1d':86400000,'1w':604800000,'1M':2592000000}[$('tf').value],stamp=new Date(nextCandleTime($('tf').value,a[a.length-1].t,futureCrosshairSlot+1)),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}if(!chartJumpSegment)drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(!chartJumpSegment&&typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment)drawRealReservationChartLines(ctx,y,top,priceBottom,0,plotW);if(!chartJumpSegment&&window.btcChartLevelVisible('switch'))window.btcDrawLiveSwitchGuide?.(ctx,{lo,hi,top,priceBottom,plotW,y});window.btcDrawCmeGaps?.(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}syncChartPriceOrderTap(cv,0,NaN,null);const showLive=!!(last&&end===a.length),liveY=showLive?y(last):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);syncChartPriceOrderTap(cv,plotW,boxY,crosshairPrice);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(last),plotW+4,liveLabelY+16);}// Overlay a distinct 265-bars-ahead date ruler when it falls in view.
 drawChartDateRange(ctx,a,left,count,plotW,top,priceBottom);
 drawSavedChartShapes(ctx,a,left,count,plotW,top,priceBottom);
 // The pre-launch candles have different exchange provenance. Mark the
@@ -11697,7 +11715,7 @@ setInterval(()=>{
 },5000);
 timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),p=Math.max(1000,v.c*(1+(Math.random()-.5)*.001));a.push({t:Date.now(),o:v.c,h:Math.max(p,v.c),l:Math.min(p,v.c),c:p,v:Math.round(30+Math.random()*200)});a.shift()}last=candles['1m'].at(-1).c;process();render()}else refresh()},45000);
 
-</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=pattern-protection-v358"></script><script src="./market-stats-stream.js?v=343"></script><script src="./protection-read-backoff.js?v=342"></script><script src="./live-manual-protection.js?v=protection-backoff-v342"></script><script src="./live-chart-levels.js?v=read-backoff-v342"></script><script src="./orphan-protection-cleanup.js?v=orphan-backoff-v342"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
+</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=pattern-roi-reservations-v359"></script><script src="./market-stats-stream.js?v=343"></script><script src="./protection-read-backoff.js?v=342"></script><script src="./live-manual-protection.js?v=protection-backoff-v342"></script><script src="./live-chart-levels.js?v=read-backoff-v342"></script><script src="./orphan-protection-cleanup.js?v=orphan-backoff-v342"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
 <script>
 /* v200: Opt-in foreground-only live switch. Standalone single TP trigger or
  * manual price. No 3-part TP integration. Never auto-arm after reload.
