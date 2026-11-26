@@ -11,8 +11,10 @@ const yes=v=>v===true||String(v).toLowerCase()==='true';
 const array=v=>Array.isArray(v)?v:Array.isArray(v?.orders)?v.orders:null;
 const activePositions=data=>{
  if(!Array.isArray(data))throw Error('포지션 조회 응답 검증 실패');
+ // Binance positionRisk v3 can legitimately return [] when a symbol
+ // has neither an active position nor a regular open order.
+ // Trust only a valid array AND two separate successful signed snapshots.
  const relevant=data.filter(p=>p?.symbol===symbol);
- if(!relevant.length)throw Error('BTCUSDT 포지션 응답 없음: 자동 취소 보류');
  const active=new Set();
  for(const p of relevant){
   const amount=Number(p.positionAmt);
