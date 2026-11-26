@@ -191,7 +191,7 @@ async function protect(side,p,info){
  }}));
 }
 async function run(){
- if(busy||window.btcProtectionEditBusy===true||document.hidden||!getApiCredentials()?.apiKey)return;
+ if(window.HANINE_DUAL_CHART_PANEL||busy||window.btcProtectionEditBusy===true||document.hidden||window.btcBinanceRequestBackoff?.()>0||!getApiCredentials()?.apiKey)return;
  busy=true;
  try{
   const data=records();
