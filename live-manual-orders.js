@@ -224,7 +224,7 @@ async function currentManualPositions(){
 // sheet. The displayed live quote is separate from the order's LIMIT price.
 // Editing the LIMIT price freezes only that field, not the moving live quote.
 let sheetQuoteGeneration=0,sheetPriceEdited=false,sheetQuoteBusy=false,sheetQuoteLastAt=0;
-let chartLimitPriceMode=false,entrySheetOriginalPosition=null,chartProtectionPlan=null,chartRequestedStageCount=null;
+let chartLimitPriceMode=false,chartCurrentLimitMode=false,entrySheetOriginalPosition=null,chartProtectionPlan=null,chartRequestedStageCount=null;
 const reservationProtectionLabel=document.createElement('div');
 reservationProtectionLabel.id='realReservationProtectionPreview';
 reservationProtectionLabel.style.cssText='display:none;margin:7px 0 10px;padding:10px;border:1px solid #3c708b;background:#0b253a;border-radius:9px;font-size:12px;line-height:1.6;color:#b7e9d8';
@@ -237,7 +237,7 @@ function restoreChartLimitSheet(){
   if(parent?.isConnected)parent.insertBefore(sh,next?.parentNode===parent?next:null);
   entrySheetOriginalPosition=null;
  }
- chartLimitPriceMode=false;chartProtectionPlan=null;chartRequestedStageCount=null;reservationProtectionLabel.style.display='none';
+ chartLimitPriceMode=false;chartCurrentLimitMode=false;chartProtectionPlan=null;chartRequestedStageCount=null;reservationProtectionLabel.style.display='none';
  for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.disabled=false;
  if(typeof quoteReset!=='undefined'&&quoteReset)quoteReset.style.display='';
 }
@@ -249,6 +249,11 @@ document.addEventListener('btc:chart-price-limit-entry',e=>{
  // Comparison modal may request 1–6 manual stages; all signed Binance
  // tick/lot/margin/leverage/stage-ledger safeguards below remain in force.
  if(chartLimitPriceMode){
+  chartCurrentLimitMode=data.currentLimit===true;
+  if(chartCurrentLimitMode){
+   $('orderHelp').textContent='실전 현재가 지정가 · LIMIT GTC · 즉시 체결 또는 미체결 가능 · 최종 진입 버튼을 눌러야 전송됩니다.';
+   quoteState.textContent='확인창을 열 때의 현재가 고정 · 직접 변경 가능 · 시장가 전환 불가';
+  }
   const requested=Number(data.stageCount);
   chartRequestedStageCount=Number.isInteger(requested)&&requested>=1&&requested<=6?requested:null;
   const pp={tpPrice:Number(data.tpPrice),slPrice:Number(data.slPrice),
@@ -480,7 +485,7 @@ async function enter(side){
   if(type==='LIMIT'){
    const p=roundDown(price,f.price.tickSize);
    if(!(Number(p)>0))throw Error('지정가 호가 단위 오류');
-   order.price=p;order.timeInForce=chartLimitPriceMode?'GTX':'GTC';
+   order.price=p;order.timeInForce=chartLimitPriceMode&&!chartCurrentLimitMode?'GTX':'GTC';
   }
   let protection=null;
   if(plan){
@@ -514,7 +519,7 @@ async function enter(side){
   catch(e){
    // Binance -5022 is a definitive Post Only rejection (would trade
    // immediately). Do not mask it as uncertain or retry as market order.
-   if(chartLimitPriceMode&&String(e?.message||'').includes('-5022')){
+   if(chartLimitPriceMode&&!chartCurrentLimitMode&&String(e?.message||'').includes('-5022')){
     lastOrderIssue=false;
     throw Error('예약 지정가가 즉시 체결될 수 있어 바이낸스가 거절했습니다(-5022). 다른 가격을 선택하세요.');
    }
