@@ -1727,6 +1727,13 @@ body.non-chart-tab #tradeBar{display:none!important}
 .patternEntryActions button:disabled{opacity:.5}
 body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fixed!important}
 @media(max-height:650px){.patternEntryCard{padding:8px;max-height:97dvh}.patternEntryHelp,.patternEntryWarning{font-size:10px}.patternEntryGrid{gap:4px}.patternEntryGrid input,.patternEntryGrid select{min-height:31px}.patternEntryStageList{max-height:92px}}
+
+/* v350 comparison entry: manual per-step limit prices, absolute TP/SL */
+.patternCompareEntryModal .patternEntryStageRow{display:flex!important;align-items:center;justify-content:space-between;gap:5px;padding:3px 5px!important;min-height:36px!important}
+.patternCompareEntryModal .patternEntryStageRow label{display:flex;flex:1;align-items:center;gap:5px;font-size:11px;white-space:nowrap}
+.patternCompareEntryModal .patternEntryStageRow input{width:100px;min-width:60px;max-width:115px;height:30px;font-size:12px;padding:2px 4px;border:1px solid #6785a8;border-radius:6px;background:#284360;color:white}
+.patternCompareEntryModal .patternEntryStageRow button{flex:0 0 auto!important;width:auto!important;min-height:28px!important;padding:3px 7px!important}
+.patternCompareEntryModal .patternEntryStageRow small{font-size:10px;color:#b2d1e5}
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
@@ -2029,10 +2036,9 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
   <label>계정<select id="patternEntryMode"><option value="paper" selected>모의매매</option><option value="real">실전 Binance</option></select></label>
   <label>진입 지정가 (USDT)<input id="patternEntryPrice" inputmode="decimal" type="number" step="0.1" min="0.1"></label>
   <label>진입 횟수<select id="patternEntryStages"><option value="1">1회 · 전량</option><option value="2">2단계</option><option value="3">3단계</option><option value="4">4단계</option><option value="5">5단계</option><option value="6" selected>6단계</option></select></label>
-  <label>단계별 가격 차이 (%)<input id="patternEntryGap" type="number" inputmode="decimal" min="0" max="3" step="0.05" value="0.2"></label>
   <label id="patternEntryMarginLabel">모의 가용 증거금 사용 (%)<input id="patternEntryMargin" type="number" min="0.1" max="100" step="0.5" value="50"></label>
-  <label id="patternEntryTpLabel">실전 익절 거리 (%)<input id="patternEntryTp" type="number" min="0.1" max="99" step="0.1" value="1"></label>
-  <label id="patternEntrySlLabel">실전 손절 거리 (%)<input id="patternEntrySl" type="number" min="0.05" max="10" step="0.05" value="1"></label>
+  <label id="patternEntryTpLabel">익절가격 (USDT)<input id="patternEntryTp" type="number" inputmode="decimal" min="0.1" step="0.1" placeholder="익절할 가격 직접 입력"></label>
+  <label id="patternEntrySlLabel">손절가격 (USDT)<input id="patternEntrySl" type="number" inputmode="decimal" min="0.1" step="0.1" placeholder="손절할 가격 직접 입력"></label>
  </div>
  <div class="patternEntryDirections"><button id="patternEntryLong" type="button" aria-pressed="false">▲ 롱 진입</button><button id="patternEntryShort" type="button" aria-pressed="false">▼ 숏 진입</button></div>
  <div id="patternEntryPreview" class="patternEntryPreview" aria-live="polite"></div>
@@ -7540,20 +7546,32 @@ function patternEntryLiveHeader(){
   timer.title=SIMILAR_PATTERN_LABELS[tf]+' 현재 진행 봉 마감까지 남은 시간';
  }
 }
-function patternEntryLevels(side,price,count,gap){
- if(!['LONG','SHORT'].includes(side)||!Number.isInteger(count)||count<1||count>6||
-    !(price>0)||!(Number.isFinite(gap)&&gap>=0&&gap<=3))return null;
- const sign=side==='LONG'?-1:1;
- const prices=Array.from({length:count},(_,i)=>Number((price*(1+sign*gap*i/100)).toFixed(2)));
- return prices.every(v=>v>0)?prices:null;
+function patternEntryLevels(side,price,count,manualPrices){
+ if(!['LONG','SHORT'].includes(side)||!Number.isInteger(count)||
+    count<1||count>6||!Number.isFinite(price)||price<=0)return null;
+ // No automatic stagger. Every limit is explicitly shown and editable.
+ const prices=Array.from({length:count},(_,i)=>
+  i===0?price:Number(manualPrices?.[i]??price));
+ return prices.every(v=>Number.isFinite(v)&&v>0)?prices:null;
+}
+function patternEntryProtection(side,entry,tp,sl){
+ if(!['LONG','SHORT'].includes(side)||!(entry>0&&tp>0&&sl>0))return null;
+ const tpPercent=Math.abs(tp-entry)/entry*100;
+ const slPercent=Math.abs(sl-entry)/entry*100;
+ if(!(tpPercent>0&&tpPercent<=99&&slPercent>=.05&&slPercent<=10))return null;
+ if(side==='LONG'&&!(tp>entry&&sl<entry)||
+    side==='SHORT'&&!(tp<entry&&sl>entry))return null;
+ return {tpPrice:tp,slPrice:sl,tpPercent,slPercent};
 }
 function patternEntryForm(){
  const mode=$('patternEntryMode')?.value,price=Number($('patternEntryPrice')?.value),
- count=Number($('patternEntryStages')?.value),gap=Number($('patternEntryGap')?.value),
+ count=Number($('patternEntryStages')?.value),
  margin=Number($('patternEntryMargin')?.value),
  tp=Number($('patternEntryTp')?.value),sl=Number($('patternEntrySl')?.value);
- return {mode,price,count,gap,margin,tp,sl,side:patternEntrySession?.side||null,
-  prices:patternEntryLevels(patternEntrySession?.side,price,count,gap)};
+ const side=patternEntrySession?.side||null;
+ const prices=patternEntryLevels(side,price,count,patternEntrySession?.stagePrices);
+ return {mode,price,count,margin,tp,sl,side,prices,
+  protections:prices?.map(p=>patternEntryProtection(side,p,tp,sl))||null};
 }
 function patternEntryMessage(message){if($('patternEntryMessage'))$('patternEntryMessage').textContent=message;}
 function closePatternEntry(){
@@ -7563,14 +7581,13 @@ function closePatternEntry(){
 }
 function openPatternEntry(price){
  if(!patternComparison||$('patternCompare')?.hidden||!(price>0)||!Number.isFinite(price))return;
- patternEntrySession={side:null,realDone:new Set(),realPending:null};
+ patternEntrySession={side:null,realDone:new Set(),realPending:null,stagePrices:[]};
  $('patternEntryMode').value='paper';
  $('patternEntryPrice').value=Number(price.toFixed(2));
  $('patternEntryStages').value=String(Math.max(1,Math.min(6,pyramidEntryCount())));
- $('patternEntryGap').value='0.2';
  $('patternEntryMargin').value='50';
- $('patternEntryTp').value='1';
- $('patternEntrySl').value='1';
+ $('patternEntryTp').value='';
+ $('patternEntrySl').value='';
  $('patternCompareEntryModal').hidden=false;
  patternEntryMessage('');
  renderPatternEntry();
@@ -7580,13 +7597,12 @@ function renderPatternEntry(){
  if(!entry||modal?.hidden)return;
  const form=patternEntryForm(),live=form.mode==='real';
  $('patternEntryMarginLabel').hidden=live;
- $('patternEntryTpLabel').hidden=!live;
- $('patternEntrySlLabel').hidden=!live;
+ $('patternEntryTpLabel').hidden=false;
+ $('patternEntrySlLabel').hidden=false;
  $('patternEntryLong').setAttribute('aria-pressed',String(entry.side==='LONG'));
  $('patternEntryShort').setAttribute('aria-pressed',String(entry.side==='SHORT'));
- const valid=!!form.prices&&(!live?
-  form.margin>=.1&&form.margin<=100:
-  form.tp>=.1&&form.tp<=99&&form.sl>=.05&&form.sl<=10);
+ const valid=!!form.prices&&form.protections?.every(Boolean)&&
+  (live||form.margin>=.1&&form.margin<=100);
  const apply=$('patternEntryApply'),list=$('patternEntryStageList');
  apply.disabled=!valid;
  apply.textContent=!entry.side?'롱 또는 숏 선택':live?
@@ -7594,7 +7610,7 @@ function renderPatternEntry(){
   form.count+'단계 모의 지정가 일괄 예약';
  list.replaceChildren();
  if(!valid){
-  $('patternEntryPreview').textContent='진입 방향·지정가·단계수·비율을 확인해 주세요.';
+  $('patternEntryPreview').textContent='진입 방향·각 단계 지정가·익절가격·손절가격을 확인해 주세요.\n롱: 손절 < 진입 < 익절 / 숏: 익절 < 진입 < 손절';
   return;
  }
  const lev=Number($('lev')?.value),free=paperFreeMargin();
@@ -7605,20 +7621,43 @@ function renderPatternEntry(){
   '실전 · 기존 바이낸스 검증 주문창 사용 · 설정의 레버리지/증거금 비율 적용\n각 단계를 개별 확인 후 제출합니다. 주문창 열기는 주문 전송이 아닙니다.':
   '모의 · 사용 가능 '+fmt(free)+' USDT · 총 예약 증거금 '+fmt(budget)+
   ' USDT · '+(Number.isFinite(lev)?lev+'배':'레버리지 확인')+
-  ' · 실제 바이낸스 주문 없음';
+  ' · 익절 '+fmt(form.tp)+' / 손절 '+fmt(form.sl)+' USDT · 실제 바이낸스 주문 없음';
  for(let i=0;i<form.prices.length;i++){
-  const row=document.createElement(live?'button':'div');
-  if(live){row.type='button';row.dataset.stage=String(i);row.disabled=entry.realDone.has(i);
-   row.addEventListener('click',()=>openPatternEntryRealStage(i));}
-  const percent=live?'':(' · 증거금 '+fmt(budget*weight[i]/weightSum)+' USDT');
-  row.textContent=(i+1)+'/'+form.count+' · '+fmt(form.prices[i])+' USDT'+percent+
-   (live?(entry.realDone.has(i)?' · 주문 접수됨':' · 실전 확인창'):'');
+  const row=document.createElement('div');
+  row.className='patternEntryStageRow';
+  const label=document.createElement('label');
+  label.textContent=(i+1)+'/'+form.count+' 지정가';
+  const field=document.createElement('input');
+  field.type='number';field.min='0.1';field.step='0.1';
+  field.inputMode='decimal';field.value=String(form.prices[i]);
+  field.setAttribute('aria-label',(i+1)+'단계 지정가 USDT');
+  field.disabled=entry.realDone.has(i);
+  field.addEventListener('change',()=>{
+   const v=Number(field.value);
+   if(!(v>0&&Number.isFinite(v))){patternEntryMessage('단계별 지정가는 0보다 커야 해요.');return;}
+   entry.stagePrices[i]=v;
+   if(i===0)$('patternEntryPrice').value=String(v);
+   entry.realDone.clear();patternEntryMessage('');renderPatternEntry();
+  });
+  label.appendChild(field);row.appendChild(label);
+  if(live){
+   const button=document.createElement('button');button.type='button';
+   button.disabled=entry.realDone.has(i)||!form.protections?.[i];
+   button.textContent=entry.realDone.has(i)?'접수됨':'실전 확인';
+   button.addEventListener('click',()=>openPatternEntryRealStage(i));
+   row.appendChild(button);
+  }else{
+   const small=document.createElement('small');
+   small.textContent='증거금 '+fmt(budget*weight[i]/weightSum)+' USDT';
+   row.appendChild(small);
+  }
   list.appendChild(row);
  }
 }
 function submitPatternEntryPaper(){
  const f=patternEntryForm();
- if(!f.prices||f.mode!=='paper'||!(f.margin>=.1&&f.margin<=100))return;
+ if(!f.prices||!f.protections?.every(Boolean)||f.mode!=='paper'||
+    !(f.margin>=.1&&f.margin<=100))return;
  const lev=Number($('lev').value),stop=Number($('stop').value),
  rr=Number($('rr').value),free=paperFreeMargin();
  const cap=pyramidEntryCount(),already=
@@ -7643,7 +7682,8 @@ function submitPatternEntryPaper(){
   const margin=budget*weights[i]/sum,notional=margin*lev;
   return {id:'manual-limit-'+paperPositionId(),side:f.side,price,createdAt:stamp+i,
    notional,margin,qty:notional/price,leverage:lev,
-   stopPct:stop/(100*lev),rr,roiMode:true,
+   stopPct:f.protections[i].slPercent/100,
+   slPrice:f.sl,tpPrice:f.tp,rr,roiMode:true,
    entryPattern:pattern};
  });
  if(orders.some(o=>!(o.qty>0&&o.notional>.01&&o.margin>0&&
@@ -7666,17 +7706,16 @@ function openPatternEntryRealStage(index){
  const f=patternEntryForm(),state=patternEntrySession;
  if(!state||f.mode!=='real'||!f.prices||!Number.isInteger(index)||
     index<0||index>=f.count||state.realDone.has(index))return;
- if(!(f.tp>=.1&&f.tp<=99&&f.sl>=.05&&f.sl<=10)){
-  patternEntryMessage('실전 익절·손절 비율을 확인해 주세요.');return;
+ if(!f.protections?.[index]){
+  patternEntryMessage('이 단계의 진입가에 맞는 익절·손절 절대가격을 입력해 주세요.');return;
  }
  const saved=typeof getApiCredentials==='function'?getApiCredentials():null;
  if(!saved?.apiKey||!saved?.apiSecret){
   patternEntryMessage('실전 API 잠금 해제 후 주문창을 열 수 있어요. 주문은 전송되지 않았어요.');
   return;
  }
- const price=f.prices[index],up=f.side==='LONG',tpPrice=Number((price*(1+(up?1:-1)*f.tp/100)).toFixed(2)),
-  slPrice=Number((price*(1+(up?-1:1)*f.sl/100)).toFixed(2));
- if(!(tpPrice>0&&slPrice>0)){patternEntryMessage('익절·손절 가격이 유효하지 않습니다.');return;}
+ const price=f.prices[index],
+  {tpPrice,slPrice,tpPercent,slPercent}=f.protections[index];
  state.realPending={index,price,side:f.side};
  $('patternCompareEntryModal').hidden=true;
  document.body.classList.add('pattern-compare-real-order');
@@ -7684,7 +7723,7 @@ function openPatternEntryRealStage(index){
  // leverage, lot/tick size, available margin, stage ledger, TP/SL direction.
  document.dispatchEvent(new CustomEvent('btc:chart-price-limit-entry',{
   detail:{symbol:'BTCUSDT',side:f.side,price,tpPrice,slPrice,
-   tpPercent:f.tp,slPercent:f.sl,stageCount:f.count}
+   tpPercent,slPercent,stageCount:f.count}
  }));
  if($('entrySheet')?.style.display!=='block'){
   $('patternCompareEntryModal').hidden=false;
@@ -7694,15 +7733,25 @@ function openPatternEntryRealStage(index){
  }
 }
 function initPatternEntry(){
- for(const id of ['patternEntryPrice','patternEntryStages','patternEntryGap',
+ for(const id of ['patternEntryPrice','patternEntryStages',
   'patternEntryMargin','patternEntryTp','patternEntrySl']){
-  $(id)?.addEventListener('input',()=>{if(patternEntrySession)patternEntrySession.realDone.clear();renderPatternEntry()});
+  $(id)?.addEventListener('change',()=>{
+   if(!patternEntrySession)return;
+   if(id==='patternEntryPrice'){
+    const value=Number($('patternEntryPrice').value);
+    if(value>0)patternEntrySession.stagePrices[0]=value;
+   }
+   patternEntrySession.realDone.clear();renderPatternEntry();
+  });
  }
  $('patternEntryMode').addEventListener('change',()=>{if(patternEntrySession)patternEntrySession.realDone.clear();renderPatternEntry()});
  for(const [id,side] of [['patternEntryLong','LONG'],['patternEntryShort','SHORT']]){
   $(id).addEventListener('click',()=>{
    if(!patternEntrySession)return;
-   if(patternEntrySession.side!==side)patternEntrySession.realDone.clear();
+   if(patternEntrySession.side!==side){
+    patternEntrySession.realDone.clear();
+    $('patternEntryTp').value='';$('patternEntrySl').value='';
+   }
    patternEntrySession.side=side;
    renderPatternEntry();
   });
