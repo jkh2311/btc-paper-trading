@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261125-projected-auto-fib-v328"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261126-dual-native-charts-v329"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1677,7 +1677,77 @@ body.non-chart-tab #tradeBar{display:none!important}
 .patternCompareRanks{display:flex;gap:5px;overflow-x:auto;max-width:100%;padding:3px 2px 4px;scrollbar-width:thin}.patternCompareRanks button{flex:1 0 auto;min-width:58px;min-height:38px;padding:6px 8px;color:#cbd9e8;background:#1b304a;border:1px solid #4b6888;border-radius:9px;font-weight:650;font-size:12px;cursor:pointer;touch-action:manipulation}.patternCompareRanks button[aria-pressed="true"]{background:#20574f;border-color:#3be5c0;color:#f1fffc}.patternCompareRanks button small{display:block;font-size:10px;margin-top:2px;opacity:.9;font-weight:500}@media(max-width:600px){.patternCompareRanks button{min-width:54px;padding:5px 6px;font-size:11px}}
 .patternForecastSetting{display:flex;align-items:center;gap:9px;padding:7px 11px;background:#132844;border:1px solid #3a597a;border-radius:9px;flex-wrap:wrap;font-size:12px;color:#d9e9fa}.patternForecastSetting label{flex:1}.patternForecastSetting input{width:86px;min-width:70px;color:#f4fbff;background:#213b59;border:1px solid #7292b3;border-radius:7px;padding:7px 9px;font-size:14px}.patternForecastSetting span{color:#adc8e6;font-size:11px}
 .patternCompare .patternDisplayTfRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 7px 8px;font-size:11px;color:#b9cfdf}.patternCompare .patternDisplayTfRow label{white-space:nowrap;font-weight:700}.patternCompare .patternDisplayTfRow select{background:#243c59;color:#e4f3ff;border:1px solid #6a8dab;border-radius:7px;min-width:100px;padding:7px;font-size:12px}.patternCompare #patternCompareDisplayTfStatus{flex:1;min-width:125px;font-size:10px;color:#a4c2db;line-height:1.5}
-</style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
+/* v329: true independent native-engine split-chart layout. */
+#dualChartLayoutOverlay[hidden]{display:none!important}
+#dualChartLayoutOverlay{position:fixed;inset:0;z-index:100080;background:#071020;color:#ddebff;display:flex;flex-direction:column;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);overscroll-behavior:contain}
+#dualChartLayoutHeader{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#142940;border-bottom:1px solid #50728b;padding:7px 9px;min-height:52px}
+#dualChartLayoutHeader strong{font-size:14px;margin-right:auto}
+#dualChartLayoutHeader button,.dualChartLayoutButton{color:#e2f4ff;border:1px solid #5d86aa;background:#213e5a;border-radius:9px;min-height:36px;padding:7px 10px;font-size:12px}
+#dualChartLayoutHeader button[aria-pressed="true"]{background:#126e66;border-color:#6ad9c4}
+#dualChartLayoutHeader button:focus-visible{outline:2px solid #a4eafa}
+#dualChartLayoutBody{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);min-height:0;flex:1;gap:5px;padding:5px}
+#dualChartLayoutBody[data-layout="stack"]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr)}
+.dualChartPane{min-height:0;min-width:0;display:flex;flex-direction:column;border:1px solid #456787;border-radius:9px;background:#0b182b;overflow:hidden}
+.dualChartPaneTitle{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:11px;min-height:28px;padding:4px 9px;background:#1b304a;color:#d9eafa}
+.dualChartPane iframe{display:block;flex:1;width:100%;height:100%;min-height:0;border:0;background:#09111f}
+#dualChartLayoutNote{font-size:10px;color:#a6c5dd;padding:4px 10px 6px;text-align:center}
+#dualChartLayoutBtn{min-width:44px;padding:7px 9px;white-space:nowrap}
+@media(max-width:720px) and (orientation:portrait){#dualChartLayoutBody{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr)}}
+@media(max-height:470px){#dualChartLayoutHeader{min-height:39px;padding:2px 6px}#dualChartLayoutHeader button{min-height:29px;padding:4px 8px}#dualChartLayoutNote{display:none}}
+/* Panel mode keeps the exact regular chart and its original indicators/
+   gestures/tools while withholding account-changing controls. */
+html.dual-chart-panel body{padding:0!important;margin:0!important;overflow-y:auto!important;overflow-x:hidden!important;background:#09111f}
+html.dual-chart-panel .app-header,
+html.dual-chart-panel .bottom-nav,
+html.dual-chart-panel #tradeBar,
+html.dual-chart-panel .daily-volume,
+html.dual-chart-panel .oi-toolbar,
+html.dual-chart-panel #oiPanel,
+html.dual-chart-panel .auto-panel,
+html.dual-chart-panel .account-strip,
+html.dual-chart-panel #chartPositionLevelVisibility,
+html.dual-chart-panel #entrySheet,
+html.dual-chart-panel #quickSwitchModal,
+html.dual-chart-panel #chartPriceOrderChoice,
+html.dual-chart-panel #dualChartLayoutBtn,
+html.dual-chart-panel #expandChartBtn,
+html.dual-chart-panel #candleTime,
+html.dual-chart-panel #quickCloseControls,
+html.dual-chart-panel #quickSwitchOpen,
+html.dual-chart-panel #indicatorPatternPanel,
+html.dual-chart-panel .price-panel .quote-wrap{display:none!important}
+html.dual-chart-panel main{padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
+html.dual-chart-panel #page-chart{padding:0!important;margin:0!important;display:block!important}
+html.dual-chart-panel .price-panel{padding:3px 5px!important;margin:0!important;min-height:0!important}
+html.dual-chart-panel .price-panel .tf-tabs{display:flex!important;margin:0!important}
+html.dual-chart-panel #tf{max-width:175px!important}
+html.dual-chart-panel .chart-panel{margin:0!important;border-radius:0!important}
+html.dual-chart-panel #chart{height:clamp(220px,51dvh,780px)!important;min-height:210px!important}
+html.dual-chart-panel #rmiChart{height:118px!important}
+html.dual-chart-panel .chart-tools{margin:3px 3px!important;gap:4px}
+html.dual-chart-panel .chart-tools button{min-height:31px;padding:5px 7px}
+html.dual-chart-panel #expandedChartOverlay .trade-bar{display:none!important}
+html.dual-chart-panel #signalAlertToast{display:none!important}
+</style></head><script>
+(function(){
+ const p=new URLSearchParams(location.search);
+ const embedded=p.get('dual_chart_panel')==='1';
+ window.HANINE_DUAL_CHART_PANEL=embedded;
+ if(!embedded)return;
+ document.documentElement.classList.add('dual-chart-panel');
+ // Panels share the exact chart code but must never initiate real Binance
+ // mutations through duplicated scripts/buttons or an unlocked API key.
+ const nativeFetch=window.fetch.bind(window);
+ window.fetch=function(input,init){
+  const url=String(typeof input==='string'?input:input?.url||'');
+  const method=String(init?.method||input?.method||'GET').toUpperCase();
+  if(/^(POST|DELETE|PUT|PATCH)$/.test(method)&&
+     (/binance\.(com|us)/i.test(url)||/\/fapi\/|\/dapi\//i.test(url)))
+   return Promise.reject(new Error('분할 비교차트는 분석 전용입니다. 실전 주문은 원래 차트에서 진행해 주세요.'));
+  return nativeFetch(input,init);
+ };
+})();
+</script><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
  <div class="price-panel"><div class="quote-wrap"><div class="price" id="price">-- USDT</div><div id="funding" class="funding" aria-live="polite">펀딩 조회 중</div></div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select></div><div id="convergenceBanner" class="convergence-banner" hidden role="status"></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
@@ -1796,7 +1866,7 @@ body.non-chart-tab #tradeBar{display:none!important}
 <div id="indicatorPatternMatches" style="display:grid;gap:6px;margin-top:7px"></div>
 </div></div></div></div></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label"><span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas><div id="disparityStageInspector" hidden style="position:absolute;z-index:9;display:none;left:7px;align-items:center;gap:5px;max-width:calc(100% - 98px);font-size:10px;pointer-events:auto"><span id="disparityStageInspectorText" style="background:#091729ec;border:1px solid #6787a2;border-radius:5px;padding:4px 5px;color:#dce8f6;white-space:nowrap"></span><button id="disparityStageSave" type="button" style="font-size:10px;min-width:35px;padding:3px 6px;background:#173c38;color:#8df3ba;border:1px solid #408876;border-radius:5px">저장</button><button id="disparityStageDelete" type="button" hidden style="font-size:10px;min-width:35px;padding:3px 6px;background:#43212d;color:#ff9eb3;border:1px solid #ad5c72;border-radius:5px">삭제</button></div></div></div>
  <div id="candleTime" class="muted candle-info"></div>
- <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button></div>
+ <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button><button id="dualChartLayoutBtn" type="button" aria-label="두 차트 레이아웃 비교 열기" title="차트 두 개 비교">▣ 레이아웃</button></div>
  <div id="range" style="display:none"></div><div id="chartHint" style="display:none"></div><p id="selected" style="display:none"></p>
  <div id="entrySheet" class="card" style="display:none"><b id="sheetPrice">실제 BTCUSDT 주문</b><div class="order-types"><label><input type="radio" name="orderType" value="limit" checked> 지정가</label><label><input type="radio" name="orderType" value="market"> 시장가</label></div><label id="limitLabel" for="limitPrice">지정가 (USDT)</label><input id="limitPrice" type="number" min="0.01" step="0.1" inputmode="decimal" placeholder="원하는 진입 가격"><p id="orderHelp" class="muted" style="font-size:11px">지정가 주문은 바이낸스에 실제 전송됩니다.</p><div class="row"><button class="buy" id="sheetLong">롱 진입</button><button class="sell" id="sheetShort">숏 진입</button><button id="sheetCancel">닫기</button></div></div>
  <div class="account-strip"><div><small id="balanceSummaryLabel">실제 사용 가능 잔고</small><strong id="balanceSummary">—</strong></div><div><small id="pnlSummaryLabel">미실현 손익 (원화 추정)</small><strong id="pnlSummary">—</strong></div></div>
@@ -1971,7 +2041,14 @@ body.non-chart-tab #tradeBar{display:none!important}
  <label>재진입 대기 (분)<input id="autoCooldownMin" type="number" inputmode="numeric" min="1" max="240" step="1" value="15"></label>
 </div></div></div></section>
 </main>
-<div id="patternCompare" class="patternCompare" role="dialog" aria-modal="true" aria-label="유사 패턴 비교 차트" hidden><div><header><strong>🔎 유사 패턴 비교 차트</strong><button id="patternCompareClose" type="button" aria-label="닫기">×</button></header><div class="patternForecastSetting"><label for="patternForecastBars">비교창 미래 시나리오 봉수</label><input id="patternForecastBars" type="number" min="5" max="2000" step="1" value="50" inputmode="numeric" aria-label="미래 시나리오 봉수 설정"><span>봉 (5~2000)</span></div><section><div><strong>현재 차트 (기준)</strong><span id="patternCompareCurrentLabel"></span></div><div class="patternDisplayTfRow"><label for="patternCompareDisplayTf">현재 차트 표시봉</label><select id="patternCompareDisplayTf" aria-label="현재 비교 차트 표시 시간봉"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><span id="patternCompareDisplayTfStatus" role="status" aria-live="polite"></span></div><canvas id="patternCompareCurrentCanvas" aria-label="현재 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><nav id="patternCompareRanks" class="patternCompareRanks" aria-label="과거 유사 패턴 순위 선택"></nav><section class="historical"><div><strong id="patternCompareHistoricalTitle">과거 유사 차트</strong><span id="patternCompareHistoricalLabel"></span></div><canvas id="patternCompareHistoricalCanvas" aria-label="과거 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><footer id="patternCompareFoot">이평선 50% · 이격도 30% · 볼린저밴드 15% · RMI 5% · 두 차트는 각각 터치하여 이동·확대</footer></div></div><div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
+<div id="patternCompare" class="patternCompare" role="dialog" aria-modal="true" aria-label="유사 패턴 비교 차트" hidden><div><header><strong>🔎 유사 패턴 비교 차트</strong><button id="patternCompareClose" type="button" aria-label="닫기">×</button></header><div class="patternForecastSetting"><label for="patternForecastBars">비교창 미래 시나리오 봉수</label><input id="patternForecastBars" type="number" min="5" max="2000" step="1" value="50" inputmode="numeric" aria-label="미래 시나리오 봉수 설정"><span>봉 (5~2000)</span></div><section><div><strong>현재 차트 (기준)</strong><span id="patternCompareCurrentLabel"></span></div><div class="patternDisplayTfRow"><label for="patternCompareDisplayTf">현재 차트 표시봉</label><select id="patternCompareDisplayTf" aria-label="현재 비교 차트 표시 시간봉"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><span id="patternCompareDisplayTfStatus" role="status" aria-live="polite"></span></div><canvas id="patternCompareCurrentCanvas" aria-label="현재 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><nav id="patternCompareRanks" class="patternCompareRanks" aria-label="과거 유사 패턴 순위 선택"></nav><section class="historical"><div><strong id="patternCompareHistoricalTitle">과거 유사 차트</strong><span id="patternCompareHistoricalLabel"></span></div><canvas id="patternCompareHistoricalCanvas" aria-label="과거 차트: 좌우로 이동, 상하로 가격 이동, 우측 가격축 드래그로 가격 확대, 하단 시간축 드래그로 시간 확대, 두 손가락 확대, 길게 눌러 캔들 확인"></canvas></section><footer id="patternCompareFoot">이평선 50% · 이격도 30% · 볼린저밴드 15% · RMI 5% · 두 차트는 각각 터치하여 이동·확대</footer></div></div><div id="dualChartLayoutOverlay" hidden role="dialog" aria-modal="true" aria-label="두 차트 레이아웃 비교">
+ <div id="dualChartLayoutHeader"><strong>▣ 두 차트 비교</strong><button type="button" data-dual-layout="columns" aria-pressed="true" title="좌우 2분할">◫ 좌우</button><button type="button" data-dual-layout="stack" aria-pressed="false" title="위아래 2분할">▤ 위아래</button><button type="button" id="dualChartLayoutClose">✕ 닫기</button></div>
+ <div id="dualChartLayoutBody" data-layout="columns">
+  <section class="dualChartPane"><div class="dualChartPaneTitle"><strong>차트 1</strong><span>독립 시간봉 · 지표 · 확대</span></div><iframe id="dualChartPane1" title="독립된 첫 번째 BTCUSDT 차트" loading="lazy" referrerpolicy="same-origin"></iframe></section>
+  <section class="dualChartPane"><div class="dualChartPaneTitle"><strong>차트 2</strong><span>독립 시간봉 · 지표 · 확대</span></div><iframe id="dualChartPane2" title="독립된 두 번째 BTCUSDT 차트" loading="lazy" referrerpolicy="same-origin"></iframe></section>
+ </div>
+ <div id="dualChartLayoutNote">각 차트에서 시간봉·이평·볼밴·피보나치·RMI·이격도·드래그·날짜 이동을 따로 조작해 · 실전 매매는 원래 차트에서</div>
+</div><div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
   <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><button type="button" id="expandedChartLatest" aria-label="최신 캔들로 이동" title="최신 차트로 이동">최신</button><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
 </div>
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
@@ -7879,6 +7956,58 @@ function paintChartWeekendRegions(ctx,regions,top,bottom,plotW,layer){
  }
  ctx.restore();
 }
+// Native two-chart layout: each panel is the original chart engine,
+// isolated in its own same-origin frame, not a simplified copy.
+function initDualChartLayout(){
+ const open=$('dualChartLayoutBtn'),modal=$('dualChartLayoutOverlay');
+ if(!open||!modal||window.HANINE_DUAL_CHART_PANEL)return;
+ const holder=$('dualChartLayoutBody'),frames=[$('dualChartPane1'),$('dualChartPane2')];
+ const close=$('dualChartLayoutClose'),buttons=[...modal.querySelectorAll('[data-dual-layout]')];
+ let previousFocus=null;
+ let chosen='columns';
+ try{const saved=localStorage.getItem('hanine-dual-layout-v1');
+  if(saved==='stack'||saved==='columns')chosen=saved;}catch(_){}
+ function applyLayout(name){
+  chosen=name;holder.dataset.layout=name;
+  for(const btn of buttons)btn.setAttribute('aria-pressed',String(btn.dataset.dualLayout===name));
+  try{localStorage.setItem('hanine-dual-layout-v1',name)}catch(_){}
+ }
+ function panelUrl(tf,panel){
+  const url=new URL(location.href);
+  url.search='';
+  url.searchParams.set('dual_chart_panel','1');
+  url.searchParams.set('dual_tf',tf);
+  url.searchParams.set('dual_instance',String(panel));
+  url.searchParams.set('app_refresh','v329');
+  return url.toString();
+ }
+ function show(){
+  if(!modal.hidden)return;
+  previousFocus=document.activeElement;
+  applyLayout(chosen);
+  const tf=$('tf')?.value||'1h';
+  frames[0].src=panelUrl(tf,1);
+  frames[1].src=panelUrl(tf==='1h'?'4h':'1h',2);
+  modal.hidden=false;
+  document.body.style.overflow='hidden';
+  close.focus({preventScroll:true});
+ }
+ function hide(){
+  if(modal.hidden)return;
+  modal.hidden=true;
+  document.body.style.overflow='';
+  // Tear down child streams and timers when closed. The main chart and
+  // its live trading session remain mounted, untouched.
+  for(const frame of frames)frame.removeAttribute('src');
+  if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});
+ }
+ open.addEventListener('click',show);
+ close.addEventListener('click',hide);
+ buttons.forEach(btn=>btn.addEventListener('click',()=>applyLayout(btn.dataset.dualLayout)));
+ document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!modal.hidden){e.preventDefault();hide()}
+ });
+}
 function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min((chartIndicators.maForecast||chartIndicators.bbForecast)?600:400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;
 if(chartJumpSegment?.bars===a)scheduleJumpExtension(a,left,count);let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
 if((chartJumpSegment||$('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
@@ -8617,7 +8746,7 @@ function renderPaperPerformance(){
   }
 }
 
-function savePaperState(){try{localStorage.setItem(PAPER_SAVE_KEY,JSON.stringify({
+function savePaperState(){if(window.HANINE_DUAL_CHART_PANEL)return;try{localStorage.setItem(PAPER_SAVE_KEY,JSON.stringify({
   position,hedgePositions,selectedHedgeSide,selectedPaperPositionId,paperMode:paperMode(),pendingOrders,autoPendingLimit,logs,closedPaperTrades,paperStatsBaseBalance,balance:$('balance').value,
   settings:{...Object.fromEntries(['lev','stop','rr','sizeMode','marginPct','pyramidEntryCount','autoMarketMode'].map(id=>[id,$(id).value])),autoMarketModeRevision:22,roiSettingsVersion:1}
 }))}catch(e){console.warn('모의매매 저장 실패',e)}}
@@ -10383,8 +10512,17 @@ function initSignalAlerts(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden){event.preventDefault();close()}});
 })();
 
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();render();void restoreChartHistoryCache();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
-setInterval(pollAutoPaperMinute,5000);
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{if(!window.HANINE_DUAL_CHART_PANEL){savePaperState();saveAutoSignals()}});restorePaperState();syncPyramidStages();initCandleDimensionMode();initDualChartLayout();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();
+if(window.HANINE_DUAL_CHART_PANEL){
+ // Child charts are view-only. Prevent a restored automatic-paper mode
+ // from creating duplicate paper trades or changing shared settings.
+ autoPaperEnabled=false;autoPendingLimit=null;
+ $('autoPaperToggle').disabled=true;
+ const requested=new URLSearchParams(location.search).get('dual_tf');
+ if(tfs.includes(requested))$('tf').value=requested;
+}
+render();void restoreChartHistoryCache();refresh();loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
+if(!window.HANINE_DUAL_CHART_PANEL)setInterval(pollAutoPaperMinute,5000);
 setInterval(()=>{
   if(!autoPendingLimit)return;
   if(Date.now()>=autoPendingLimit.expiresAt)cancelAutoPendingLimit('5분 미체결 자동 취소');
