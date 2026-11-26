@@ -7610,13 +7610,20 @@ async function restoreLastVisibleScreen(){
    const snap=saved.comparison,tf=snap.tf;
    if(!Object.hasOwn(SIMILAR_PATTERN_LABELS,tf))return;
    switchTab('chart');
-   // Existing chart-history cache is read first by the standard loader.
-   // Never rerun a similarity search or use a stale rank with wrong times.
-   let bars;
-   try{bars=await loadIndicatorPatternHistory(tf)}catch(e){
-    console.warn('마지막 유사 패턴 비교 복원 대기:',e);return;
-   }
+   // Use ONLY the chart history already restored from IndexedDB. A PWA
+   // wake must never launch a multi-year REST history download by itself.
+   // If iOS evicted its cache, keep the saved view for manual restoration.
+   const bars=tf==='1m'&&minuteChartArchive?.length?
+    minuteChartArchive:candles[tf];
    if(!Array.isArray(bars)||bars.length<230)return;
+   let cachedDisplayBars=null;
+   if(snap.displayTf&&snap.displayTf!==tf){
+    cachedDisplayBars=snap.displayTf==='1m'&&minuteChartArchive?.length?
+     minuteChartArchive:candles[snap.displayTf];
+    const c=indicatorPatternConfig(snap.displayTf);
+    if(!Array.isArray(cachedDisplayBars)||
+       cachedDisplayBars.length<Math.max(...c.ma,c.bb)+c.window+2)return;
+   }
    const matches=[];
    for(const m of snap.matches){
     if(!Number.isFinite(m.at))return;
@@ -7633,9 +7640,12 @@ async function restoreLastVisibleScreen(){
      patternComparison.forecastBars=snap.forecastBars;
      $('patternForecastBars').value=String(snap.forecastBars);
     }
-    if(snap.displayTf&&snap.displayTf!==tf&&
-       Object.hasOwn(SIMILAR_PATTERN_LABELS,snap.displayTf)){
-     try{await choosePatternCurrentDisplay(snap.displayTf)}catch(_){}
+    if(cachedDisplayBars){
+     const current=patternComparison.views.current;
+     current.displayTf=snap.displayTf;
+     current.displayBars=cachedDisplayBars;
+     $('patternCompareDisplayTf').value=snap.displayTf;
+     current.replayKey=null;current.replaySource=null;
     }
     for(const name of ['current','historical']){
      const row=snap.views?.[name],view=patternComparison?.views[name];
@@ -10665,8 +10675,8 @@ function initSignalAlerts(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden){event.preventDefault();close()}});
 })();
 
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();render();void restoreChartHistoryCache();refresh();
-setTimeout(()=>{void restoreLastVisibleScreen().catch(e=>console.warn('마지막 화면 복구 실패',e))},350);loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initAutoPaperUi();initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();render();const lastViewChartCacheTask=restoreChartHistoryCache();refresh();
+setTimeout(()=>{Promise.resolve(lastViewChartCacheTask).then(()=>restoreLastVisibleScreen()).catch(e=>console.warn('마지막 화면 복구 실패',e))},350);loadFx();tick();connectWs();updateFunding();updateDailyVolume();setInterval(updateFunding,30000);setInterval(updateDailyVolume,60000);setInterval(()=>{if(!$('oiPanel').hidden)updateOi()},60000);setInterval(renderFundingCountdown,1000);setInterval(()=>{if(document.visibilityState==='visible'&&$('page-chart').classList.contains('active')&&chartViewBars()?.length>=22)draw()},1000);setInterval(tick,2000);
 setInterval(pollAutoPaperMinute,5000);
 setInterval(()=>{
   if(!autoPendingLimit)return;
