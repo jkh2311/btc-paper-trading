@@ -4480,6 +4480,7 @@ function saveAutoSettings(){
   }catch(e){console.warn('자동 모의 설정 저장 실패',e)}
 }
 function saveAutoSignals(){
+  if(window.HANINE_DUAL_CHART_PANEL)return;
   try{localStorage.setItem(AUTO_PAPER_SIGNALS_KEY,JSON.stringify({history:autoSignalHistory.slice(-100),lastEntryAt:autoLastEntryAt,lastOrderAt:autoLastOrderAt,dailyEntryCounts:autoDailyEntryCounts}))}
   catch(e){console.warn('신호 기록 저장 실패',e)}
 }
@@ -10657,7 +10658,7 @@ function initSignalAlerts(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden){event.preventDefault();close()}});
 })();
 
-setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{savePaperState();saveAutoSignals()});restorePaperState();syncPyramidStages();initCandleDimensionMode();initDualChartLayout();initDualPanelChartResize();initAutoPaperUi();if(!window.HANINE_DUAL_CHART_PANEL)initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();
+setInterval(checkAppUpdate,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkAppUpdate()});window.addEventListener('focus',checkAppUpdate);document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()},{passive:false});window.addEventListener('pagehide',()=>{if(!window.HANINE_DUAL_CHART_PANEL){savePaperState();saveAutoSignals()}});restorePaperState();syncPyramidStages();initCandleDimensionMode();initDualChartLayout();initDualPanelChartResize();initAutoPaperUi();if(!window.HANINE_DUAL_CHART_PANEL)initSignalAlerts();initChartIndicatorControls();initDailyHistoryJump();initIntradayHistoryJump();initChartDateRangeTool();initChartTimeJump();initChartPriceOrderChoice();initPatternComparison();initIndicatorPatternSearch();
 if(window.HANINE_DUAL_CHART_PANEL){
  autoPaperEnabled=false;autoPendingLimit=null;
  $('autoPaperToggle').disabled=true;
