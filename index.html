@@ -7904,7 +7904,7 @@ function initPatternComparison(){
    }else{tapX=null;tapY=null;dragMode='time'}
   };
   canvas.addEventListener('dblclick',e=>{
-   if(!patternComparison)return;
+   if(!patternComparison||!$('patternCompareEntryModal')?.hidden)return;
    const view=patternCompareView(which);if(!view)return;
    const rect=canvas.getBoundingClientRect();
    if(e.clientX-rect.left>=rect.width-71){view.priceZoom=1;view.pricePan=0;}
