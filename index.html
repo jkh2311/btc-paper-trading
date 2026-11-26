@@ -7216,7 +7216,7 @@ async function choosePatternHistoricalDisplay(tf){
    tf==='1m'&&minuteChartArchive?.length?minuteChartArchive:candles[tf]||[];
   const config=indicatorPatternConfig(tf);
   const warmup=Math.max(config.bb,...config.ma,
-   config.rmiLength+config.rmiMomentum,200)+3;
+   config.rmiLength+config.rmiMomentum)+2;
   let i=patternHistoricalAnchorIndex(bars,tf,matchTime);
   if(!Array.isArray(bars)||i<warmup+10){
    // Fetch only after an explicit user choice (never a screen-refresh timer).
@@ -7559,7 +7559,7 @@ function setPatternComparisonRank(rank){
   patternHistoricalMatchTime(state));
  const configCheck=indicatorPatternConfig(historicalTf);
  const warmup=Math.max(configCheck.bb,...configCheck.ma,
-  configCheck.rmiLength+configCheck.rmiMomentum,200)+3;
+  configCheck.rmiLength+configCheck.rmiMomentum)+2;
  if(chosenIndex<warmup+10){
   // Cached alternate timeframe cannot contain this rank: fall back to
   // the ORIGINAL genuine match timeframe rather than a false date marker.
@@ -7569,7 +7569,7 @@ function setPatternComparisonRank(rank){
  }else $('patternCompareHistoricalStatus').textContent='';
  const targetConfig=indicatorPatternConfig(historicalTf);
  const targetWarmup=Math.max(targetConfig.bb,...targetConfig.ma,
-  targetConfig.rmiLength+targetConfig.rmiMomentum,200)+3;
+  targetConfig.rmiLength+targetConfig.rmiMomentum)+2;
  state.views.historical={
   ...previous,displayTf:historicalTf,
   displayBars:historicalTf===state.tf?null:historicalBars,
@@ -8288,8 +8288,8 @@ async function restoreLastVisibleScreen(){
       matchTime=patternHistoricalMatchTime(patternComparison),
       candidate=patternHistoricalAnchorIndex(historic,snap.historicalTf,matchTime);
      const conf=indicatorPatternConfig(snap.historicalTf),
-      required=Math.max(203,conf.bb,...conf.ma,
-       conf.rmiLength+conf.rmiMomentum)+10;
+      required=Math.max(conf.bb,...conf.ma,
+       conf.rmiLength+conf.rmiMomentum)+12;
      if(candidate>=required){
       historical.displayTf=snap.historicalTf;
       historical.displayBars=historic;
