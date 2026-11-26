@@ -111,7 +111,7 @@ window.btcDrawLiveLevels=(ctx,scale)=>{
  }
 };
 async function readAlgos(){
- if(readBusy||requestBusy||document.hidden||!creds()?.apiKey)return false;
+ if(window.HANINE_DUAL_CHART_PANEL||readBusy||requestBusy||document.hidden||!positions.length||window.btcBinanceRequestBackoff?.()>0||!creds()?.apiKey)return false;
  readBusy=true;const id=++epoch;
  try{
   const r=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
@@ -144,7 +144,7 @@ document.addEventListener('btc:real-account-updated',e=>{
  accountAt=d.at;
  if(!positions.length)note('실제 포지션 없음');
  redraw();
- if(Date.now()-readStamp>4500)void readAlgos();
+ if(positions.length&&Date.now()-readStamp>15000)void readAlgos();
 });
 document.addEventListener('btc:real-account-cleared',()=>{positions=[];algos=[];accountAt=0;readStamp=0;redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));});
 function scaleNow(){return window.btcLiveScale||null;}
@@ -494,7 +494,8 @@ document.addEventListener('btc:manual-protection-status',e=>{
   void readAlgos();
  }
 });
-setInterval(()=>{if(Date.now()-readStamp>5500)void readAlgos()},5500);
-document.addEventListener('btc:credentials-unlocked',()=>setTimeout(readAlgos,800));
-setTimeout(readAlgos,1500);
+setInterval(()=>{if(positions.length&&Date.now()-readStamp>30000)void readAlgos()},30000);
+document.addEventListener('btc:credentials-unlocked',()=>{if(positions.length)setTimeout(readAlgos,800)});
+// Empty positions do not require repeated private exchange order-list polling.
+if(positions.length)setTimeout(readAlgos,1500);
 })();
