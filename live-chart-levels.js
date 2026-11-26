@@ -5,10 +5,7 @@ const chart=document.getElementById('chart');
 if(!chart)return;
 const symbol='BTCUSDT',api='https://fapi.binance.com', $=id=>document.getElementById(id);
 let positions=[],algos=[],algoError='',accountAt=0,drag=null,requestBusy=false,readBusy=false,readStamp=0,epoch=0;
-let actionMessage='',actionError=false,readBlockedUntil=0;
-// Exchange -1003 denotes a real IP ban, not missing API credentials.
-// Persist only the next safe READ time, never keys or order data.
-try{readBlockedUntil=Number(sessionStorage.getItem('btc-protection-read-blocked-until'))||0}catch(_){}
+let actionMessage='',actionError=false;
 const num=x=>x===null||x===undefined||x===''?NaN:Number(x);
 const fmt=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:2});
 const hint=document.createElement('div');
@@ -114,14 +111,13 @@ window.btcDrawLiveLevels=(ctx,scale)=>{
  }
 };
 async function readAlgos(){
- if(!positions.length||readBusy||requestBusy||document.hidden||Date.now()<readBlockedUntil||!creds()?.apiKey)return false;
+ if(readBusy||requestBusy||document.hidden||!creds()?.apiKey)return false;
  readBusy=true;const id=++epoch;
  try{
   const r=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
   const a=openAlgoList(r);
   if(!a)throw Error('조건부 주문 응답 형식 오류');
-  if(id===epoch){algos=a.filter(o=>o.symbol===symbol);algoError='';readStamp=Date.now();readBlockedUntil=0;
-   try{sessionStorage.removeItem('btc-protection-read-blocked-until')}catch(_){}
+  if(id===epoch){algos=a.filter(o=>o.symbol===symbol);algoError='';readStamp=Date.now();
    if(positions.length){
     const duplicates=positions.flatMap(p=>{
      const sl=algos.filter(a=>matching(a,p,'sl'));
@@ -132,16 +128,7 @@ async function readAlgos(){
     else note('실전 진입선 / 손절·익절선 · 손절·익절선 길게 누르거나 드래그하여 실제 가격 변경');
    }
    redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));return true;}
- }catch(e){if(id===epoch){
-   algoError=String(e?.message||e);
-   if(/(?:Binance\s*-1003|banned until|Way too many requests|Binance\s*418|Binance\s*429)/i.test(algoError)){
-    const match=algoError.match(/banned until\s+(\d{13})/i);
-    readBlockedUntil=Math.max(Date.now()+60000,Number(match?.[1])||Date.now()+60000);
-    try{sessionStorage.setItem('btc-protection-read-blocked-until',String(readBlockedUntil))}catch(_){}
-   }
-   if(positions.length)note('⚠ 보호 주문 조회 실패 · '+algoError,true);
-   redraw();
-  }return false;}
+ }catch(e){if(id===epoch){algoError=String(e?.message||e);note('⚠ 보호 주문 조회 실패 · '+algoError,true);redraw();}return false;}
  finally{readBusy=false;}
 }
 window.btcRefreshRealProtection=async()=>{
@@ -155,12 +142,9 @@ document.addEventListener('btc:real-account-updated',e=>{
  positions=d.positions.map(p=>({...p,amount:num(p.amount),entry:num(p.entry),mark:num(p.mark)}))
  .filter(p=>side(p)&&Math.abs(p.amount)>0);
  accountAt=d.at;
- if(!positions.length){
-  algos=[];algoError='';actionMessage='';actionError=false;
-  hint.textContent='';hint.style.display='none';
-  readStamp=Date.now();
- }else if(Date.now()-readStamp>30000)void readAlgos();
+ if(!positions.length)note('실제 포지션 없음');
  redraw();
+ if(Date.now()-readStamp>4500)void readAlgos();
 });
 document.addEventListener('btc:real-account-cleared',()=>{positions=[];algos=[];accountAt=0;readStamp=0;redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));});
 function scaleNow(){return window.btcLiveScale||null;}
@@ -510,10 +494,7 @@ document.addEventListener('btc:manual-protection-status',e=>{
   void readAlgos();
  }
 });
-// Only active positions require automatic protection-level reads.
-// Explicit user edits and manual-protection events still request immediate
-// refresh, except while an exchange-reported IP ban is in effect.
-setInterval(()=>{if(positions.length&&Date.now()-readStamp>30000)void readAlgos()},30000);
-document.addEventListener('btc:credentials-unlocked',()=>{if(positions.length)setTimeout(readAlgos,800)});
-if(positions.length)setTimeout(readAlgos,1500);
+setInterval(()=>{if(Date.now()-readStamp>5500)void readAlgos()},5500);
+document.addEventListener('btc:credentials-unlocked',()=>setTimeout(readAlgos,800));
+setTimeout(readAlgos,1500);
 })();
