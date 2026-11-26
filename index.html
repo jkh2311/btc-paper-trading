@@ -7224,6 +7224,11 @@ async function choosePatternHistoricalDisplay(tf){
    i=patternHistoricalAnchorIndex(bars,tf,matchTime);
   }
   if(requestId!==state.historicalDisplayRequestId||patternComparison!==state)return;
+  if(matchTime!==patternHistoricalMatchTime(state)){
+   if(status)status.textContent='검색 순위 변경됨 · 새 순위의 날짜를 다시 선택해 주세요';
+   if(selector)selector.value=oldTf;
+   return;
+  }
   if(i<warmup+10)throw Error('해당 날짜의 '+SIMILAR_PATTERN_LABELS[tf]+' 실제 캔들 부족');
   view.displayTf=tf;view.displayBars=tf===state.tf?null:bars;
   view.index=i;view.baseIndex=i;
@@ -7546,6 +7551,9 @@ function setPatternComparisonRank(rank){
   state.config.window:
   indicatorPatternConfig(state.views.current.displayTf).window;
  const previous=state.views.historical;
+ // Invalidate an old timeframe request if rank changed mid-download.
+ state.historicalDisplayRequestId=(state.historicalDisplayRequestId||0)+1;
+ $('patternCompareHistoricalTf').disabled=false;
  let historicalTf=patternHistoricalTf(state),historicalBars=patternHistoricalData(state);
  let chosenIndex=patternHistoricalAnchorIndex(historicalBars,historicalTf,
   patternHistoricalMatchTime(state));
