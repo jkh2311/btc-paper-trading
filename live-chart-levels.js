@@ -112,6 +112,11 @@ window.btcDrawLiveLevels=(ctx,scale)=>{
 };
 async function readAlgos(){
  if(readBusy||requestBusy||document.hidden||!creds()?.apiKey)return false;
+ // Chart has no active BTC position; orphan cleanup is handled separately.
+ if(!positions.length){
+  algos=[];algoError='';readStamp=Date.now();redraw();return true;
+ }
+ if(window.btcProtectionReadBackoff?.active())return false;
  readBusy=true;const id=++epoch;
  try{
   const r=await signed('GET','/fapi/v1/openAlgoOrders',{symbol});
@@ -128,7 +133,12 @@ async function readAlgos(){
     else note('실전 진입선 / 손절·익절선 · 손절·익절선 길게 누르거나 드래그하여 실제 가격 변경');
    }
    redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));return true;}
- }catch(e){if(id===epoch){algoError=String(e?.message||e);note('⚠ 보호 주문 조회 실패 · '+algoError,true);redraw();}return false;}
+ }catch(e){if(id===epoch){
+   const limited=window.btcProtectionReadBackoff?.remember(e)===true;
+   algoError=limited?window.btcProtectionReadBackoff.message():String(e?.message||e);
+   note(limited?algoError:'⚠ 보호 주문 조회 실패 · '+algoError,true);
+   redraw();
+  }return false;}
  finally{readBusy=false;}
 }
 window.btcRefreshRealProtection=async()=>{
@@ -144,7 +154,7 @@ document.addEventListener('btc:real-account-updated',e=>{
  accountAt=d.at;
  if(!positions.length)note('실제 포지션 없음');
  redraw();
- if(Date.now()-readStamp>4500)void readAlgos();
+ if(positions.length&&Date.now()-readStamp>30000)void readAlgos();
 });
 document.addEventListener('btc:real-account-cleared',()=>{positions=[];algos=[];accountAt=0;readStamp=0;redraw();document.dispatchEvent(new Event('btc:real-protection-updated'));});
 function scaleNow(){return window.btcLiveScale||null;}
@@ -494,7 +504,7 @@ document.addEventListener('btc:manual-protection-status',e=>{
   void readAlgos();
  }
 });
-setInterval(()=>{if(Date.now()-readStamp>5500)void readAlgos()},5500);
+setInterval(()=>{if(positions.length&&Date.now()-readStamp>30000)void readAlgos()},30000);
 document.addEventListener('btc:credentials-unlocked',()=>setTimeout(readAlgos,800));
 setTimeout(readAlgos,1500);
 })();
