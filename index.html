@@ -3045,7 +3045,7 @@ function updateIntradayHistoryJump(){
    button.disabled=chartJumpBusy||demo;
    button.textContent=chartJumpSegment?.tf===tf?'최신 ⟶':spotSecondsLabel(tf)+' 날짜 이동';
    button.title=tf==='30s'?'최근 1개월 자동 조회 · 더 오래된 날짜는 직접 불러오기':'최근 1년 바이낸스 현물 1초봉';
-   if(tf==='30s'&&!chartJumpSegment&&futuresThirtyHistoryBusy){
+   if(tf==='30s'&&!chartJumpSegment&&(futuresThirtyHistoryBusy||futuresThirtyBackfillBusy)){
     button.textContent='30초봉 · 과거 로딩 중';
     button.title=futuresThirtyHistoryStatus;
    }
@@ -3647,7 +3647,8 @@ function isSpotSecondsTf(tf=$('tf').value){return tf==='1s';}
 function isSecondsChartTf(tf=$('tf').value){return tf==='1s'||tf==='30s';}
 function spotSecondsLabel(tf){return tf==='30s'?'30초봉':'1초봉';}
 const FUTURES_ARCHIVE_DAY=86400000,FUTURES_THIRTY_STEP=30000;
-let futuresThirtyBars=[],futuresThirtyArchive=[],futuresThirtyLive=[];
+let futuresThirtyBars=[],futuresThirtyArchive=[],futuresThirtyLive=[],futuresThirtyBridge=[];
+let futuresThirtyBackfill=null,futuresThirtyBackfillBusy=false,futuresThirtyBackfillAt=0;
 let futuresThirtySocket=null,futuresThirtyLastTick=0,futuresThirtyRetryAt=0;
 let futuresThirtyHistoryBusy=false,futuresThirtyHistoryRetryAt=0,futuresThirtyArchiveDay=null;
 let futuresThirtyStatus='선물 30초봉 조회 중…',futuresThirtyHistoryStatus='';
@@ -3697,9 +3698,20 @@ async function loadFuturesThirtyArchiveDay(day){
  void chartCacheWrite(CHART_HISTORY_STORE,{tf:key,bars}).catch(()=>{});
  return bars;
 }
+function prependAdjacentThirtyBars(older,newer){
+ if(!newer.length)return newer;
+ const first=newer[0].t;
+ const end=older.findLastIndex(b=>b.t<first);
+ if(end<0||older[end].t!==first-FUTURES_THIRTY_STEP)return newer;
+ let start=end;
+ while(start>0&&older[start].t-older[start-1].t===FUTURES_THIRTY_STEP)start--;
+ return older.slice(start,end+1).concat(newer);
+}
 function mergeFuturesThirtyChart(){
- const first=futuresThirtyLive[0]?.t??Infinity;
- futuresThirtyBars=futuresThirtyArchive.filter(b=>b.t<first).concat(futuresThirtyLive);
+ let start=futuresThirtyLive.length-1;
+ while(start>0&&futuresThirtyLive[start].t-futuresThirtyLive[start-1].t===FUTURES_THIRTY_STEP)start--;
+ const live=futuresThirtyLive.slice(Math.max(0,start));
+ futuresThirtyBars=prependAdjacentThirtyBars(futuresThirtyArchive,prependAdjacentThirtyBars(futuresThirtyBridge,live));
 }
 async function loadFuturesThirtyMonth(){
  if(futuresThirtyHistoryBusy||demo||document.hidden||$('tf').value!=='30s'||chartJumpSegment||
@@ -3755,11 +3767,52 @@ async function fetchFuturesThirtyRange(start,end){
  }
  throw Error('선물 체결량이 많아 선택한 범위를 모두 조회하지 못했습니다');
 }
+async function backfillFuturesThirty(){
+ const state=futuresThirtyBackfill;
+ if(!state||!futuresThirtyLive.length||futuresThirtyBackfillBusy||chartJumpBusy||chartJumpSegment||
+    Date.now()<Math.max(futuresThirtyBackfillAt,futuresThirtyRetryAt))return;
+ const archiveTail=futuresThirtyArchive.at(-1)?.t;
+ const floor=Math.max(futuresThirtyMonthStart(),archiveTail===undefined?
+  Math.floor(Date.now()/FUTURES_ARCHIVE_DAY)*FUTURES_ARCHIVE_DAY:archiveTail+FUTURES_THIRTY_STEP);
+ if(!futuresThirtyBars.length||futuresThirtyBars[0].t<=floor)return;
+ futuresThirtyBackfillBusy=true;
+ futuresThirtyBackfillAt=Date.now()+2500;
+ try{
+  const count=Math.min(state.before,1000),from=state.before-count;
+  const rows=await fetchFuturesThirtyTrades({fromId:String(from),limit:String(count)});
+  if(futuresThirtyBackfill!==state)return;
+  if(rows.length!==count||rows.some((row,i)=>Number(row.a)!==from+i))
+   throw Error('선물 체결 번호가 연속되지 않습니다');
+  // Older pages may complete the previous page's opening 30-second candle.
+  // Accumulate that boundary without including it until its start is known.
+  const older=new Map();
+  for(const row of rows)addFuturesThirtyTrade(older,+row.T,+row.p,+row.q);
+  for(const [t,bar] of older){
+   const newer=state.buckets.get(t);
+   if(newer){
+    bar.h=Math.max(bar.h,newer.h);bar.l=Math.min(bar.l,newer.l);bar.v+=newer.v;
+    if(newer.last>=bar.last){bar.c=newer.c;bar.last=newer.last;}
+    if(newer.first<bar.first){bar.o=newer.o;bar.first=newer.first;}
+   }
+   state.buckets.set(t,bar);
+  }
+  const first=candleOpenTime('30s',+rows[0].T);
+  const liveStart=futuresThirtyLive[0].t;
+  state.before=from;
+  futuresThirtyBridge=[...state.buckets.values()]
+   .filter(b=>b.t>first&&b.t<liveStart).sort((a,b)=>a.t-b.t);
+  mergeFuturesThirtyChart();
+  if($('tf').value==='30s'&&!chartJumpSegment){draw();drawRmi();}
+ }catch(_){
+  futuresThirtyBackfillAt=Date.now()+10000;
+ }finally{futuresThirtyBackfillBusy=false;}
+}
 function syncFuturesThirtyChart(){
  if(demo||document.hidden||$('tf').value!=='30s'){
   const old=futuresThirtySocket;futuresThirtySocket=null;old?.close();return;
  }
  void loadFuturesThirtyMonth();
+ void backfillFuturesThirty();
  if(futuresThirtySocket&&Date.now()-futuresThirtyLastTick<=15000)return;
  if(futuresThirtySocket){const old=futuresThirtySocket;futuresThirtySocket=null;old.close();}
  if(Date.now()<futuresThirtyRetryAt)return;
@@ -3793,7 +3846,13 @@ function syncFuturesThirtyChart(){
   const rows=history.concat(queue).sort((a,b)=>a.a-b.a);
   let start=0;
   for(let i=1;i<rows.length;i++)if(rows[i].a>rows[i-1].a+1)start=i;
-  for(const row of rows.slice(start))ingest(row);
+  const connected=rows.slice(start);
+  for(const row of connected)ingest(row);
+  if(connected.length){
+   futuresThirtyBackfill={before:Number(connected[0].a),buckets:new Map([...buckets].map(([t,b])=>[t,{...b}]))};
+   futuresThirtyBridge=[];
+   resetStableChartScale();
+  }
   const first=buckets.keys().next().value;
   if(buckets.size>1)buckets.delete(first);
   queue=null;update();scheduleLivePaint();
@@ -6506,6 +6565,14 @@ async function jumpChartToUtc(requestedTime){
  if(existing?.length>=22&&target>=existing[0].t&&target<=existing.at(-1).t&&(tf!=='30s'||existing[patternCompareNearestIndex(existing,target)]?.t===target)){
    if(status)status.textContent='선택한 날짜로 이동했어.';
    centerChartOnTimestamp(existing,target);return;
+ }
+ if(tf==='30s'&&futuresThirtyArchive[patternCompareNearestIndex(futuresThirtyArchive,target)]?.t===target){
+  const day=Math.floor(target/FUTURES_ARCHIVE_DAY)*FUTURES_ARCHIVE_DAY;
+  const bars=futuresThirtyArchive.filter(b=>b.t>=day&&b.t<day+FUTURES_ARCHIVE_DAY);
+  chartJumpSegment={tf,bars};
+  centerChartOnTimestamp(bars,target);
+  if(status)status.textContent='바이낸스 선물 30초봉 · 날짜 이동 완료';
+  return;
  }
  const cached=cachedSegmentFor(tf,target);
  if(cached){
