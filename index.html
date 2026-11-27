@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-pattern-1000-v364"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-pattern-lock-timeframes-v365"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -7503,7 +7503,6 @@ async function loadPatternHistoricalMinuteWindow(matchTime){
 }
 // Explicit lower-pane timeframe selection; no similarity re-search or orders.
 async function choosePatternHistoricalDisplay(tf){
- if(patternComparison?.forecastLock){$('patternCompareHistoricalTf').value=patternHistoricalTf(patternComparison);return;}
  if(patternComparison?.manualReference){await loadPatternManualReference(tf,patternComparison.manualReference.time);return;}
  const state=patternComparison,selector=$('patternCompareHistoricalTf'),
   status=$('patternCompareHistoricalStatus');
@@ -7672,7 +7671,6 @@ function refreshPatternCurrentTarget(){
 async function choosePatternCurrentDisplay(tf){
  const state=patternComparison,status=$('patternCompareDisplayTfStatus');
  if(!state||!SIMILAR_PATTERN_LABELS[tf])return;
- if(state.forecastLock){$('patternCompareDisplayTf').value=patternDisplayTf(state);return;}
  const view=state.views.current,selector=$('patternCompareDisplayTf');
  const requestId=state.displayRequestId=(state.displayRequestId||0)+1;
  if(selector)selector.disabled=true;
@@ -7702,7 +7700,7 @@ async function choosePatternCurrentDisplay(tf){
    '원본 '+SIMILAR_PATTERN_LABELS[state.tf]+' → '+SIMILAR_PATTERN_LABELS[tf]+
     ' · 이후 '+(replay?.available||0)+'봉'+
     (replay?.interpolated?' · 중간 경로는 선형 보간':' · 원본 흐름을 시간대로 집계')+
-    (replay?.truncated?' · 표시 최대 2000봉까지':'')+
+    (replay?.truncated?' · 표시 최대 1000봉까지':'')+
     (!(replay?.available>0)?' · 예측 기간이 짧아 완성 구간 없음':'');
  }catch(e){
   if(requestId===state.displayRequestId&&patternComparison===state){
@@ -8389,7 +8387,7 @@ function patternParseKst(date,time){
 function syncPatternForecastControls(state){
  const locked=!!state.forecastLock;
  const button=$('patternForecastLock');button.textContent=locked?'저장 풀기':'저장';button.setAttribute('aria-pressed',String(locked));
- for(const id of ['patternManualDate','patternManualTime','patternManualLoad','patternCompareHistoricalTf','patternCompareDisplayTf','patternForecastBars','patternCompareBlendToggle']){
+ for(const id of ['patternManualDate','patternManualTime','patternManualLoad','patternForecastBars','patternCompareBlendToggle']){
   if(locked)$(id).disabled=true;
   else if(!patternManualBusy&&['patternManualDate','patternManualTime','patternManualLoad','patternForecastBars','patternCompareBlendToggle'].includes(id))$(id).disabled=false;
  }
@@ -8397,7 +8395,9 @@ function syncPatternForecastControls(state){
 }
 async function loadPatternManualReference(tf,time){
  const state=patternComparison,status=$('patternManualStatus');
- if(!state||state.forecastLock||patternManualBusy)return;
+ if(!state||patternManualBusy)return;
+ const existingLock=state.forecastLock;
+ if(existingLock&&(!state.manualReference||time!==state.manualReference.time))return;
  if(!Number.isFinite(time)||time<Date.UTC(2019,8,9)||time>=Date.now()||demo){status.textContent='실제 선물 거래 기간 내 과거 KST 날짜와 시간을 입력하세요.';return;}
  if(Date.now()<patternManualRetry){status.textContent='조회 제한 대기 중 · 잠시 후 다시 시도';return;}
  const anchor=candleOpenTime(tf,time),native=tf==='10m'?'5m':tf;
@@ -8417,20 +8417,20 @@ async function loadPatternManualReference(tf,time){
    const next=nextCandleTime(native,part.at(-1).t,1);if(next<=cursor)break;cursor=next;
    if(raw.length<1000)break;
   }
-  if(patternComparison!==state||state.forecastLock||$('patternCompare')?.hidden)return;
+  if(patternComparison!==state||state.forecastLock!==existingLock||$('patternCompare')?.hidden)return;
   const bars=tf==='10m'?buildTenMinuteCandles(rows,true):rows;
   const i=patternHistoricalAnchorIndex(bars,tf,anchor);
   const required=Math.max(...config.ma,config.bb,config.rmiLength+config.rmiMomentum)+2;
   if(i<required+10||!bars[i+1]||bars[i+1].t!==nextCandleTime(tf,bars[i].t,1))throw Error('해당 날짜의 실제 선물 캔들이 부족합니다.');
   for(let j=Math.max(1,i-required-9);j<=i;j++)if(bars[j].t!==nextCandleTime(tf,bars[j-1].t,1))throw Error('기준일 주변 캔들 누락');
-  state.manualReference={tf,time:anchor,bars,index:i,replayBars:bars.slice(i,i+1+PATTERN_COMPARE_MAX_FUTURE)};
+  state.manualReference={tf,time:existingLock?time:anchor,bars,index:i,replayBars:bars.slice(i,i+1+PATTERN_COMPARE_MAX_FUTURE)};
   Object.assign(state.views.historical,{displayTf:tf,displayBars:bars,index:Math.min(bars.length-1,i+Math.floor(config.window/2)),baseIndex:i,count:Math.max(10,Math.min(config.window,i-required)),inspectIndex:null,inspectPrice:null,priceZoom:1,pricePan:0,futureShift:0});
   state.views.current.replayKey=null;state.views.current.replaySource=null;
   $('patternCompareHistoricalTf').value=tf;$('patternCompareHistoricalTitle').textContent='과거 실제 차트 (직접 비교)';
-  const stamp=patternCompareLocalInputDate(anchor);$('patternManualDate').value=stamp.slice(0,10);$('patternManualTime').value=stamp.slice(11);
-  status.textContent='직접 비교 · '+stamp.replace('T',' ')+' KST';renderPatternComparison();
+  const stamp=patternCompareLocalInputDate(state.manualReference.time);$('patternManualDate').value=stamp.slice(0,10);$('patternManualTime').value=stamp.slice(11);
+  status.textContent=(existingLock?'저장 유지 · ':'직접 비교 · ')+stamp.replace('T',' ')+' KST';renderPatternComparison();
  }catch(e){if(patternComparison===state){status.textContent='조회 실패 · '+String(e?.message||e);$('patternCompareHistoricalTf').value=patternHistoricalTf(state);}}
- finally{patternManualBusy=false;$('patternManualLoad').disabled=false;if(!patternComparison?.forecastLock)$('patternCompareHistoricalTf').disabled=false;}
+ finally{patternManualBusy=false;$('patternManualLoad').disabled=!!patternComparison?.forecastLock;$('patternCompareHistoricalTf').disabled=false;}
 }
 // Grow the independently browsable historical series, never the trading
 // candles or the fixed comparison reference. Preserve the visible timestamp
@@ -8487,8 +8487,28 @@ function patternManualReplay(state,source,index,tf){
  const combined=[current,...history];
  return patternProjectToTimeframe(combined,0,1,ref.tf,source,index,tf,state.forecastBars);
 }
+// Display-only conversion of the stored absolute path on a different grid.
+ // Interpolate between stored knots; never re-anchor to today's price.
+function patternResampleLockedReplay(lock,time,tf){
+ const z=lock.scenario,times=z.prices.map((_,k)=>nextCandleTime(lock.tf,lock.time,k));
+ if(!times.length||time>times.at(-1))return null;
+ const sample=(values,t)=>{
+  if(t<times[0]||t>times.at(-1))return null;
+  let lo=0,hi=times.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(times[m]<=t)lo=m;else hi=m-1;}
+  const a=values[lo];if(t===times[lo])return Number.isFinite(a)?a:null;
+  const b=values[lo+1];return Number.isFinite(a)&&Number.isFinite(b)?a+(b-a)*(t-times[lo])/(times[lo+1]-times[lo]):null;
+ };
+ const target=[];for(let k=0;k<=PATTERN_COMPARE_MAX_FUTURE;k++){const t=nextCandleTime(tf,time,k);if(t>times.at(-1))break;target.push(t);}
+ const prices=target.map(t=>sample(z.prices,t));
+ if(!prices.some(Number.isFinite))return null;
+ const ma=z.ma.map(m=>({...m,values:target.map(t=>sample(m.values,t))}));
+ const bb=target.map(t=>{const row={};for(const key of ['mid','upper','lower'])row[key]=sample(z.bb.map(b=>b?.[key]),t);return Object.values(row).every(Number.isFinite)?row:{mid:NaN,upper:NaN,lower:NaN};});
+ const frozenFib=lock.fib?target.map(t=>{const row=Array.from({length:7},(_,i)=>sample(lock.fib.map(v=>v?.[i]),t));return row.every(Number.isFinite)?row:null;}):null;
+ return {...z,locked:true,prices,ma,bb,ohlc:[],frozenFib,available:prices.length-1,interpolated:true};
+}
 function patternLockedReplay(lock,time,tf){
- if(!lock||lock.tf!==tf)return null;
+ if(!lock)return null;
+ if(lock.tf!==tf)return patternResampleLockedReplay(lock,time,tf);
  let offset=0;while(offset<lock.scenario.prices.length&&nextCandleTime(tf,lock.time,offset)<time)offset++;
  if(offset>=lock.scenario.prices.length||nextCandleTime(tf,lock.time,offset)!==time)return null;
  const z=lock.scenario;
