@@ -8429,7 +8429,7 @@ async function loadPatternManualReference(tf,time){
  if(nextCandleTime(tf,anchor,2)>Date.now()){status.textContent='이후 완료 캔들이 있는 과거 시점을 선택하세요.';return;}
  const key=tf+':'+anchor;
  const useReference=ref=>{
-  attachManualReference(state,{...ref,time:existingLock?time:anchor});
+  attachManualReference(state,{...ref,time});
   status.textContent=(existingLock?'저장 유지 · ':'자동 유지 · 실시간 예측 연동 · ')+patternCompareLocalInputDate(state.manualReference.time).replace('T',' ')+' KST';
   renderPatternComparison();saveLastVisibleScreen(true);draw();
  };
@@ -8569,7 +8569,15 @@ function togglePatternForecastLock(){
 }
 function initPatternComparison(){
  initPatternEntry();
- $('patternManualLoad').addEventListener('click',()=>void loadPatternManualReference(patternHistoricalTf(patternComparison),patternParseKst($('patternManualDate').value,$('patternManualTime').value)));
+ $('patternManualLoad').addEventListener('click',()=>{
+  const state=patternComparison,date=$('patternManualDate'),time=$('patternManualTime');
+  // Commit the native date/time picker before reading its final value.
+  if(document.activeElement===date||document.activeElement===time)document.activeElement.blur();
+  requestAnimationFrame(()=>{
+   if(patternComparison===state&&state)
+    void loadPatternManualReference(patternHistoricalTf(state),patternParseKst(date.value,time.value));
+  });
+ });
  $('patternForecastLock').addEventListener('click',togglePatternForecastLock);
  $('patternCompareRefresh')?.addEventListener('click',()=>void refreshPatternCurrentManually());
  $('patternCompareClose')?.addEventListener('click',closePatternComparison);
