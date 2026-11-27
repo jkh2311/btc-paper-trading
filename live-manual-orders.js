@@ -251,7 +251,7 @@ document.addEventListener('btc:chart-price-limit-entry',e=>{
  if(chartLimitPriceMode){
   chartCurrentLimitMode=data.currentLimit===true;
   if(chartCurrentLimitMode){
-   $('orderHelp').textContent='실전 현재가 지정가 · LIMIT GTC · 즉시 체결 또는 미체결 가능 · 최종 진입 버튼을 눌러야 전송됩니다.';
+   $('orderHelp').textContent='실전 현재가 지정가 · Post Only · 호가 대기 후 체결 가능 · 최종 진입 버튼을 눌러야 전송됩니다.';
    if(limitInput)limitInput.readOnly=true;
    sheetPriceEdited=true; // Prevent REST quote fallback; WebSocket only in this mode.
    displayLiveQuote();
@@ -420,7 +420,7 @@ function showSheet(side,chartPrice=null){
  $('sheetPrice').textContent='BTCUSDT 실제 '+(side==='LONG'?'롱':'숏')+' 주문';
  $('orderHelp').textContent=chartSelected?
    '실전 예약 지정가 · Post Only(즉시 체결 방지) · 수량은 설정값으로 계산 · 아래 실제 진입 버튼을 누르면 바이낸스에 전송됩니다.':
-   '실전 주문 · 지정가 / 시장가';
+   '실전 주문 · Post Only / 시장가';
  sh.dataset.realSide=side;
  sheetQuoteGeneration++;sheetPriceEdited=chartSelected;sheetQuoteLastAt=0;
  if(limitInput)limitInput.value=chartSelected?chartPrice.toFixed(1):'';
@@ -468,6 +468,7 @@ async function enter(side){
   if(currentFollow&&(!chartCurrentLimitMode||entryGeneration!==sheetQuoteGeneration||!isSheetOpen()))throw Error('주문 확인창 변경 · 주문 미전송');
   let price=currentFollow?freshChartCurrentLimit(liveQuote,currentTick,currentDigits,Date.now()):type==='LIMIT'?Number($('limitPrice').value):quote;
   if(currentFollow&&price===null)throw Error('실시간 현재가 연결 확인 필요 · 주문 미전송');
+
   if(chartLimitPriceMode&&type!=='LIMIT')throw Error('차트 예약진입은 지정가만 가능합니다.');
   if(!(price>0))throw Error('유효한 현재가/지정가가 필요합니다');
   const plan=chartLimitPriceMode?chartProtectionPlan:null;
@@ -508,8 +509,11 @@ async function enter(side){
   if(used>=count)throw Error('실계좌 보유/미체결 기준 '+count+'단계 한도에 도달했습니다. 증거금이 남아도 단계 한도를 넘겨 주문하지 않습니다.');
   if(currentFollow){
    if(!chartCurrentLimitMode||entryGeneration!==sheetQuoteGeneration||!isSheetOpen())throw Error('주문 확인창 변경 · 주문 미전송');
-   price=freshChartCurrentLimit(liveQuote,currentTick,currentDigits,Date.now());
-   if(price===null)throw Error('실시간 현재가 연결 확인 필요 · 주문 미전송');
+   const book=await publicJson('/fapi/v1/ticker/bookTicker?symbol='+symbol);
+   const bid=Number(book?.bidPrice),ask=Number(book?.askPrice);
+   if(book.symbol!==symbol||!(bid>0&&ask>=bid))throw Error('실시간 바이낸스 호가 조회 실패 · 주문 미전송');
+   if(!chartCurrentLimitMode||entryGeneration!==sheetQuoteGeneration||!isSheetOpen())throw Error('주문 확인창 변경 · 주문 미전송');
+   price=side==='LONG'?bid:ask;
    limitInput.value=price.toFixed(currentDigits);
    quoteState.textContent='최신 지정가 확정 · 주문 조건 검사 중';
   }
@@ -530,7 +534,7 @@ async function enter(side){
   if(type==='LIMIT'){
    const p=currentFollow?price.toFixed(currentDigits):roundDown(price,f.price.tickSize);
    if(!(Number(p)>0))throw Error('지정가 호가 단위 오류');
-   order.price=p;order.timeInForce=chartLimitPriceMode&&!chartCurrentLimitMode?'GTX':'GTC';
+   order.price=p;order.timeInForce='GTX';
   }
   let protection=null;
   if(plan){
@@ -568,9 +572,9 @@ async function enter(side){
   catch(e){
    // Binance -5022 is a definitive Post Only rejection (would trade
    // immediately). Do not mask it as uncertain or retry as market order.
-   if(chartLimitPriceMode&&!chartCurrentLimitMode&&String(e?.message||'').includes('-5022')){
+   if(order.timeInForce==='GTX'&&String(e?.message||'').includes('-5022')){
     lastOrderIssue=false;
-    throw Error('예약 지정가가 즉시 체결될 수 있어 바이낸스가 거절했습니다(-5022). 다른 가격을 선택하세요.');
+    throw Error('Post Only 주문이 즉시 체결될 가격이라 바이낸스가 거절했습니다(-5022). 다른 가격을 선택하세요.');
    }
    let known=null;try{known=await signed('GET','/fapi/v1/order',{symbol,origClientOrderId:lastRequest});}catch(_){}
    if(!known)throw Error('주문 전송 결과 불확실 · ID '+lastRequest+' · 바이낸스 주문내역에서 먼저 확인하세요. '+e.message);
@@ -597,7 +601,7 @@ async function enter(side){
  });
 }
 // The selected-position action places a user-priced LIMIT close. The individual
-// card button remains a fast MARKET close. Both recheck the live exchange position.
+// card button also opens the Post Only close editor. Both recheck the live exchange position.
 function chooseLiveClosePrice(side,qty,initialPrice,tick,digits){
  // Display the same trade stream as the chart; editable LIMIT only freezes on input.
  return new Promise(resolve=>{
@@ -786,10 +790,12 @@ async function closeSelected(orderKind='LIMIT'){
   const order={symbol,side:exitSide,positionSide,type:orderKind,quantity:closeQuantity,
    newClientOrderId:id,newOrderRespType:'RESULT'};
   if(!dual)order.reduceOnly='true';
-  if(orderKind==='LIMIT'){order.price=price;order.timeInForce='GTC';}
+  if(orderKind==='LIMIT'){order.price=price;order.timeInForce='GTX';}
   let res;
   try{res=await signed('POST','/fapi/v1/order',order);}
   catch(e){
+   if(order.timeInForce==='GTX'&&String(e?.message||'').includes('-5022'))
+    throw Error('호가가 바뀌어 Post Only 청산 주문이 거절됐어요. 가격을 다시 확인해 주세요.');
    try{res=await signed('GET','/fapi/v1/order',{symbol,origClientOrderId:id});}
    catch(_){throw Error('청산 주문 응답 미확정 · 바이낸스에서 ID '+id+'를 확인하세요. '+e.message);}
   }
@@ -807,7 +813,7 @@ document.addEventListener('btc:real-close-requested',e=>{
  const requested=e.detail;
  if(!requested||!['LONG','SHORT'].includes(requested.side)||busy)return;
  selected=requested;
- void closeSelected('MARKET');
+ void closeSelected('LIMIT');
 });
 async function cancelOrders(){
  await run(async()=>{
@@ -1183,8 +1189,8 @@ function quickCloseRender(){
   quickCloseQuote.textContent='시장가 · 체결가 변동 가능';
  }else if(Number.isFinite(quickCloseBook.bid)&&Number.isFinite(quickCloseBook.ask)&&
           Date.now()-quickCloseBook.at<=6000){
-  quickCloseQuote.textContent='롱 '+fmt(quickCloseBook.bid)+' / 숏 '+
-   fmt(quickCloseBook.ask)+' USDT · 현재 호가';
+  quickCloseQuote.textContent='롱 '+fmt(quickCloseBook.ask)+' / 숏 '+
+   fmt(quickCloseBook.bid)+' USDT · 현재 호가';
  }else{
   quickCloseQuote.textContent='지정가 호가 갱신 중…';
  }
@@ -1307,16 +1313,16 @@ async function quickCloseSubmit(side,selection){
    const tick=Number(f.price.tickSize);
    if(book.symbol!==symbol||!(bid>0&&ask>=bid&&tick>0))
     throw Error('실시간 바이낸스 지정가 호가 조회 실패');
-   const raw=side==='LONG'?bid:ask;
-   const steps=side==='LONG'?Math.floor((raw+tick*1e-7)/tick):
-    Math.ceil((raw-tick*1e-7)/tick);
+   const raw=side==='LONG'?ask:bid;
+   const steps=side==='LONG'?Math.ceil((raw-tick*1e-7)/tick):
+    Math.floor((raw+tick*1e-7)/tick);
    const digits=Math.min(8,(String(f.price.tickSize).split('.')[1]||'').length);
    const price=Number((steps*tick).toFixed(digits));
    if(!(price>0&&
     (Number(f.price.minPrice)<=0||price>=Number(f.price.minPrice))&&
     (Number(f.price.maxPrice)<=0||price<=Number(f.price.maxPrice))))
     throw Error('지정가 가격 단위 또는 허용 범위 확인 실패');
-   order.price=String(price);order.timeInForce='GTC';
+   order.price=String(price);order.timeInForce='GTX';
    quickCloseBook={bid,ask,at:Date.now()};
   }
   if(!visible()||quickCloseSwitchInProgress())
@@ -1339,6 +1345,8 @@ async function quickCloseSubmit(side,selection){
   let response;
   try{response=await signed('POST','/fapi/v1/order',order);}
   catch(e){
+   if(order.timeInForce==='GTX'&&String(e?.message||'').includes('-5022'))
+    throw Error('호가가 바뀌어 Post Only 청산 주문이 거절됐어요. 가격을 다시 확인해 주세요.');
    // Network failure may follow exchange acceptance. Never resubmit.
    try{response=await signed('GET','/fapi/v1/order',{
     symbol,origClientOrderId:order.newClientOrderId});}
@@ -1376,7 +1384,7 @@ quickCloseReview.hidden=true;
 quickCloseReview.style.cssText='position:fixed;inset:0;z-index:100100;background:rgba(3,10,21,.88);display:none;align-items:center;justify-content:center;padding:16px';
 quickCloseReview.innerHTML='<section role="dialog" aria-modal="true" aria-label="실전 청산 최종 확인" style="width:min(440px,100%);max-height:90dvh;overflow:auto;background:#14243b;color:#edf5ff;border:1px solid #6183a2;border-radius:17px;padding:18px;box-shadow:0 12px 36px #0009">'+
  '<h3 id="qcrTitle" style="margin:0 0 12px;font-size:19px">실전 청산 확인</h3>'+
- '<label style="display:block;margin:9px 0 4px">청산 방식</label><select id="qcrMethod" style="width:100%"><option value="LIMIT">지정가 청산</option><option value="MARKET">시장가 청산</option></select>'+
+ '<label style="display:block;margin:9px 0 4px">청산 방식</label><select id="qcrMethod" style="width:100%"><option value="LIMIT">Post Only 청산</option><option value="MARKET">시장가 청산</option></select>'+
  '<label style="display:block;margin:9px 0 4px">청산 비율 (%)</label><input id="qcrPercent" type="number" min="1" max="100" step="1" inputmode="numeric" style="width:100%">'+
  '<div id="qcrPreview" aria-live="polite" style="line-height:1.75;font-size:13px;margin:13px 0;color:#cce3f4">바이낸스 포지션 조회 중…</div>'+
  '<div style="font-size:11px;color:#f6c18a;line-height:1.6">표시 금액과 수익률은 예상치입니다. 최종 체결 결과에 따라 달라지며 지정가는 미체결될 수 있습니다.</div>'+
@@ -1412,7 +1420,7 @@ async function qcrRefresh(){
   if(!position)throw Error('바이낸스에서 '+side+' 보유 포지션을 찾지 못했습니다');
   const bid=Number(book.bidPrice),ask=Number(book.askPrice),entry=Number(position.entryPrice);
   if(!(bid>0&&ask>=bid&&entry>0))throw Error('실시간 호가/진입가 확인 실패');
-  const exitPrice=side==='LONG'?bid:ask;
+  const exitPrice=side==='LONG'?ask:bid;
   const qty=Math.abs(Number(position.positionAmt))*pct/100;
   const gross=(side==='LONG'?exitPrice-entry:entry-exitPrice)*qty;
   // Estimates only: maker exit 0.02%, taker exit 0.05%, entry 0.05%.
@@ -1456,7 +1464,7 @@ async function qcrRefresh(){
   const foot=document.createElement('div');
   foot.style.cssText='padding-top:9px;color:#abc0d4;font-size:11px';
   foot.textContent='적용 환율 '+Math.round(fx).toLocaleString('ko-KR')+'원 · '+
-   (method==='LIMIT'?'최종 확인 시 최신 호가로 지정가 제출 · 미체결 가능':
+   (method==='LIMIT'?'최종 확인 시 최신 호가로 Post Only 제출 · 미체결 가능':
     '최종 확인 시 시장가 주문 · 체결가격 변동 가능');
   preview.append(foot);
   qcr('qcrSubmit').disabled=false;
@@ -1526,10 +1534,10 @@ for(const [id,side] of [['long','LONG'],['short','SHORT']]){
  const b=$(id);if(!b)continue;b.disabled=false;b.onclick=()=>showSheet(side);
 }
 for(const [id,side] of [['sheetLong','LONG'],['sheetShort','SHORT']])if($(id))$(id).onclick=()=>enter(side);
-if($('close')){$('close').textContent='선택 포지션 지정가 청산';$('close').onclick=()=>void closeSelected('LIMIT');}
+if($('close')){$('close').textContent='선택 포지션 Post Only 청산';$('close').onclick=()=>void closeSelected('LIMIT');}
 if($('cancel')){$('cancel').textContent='대기 주문 취소';$('cancel').onclick=cancelOrders;}
 $('sheetPrice').textContent='실제 BTCUSDT 주문';
-$('orderHelp').textContent='실전 주문 · 지정가 / 시장가';
+$('orderHelp').textContent='실전 주문 · Post Only / 시장가';
 const note=document.querySelector('.real-account-note');
 if(note)note.textContent='앱 활성 중 5초 갱신';
 const auto=setInterval(refreshLoop,5000);
