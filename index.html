@@ -7813,14 +7813,15 @@ function renderPatternComparison(){
     state.bars.length,state.bars.at(-1)?.t,state.bars.at(-1)?.c,
     source.length,source.at(-1)?.t,source.at(-1)?.c].join('|');
    if(view.replayKey!==replayKey||view.replaySource!==source){
-    const originalReplay=state.manualReference?patternManualReplay(state,source,index,displayTf):displayTf===state.tf?
+    const manual=state.manualReference?patternManualForecast(state,source,source.length-1,displayTf):null;
+    const originalReplay=state.manualReference?patternLockedReplay(manual,bar.t,displayTf):displayTf===state.tf?
      patternReplaySeries(state.bars,index,state.match.index,
       state.forecastBars,state.tf,false):
      patternProjectToTimeframe(state.bars,sourceIndex,state.match.index,
       state.tf,source,index,displayTf,state.forecastBars);
     // OFF is a byte-for-byte-equivalent original scenario object.
     // ON modifies only the independent comparison canvas visualization.
-    view.replayScenario=patternCompareBlendEnabled?
+    view.replayScenario=patternCompareBlendEnabled&&!state.manualReference?
      patternCompareFiftyFiftyScenario(source,index,displayTf,originalReplay):
      originalReplay;
     view.replayKey=replayKey;view.replaySource=source;
@@ -8429,7 +8430,7 @@ async function loadPatternManualReference(tf,time,keepStart=false){
  if(nextCandleTime(tf,anchor,2)>Date.now()){status.textContent='이후 완료 캔들이 있는 과거 시점을 선택하세요.';return;}
  const key=tf+':'+anchor;
  const useReference=ref=>{
-  attachManualReference(state,{...ref,time,startedAt:keepStart?state.manualReference?.startedAt:Date.now()});
+  attachManualReference(state,{...ref,time,startedAt:keepStart?state.manualReference?.startedAt:Date.now(),forecast:keepStart?state.manualReference?.forecast:null});
   status.textContent=(existingLock?'저장 유지 · ':'자동 유지 · 실시간 예측 연동 · ')+patternCompareLocalInputDate(state.manualReference.time).replace('T',' ')+' KST';
   renderPatternComparison();saveLastVisibleScreen(true);draw();
  };
@@ -8514,25 +8515,27 @@ async function extendPatternManualHistory(state,direction){
  }catch(e){if(patternComparison===state&&state.manualReference===ref){status.textContent='추가 조회 실패 · '+String(e?.message||e);patternManualExtendAfter=Date.now()+5000;}}
  finally{patternManualExtendBusy=false;}
 }
-function patternManualReplay(state,source,index,tf){
- const ref=state.manualReference;if(!ref||!source[index])return null;
- // Reuse the existing timeframe conversion with an isolated historical
- // series plus an independent current anchor. Do not alter ranked data.
+function patternManualForecast(state,source,index,tf){
+ const ref=state.manualReference,anchor=source[index];
+ if(!ref||!anchor)return null;
+ if(ref.forecast)return ref.forecast;
  const history=(ref.replayBars||ref.bars.slice(ref.index)).slice(0,1+Math.min(PATTERN_COMPARE_MAX_FUTURE,state.forecastBars));
- // Advance the analogue by elapsed live candle time, keeping the original
- // historical selection intact. Already elapsed steps cannot restart.
- if(Number.isFinite(ref.startedAt)){
-  const liveStart=candleOpenTime(ref.tf,ref.startedAt);
-  const liveTime=source[index].t;
-  let elapsed=0;
-  while(elapsed+1<history.length&&nextCandleTime(ref.tf,liveStart,elapsed+1)<=liveTime)elapsed++;
-  history.splice(0,elapsed);
- }
  if(history.length<2)return null;
- const current={...source[index],t:candleOpenTime(ref.tf,source[index].t)};
- // Keep the live anchor before the independent historical sequence, so it cannot become a historical successor.
+ const current={...anchor,t:candleOpenTime(ref.tf,anchor.t)};
  const combined=[current,...history];
- return patternProjectToTimeframe(combined,0,1,ref.tf,source,index,tf,state.forecastBars);
+ let forecastTf=tf,forecastTime=anchor.t;
+ let scenario=patternProjectToTimeframe(combined,0,1,ref.tf,source,index,tf,state.forecastBars);
+ if((scenario?.prices?.length||0)<2&&tf!==ref.tf){
+  forecastTf=ref.tf;forecastTime=current.t;
+  scenario=patternProjectToTimeframe(combined,0,1,ref.tf,[current],0,ref.tf,state.forecastBars);
+ }
+ if((scenario?.prices?.length||0)<2)return null;
+ if(patternCompareBlendEnabled&&forecastTf===tf)
+  scenario=patternCompareFiftyFiftyScenario(source,index,tf,scenario);
+ const fib=patternCompareProjectedFibLevels(source.slice(Math.max(0,index-264),index+1),scenario.prices);
+ const forecast={tf:forecastTf,time:forecastTime,scenario,fib,automatic:true};
+ ref.forecast=forecast;
+ return forecast;
 }
 // Display-only conversion of the stored absolute path on a different grid.
  // Interpolate between stored knots; never re-anchor to today's price.
@@ -9474,31 +9477,19 @@ let sharedLockRaw=null,sharedLockValue=null;
 function sharedSavedForecast(){
  try{const raw=localStorage.getItem(HANINE_LOCK_KEY);if(raw!==sharedLockRaw){sharedLockRaw=raw;sharedLockValue=raw?JSON.parse(raw)?.comparison?.forecastLock:null;}return sharedLockValue;}catch(_){return null;}
 }
-let automaticForecastCache=null;
 function sharedAutomaticForecast(bars,tf){
- const ref=readAutomaticComparison()?.comparison.manualReference;
- const anchor=bars.at(-1);
- if(!ref||!anchor||viewOffset>0)return null;
- const horizon=patternCompareFutureBars,fibEnabled=chartIndicators.fib;
- const cache=automaticForecastCache;
- if(cache?.ref===ref&&cache.bars===bars&&cache.tf===tf&&cache.time===anchor.t&&cache.price===anchor.c&&cache.horizon===horizon&&cache.fibEnabled===fibEnabled)return cache.value;
- const state={manualReference:ref,forecastBars:horizon};
- let forecastTf=tf,scenario=patternManualReplay(state,bars,bars.length-1,tf);
- if((scenario?.prices?.length||0)<2&&ref.tf!==tf){
-  forecastTf=ref.tf;
-  scenario=patternManualReplay(state,[anchor],0,forecastTf);
- }
- const fib=fibEnabled&&scenario?.prices?.length>1?
-  patternCompareProjectedFibLevels(bars.slice(-265),scenario.prices):null;
- const value=scenario?.prices?.length>1?{tf:forecastTf,time:anchor.t,scenario,fib,automatic:true}:null;
- automaticForecastCache={ref,bars,tf,time:anchor.t,price:anchor.c,horizon,fibEnabled,value};
- return value;
+ const saved=readAutomaticComparison(),ref=saved?.comparison.manualReference;
+ if(!ref||!bars.length||viewOffset>0)return null;
+ if(ref.forecast)return ref.forecast;
+ const forecast=patternManualForecast({manualReference:ref,forecastBars:patternCompareFutureBars},bars,bars.length-1,tf);
+ if(forecast)try{localStorage.setItem(HANINE_AUTO_COMPARISON_KEY,JSON.stringify(saved));}catch(_){}
+ return forecast;
 }
 function sharedForecastPoints(lock,a,tf,left,bw,plotW){
  if(!lock?.scenario?.prices?.length||!a?.length)return [];
  const tail=a.at(-1).t,points=[];
  // Keep the original saved path intact; only show the unoccupied future.
- const cutoff=lock.automatic?tail:nextCandleTime(tf,tail,1);
+ const cutoff=lock.automatic&&lock.time===tail?tail:nextCandleTime(tf,tail,1);
  const duration=candleDuration[tf]||60000;
  for(let k=0;k<lock.scenario.prices.length;k++){
   const t=nextCandleTime(lock.tf,lock.time,k);
@@ -10992,7 +10983,7 @@ function persistLockedComparison(force=false,automatic=false){
   if(ref){
    const v=state.views.historical,bars=ref.bars;
    const subset=mergeDailyCandles(bars.slice(Math.max(0,ref.index-700),ref.index+1101),bars.slice(Math.max(0,v.index-700),v.index+351));
-   manual={tf:ref.tf,time:ref.time,startedAt:ref.startedAt,bars:subset,replayBars:ref.replayBars,index:patternHistoricalAnchorIndex(subset,ref.tf,ref.time)};
+   manual={tf:ref.tf,time:ref.time,startedAt:ref.startedAt,forecast:ref.forecast,bars:subset,replayBars:ref.replayBars,index:patternHistoricalAnchorIndex(subset,ref.tf,ref.time)};
   }
   const value={version:1,tab:'chart',mode:'compare',savedAt:Date.now(),comparison:{...snap,forecastLock:state.forecastLock,manualReference:manual,backupSources:sources}};
   const key=automatic?HANINE_AUTO_COMPARISON_KEY:HANINE_LOCK_KEY;
