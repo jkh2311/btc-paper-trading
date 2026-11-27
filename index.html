@@ -3789,6 +3789,7 @@ for(const event of ['pointerup','pointercancel','lostpointercapture'])
 // The RMI/disparity separator is a full-width, fixed boundary.
 // Individual right-hand numeric axes zoom their own series independently.
 function visibleFutureSlots(count){
+ if(readAutomaticComparison())return Math.min(patternCompareFutureBars,Math.max(4,Math.floor(count*.32)));
  // When a forecast is enabled, leave enough future slots to SHOW the entire
  // requested projection, with at least 40 actual candles at the left.
  // No synthetic candles are added to the trading/market data arrays.
@@ -7858,6 +7859,7 @@ function renderPatternComparison(){
 function closePatternComparison(){
  if($('patternCompare')?.hidden)return;
  if(patternComparison?.forecastLock&&!persistLockedComparison(true)){$('patternManualStatus').textContent='저장 확인 실패 · 다시 시도하세요.';return;}
+ if(patternComparison?.manualReference&&!patternComparison.forecastLock)persistLockedComparison(true,true);
  if(patternEntrySession)closePatternEntry();
  $('patternCompare').hidden=true;patternComparison=null;
  document.body.style.overflow=patternCompareBodyOverflow;
@@ -7867,7 +7869,7 @@ function closePatternComparison(){
 // The current chart's zoom, scroll, crosshair and live-candle updates remain.
 function setPatternComparisonRank(rank){
  const state=patternComparison;
- if(!state||state.forecastLock||!Number.isInteger(rank)||rank<1||rank>state.matches.length)return;
+ if(!state||state.forecastLock||state.manualReference||!Number.isInteger(rank)||rank<1||rank>state.matches.length)return;
  state.manualReference=null;state.views.current.replayKey=null;$('patternManualStatus').textContent='';
  const selected=state.matches[rank-1];
  if(!selected||!state.bars[selected.index])return;
@@ -7978,9 +7980,11 @@ function openPatternComparison(tf,bars,matches,rank){
  if(forecastInput)forecastInput.value=String(patternComparison.forecastBars);
  patternCompareBlendButton();
  $('patternCompareFoot').textContent='';
- patternCompareBodyOverflow=document.body.style.overflow;
+ if($('patternCompare').hidden)patternCompareBodyOverflow=document.body.style.overflow;
  document.body.style.overflow='hidden';
  $('patternCompare').hidden=false;
+ const automatic=readAutomaticComparison()?.comparison;
+ if(automatic?.manualReference)attachManualReference(patternComparison,automatic.manualReference);
  saveLastVisibleScreen(true);
  requestAnimationFrame(renderPatternComparison);
  $('patternCompareClose')?.focus({preventScroll:true});
@@ -8403,7 +8407,16 @@ function syncPatternForecastControls(state){
   if(locked)$(id).disabled=true;
   else if(!patternManualBusy&&['patternManualDate','patternManualTime','patternManualLoad','patternForecastBars','patternCompareBlendToggle'].includes(id))$(id).disabled=false;
  }
- for(const b of $('patternCompareRanks').querySelectorAll('button')){b.disabled=locked;b.setAttribute('aria-pressed',String(!state.manualReference&&Number(b.dataset.rank)===state.rank));}
+ for(const b of $('patternCompareRanks').querySelectorAll('button')){b.disabled=locked||!!state.manualReference;b.setAttribute('aria-pressed',String(!state.manualReference&&Number(b.dataset.rank)===state.rank));}
+}
+function attachManualReference(state,ref){
+ const {tf,time,bars,index}=ref,config=indicatorPatternConfig(tf);
+ state.manualReference=ref;
+ Object.assign(state.views.historical,{displayTf:tf,displayBars:bars,index:Math.min(bars.length-1,index+Math.floor(config.window/2)),baseIndex:index,count:config.window,inspectIndex:null,inspectPrice:null,priceZoom:1,pricePan:0,futureShift:0});
+ state.views.current.replayKey=null;state.views.current.replaySource=null;
+ $('patternCompareHistoricalTf').value=tf;$('patternCompareHistoricalTitle').textContent='과거 실제 차트 (직접 비교)';
+ const stamp=patternCompareLocalInputDate(time);$('patternManualDate').value=stamp.slice(0,10);$('patternManualTime').value=stamp.slice(11);
+ $('patternManualStatus').textContent='자동 유지 · 실시간 예측 연동';
 }
 async function loadPatternManualReference(tf,time){
  const state=patternComparison,status=$('patternManualStatus');
@@ -8435,12 +8448,9 @@ async function loadPatternManualReference(tf,time){
   const required=Math.max(...config.ma,config.bb,config.rmiLength+config.rmiMomentum)+2;
   if(i<required+10||!bars[i+1]||bars[i+1].t!==nextCandleTime(tf,bars[i].t,1))throw Error('해당 날짜의 실제 선물 캔들이 부족합니다.');
   for(let j=Math.max(1,i-required-9);j<=i;j++)if(bars[j].t!==nextCandleTime(tf,bars[j-1].t,1))throw Error('기준일 주변 캔들 누락');
-  state.manualReference={tf,time:existingLock?time:anchor,bars,index:i,replayBars:bars.slice(i,i+1+PATTERN_COMPARE_MAX_FUTURE)};
-  Object.assign(state.views.historical,{displayTf:tf,displayBars:bars,index:Math.min(bars.length-1,i+Math.floor(config.window/2)),baseIndex:i,count:Math.max(10,Math.min(config.window,i-required)),inspectIndex:null,inspectPrice:null,priceZoom:1,pricePan:0,futureShift:0});
-  state.views.current.replayKey=null;state.views.current.replaySource=null;
-  $('patternCompareHistoricalTf').value=tf;$('patternCompareHistoricalTitle').textContent='과거 실제 차트 (직접 비교)';
-  const stamp=patternCompareLocalInputDate(state.manualReference.time);$('patternManualDate').value=stamp.slice(0,10);$('patternManualTime').value=stamp.slice(11);
-  status.textContent=(existingLock?'저장 유지 · ':'직접 비교 · ')+stamp.replace('T',' ')+' KST';renderPatternComparison();
+  attachManualReference(state,{tf,time:existingLock?time:anchor,bars,index:i,replayBars:bars.slice(i,i+1+PATTERN_COMPARE_MAX_FUTURE)});
+  status.textContent=(existingLock?'저장 유지 · ':'자동 유지 · 실시간 예측 연동 · ')+patternCompareLocalInputDate(state.manualReference.time).replace('T',' ')+' KST';
+  renderPatternComparison();saveLastVisibleScreen(true);draw();
  }catch(e){if(patternComparison===state){status.textContent='조회 실패 · '+String(e?.message||e);$('patternCompareHistoricalTf').value=patternHistoricalTf(state);}}
  finally{patternManualBusy=false;$('patternManualLoad').disabled=!!patternComparison?.forecastLock;$('patternCompareHistoricalTf').disabled=false;}
 }
@@ -8485,7 +8495,7 @@ async function extendPatternManualHistory(state,direction){
   if(Number.isFinite(inspectTime))view.inspectIndex=patternCompareNearestIndex(merged,inspectTime);
   if(direction<0&&start===earliest)ref.startReached=true;
   if(direction>0&&end===latest)ref.endReachedUntil=Date.now()+30000;
-  status.textContent=normal();renderPatternComparison();
+  status.textContent=normal();renderPatternComparison();saveLastVisibleScreen(true);
  }catch(e){if(patternComparison===state&&state.manualReference===ref){status.textContent='추가 조회 실패 · '+String(e?.message||e);patternManualExtendAfter=Date.now()+5000;}}
  finally{patternManualExtendBusy=false;}
 }
@@ -8843,7 +8853,7 @@ function initPatternComparison(){
 async function restoreLastVisibleScreen(reopen=false){
  if(restoringViewStarted&&!reopen)return;
  restoringViewStarted=true;
- const stored=reopen?readPersistentComparison():null;
+ const stored=reopen?(readPersistentComparison()||readAutomaticComparison()):null;
  const saved=stored?{...stored,mode:'compare',tab:'chart'}:readLastView();
  if(!saved)return;
  restoringLastView=true;
@@ -8860,13 +8870,13 @@ async function restoreLastVisibleScreen(reopen=false){
    // If iOS evicted its cache, keep the saved view for manual restoration.
    const backup=snap.backupSources||{};
    const live=tf==='1m'&&minuteChartArchive?.length?minuteChartArchive:candles[tf];
-   const bars=snap.forecastLock?mergeDailyCandles(backup[tf]||[],live||[]):live;
+   const bars=snap.backupSources?mergeDailyCandles(backup[tf]||[],live||[]):live;
    if(!Array.isArray(bars)||bars.length<230)return;
    let cachedDisplayBars=null;
    if(snap.displayTf&&snap.displayTf!==tf){
     cachedDisplayBars=snap.displayTf==='1m'&&minuteChartArchive?.length?
      minuteChartArchive:candles[snap.displayTf];
-    if(snap.forecastLock)cachedDisplayBars=mergeDailyCandles(backup[snap.displayTf]||[],cachedDisplayBars||[]);
+    if(snap.backupSources)cachedDisplayBars=mergeDailyCandles(backup[snap.displayTf]||[],cachedDisplayBars||[]);
     const c=indicatorPatternConfig(snap.displayTf);
     if(!Array.isArray(cachedDisplayBars)||
        cachedDisplayBars.length<Math.max(...c.ma,c.bb)+c.window+2)return;
@@ -8894,11 +8904,8 @@ async function restoreLastVisibleScreen(reopen=false){
      $('patternCompareDisplayTf').value=snap.displayTf;
      current.replayKey=null;current.replaySource=null;
     }
-    if(snap.forecastLock&&snap.manualReference?.bars?.length){
-     const ref=snap.manualReference;patternComparison.manualReference=ref;
-     const historical=patternComparison.views.historical;historical.displayTf=ref.tf;historical.displayBars=ref.bars;historical.index=ref.index;historical.baseIndex=ref.index;
-     $('patternCompareHistoricalTf').value=ref.tf;$('patternCompareHistoricalTitle').textContent='과거 실제 차트 (직접 비교)';
-     const stamp=patternCompareLocalInputDate(ref.time);$('patternManualDate').value=stamp.slice(0,10);$('patternManualTime').value=stamp.slice(11);
+    if(snap.manualReference?.bars?.length){
+     attachManualReference(patternComparison,snap.manualReference);
     }else if(snap.historicalTf&&snap.historicalTf!==tf&&
        Object.hasOwn(SIMILAR_PATTERN_LABELS,snap.historicalTf)){
      // On iPhone reopen, use ONLY existing cache: never run a fresh
@@ -8999,6 +9006,7 @@ function initIndicatorPatternSearch(){
   // visible, including while new historical candles are loading.
   if(patternComparison?.forecastLock||readPersistentComparison()){indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false;syncRetry();await restoreLastVisibleScreen(true);return;}
   closePatternComparison();
+  clearAutomaticComparison();draw();
   resultsEl.replaceChildren();
   status.textContent=research?'이전 후보 제외 · 새 유사 패턴 검색 중…':'이전 검색 결과 초기화 · 새 검색 시작…';
   try{
@@ -9065,7 +9073,7 @@ function initIndicatorPatternSearch(){
   finally{indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false;syncRetry()}
  };
  btn.addEventListener('click',()=>void search(false));
- const savedButton=document.createElement('button');savedButton.type='button';savedButton.textContent='저장된 유사 비교창 열기';savedButton.style.cssText='width:100%;margin-top:5px;padding:7px;font-size:12px';savedButton.onclick=()=>{if(readPersistentComparison())void restoreLastVisibleScreen(true);else status.textContent='저장된 비교 결과가 없습니다.';};retry.after(savedButton);
+ const savedButton=document.createElement('button');savedButton.type='button';savedButton.textContent='이전 유사 비교창 열기';savedButton.style.cssText='width:100%;margin-top:5px;padding:7px;font-size:12px';savedButton.onclick=()=>{if(readPersistentComparison()||readAutomaticComparison())void restoreLastVisibleScreen(true);else status.textContent='저장된 비교 결과가 없습니다.';};retry.after(savedButton);
  retry.addEventListener('click',()=>void search(true));
 }
 // The focus strategy selector mirrors the Settings select; all existing
@@ -9433,11 +9441,29 @@ let sharedLockRaw=null,sharedLockValue=null;
 function sharedSavedForecast(){
  try{const raw=localStorage.getItem(HANINE_LOCK_KEY);if(raw!==sharedLockRaw){sharedLockRaw=raw;sharedLockValue=raw?JSON.parse(raw)?.comparison?.forecastLock:null;}return sharedLockValue;}catch(_){return null;}
 }
+let automaticForecastCache=null;
+function sharedAutomaticForecast(bars,tf){
+ const ref=readAutomaticComparison()?.comparison.manualReference;
+ const anchor=bars.at(-1);
+ if(!ref||!anchor||viewOffset>0)return null;
+ const horizon=patternCompareFutureBars;
+ const cache=automaticForecastCache;
+ if(cache?.ref===ref&&cache.bars===bars&&cache.tf===tf&&cache.time===anchor.t&&cache.price===anchor.c&&cache.horizon===horizon)return cache.value;
+ const state={manualReference:ref,forecastBars:horizon};
+ let forecastTf=tf,scenario=patternManualReplay(state,bars,bars.length-1,tf);
+ if((scenario?.prices?.length||0)<2&&ref.tf!==tf){
+  forecastTf=ref.tf;
+  scenario=patternManualReplay(state,[anchor],0,forecastTf);
+ }
+ const value=scenario?.prices?.length>1?{tf:forecastTf,time:anchor.t,scenario,automatic:true}:null;
+ automaticForecastCache={ref,bars,tf,time:anchor.t,price:anchor.c,horizon,value};
+ return value;
+}
 function sharedForecastPoints(lock,a,tf,left,bw,plotW){
  if(!lock?.scenario?.prices?.length||!a?.length)return [];
  const tail=a.at(-1).t,points=[];
  // Keep the original saved path intact; only show the unoccupied future.
- const cutoff=nextCandleTime(tf,tail,1);
+ const cutoff=lock.automatic?tail:nextCandleTime(tf,tail,1);
  const duration=candleDuration[tf]||60000;
  for(let k=0;k<lock.scenario.prices.length;k++){
   const t=nextCandleTime(lock.tf,lock.time,k);
@@ -9456,7 +9482,7 @@ function paintSharedSavedForecast(ctx,lock,points,y,top,bottom,plotW,bw){
  if(chartIndicators.fib&&lock.fib){for(let j=0;j<7;j++)line(lock.fib.map(v=>v?.[j]),['#bfc8db','#3399ff','#0000ff','#00ff00','#008000','#ff0000','#bfc8db'][j],1);}
  for(const m of z.ma||[])if(chartIndicators['ma'+m.period])line(m.values,m.color,1.4);
  if(chartIndicators.bb)for(const key of ['upper','mid','lower'])line((z.bb||[]).map(v=>v?.[key]),'#63b6a8',1.2);
- line(z.prices,'#ffd780',2.1);ctx.setLineDash([]);ctx.font='bold 11px sans-serif';ctx.fillStyle='#ffe0a0';ctx.fillText('저장된 유사 예측',Math.max(4,Math.min(plotW-100,points[0].x)),top+12);ctx.restore();
+ line(z.prices,'#ffd780',2.1);ctx.setLineDash([]);ctx.font='bold 11px sans-serif';ctx.fillStyle='#ffe0a0';ctx.fillText(lock.automatic?'과거 차트 기반 예측':'저장된 유사 예측',Math.max(4,Math.min(plotW-100,points[0].x)),top+12);ctx.restore();
 }
 function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText('캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min((chartIndicators.maForecast||chartIndicators.bbForecast)?600:400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;
 if(chartJumpSegment?.bars===a)scheduleJumpExtension(a,left,count);let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
@@ -9495,7 +9521,7 @@ const levels=[...liveLevels,...paperLevels,...(chartJumpSegment?[]:realReservati
 // While viewing far-back history, an unrelated current open position can
 // be tens of thousands of dollars away. Do not compress historical candles
 // merely to keep that off-screen trading level in the fitted price range.
-const sharedLock=!chartJumpSegment?sharedSavedForecast():null,sharedPoints=sharedForecastPoints(sharedLock,a,$('tf').value,left,plotW/count,plotW);
+const sharedLock=!chartJumpSegment?(sharedSavedForecast()||sharedAutomaticForecast(a,$('tf').value)):null,sharedPoints=sharedForecastPoints(sharedLock,a,$('tf').value,left,plotW/count,plotW);
 if(sharedPoints.length&&verticalZoom===1&&Math.abs(verticalPan)<1e-9){const prices=sharedPoints.map(p=>sharedLock.scenario.prices[p.k]).filter(Number.isFinite);if(prices.length){base.lo=Math.min(base.lo,...prices);base.hi=Math.max(base.hi,...prices);}}
 const activeSwitchGuide=!chartJumpSegment&&!viewOffset&&window.btcChartLevelVisible?.('switch')!==false?window.btcLiveSwitchLevel?.():null;
 if(activeSwitchGuide&&Number.isFinite(activeSwitchGuide.price)&&verticalZoom===1&&Math.abs(verticalPan)<1e-9){base.lo=Math.min(base.lo,activeSwitchGuide.price);base.hi=Math.max(base.hi,activeSwitchGuide.price);const pad=Math.max(2,(base.hi-base.lo)*.04);base.lo-=pad;base.hi+=pad;}
@@ -10859,6 +10885,20 @@ $('oiToggle').addEventListener('click',()=>{const p=$('oiPanel'),show=p.hidden;p
 // are stored here. iOS can suspend or discard a PWA while the screen is off.
 const HANINE_LAST_VIEW_KEY='hanine-last-screen-v345';
 const HANINE_LOCK_KEY='hanine-saved-comparison-v1';
+const HANINE_AUTO_COMPARISON_KEY='hanine-auto-comparison-v1';
+var automaticComparison;
+function readAutomaticComparison(){
+ if(automaticComparison===undefined){
+  try{const saved=JSON.parse(localStorage.getItem(HANINE_AUTO_COMPARISON_KEY)||'null');automaticComparison=saved?.comparison?.manualReference?.bars?.length?saved:null;}
+  catch(_){automaticComparison=null;}
+ }
+ return automaticComparison;
+}
+function clearAutomaticComparison(){
+ automaticComparison=null;
+ try{localStorage.removeItem(HANINE_AUTO_COMPARISON_KEY);}catch(_){}
+}
+
 let lastLockScreenWrite=0;
 const HANINE_TABS=new Set(['chart','position','history','liquidation','settings']);
 let restoringLastView=false,lastViewSavedAt=0,restoringViewStarted=false;
@@ -10869,11 +10909,13 @@ function readLastView(){
  try{
   const locked=readPersistentComparison();if(locked&&locked.mode==='compare')return locked;
   const value=JSON.parse(localStorage.getItem(HANINE_LAST_VIEW_KEY)||'null');
-  return value&&value.version===1&&HANINE_TABS.has(value.tab)?value:null;
+  if(!value||value.version!==1||!HANINE_TABS.has(value.tab))return null;
+  const automatic=readAutomaticComparison();
+  return value.mode==='compare'&&automatic?{...value,comparison:automatic.comparison}:value;
  }catch(_){return null;}
 }
-function persistLockedComparison(force=false){
- const state=patternComparison;if(!state?.forecastLock||$('patternCompare')?.hidden)return false;
+function persistLockedComparison(force=false,automatic=false){
+ const state=patternComparison;if(!(automatic?state?.manualReference:state?.forecastLock)||$('patternCompare')?.hidden)return false;
  if(!force&&Date.now()-lastLockScreenWrite<5000)return true;
  try{
   const snap=lastComparisonSnapshot(),ref=state.manualReference;
@@ -10897,8 +10939,10 @@ function persistLockedComparison(force=false){
    manual={tf:ref.tf,time:ref.time,bars:subset,replayBars:ref.replayBars,index:patternHistoricalAnchorIndex(subset,ref.tf,ref.time)};
   }
   const value={version:1,tab:'chart',mode:'compare',savedAt:Date.now(),comparison:{...snap,forecastLock:state.forecastLock,manualReference:manual,backupSources:sources}};
-  const json=JSON.stringify(value);localStorage.setItem(HANINE_LOCK_KEY,json);
-  if(localStorage.getItem(HANINE_LOCK_KEY)!==json)throw Error('저장 검증 실패');
+  const key=automatic?HANINE_AUTO_COMPARISON_KEY:HANINE_LOCK_KEY;
+  if(automatic)automaticComparison=value;
+  const json=JSON.stringify(value);localStorage.setItem(key,json);
+  if(localStorage.getItem(key)!==json)throw Error('저장 검증 실패');
   lastLockScreenWrite=Date.now();return true;
  }catch(e){console.warn('저장 비교창 보관 실패',e);return false;}
 }
@@ -10932,6 +10976,7 @@ function saveLastVisibleScreen(force=false){
  if(!HANINE_TABS.has(tab))return;
  const compare=!$('patternCompare')?.hidden;
  const expanded=!$('expandedChartOverlay')?.hidden;
+ if(compare&&patternComparison?.manualReference&&force)persistLockedComparison(true,true);
  const value={version:1,tab,mode:compare?'compare':expanded?'expanded':'tab',
   savedAt:now,comparison:compare?lastComparisonSnapshot():null};
  try{const locked=readPersistentComparison();if(locked&&!compare){localStorage.setItem(HANINE_LOCK_KEY,JSON.stringify({...locked,mode:value.mode,tab:value.tab}));}localStorage.setItem(HANINE_LAST_VIEW_KEY,JSON.stringify(value));
