@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-pattern-persistent-lock-v366"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-pattern-research-v367"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -1929,7 +1929,7 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
 <option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option>
 </select>
 <div id="indicatorPatternHint" style="font-size:10px;color:#a9bfd3;line-height:1.6;margin:5px 0 7px">볼린저밴드·이평선·RMI·이격도 비교. BTC 절대가격 제외 · 유사도는 승률 아님</div>
-<button id="indicatorPatternSearch" type="button" style="font-size:12px;padding:7px;background:#284b69;border:1px solid #648bad;color:#e4f6ff;border-radius:6px;width:100%">선택한 시간봉 유사 패턴 검색</button>
+<button id="indicatorPatternSearch" type="button" style="font-size:12px;padding:7px;background:#284b69;border:1px solid #648bad;color:#e4f6ff;border-radius:6px;width:100%">선택한 시간봉 유사 패턴 검색</button><button id="indicatorPatternResearch" type="button" disabled style="font-size:12px;padding:7px;background:#284b69;border:1px solid #648bad;color:#e4f6ff;border-radius:6px;width:100%;margin-top:5px">재검색 (이전 결과 제외)</button>
 <div id="indicatorPatternStatus" role="status" aria-live="polite" style="font-size:11px;margin-top:6px;color:#aacee7;line-height:1.55"></div>
 <div id="indicatorPatternMatches" style="display:grid;gap:6px;margin-top:7px"></div>
 </div></div></div></div></div><div id="focusRmiDivider" role="separator" aria-label="거래량과 RMI 사이 높이 조절" aria-orientation="horizontal" tabindex="0"></div><div class="indicator-label"><span id="rmiSignalReadyLabel" style="color:#ffc857;font-weight:700;margin-left:6px" hidden>🟡 LONG 신호준비</span></div><canvas id="rmiChart" style="height:130px"></canvas><div id="disparityStageInspector" hidden style="position:absolute;z-index:9;display:none;left:7px;align-items:center;gap:5px;max-width:calc(100% - 98px);font-size:10px;pointer-events:auto"><span id="disparityStageInspectorText" style="background:#091729ec;border:1px solid #6787a2;border-radius:5px;padding:4px 5px;color:#dce8f6;white-space:nowrap"></span><button id="disparityStageSave" type="button" style="font-size:10px;min-width:35px;padding:3px 6px;background:#173c38;color:#8df3ba;border:1px solid #408876;border-radius:5px">저장</button><button id="disparityStageDelete" type="button" hidden style="font-size:10px;min-width:35px;padding:3px 6px;background:#43212d;color:#ff9eb3;border:1px solid #ad5c72;border-radius:5px">삭제</button></div></div></div>
@@ -6439,7 +6439,7 @@ function indicatorPatternContinuous(bars,tf,from,to){
   if(bars[j].t!==nextCandleTime(tf,bars[j-1].t,1))return false;
  return true;
 }
-async function historicalPatternCandidates(bars,tf,now=Date.now(),onProgress=null){
+async function historicalPatternCandidates(bars,tf,now=Date.now(),onProgress=null,excludedTimes=[]){
  const config=indicatorPatternConfig(tf),n=bars.length;
  const warmup=Math.max(config.bb,...config.ma,...config.disparity);
  if(n<warmup+config.window+config.lookahead+3)return [];
@@ -6467,7 +6467,9 @@ async function historicalPatternCandidates(bars,tf,now=Date.now(),onProgress=nul
  picks.sort((a,b)=>a.distance-b.distance);
  if(onProgress)onProgress(maxIndex-minIndex+1,maxIndex-minIndex+1);
  const results=[];
+ const excludedIndices=excludedTimes.map(t=>patternCompareNearestIndex(bars,t)).filter(i=>Number.isInteger(i)&&i>=0&&i<bars.length);
  for(const p of picks){
+  if(excludedIndices.some(i=>Math.abs(i-p.index)<config.window))continue;
   if(results.some(x=>Math.abs(x.index-p.index)<config.window))continue;
   if(!indicatorPatternContinuous(bars,tf,p.index,p.index+config.lookahead))continue;
   const anchor=bars[p.index].c;
@@ -8956,11 +8958,14 @@ window.addEventListener('pagehide',()=>saveLastVisibleScreen(true));
 // iOS may re-create the page after sleep. Restore once after all chart
 // handlers are initialized; normal background->foreground preserves state.
 function initIndicatorPatternSearch(){
- const btn=$('indicatorPatternSearch'),tfSelect=$('indicatorPatternTf'),
+ const btn=$('indicatorPatternSearch'),retry=$('indicatorPatternResearch'),tfSelect=$('indicatorPatternTf'),
   status=$('indicatorPatternStatus'),resultsEl=$('indicatorPatternMatches'),
   hint=$('indicatorPatternHint');
- if(!btn||!tfSelect||!status||!resultsEl)return;
+ if(!btn||!retry||!tfSelect||!status||!resultsEl)return;
+ const seenByTf=new Map();
+ const syncRetry=()=>{retry.disabled=indicatorPatternSearchBusy||!(seenByTf.get(tfSelect.value)?.length);};
  const updateHint=()=>{
+  syncRetry();
   const tf=tfSelect.value,config=indicatorPatternConfig(tf);
   if(hint)hint.textContent=config.name+
    ' · 이평 50% / 이격도 30% / 볼밴 15% / RMI 5% · BTC 절대가격 제외 · 유사도 ≠ 승률';
@@ -8973,17 +8978,19 @@ function initIndicatorPatternSearch(){
   if(!indicatorPatternSearchBusy){tfSelect.value=$('tf').value;updateHint();}
  });
  tfSelect.value=$('tf')?.value||'4h';updateHint();
- btn.addEventListener('click',async()=>{
+ const search=async(research=false)=>{
   if(indicatorPatternSearchBusy)return;
   if(demo){status.textContent='실제 과거 시세 조회 모드에서 검색할 수 있어.';return}
   const tf=tfSelect.value,config=indicatorPatternConfig(tf);
-  indicatorPatternSearchBusy=true;btn.disabled=true;tfSelect.disabled=true;
+  const excluded=research?(seenByTf.get(tf)||[]):[];
+  if(research&&!excluded.length)return;
+  indicatorPatternSearchBusy=true;btn.disabled=true;retry.disabled=true;tfSelect.disabled=true;
   // A new search must never leave a previous rank, scenario or controls
   // visible, including while new historical candles are loading.
-  if(patternComparison?.forecastLock||readPersistentComparison()){indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false;status.textContent='저장된 비교창을 먼저 저장 풀기 해주세요.';return;}
+  if(patternComparison?.forecastLock||readPersistentComparison()){indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false;syncRetry();status.textContent='저장된 비교창을 먼저 저장 풀기 해주세요.';return;}
   closePatternComparison();
   resultsEl.replaceChildren();
-  status.textContent='이전 검색 결과 초기화 · 새 검색 시작…';
+  status.textContent=research?'이전 후보 제외 · 새 유사 패턴 검색 중…':'이전 검색 결과 초기화 · 새 검색 시작…';
   try{
    status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 과거 캔들 기록 확인 중…';
    let bars=await loadIndicatorPatternHistory(tf);
@@ -9002,16 +9009,18 @@ function initIndicatorPatternSearch(){
      status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 과거 전체 탐색 중… '+
       Math.min(100,Math.floor(done/Math.max(1,total)*100))+'% · '+
       '조회 범위 '+asKst(firstAvailable)+' ~ '+asKst(lastAvailable);
-   });
+   },excluded);
+   if(!matches.length&&research){status.textContent='새 유사 패턴 후보가 더 없습니다. 일반 검색으로 처음부터 검색할 수 있습니다.';return;}
    if(!matches.length)throw Error('유효한 연속 '+config.window+
     '봉 구간이 부족해. 누락된 과거 캔들 조회를 확인해 줘.');
+   seenByTf.set(tf,[...new Set([...excluded,...matches.map(m=>m.time)])]);
    const best=matches[0]?.similarity||0;
    const weak=best<55;
    status.textContent=config.name+' · 과거 '+bars.length.toLocaleString()+
     '개 캔들 검색 ('+asKst(firstAvailable)+' ~ '+asKst(lastAvailable)+
     ') · '+(weak?'⚠ 충분히 닮은 구간을 찾지 못함 (최고 '+best.toFixed(1)+
     '점) · 아래는 상대적으로 가까운 후보일 뿐이야':
-    '유사 TOP '+matches.length+' · 누르면 비교 차트 표시');
+    '유사 TOP '+matches.length+' · 누르면 비교 차트 표시')+(research?' · 이전 '+excluded.length+'개 후보 제외':'');
    for(const [index,match] of matches.entries()){
     const button=document.createElement('button');
     button.type='button';
@@ -9030,8 +9039,10 @@ function initIndicatorPatternSearch(){
     resultsEl.appendChild(button);
    }
   }catch(e){status.textContent='검색 실패: '+String(e.message||e)}
-  finally{indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false}
- });
+  finally{indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false;syncRetry()}
+ };
+ btn.addEventListener('click',()=>void search(false));
+ retry.addEventListener('click',()=>void search(true));
 }
 // The focus strategy selector mirrors the Settings select; all existing
 // strategy change, persistence, alert and one-minute-only trading rules stay
