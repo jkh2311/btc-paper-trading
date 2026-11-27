@@ -9131,10 +9131,9 @@ function initPatternComparison(){
     lastX=e.clientX;lastY=e.clientY;tapX=e.clientX;tapY=e.clientY;tapMoved=false;
     const r=canvas.getBoundingClientRect();
     const y=e.clientY-r.top,axis=patternCompareView(which)?.priceAxisRange;
-    const onPriceAxis=e.clientX-r.left>=r.width-71&&
-     (which==='historical'||!axis||y>=axis.top&&y<=axis.bottom);
-    dragMode=which==='historical'&&patternComparison.manualReference?'time':onPriceAxis?'price':
-     which==='historical'&&y>=r.height-24?'timeScale':'time';
+    const onPriceAxis=e.clientX-r.left>=r.width-71&&(!axis||y>=axis.top&&y<=axis.bottom);
+    dragMode=onPriceAxis?'price':
+     which==='historical'&&!patternComparison.manualReference&&y>=r.height-24?'timeScale':'time';
     priceLabelHold=pinnedPriceLabelAt(e.clientX,e.clientY);
     if(priceLabelHold!==null){
      const targetPrice=priceLabelHold;
@@ -9154,8 +9153,8 @@ function initPatternComparison(){
       holdingCrosshair=true;
       if(dragMode==='price')inspectAtPriceY(lastY);
       else{
-       inspectAtX(lastX,which!=='current');
-       if(which==='current')inspectAtPriceY(lastY);
+       inspectAtX(lastX,false);
+       inspectAtPriceY(lastY);
       }
      },380);
     }
@@ -9183,8 +9182,8 @@ function initPatternComparison(){
     lastX=e.clientX;lastY=e.clientY;
     if(dragMode==='price')inspectAtPriceY(e.clientY);
     else{
-     inspectAtX(e.clientX,which!=='current');
-     if(which==='current')inspectAtPriceY(e.clientY);
+     inspectAtX(e.clientX,false);
+     inspectAtPriceY(e.clientY);
     }
     return;
    }
@@ -9220,7 +9219,7 @@ function initPatternComparison(){
      // Mirror the native chart's price pan, while the right-side price
      // scale continues to control vertical zoom independently.
      const scale=(view.priceBaselineRange||1)/Math.max(.12,view.priceZoom||1);
-     if(!(which==='historical'&&patternComparison.manualReference)&&Math.abs(deltaY)>=1){
+     if(Math.abs(deltaY)>=1){
       view.pricePan=(view.pricePan||0)+
        deltaY/Math.max(80,view.pricePlotHeight||canvas.clientHeight*.61)*scale/
         Math.max(1,view.priceBaselineRange||1);
@@ -9231,7 +9230,7 @@ function initPatternComparison(){
       patternCompareSetIndex(which,view.index+(view.futureShift||0)-
        (view.pastReveal||0)-barsMoved);
       tapMoved=true;
-     }else if(!(which==='historical'&&patternComparison.manualReference)&&Math.abs(deltaY)>=1)renderPatternComparison();
+     }else if(Math.abs(deltaY)>=1)renderPatternComparison();
     }
    }
   });
@@ -9245,7 +9244,7 @@ function initPatternComparison(){
    if(e.type==='pointerup'&&!tapMoved&&!holdingCrosshair&&
       pointers.size===1&&patternComparison&&
       (dragMode==='time'||dragMode==='price')){
-    if(which==='current'&&dragMode==='price'&&priceLabelHold===null)inspectAtPriceY(e.clientY);
+    if(dragMode==='price'&&priceLabelHold===null)inspectAtPriceY(e.clientY);
     else clearComparisonGuides();
    }
    priceLabelHold=null;
@@ -9391,6 +9390,7 @@ async function restoreLastVisibleScreen(reopen=false){
        Number(row.pastReveal)||0)):0;
      view.priceZoom=Math.max(.12,Math.min(20,Number(row.priceZoom)||1));
      view.pricePan=Number.isFinite(row.pricePan)?row.pricePan:0;
+     view.inspectPrice=Number.isFinite(row.inspectPrice)&&row.inspectPrice>0?row.inspectPrice:null;
      if(row.show&&typeof row.show==='object')
       view.show={...view.show,...row.show};
     }
@@ -11418,7 +11418,7 @@ function lastComparisonSnapshot(){
   views[name]={time:timeOf(view.index),base:timeOf(view.baseIndex),
    inspect:timeOf(view.inspectIndex),count:view.count,
    futureShift:view.futureShift||0,pastReveal:view.pastReveal||0,priceZoom:view.priceZoom,
-   pricePan:view.pricePan,show:view.show};
+   pricePan:view.pricePan,inspectPrice:view.inspectPrice,show:view.show};
  }
  const matches=state.matches.slice(0,10).map(m=>({
   ...m,at:state.bars[m.index]?.t
