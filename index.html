@@ -1818,7 +1818,7 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
- <div class="price-panel"><div class="quote-wrap"><div class="price" id="price">-- USDT</div><div id="funding" class="funding" aria-live="polite">펀딩 조회 중</div></div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="1s">1초 · 현물</option><option value="30s">30초 · 현물</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select></div><div id="convergenceBanner" class="convergence-banner" hidden role="status"></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
+ <div class="price-panel"><div class="quote-wrap"><div class="price" id="price">-- USDT</div><div id="funding" class="funding" aria-live="polite">펀딩 조회 중</div></div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="1s">1초 · 현물</option><option value="30s">30초 · 선물</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select></div><div id="convergenceBanner" class="convergence-banner" hidden role="status"></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
  <div class="daily-volume" onclick="openVolume30()" id="dailyVolumeTrigger" role="button" tabindex="0" aria-label="최근 30일 일별 BTC 거래량 보기" aria-expanded="false" aria-controls="volume30Overlay">
  <div class="daily-volume-half">
   <div class="daily-volume-top"><span>오늘 거래량</span><strong id="dayVol">조회 중…</strong></div>
@@ -2131,7 +2131,7 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
  </div>
 </div>
 <div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
-  <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><button type="button" id="expandedChartLatest" aria-label="최신 캔들로 이동" title="최신 차트로 이동">최신</button><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="1s">1초 · 현물</option><option value="30s">30초 · 현물</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
+  <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><button type="button" id="expandedChartLatest" aria-label="최신 캔들로 이동" title="최신 차트로 이동">최신</button><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="1s">1초 · 현물</option><option value="30s">30초 · 선물</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
 </div>
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
 <div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button>
@@ -2924,7 +2924,7 @@ async function saveCachedChartSegment(segment){
  const chunks=[...preserved,{bars:merged,savedAt:Date.now()}]
   .sort((a,b)=>a.savedAt-b.savedAt);
  cachedChartSegments[tf]=chunks;
- try{await chartCacheWrite(CHART_SEGMENT_STORE,{tf,chunks,version:1})}
+ try{await chartCacheWrite(CHART_SEGMENT_STORE,{tf:tf==='30s'?'futures-30s':tf,chunks,version:1})}
  catch(e){console.warn('날짜 이동 구간 캐시 저장 불가',e)}
 }
 let chartCacheFlushAt=0,chartCacheFlushBusy=false;
@@ -2965,7 +2965,7 @@ async function restoreChartHistoryCache(){
      else historyReadyUntil[tf]=row.completeFrom;
     }
    }
-   const segmentRow=await chartCacheRead(CHART_SEGMENT_STORE,tf).catch(()=>null);
+   const segmentRow=await chartCacheRead(CHART_SEGMENT_STORE,tf==='30s'?'futures-30s':tf).catch(()=>null);
    if(Array.isArray(segmentRow?.chunks)){
     cachedChartSegments[tf]=segmentRow.chunks.filter(x=>
      Array.isArray(x?.bars)&&x.bars.length>=22);
@@ -3039,15 +3039,15 @@ function historyPeriodLabel(tf){const m=HISTORY_LOOKBACK_MONTHS[tf];return m===7
 function updateIntradayHistoryJump(){
   const button=$('intradayHistoryJump');if(!button)return;
   const tf=$('tf').value,full=['1w','1M'].includes(tf),
-   active=isSpotSecondsTf(tf)||full||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf);
+   active=isSecondsChartTf(tf)||full||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,tf);
   button.style.display=active?'block':'none';if(!active)return;
-  if(isSpotSecondsTf(tf)){
+  if(isSecondsChartTf(tf)){
    button.disabled=chartJumpBusy||demo;
    button.textContent=chartJumpSegment?.tf===tf?'최신 ⟶':spotSecondsLabel(tf)+' 날짜 이동';
    button.title=tf==='30s'?'최근 1개월 자동 조회 · 더 오래된 날짜는 직접 불러오기':'최근 1년 바이낸스 현물 1초봉';
-   if(tf==='30s'&&!chartJumpSegment&&spotThirtyHistoryBusy){
+   if(tf==='30s'&&!chartJumpSegment&&futuresThirtyHistoryBusy){
     button.textContent='30초봉 · 과거 로딩 중';
-    button.title=spotThirtyHistoryStatus;
+    button.title=futuresThirtyHistoryStatus;
    }
    return;
   }
@@ -3340,7 +3340,7 @@ function initIntradayHistoryJump(){
  const button=$('intradayHistoryJump');if(!button)return;
  button.addEventListener('click',async()=>{
    const tf=$('tf').value;
-   if(isSpotSecondsTf(tf)){
+   if(isSecondsChartTf(tf)){
     if(chartJumpSegment?.tf===tf){resetChartTimeJump();return;}
     if($('chartIndicatorMenu')?.hidden)$('chartIndicatorToggle')?.click();
     $('chartTimeJumpControls')?.scrollIntoView({block:'nearest'});
@@ -3643,120 +3643,178 @@ function scheduleLivePaint(){
   }
 }
 
-function isSpotSecondsTf(tf=$('tf').value){return tf==='1s'||tf==='30s';}
+function isSpotSecondsTf(tf=$('tf').value){return tf==='1s';}
+function isSecondsChartTf(tf=$('tf').value){return tf==='1s'||tf==='30s';}
 function spotSecondsLabel(tf){return tf==='30s'?'30초봉':'1초봉';}
-function buildSpotThirtySecondCandles(rows,now=0){
- const bars=[];
- let bucket=null,count=0;
- const flush=()=>{
-  if(!bucket)return;
-  const current=now>=bucket.t&&now<bucket.t+30000;
-  if(count&&(count===30||current))bars.push(bucket);
- };
- for(const row of rows){
-  const t=candleOpenTime('30s',row.t);
-  if(!bucket||t!==bucket.t){
-   flush();
-   bucket={...row,t,source:'spot'};
-   count=row.t===t?1:0;
-   continue;
-  }
-  if(!count||row.t!==t+count*1000){count=0;continue;}
-  bucket.h=Math.max(bucket.h,row.h);bucket.l=Math.min(bucket.l,row.l);
-  bucket.c=row.c;bucket.v+=row.v;count++;
- }
- // A live bucket may be partial at the right boundary only.
- if(count)flush();
- return bars;
-}
-let spotThirtySecondBars=[];
-const SPOT_ARCHIVE_DAY=86400000;
-const SPOT_THIRTY_STEP=30000;
-let spotThirtyHistoryBusy=false,spotThirtyRetryAt=0,spotThirtyHistoryStatus='';
-function spotThirtyMonthStart(now=Date.now()){
+const FUTURES_ARCHIVE_DAY=86400000,FUTURES_THIRTY_STEP=30000;
+let futuresThirtyBars=[],futuresThirtyArchive=[],futuresThirtyLive=[];
+let futuresThirtySocket=null,futuresThirtyLastTick=0,futuresThirtyRetryAt=0;
+let futuresThirtyHistoryBusy=false,futuresThirtyHistoryRetryAt=0,futuresThirtyArchiveDay=null;
+let futuresThirtyStatus='선물 30초봉 조회 중…',futuresThirtyHistoryStatus='';
+function futuresThirtyMonthStart(now=Date.now()){
  const d=new Date(now),year=d.getUTCFullYear(),month=d.getUTCMonth();
  return Date.UTC(year,month-1,Math.min(d.getUTCDate(),new Date(Date.UTC(year,month,0)).getUTCDate()));
 }
-function showSpotThirtyHistoryStatus(){
- if($('tf').value==='30s'){
-  const status=$('chartTimeJumpStatus');
-  if(status&&!chartJumpBusy&&!chartJumpSegment)status.textContent=spotThirtyHistoryStatus;
- }
+function addFuturesThirtyTrade(buckets,time,price,qty){
+ if(!(Number.isFinite(time)&&price>0&&Number.isFinite(price)&&qty>0&&Number.isFinite(qty)))return;
+ const t=candleOpenTime('30s',time),bar=buckets.get(t);
+ if(bar){
+  if(time<bar.first){bar.o=price;bar.first=time;}
+  if(time>=bar.last){bar.c=price;bar.last=time;}
+  bar.h=Math.max(bar.h,price);bar.l=Math.min(bar.l,price);bar.v+=qty;
+ }else buckets.set(t,{t,o:price,h:price,l:price,c:price,v:qty,first:time,last:time});
 }
-async function loadSpotThirtyArchiveDay(day){
- const date=new Date(day).toISOString().slice(0,10),key='spot-30s-'+date;
+async function loadFuturesThirtyArchiveDay(day){
+ const date=new Date(day).toISOString().slice(0,10),key='futures-30s-'+date;
  const cached=await chartCacheRead(CHART_HISTORY_STORE,key).catch(()=>null);
- if(cached?.bars?.length===2880)return cached.bars;
- const url='https://data.binance.vision/data/spot/daily/klines/BTCUSDT/1s/BTCUSDT-1s-'+date+'.zip';
- const response=await fetch(url,{signal:AbortSignal.timeout(25000)});
+ if(cached?.bars?.length)return cached.bars;
+ const url='https://data.binance.vision/data/futures/um/daily/aggTrades/BTCUSDT/BTCUSDT-aggTrades-'+date+'.zip';
+ const response=await fetch(url,{signal:AbortSignal.timeout(90000)});
  if(response.status===404)return null;
- if(!response.ok)throw Error('일별 데이터 HTTP '+response.status);
+ if(!response.ok)throw Error('일별 선물 데이터 HTTP '+response.status);
  const zip=await response.arrayBuffer(),view=new DataView(zip);
- // Binance daily archives contain one deflated CSV entry.
  if(view.byteLength<30||view.getUint32(0,true)!==0x04034b50||
-    view.getUint16(8,true)!==8||(view.getUint16(6,true)&9))throw Error('거래소 일별 압축 형식 오류');
+    view.getUint16(8,true)!==8||(view.getUint16(6,true)&9))throw Error('일별 압축 형식 오류');
  const offset=30+view.getUint16(26,true)+view.getUint16(28,true),size=view.getUint32(18,true);
- if(!size||offset+size>view.byteLength)throw Error('거래소 일별 압축 데이터 부족');
- const payload=new Blob([zip.slice(offset,offset+size)]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
- const csv=await new Response(payload).text();
- const rows=[];
- for(const line of csv.split('\n')){
-  if(!line)continue;
-  const [stamp,o,h,l,c,v]=line.split(',',6),time=Number(stamp);
-  rows.push({t:time>1e14?time/1000:time,o:+o,h:+h,l:+l,c:+c,v:+v});
+ if(!size||offset+size>view.byteLength)throw Error('일별 압축 데이터 부족');
+ const reader=new Blob([zip.slice(offset,offset+size)]).stream()
+  .pipeThrough(new DecompressionStream('deflate-raw')).pipeThrough(new TextDecoderStream()).getReader();
+ const buckets=new Map();
+ let tail='';
+ const consume=line=>{
+  const [,p,q,,,stamp]=line.split(',',6),time=Number(stamp);
+  if(time>=day&&time<day+FUTURES_ARCHIVE_DAY)addFuturesThirtyTrade(buckets,time,+p,+q);
+ };
+ for(;;){
+  const {value,done}=await reader.read();
+  if(done)break;
+  const lines=(tail+value).split('\n');tail=lines.pop();
+  for(const line of lines)if(line)consume(line);
  }
- const bars=buildSpotThirtySecondCandles(normalizeChartCacheBars(rows));
- if(bars.length!==2880||bars[0].t!==day||bars.at(-1).t!==day+SPOT_ARCHIVE_DAY-SPOT_THIRTY_STEP)
-  throw Error('일별 30초봉이 연속되지 않습니다');
+ if(tail)consume(tail);
+ const bars=normalizeChartCacheBars([...buckets.values()].sort((a,b)=>a.t-b.t));
+ if(!bars.length)throw Error('일별 선물 체결 데이터 없음');
  void chartCacheWrite(CHART_HISTORY_STORE,{tf:key,bars}).catch(()=>{});
  return bars;
 }
-async function fetchSpotThirtyPage(start,end){
- const query=new URLSearchParams({symbol:'BTCUSDT',interval:'1s',limit:'990',startTime:String(start),endTime:String(end)});
- const response=await fetch('https://data-api.binance.vision/api/v3/klines?'+query,{cache:'no-store',signal:AbortSignal.timeout(12000)});
- if([418,429].includes(response.status))
-  spotSecondRetryAt=Date.now()+Math.max(1,Number(response.headers.get('Retry-After'))||60)*1000;
- if(!response.ok)throw Error('현물 조회 HTTP '+response.status);
- const raw=await response.json();
- const bars=buildSpotThirtySecondCandles(normalizeChartCacheBars(raw.map(v=>({t:+v[0],o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:+v[5]}))));
- if(bars.length!==(end-start+1)/SPOT_THIRTY_STEP||bars[0]?.t!==start)
-  throw Error('현물 1초봉 일부가 아직 조회되지 않습니다');
- return bars;
+function mergeFuturesThirtyChart(){
+ const first=futuresThirtyLive[0]?.t??Infinity;
+ futuresThirtyBars=futuresThirtyArchive.filter(b=>b.t<first).concat(futuresThirtyLive);
 }
-async function loadSpotThirtyMonth(){
- if(spotThirtyHistoryBusy||demo||document.hidden||$('tf').value!=='30s'||chartJumpSegment||
-    !spotThirtySecondBars.length||Date.now()<Math.max(spotThirtyRetryAt,spotSecondRetryAt))return;
- const minimum=spotThirtyMonthStart();
- if(spotThirtySecondBars[0].t<=minimum)return;
- spotThirtyHistoryBusy=true;
+async function loadFuturesThirtyMonth(){
+ if(futuresThirtyHistoryBusy||demo||document.hidden||$('tf').value!=='30s'||chartJumpSegment||
+    Date.now()<futuresThirtyHistoryRetryAt)return;
+ const today=Math.floor(Date.now()/FUTURES_ARCHIVE_DAY)*FUTURES_ARCHIVE_DAY;
+ const minimum=futuresThirtyMonthStart();
+ if(futuresThirtyArchiveDay===null)futuresThirtyArchiveDay=today-FUTURES_ARCHIVE_DAY;
+ if(futuresThirtyArchiveDay<minimum)return;
+ futuresThirtyHistoryBusy=true;
  try{
-  while(spotThirtySecondBars[0].t>minimum&&!demo&&!document.hidden&&$('tf').value==='30s'&&!chartJumpSegment){
-   const edge=spotThirtySecondBars[0].t,day=Math.floor((edge-1)/SPOT_ARCHIVE_DAY)*SPOT_ARCHIVE_DAY;
-   const today=Math.floor(Date.now()/SPOT_ARCHIVE_DAY)*SPOT_ARCHIVE_DAY;
-   spotThirtyHistoryStatus='최근 1개월 불러오는 중 · '+new Date(edge+9*3600000).toISOString().slice(0,16).replace('T',' ')+' KST부터 표시';
-   showSpotThirtyHistoryStatus();
-   const archive=day<today?await loadSpotThirtyArchiveDay(day):null;
-   let bars;
-   if(archive)bars=archive.filter(b=>b.t<edge);
-   else{
-    const pages=[];
-    for(let end=edge;end>day&&pages.length<4;){
-     const start=Math.max(day,end-990000);
-     pages.unshift(fetchSpotThirtyPage(start,end-1));end=start;
-    }
-    bars=(await Promise.all(pages)).flat();
+  while(futuresThirtyArchiveDay>=minimum&&!demo&&!document.hidden&&$('tf').value==='30s'&&!chartJumpSegment){
+   const day=futuresThirtyArchiveDay;
+   futuresThirtyHistoryStatus='선물 과거 조회 · '+new Date(day).toISOString().slice(0,10);
+   const bars=await loadFuturesThirtyArchiveDay(day);
+   futuresThirtyArchiveDay-=FUTURES_ARCHIVE_DAY;
+   if(bars){
+    futuresThirtyArchive=bars.concat(futuresThirtyArchive);
+    mergeFuturesThirtyChart();
+    if($('tf').value==='30s'&&!chartJumpSegment){draw();drawRmi();}
    }
-   if(spotThirtySecondBars[0]?.t!==edge)continue;
-   if(!bars.length||bars.at(-1).t+SPOT_THIRTY_STEP!==edge)throw Error('이전 30초봉과 연결되지 않습니다');
-   spotThirtySecondBars=bars.concat(spotThirtySecondBars);
-   if($('tf').value==='30s'&&!chartJumpSegment){draw();drawRmi();}
   }
-  if(spotThirtySecondBars[0].t<=minimum)spotThirtyHistoryStatus='최근 1개월 30초봉 조회 완료';
+  futuresThirtyHistoryStatus='최근 1개월 공개 선물 기록';
  }catch(e){
-  spotThirtyRetryAt=Date.now()+10000;
-  spotThirtyHistoryStatus='30초봉 추가 조회 재시도 중 · '+String(e.message||e);
- }finally{spotThirtyHistoryBusy=false;showSpotThirtyHistoryStatus();}
+  futuresThirtyArchiveDay=Math.max(minimum,futuresThirtyArchiveDay);
+  futuresThirtyHistoryRetryAt=Date.now()+20000;
+  futuresThirtyHistoryStatus='선물 기록 재조회 대기 · '+String(e.message||e);
+ }finally{
+  futuresThirtyHistoryBusy=false;
+  if($('tf').value==='30s'&&!chartJumpSegment)$('chartTimeJumpStatus').textContent=futuresThirtyHistoryStatus;
+ }
 }
+async function fetchFuturesThirtyTrades(params){
+ const response=await fetch('https://fapi.binance.com/fapi/v1/aggTrades?'+new URLSearchParams({symbol:'BTCUSDT',limit:'1000',...params}),
+  {cache:'no-store',signal:AbortSignal.timeout(10000)});
+ if([418,429].includes(response.status))
+  futuresThirtyRetryAt=Date.now()+Math.max(1,Number(response.headers.get('Retry-After'))||60)*1000;
+ if(!response.ok)throw Error('선물 체결 조회 HTTP '+response.status);
+ const rows=await response.json();
+ if(!Array.isArray(rows))throw Error('선물 체결 응답 오류');
+ return rows;
+}
+async function fetchFuturesThirtyRange(start,end){
+ if(end<start)return [];
+ if(Date.now()<futuresThirtyRetryAt)throw Error('바이낸스 선물 조회 제한 · 잠시 후 다시 시도');
+ const buckets=new Map();
+ let params={startTime:String(start),endTime:String(end)};
+ for(let page=0;page<45;page++){
+  const rows=await fetchFuturesThirtyTrades(params);
+  for(const row of rows)if(row.T>=start&&row.T<=end)addFuturesThirtyTrade(buckets,+row.T,+row.p,+row.q);
+  const last=rows.at(-1);
+  if(!last||last.T>=end||rows.length<1000)return [...buckets.values()].sort((a,b)=>a.t-b.t);
+  params={fromId:String(Number(last.a)+1)};
+ }
+ throw Error('선물 체결량이 많아 선택한 범위를 모두 조회하지 못했습니다');
+}
+function syncFuturesThirtyChart(){
+ if(demo||document.hidden||$('tf').value!=='30s'){
+  const old=futuresThirtySocket;futuresThirtySocket=null;old?.close();return;
+ }
+ void loadFuturesThirtyMonth();
+ if(futuresThirtySocket&&Date.now()-futuresThirtyLastTick<=15000)return;
+ if(futuresThirtySocket){const old=futuresThirtySocket;futuresThirtySocket=null;old.close();}
+ if(Date.now()<futuresThirtyRetryAt)return;
+ let socket;
+ try{socket=new WebSocket('wss://fstream.binance.com/market/ws/btcusdt@aggTrade');}
+ catch(_){futuresThirtyRetryAt=Date.now()+5000;return;}
+ futuresThirtySocket=socket;futuresThirtyLastTick=Date.now();
+ let queue=[],sequence=-1,buckets=new Map();
+ const ingest=row=>{
+  const id=Number(row.a);
+  if(!Number.isSafeInteger(id)||id<=sequence)return;
+  sequence=id;addFuturesThirtyTrade(buckets,+row.T,+row.p,+row.q);
+ };
+ function update(){
+  futuresThirtyLive=[...buckets.values()].sort((a,b)=>a.t-b.t);
+  if(futuresThirtyLive.length>3000)buckets.delete(futuresThirtyLive.shift().t);
+  if(futuresThirtyBars.length&&futuresThirtyBars.at(-1).t===futuresThirtyLive.at(-1)?.t&&futuresThirtyBars.at(-1)===futuresThirtyLive.at(-1))return;
+  mergeFuturesThirtyChart();
+ }
+ socket.onopen=async()=>{
+  let history=[];
+  try{
+   history=await fetchFuturesThirtyTrades({});
+   const first=Number(history[0]?.a);
+   if(first>=3000){
+    const earlier=await Promise.allSettled([3,2,1].map(k=>fetchFuturesThirtyTrades({fromId:String(first-1000*k)})));
+    history=earlier.flatMap(r=>r.status==='fulfilled'?r.value:[]).concat(history);
+   }
+  }catch(_){}
+  if(futuresThirtySocket!==socket)return;
+  const rows=history.concat(queue).sort((a,b)=>a.a-b.a);
+  let start=0;
+  for(let i=1;i<rows.length;i++)if(rows[i].a>rows[i-1].a+1)start=i;
+  for(const row of rows.slice(start))ingest(row);
+  const first=buckets.keys().next().value;
+  if(buckets.size>1)buckets.delete(first);
+  queue=null;update();scheduleLivePaint();
+ };
+ socket.onmessage=e=>{
+  if(futuresThirtySocket!==socket)return;
+  try{
+   const row=JSON.parse(e.data);
+   if(row.e!=='aggTrade'||row.s!=='BTCUSDT')return;
+   futuresThirtyLastTick=Date.now();
+   if(queue){if(queue.length<20000)queue.push(row);}
+   else{ingest(row);update();scheduleLivePaint();}
+  }catch(_){}
+ };
+ socket.onclose=()=>{
+  if(futuresThirtySocket!==socket)return;
+  futuresThirtySocket=null;futuresThirtyStatus='선물 30초봉 연결 재시도 중…';
+  futuresThirtyRetryAt=Math.max(futuresThirtyRetryAt,Date.now()+3000);
+ };
+}
+setInterval(syncFuturesThirtyChart,2000);
 let spotSecondBars=[],spotSecondBusy=false,spotSecondRetryAt=0,spotSecondStatus='현물 1초봉 조회 중…';
 function spotSecondCutoff(now=Date.now()){
  const date=new Date(now);
@@ -3783,16 +3841,6 @@ async function refreshSpotSecondChart(){
   if(!next.length)return;
   const contiguous=last&&next[0].t<=last+1000;
   spotSecondBars=mergeDailyCandles(contiguous?spotSecondBars:[],next).slice(-5000);
-  const recent=buildSpotThirtySecondCandles(spotSecondBars,Date.now());
-  if(recent.length){
-   const start=recent[0].t,prior=spotThirtySecondBars.at(-1)?.t;
-   if(!prior||start>prior+SPOT_THIRTY_STEP)spotThirtySecondBars=recent;
-   else{
-    const keep=spotThirtySecondBars.findLastIndex(bar=>bar.t<start)+1;
-    spotThirtySecondBars.splice(keep,spotThirtySecondBars.length-keep,...recent);
-   }
-  }
-  if($('tf').value==='30s')void loadSpotThirtyMonth();
   if(!contiguous)resetStableChartScale();
  }catch(e){
   spotSecondStatus='현물 초봉 조회 실패 · '+String(e.message||e);
@@ -3840,7 +3888,7 @@ function connectWs(){
     ws.onclose=()=>{wsConnected=false;paintLivePrice();if(!demo){showMarketConnectionError('실시간 시세 연결 끊김 · 재접속 중');wsRetry=setTimeout(connectWs,3000)}};
   }catch(_){wsConnected=false;wsRetry=setTimeout(connectWs,3000)}
 }
-function startDemo(){resetStableChartScale();if(ws){ws.onclose=null;ws.close();ws=null}clearTimeout(wsRetry);wsConnected=false;demo=true;if(isSpotSecondsTf())$('tf').value='1m';let p=last||90000;for(let tf of tfs){let arr=[];for(let i=0;i<100;i++){let o=p;p=Math.max(1000,p*(1+(Math.random()-.5)*.002));arr.push({t:Date.now()-(100-i)*60000,o,h:Math.max(o,p)*1.0003,l:Math.min(o,p)*.9997,c:p,v:Math.round(30+Math.random()*200)})}candles[tf]=arr}last=p;$('status').textContent='데모 모드: 무작위 생성 가격. 실제 BTC 시세 아님.';render()}
+function startDemo(){resetStableChartScale();if(ws){ws.onclose=null;ws.close();ws=null}clearTimeout(wsRetry);wsConnected=false;demo=true;if(isSecondsChartTf())$('tf').value='1m';syncFuturesThirtyChart();let p=last||90000;for(let tf of tfs){let arr=[];for(let i=0;i<100;i++){let o=p;p=Math.max(1000,p*(1+(Math.random()-.5)*.002));arr.push({t:Date.now()-(100-i)*60000,o,h:Math.max(o,p)*1.0003,l:Math.min(o,p)*.9997,c:p,v:Math.round(30+Math.random()*200)})}candles[tf]=arr}last=p;$('status').textContent='데모 모드: 무작위 생성 가격. 실제 BTC 시세 아님.';render()}
 function sma(arr,i,n){if(i<n-1)return null;let v=0;for(let j=i-n+1;j<=i;j++)v+=arr[j].c;return v/n}
 function rmiSeries(a,length=14,momentum=5){
  const out=new Array(a.length).fill(null);if(a.length<momentum+length)return out;
@@ -4577,8 +4625,8 @@ function stableChartPriceRange(a,tf){
     chartRangeAnchor={tf,lo:low-padding,hi:high+padding};
   }
   // Only follow a live price approaching the edge; never auto-fit to position lines or zoom.
-  const referencePrice=isSpotSecondsTf(tf)?a.at(-1)?.c:last;
-  if(!(isSpotSecondsTf(tf)&&chartJumpSegment)&&Math.abs(verticalPan)<1e-9&&referencePrice>0&&a.length&&visibleWindow(a).end===a.length){
+  const referencePrice=isSecondsChartTf(tf)?a.at(-1)?.c:last;
+  if(!(isSecondsChartTf(tf)&&chartJumpSegment)&&Math.abs(verticalPan)<1e-9&&referencePrice>0&&a.length&&visibleWindow(a).end===a.length){
     const span=chartRangeAnchor.hi-chartRangeAnchor.lo,edge=span*.08;
     let shift=0;
     if(referencePrice>chartRangeAnchor.hi-edge)shift=referencePrice-(chartRangeAnchor.hi-edge);
@@ -5496,7 +5544,7 @@ function renderChartTimeAxis(bars,left,count,plotW){
       dayChanged?
       String(date.getUTCMonth()+1).padStart(2,'0')+'.'+String(date.getUTCDate()).padStart(2,'0')+' '+hh+':'+mm:
       hh+':'+mm;
-    const seconds=isSpotSecondsTf()?':'+String(date.getUTCSeconds()).padStart(2,'0'):'';
+    const seconds=isSecondsChartTf()?':'+String(date.getUTCSeconds()).padStart(2,'0'):'';
     items.push({x,label:label+seconds});previousX=x;
   }
   // In short visible windows, ensure at least one precise reference time.
@@ -6329,7 +6377,7 @@ function scheduleJumpExtension(bars,left,count){
     Date.now()-jumpExtendRetryAt<2500||!bars?.length)return;
  // Each timeframe retains its own requested horizon; the old maximum
  // calculation unintentionally limited 4h/6h/12h jumps to three years.
- const minTime=isSpotSecondsTf(segment.tf)?spotSecondCutoff():segment.tf==='1d'?Date.UTC(2017,7,17):
+ const minTime=isSecondsChartTf(segment.tf)?spotSecondCutoff():segment.tf==='1d'?Date.UTC(2017,7,17):
   historyCutoff(segment.tf);
  const timeStep=candleDuration[segment.tf]||60000;
  const nowLast=candleOpenTime(segment.tf,Date.now());
@@ -6345,18 +6393,26 @@ async function extendJumpHistory(direction,segment){
  if(jumpExtendBusy||chartJumpSegment!==segment)return;
  jumpExtendBusy=true;jumpExtendRetryAt=Date.now();
  const tf=segment.tf,step=candleDuration[tf]||60000;
- const source=tf==='30s'?'1s':tf==='10m'?'5m':tf,sourceStep=candleDuration[source]||step;
+ const source=tf==='10m'?'5m':tf,sourceStep=candleDuration[source]||step;
  const first=segment.bars[0].t,last=segment.bars.at(-1).t;
- const minTime=isSpotSecondsTf(tf)?spotSecondCutoff():tf==='1d'?Date.UTC(2017,7,17):
+ const minTime=isSecondsChartTf(tf)?spotSecondCutoff():tf==='1d'?Date.UTC(2017,7,17):
    historyCutoff(tf);
  const nowLast=candleOpenTime(tf,Date.now());
  const start=direction==='before'?Math.max(minTime,first-450*step):last+step;
- const finish=tf==='30s'?(direction==='before'?first-sourceStep:Math.min(nowLast-sourceStep,last+450*step+step-sourceStep)):
-  direction==='before'?first-step:Math.min(nowLast,last+450*step);
+ const finish=direction==='before'?first-step:Math.min(nowLast,last+450*step);
  if(finish<start){jumpExtendBusy=false;return}
  const status=$('chartTimeJumpStatus');
  try{
   const fetched=[];
+  if(tf==='30s'){
+   const edge=direction==='before'?finish:start;
+   const day=Math.floor(edge/FUTURES_ARCHIVE_DAY)*FUTURES_ARCHIVE_DAY;
+   const closed=Math.floor(Date.now()/FUTURES_ARCHIVE_DAY)*FUTURES_ARCHIVE_DAY;
+   const archive=day<closed?await loadFuturesThirtyArchiveDay(day):null;
+   fetched.push(...(archive||await fetchFuturesThirtyRange(
+    direction==='before'?Math.max(start,first-25*step):start,
+    direction==='before'?first-1:Math.min(nowLast-1,finish+step-1,start+25*step-1))));
+  }else{
   // Use Binance spot for daily timestamps before futures launch.
   for(let cursor=Math.floor(start/sourceStep)*sourceStep;cursor<=finish;){
    const spot=isSpotSecondsTf(tf)||tf==='1d'&&cursor<Date.UTC(2019,8,9);
@@ -6375,7 +6431,8 @@ async function extendJumpHistory(direction,segment){
     .filter(v=>Number.isFinite(v.t)&&v.c>0));
    cursor=end+sourceStep;
   }
-  const extra=tf==='30s'?buildSpotThirtySecondCandles(fetched):tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
+  }
+  const extra=tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
   if(chartJumpSegment!==segment||$('tf').value!==tf)return;
   const original=segment.bars;
   // No fabricated candles between disconnected history windows.
@@ -6400,7 +6457,7 @@ async function extendJumpHistory(direction,segment){
 function chartViewBars(){
  const tf=$('tf').value;
  return chartJumpSegment?.tf===tf?chartJumpSegment.bars:
-  tf==='30s'?spotThirtySecondBars:tf==='1s'?spotSecondBars:
+  tf==='30s'?futuresThirtyBars:tf==='1s'?spotSecondBars:
   tf==='1m'&&minuteChartArchive?.length?minuteChartArchive:candles[tf];
 }
 function dateJumpKstMillis(dateText,timeText){
@@ -6418,7 +6475,7 @@ function resetChartTimeJump(){
  const status=$('chartTimeJumpStatus');if(status)status.textContent='최신 차트로 돌아왔어요.';
 }
 function centerChartOnTimestamp(bars,time){
- if(!Array.isArray(bars)||bars.length<22)return false;
+ if(!Array.isArray(bars)||bars.length<($('tf').value==='30s'?1:22))return false;
  let lo=0,hi=bars.length;
  while(lo<hi){const mid=(lo+hi)>>1;if(bars[mid].t<time)lo=mid+1;else hi=mid;}
  const index=Math.max(0,Math.min(bars.length-1,lo));
@@ -6435,18 +6492,18 @@ async function jumpChartToUtc(requestedTime){
    if(status)status.textContent='유효한 과거 날짜·시간을 선택해 줘.';return;
  }
  const full=['1w','1M'].includes(tf);
- const minimum=isSpotSecondsTf(tf)?spotSecondCutoff():tf==='1d'||full?Date.UTC(2017,7,17):
+ const minimum=isSecondsChartTf(tf)?spotSecondCutoff():tf==='1d'||full?Date.UTC(2017,7,17):
    historyCutoff(tf);
  if(requestedTime<minimum){
    if(status)status.textContent=tf==='1d'||full?
     '바이낸스 과거 기록은 2017년 8월부터 볼 수 있어.':
-    '최근 '+(isSpotSecondsTf(tf)?'1년':historyPeriodLabel(tf))+' 이내의 날짜를 선택해 줘.';
+    '최근 '+(isSecondsChartTf(tf)?'1년':historyPeriodLabel(tf))+' 이내의 날짜를 선택해 줘.';
    return;
  }
  const duration=candleDuration[tf]||60000;
  const target=candleOpenTime(tf,requestedTime);
  const existing=chartViewBars();
- if(existing?.length>=22&&target>=existing[0].t&&target<=existing.at(-1).t){
+ if(existing?.length>=22&&target>=existing[0].t&&target<=existing.at(-1).t&&(tf!=='30s'||existing[patternCompareNearestIndex(existing,target)]?.t===target)){
    if(status)status.textContent='선택한 날짜로 이동했어.';
    centerChartOnTimestamp(existing,target);return;
  }
@@ -6469,10 +6526,23 @@ async function jumpChartToUtc(requestedTime){
     if(status)status.textContent='주봉·월봉 날짜 이동 완료 · 2017년 이후 현물·선물 기록';
     return;
    }
-   const source=tf==='30s'?'1s':tf==='10m'?'5m':tf;
+   if(tf==='30s'){
+    const day=Math.floor(target/FUTURES_ARCHIVE_DAY)*FUTURES_ARCHIVE_DAY;
+    const today=Math.floor(Date.now()/FUTURES_ARCHIVE_DAY)*FUTURES_ARCHIVE_DAY;
+    const archive=day<today?await loadFuturesThirtyArchiveDay(day):null;
+    const bars=archive||await fetchFuturesThirtyRange(Math.max(minimum,target-duration*30),
+     Math.min(candleOpenTime(tf,Date.now())-1,target+duration*15-1));
+    if($('tf').value!==tf)return;
+    if(!bars.some(b=>b.t===target))throw Error('선택한 시각의 선물 30초봉이 부족합니다');
+    chartJumpSegment={tf,bars};void saveCachedChartSegment(chartJumpSegment);
+    centerChartOnTimestamp(bars,target);
+    if(status)status.textContent='바이낸스 선물 30초봉 · 날짜 이동 완료';
+    return;
+   }
+   const source=tf==='10m'?'5m':tf;
    const sourceDuration=candleDuration[source];
-   const from=Math.max(minimum,target-duration*(tf==='30s'?180:360));
-   const until=tf==='30s'?Math.min(candleOpenTime(tf,Date.now())-sourceDuration,target+duration*90-sourceDuration):Math.min(Date.now(),target+duration*260);
+   const from=Math.max(minimum,target-duration*360);
+   const until=Math.min(Date.now(),target+duration*260);
    const fetched=[];
    // Split any daily window crossing 2019-09-09. Before that day the
    // source is BTCUSDT spot; from launch onward it is USD-M futures.
@@ -6493,7 +6563,7 @@ async function jumpChartToUtc(requestedTime){
        .filter(v=>Number.isFinite(v.t)&&v.c>0));
      cursor=end+sourceDuration;
    }
-   const bars=tf==='30s'?buildSpotThirtySecondCandles(fetched):tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
+   const bars=tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
    if(bars.length<22||!bars.some(v=>Math.abs(v.t-target)<duration*2))
      throw Error('해당 시간대의 거래소 캔들을 찾지 못했어');
    if($('tf').value!==tf)return;
@@ -6512,7 +6582,7 @@ function initChartTimeJump(){
  date.value=kst.toISOString().slice(0,10);
  time.value=String(kst.getUTCHours()).padStart(2,'0')+':'+
    String(kst.getUTCMinutes()).padStart(2,'0');
- const syncTimeStep=()=>{time.step=isSpotSecondsTf()?'1':'60';};
+ const syncTimeStep=()=>{time.step=isSecondsChartTf()?'1':'60';};
  $('tf').addEventListener('change',syncTimeStep);syncTimeStep();
  go.addEventListener('click',()=>{void jumpChartToUtc(dateJumpKstMillis(date.value,time.value))});
  $('chartJumpLatest')?.addEventListener('click',resetChartTimeJump);
@@ -9229,9 +9299,9 @@ function initIndicatorPatternSearch(){
   updateHint();
  });
  $('tf')?.addEventListener('change',()=>{
-  if(!indicatorPatternSearchBusy&&!isSpotSecondsTf()){tfSelect.value=$('tf').value;updateHint();}
+  if(!indicatorPatternSearchBusy&&!isSecondsChartTf()){tfSelect.value=$('tf').value;updateHint();}
  });
- tfSelect.value=isSpotSecondsTf($('tf')?.value)?'1m':$('tf')?.value||'4h';updateHint();
+ tfSelect.value=isSecondsChartTf($('tf')?.value)?'1m':$('tf')?.value||'4h';updateHint();
  const search=async(research=false)=>{
   if(indicatorPatternSearchBusy)return;
   if(demo){status.textContent='실제 과거 시세 조회 모드에서 검색할 수 있어.';return}
@@ -9716,7 +9786,7 @@ function paintSharedSavedForecast(ctx,lock,points,y,top,bottom,plotW,bw){
  if(chartIndicators.bb)for(const key of ['upper','mid','lower'])line((z.bb||[]).map(v=>v?.[key]),'#63b6a8',1.2);
  line(z.prices,'#ffd780',2.1);ctx.setLineDash([]);ctx.font='bold 11px sans-serif';ctx.fillStyle='#ffe0a0';ctx.fillText(lock.automatic?'과거 차트 기반 예측':'저장된 유사 예측',Math.max(4,Math.min(plotW-100,points[0].x)),top+12);ctx.restore();
 }
-function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<22){ctx.fillStyle='#aab8cd';ctx.fillText(isSpotSecondsTf()?spotSecondStatus:'캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min((chartIndicators.maForecast||chartIndicators.bbForecast)?600:400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;
+function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<($('tf').value==='30s'?1:22)){ctx.fillStyle='#aab8cd';ctx.fillText($('tf').value==='30s'?futuresThirtyStatus:isSpotSecondsTf()?spotSecondStatus:'캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min((chartIndicators.maForecast||chartIndicators.bbForecast)?600:400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;
 if(chartJumpSegment?.bars===a)scheduleJumpExtension(a,left,count);let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
 if((chartJumpSegment||isSpotSecondsTf()||$('tf').value==='1m'||$('tf').value==='1d'||Object.hasOwn(HISTORY_LOOKBACK_MONTHS,$('tf').value))&&viewOffset>0&&data.length&&
    Math.abs(verticalPan)<1e-9&&verticalZoom===1){
@@ -9753,7 +9823,7 @@ const levels=[...liveLevels,...paperLevels,...(chartJumpSegment?[]:realReservati
 // While viewing far-back history, an unrelated current open position can
 // be tens of thousands of dollars away. Do not compress historical candles
 // merely to keep that off-screen trading level in the fitted price range.
-const sharedLock=!isSpotSecondsTf()&&!chartJumpSegment?(sharedSavedForecast()||sharedAutomaticForecast(a,$('tf').value)):null,sharedPoints=sharedForecastPoints(sharedLock,a,$('tf').value,left,plotW/count,plotW);
+const sharedLock=!isSecondsChartTf()&&!chartJumpSegment?(sharedSavedForecast()||sharedAutomaticForecast(a,$('tf').value)):null,sharedPoints=sharedForecastPoints(sharedLock,a,$('tf').value,left,plotW/count,plotW);
 if(sharedPoints.length&&verticalZoom===1&&Math.abs(verticalPan)<1e-9){
  for(const {k} of sharedPoints){
   const row=chartIndicators.fib?sharedLock.fib?.[k]:null;
@@ -9832,19 +9902,29 @@ if(!chartJumpSegment)window.btcDailyConvergenceForecast?.render(ctx,{
  bars:a,tf:$('tf').value,left,count,bw,y,top,bottom:priceBottom,plotW
 });
 drawAutoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);
-drawDisparityStageTwoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();paintChartWeekendRegions(ctx,weekendRegions,priceBottom,volBottom,plotW,'background');data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);if(candleDimensionMode==='6d'&&webgl6dScene){return;}else if(candleDimensionMode==='6d')drawSixDVolumeCylinder(ctx,x,bw,volBottom-height,volBottom,v.c>=v.o);else{ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)}});if(webgl6dScene)ctx.drawImage(webgl6dScene,0,0,w,h);ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));paintChartWeekendRegions(ctx,weekendRegions,top,priceBottom,plotW,'labels');drawSixDChartTag(ctx,plotW,top);if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms=candleDuration[$('tf').value],stamp=new Date(nextCandleTime($('tf').value,a[a.length-1].t,futureCrosshairSlot+1)),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}if(!chartJumpSegment)drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(!chartJumpSegment&&typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment)drawRealReservationChartLines(ctx,y,top,priceBottom,0,plotW);if(!chartJumpSegment&&window.btcChartLevelVisible('switch'))window.btcDrawLiveSwitchGuide?.(ctx,{lo,hi,top,priceBottom,plotW,y});window.btcDrawCmeGaps?.(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}syncChartPriceOrderTap(cv,0,NaN,null);const liveChartPrice=isSpotSecondsTf()?(chartJumpSegment?null:a.at(-1)?.c):last,showLive=!!(liveChartPrice&&end===a.length),liveY=showLive?y(liveChartPrice):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);syncChartPriceOrderTap(cv,plotW,boxY,crosshairPrice);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(liveChartPrice),plotW+4,liveLabelY+16);}// Overlay a distinct 265-bars-ahead date ruler when it falls in view.
+drawDisparityStageTwoPaperSignals(ctx,a,start,end,left,bw,y,top,priceBottom,plotW);ctx.save();ctx.beginPath();ctx.rect(0,priceBottom,plotW,h-priceBottom);ctx.clip();paintChartWeekendRegions(ctx,weekendRegions,priceBottom,volBottom,plotW,'background');data.forEach((v,i)=>{const x=(start+i-left+.5)*bw,height=Math.max(0,Math.min(1,(v.v||0)/mx))*(volBottom-volTop);if(candleDimensionMode==='6d'&&webgl6dScene){return;}else if(candleDimensionMode==='6d')drawSixDVolumeCylinder(ctx,x,bw,volBottom-height,volBottom,v.c>=v.o);else{ctx.fillStyle=v.c>=v.o?'rgba(39,201,150,.55)':'rgba(240,92,117,.55)';ctx.fillRect(x-bw*.31,volBottom-height,Math.max(1,bw*.62),height)}});if(webgl6dScene)ctx.drawImage(webgl6dScene,0,0,w,h);ctx.restore();ctx.lineWidth=1;ctx.fillStyle='#aab8cd';ctx.fillText('Volume',8,Math.min(h-10,priceBottom+13));paintChartWeekendRegions(ctx,weekendRegions,top,priceBottom,plotW,'labels');drawSixDChartTag(ctx,plotW,top);if(slots>0){if(futureCrosshairSlot!==null&&a.length+futureCrosshairSlot>=left&&a.length+futureCrosshairSlot<left+count){let fx=(a.length+futureCrosshairSlot-left+.5)*bw;ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(fx,top);ctx.lineTo(fx,volBottom);ctx.stroke();ctx.restore();let ms=candleDuration[$('tf').value],stamp=new Date(nextCandleTime($('tf').value,a[a.length-1].t,futureCrosshairSlot+1)),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(stamp),tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,fx-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택한 미래 시간: '+dateText+' (한국시간) · 아직 캔들이 생성되지 않았습니다.'}}if(crosshairIndex!==null&&crosshairIndex>=start&&crosshairIndex<end){let i=crosshairIndex-start,x=(crosshairIndex-left+.5)*bw,v=data[i],dt=new Date(v.t),dateText=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(dt);ctx.save();ctx.strokeStyle='#d4dbe7';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,volBottom);ctx.stroke();ctx.restore();let tw=Math.min(w-10,Math.max(180,ctx.measureText(dateText).width+22)),bx=Math.max(4,Math.min(w-tw-4,x-tw/2));ctx.fillStyle='#394456';ctx.fillRect(bx,volBottom-25,tw,24);ctx.fillStyle='#ffffff';ctx.font='12px sans-serif';ctx.fillText(dateText,bx+8,volBottom-8);$('candleTime').textContent='선택 캔들: '+dateText+' (한국시간) · 시가 '+fmt(v.o)+' / 고가 '+fmt(v.h)+' / 저가 '+fmt(v.l)+' / 종가 '+fmt(v.c)}if(!chartJumpSegment)drawPaperChartLevels(ctx,paperChartLevels(),y,top,priceBottom,plotW);if(!chartJumpSegment&&typeof window.btcDrawLiveLevels==='function')window.btcDrawLiveLevels(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment)drawRealReservationChartLines(ctx,y,top,priceBottom,0,plotW);if(!chartJumpSegment&&window.btcChartLevelVisible('switch'))window.btcDrawLiveSwitchGuide?.(ctx,{lo,hi,top,priceBottom,plotW,y});window.btcDrawCmeGaps?.(ctx,{lo,hi,top,priceBottom,plotW,y});if(!chartJumpSegment&&!window.btcLiveChartPrices?.().length)drawPendingOrderLines(ctx,y,top,priceBottom,plotW);drawVolumeDividerGrip(ctx,priceBottom,plotW);const remaining=selectedCandleCountdown();if(remaining){ctx.save();const timerLabel='⏱ '+remaining;ctx.font='bold 10px -apple-system,sans-serif';const timerWidth=Math.min(76,Math.ceil(ctx.measureText(timerLabel).width+12));const timerX=Math.max(4,plotW-timerWidth-3);ctx.fillStyle='#123b38';ctx.fillRect(timerX,1,timerWidth,16);ctx.fillStyle='#d9fff3';ctx.fillText(timerLabel,timerX+5,12);ctx.restore()}if($('tf').value==='1d'&&convergence){const c=convergence,origin=c.origin,day=86400000;const px=t=>(Math.round((t-a[0].t)/day)-left+.5)*bw;const startTime=Math.max(origin,a[Math.max(0,start)].t),endTime=Math.min(c.date.getTime(),a.at(-1).t+futureSlots*day);if(endTime>startTime){ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,priceBottom-top);ctx.clip();for(const item of [[c.hi,'#f6a04d'],[c.lo,'#4cb9ed']]){const line=item[0],val=t=>line.base+line.slope*(t-origin)/day;ctx.strokeStyle=item[1];ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(px(startTime),y(val(startTime)));ctx.lineTo(px(endTime),y(val(endTime)));ctx.stroke()}ctx.restore()}const xx=px(c.date.getTime());if(xx>=0&&xx<=plotW){ctx.save();ctx.strokeStyle='#c4a1ff';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(xx,top);ctx.lineTo(xx,priceBottom);ctx.stroke();ctx.restore();ctx.fillStyle='#c4a1ff';ctx.font='bold 11px sans-serif';ctx.fillText('예상 수렴',Math.max(4,Math.min(plotW-65,xx-28)),top+13)}}syncChartPriceOrderTap(cv,0,NaN,null);const liveChartPrice=isSecondsChartTf()?(chartJumpSegment?null:a.at(-1)?.c):last,showLive=!!(liveChartPrice&&end===a.length),liveY=showLive?y(liveChartPrice):null;let liveLabelY=showLive?Math.max(top+22,Math.min(liveY-12,priceBottom-24)):null;if(crosshairPrice!==null&&Number.isFinite(crosshairPrice)){const yy=y(crosshairPrice);if(yy>=top&&yy<=priceBottom){const overlapping=showLive&&Math.abs(yy-liveY)<5;ctx.save();ctx.strokeStyle='#f3f6ff';ctx.lineWidth=overlapping?2:1.3;ctx.setLineDash(overlapping?[2,6]:[6,4]);ctx.beginPath();ctx.moveTo(0,overlapping?yy-2:yy);ctx.lineTo(plotW,overlapping?yy-2:yy);ctx.stroke();ctx.restore();const label=fmt(crosshairPrice),boxY=Math.max(top,Math.min(priceBottom-22,yy-11));ctx.fillStyle='#dce4f0';ctx.fillRect(plotW,boxY,right,22);ctx.fillStyle='#142136';ctx.font='bold 11px sans-serif';ctx.fillText(label,plotW+4,boxY+15);syncChartPriceOrderTap(cv,plotW,boxY,crosshairPrice);if(showLive&&Math.abs(boxY-liveLabelY)<25){liveLabelY=boxY+24;if(liveLabelY+24>priceBottom)liveLabelY=boxY-25;liveLabelY=Math.max(0,Math.min(h-24,liveLabelY))}}}if(showLive){const yy=liveY;ctx.save();ctx.strokeStyle='#33d7a5';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(plotW,yy);ctx.stroke();ctx.restore();ctx.fillStyle='#23b98e';ctx.fillRect(plotW,liveLabelY,right,24);ctx.fillStyle='#081521';ctx.font='bold 12px sans-serif';ctx.fillText(fmt(liveChartPrice),plotW+4,liveLabelY+16);}// Overlay a distinct 265-bars-ahead date ruler when it falls in view.
 drawChartDateRange(ctx,a,left,count,plotW,top,priceBottom);
 drawSavedChartShapes(ctx,a,left,count,plotW,top,priceBottom);
 // The pre-launch candles have different exchange provenance. Mark the
 // visible spot/futures combination without modifying any trading signals.
-if(isSpotSecondsTf()||['1d','1w','1M'].includes($('tf').value)&&data.some(b=>b.source==='spot')){
+if(isSecondsChartTf()||['1d','1w','1M'].includes($('tf').value)&&data.some(b=>b.source==='spot')){
  const hasFutures=data.some(b=>b.source!=='spot');
- const sourceText=isSpotSecondsTf()?'BTCUSDT 현물 · '+spotSecondsLabel($('tf').value):hasFutures?'BTCUSDT · 2019-09-09 이전 현물 / 이후 선물':'BTCUSDT 현물 · 선물 상장 이전';
+ const sourceText=$('tf').value==='30s'?'BTCUSDT 선물 · 30초봉':isSpotSecondsTf()?'BTCUSDT 현물 · 1초봉':hasFutures?'BTCUSDT · 2019-09-09 이전 현물 / 이후 선물':'BTCUSDT 현물 · 선물 상장 이전';
  ctx.save();ctx.font='bold 10px sans-serif';
  const textW=ctx.measureText(sourceText).width+12;
  ctx.fillStyle='rgba(10,24,41,.82)';ctx.fillRect(5,top+24,textW,17);
  ctx.fillStyle='#e6c483';ctx.fillText(sourceText,11,top+36);
  ctx.restore();
+}
+if($('tf').value==='30s'){
+ for(let i=Math.max(1,start);i<end;i++){
+  if(a[i].t-a[i-1].t<=FUTURES_THIRTY_STEP)continue;
+  const x=(i-left)*bw;
+  ctx.save();ctx.strokeStyle='#e6c483';ctx.setLineDash([4,4]);ctx.beginPath();
+  ctx.moveTo(x,top);ctx.lineTo(x,priceBottom);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#e6c483';ctx.font='bold 10px sans-serif';
+  ctx.fillText('미조회 구간',Math.min(x+4,plotW-65),top+49);ctx.restore();
+ }
 }
 renderChartTimeAxis(a,left,count,plotW);$('range').textContent='표시 '+data.length+'개 / 전체 '+a.length+'개 캔들'+(viewOffset===0?' · 오른쪽 미래 빈 공간 '+slots+'칸':'')+' · '+(viewOffset?'과거 탐색 중 ('+viewOffset+'개 전)':'최신 구간')+' · 핀치 확대/축소 · 차트 상하·좌우·대각선 이동 · 오른쪽 가격축 확대/축소'}
 let verticalPan=0,levelDragPreview=null;const chart=$('chart');let touchStart=null,holdTimer=null;
@@ -11724,7 +11804,7 @@ $('myApiClear').onclick=()=>{
 };
 
 $('sheetLong').onclick=()=>request('LONG');$('sheetShort').onclick=()=>request('SHORT');for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.addEventListener('change',updateOrderType);$('sheetCancel').onclick=()=>{$('entrySheet').style.display='none'};$('retry').onclick=()=>{if(patternComparison?.forecastLock&&!persistLockedComparison(true)){alert('저장된 비교창 보관 실패 · 새로고침 중단');return;}saveLastVisibleScreen(true);savePaperState();const url=new URL(window.location.href);url.searchParams.set('app_refresh',String(Date.now()));window.location.replace(url.toString())};$('demo').onclick=startDemo;
-$('tf').onchange=()=>{viewOffset=0;resetStableChartScale();crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;$('candleTime').textContent='';chartJumpSegment=null;if($('tf').value==='1d')void loadDailyHistory();if(isSpotSecondsTf())void refreshSpotSecondChart();render();
+$('tf').onchange=()=>{viewOffset=0;resetStableChartScale();crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;$('candleTime').textContent='';chartJumpSegment=null;if($('tf').value==='1d')void loadDailyHistory();if(isSpotSecondsTf())void refreshSpotSecondChart();syncFuturesThirtyChart();render();
  requestAnimationFrame(()=>{draw();drawRmi()});
 };$('long').onclick=()=>showOrderSheet('LONG');$('short').onclick=()=>showOrderSheet('SHORT');$('close').onclick=()=>{const p=allPaperPositions().find(x=>x.id===selectedPaperPositionId);if(!p)return;const number=hedgePositions[p.side].findIndex(x=>x.id===p.id)+1;if(confirm('가상 '+(p.side==='LONG'?'롱':'숏')+' #'+number+' 포지션 한 개만 현재가로 청산할까요?'))closePositionById(p.id,'선택 포지션 수동 청산')};$('cancel').onclick=()=>{if(!pendingOrders.length)return;if(!confirm('수동 미체결 주문 '+pendingOrders.length+'건을 모두 취소할까요?'))return;const count=pendingOrders.length;pendingOrders=[];add('가상 지정가 미체결 '+count+'건 모두 취소 · 예약 증거금 반환');savePaperState();render()};$('clear').onclick=()=>{logs=[];renderLogs();savePaperState()};
 $('paperStatsReset').onclick=()=>{
