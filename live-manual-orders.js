@@ -862,6 +862,7 @@ function renderSwitchWatch(){
   '앱 내부 가격 감시 · 바이낸스 미체결 주문 아님 · 앱 활성 중에만 작동':
   '이전 스위칭 상태 확인 중 · 바이낸스 포지션/미체결 주문 조회 후 자동 정리';
  card.append(title,details,note);
+ if(['ARMED','PAUSED'].includes(p.state)){const cancel=document.createElement('button');cancel.type='button';cancel.textContent='스위칭 예약 취소';cancel.style.cssText='margin-top:8px;padding:8px 12px;font-size:12px';cancel.onclick=()=>{if(!confirm('스위칭 예약 감시를 취소할까요? 기존 거래소 주문은 유지됩니다.'))return;const result=window.btcCancelChartSwitchWatch?.();if(!result?.ok)alert(result?.reason||'예약 취소 상태 확인 필요');};card.append(cancel);}
  if(p.state!=='ARMED'&&p.message){
   const status=document.createElement('div');status.style.cssText='font-size:11px;color:#efc9ba';
   status.textContent=p.message;card.append(status);
