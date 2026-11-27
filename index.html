@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-pattern-lock-timeframes-v365"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-pattern-persistent-lock-v366"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -7846,6 +7846,7 @@ function renderPatternComparison(){
 }
 function closePatternComparison(){
  if($('patternCompare')?.hidden)return;
+ if(patternComparison?.forecastLock){$('patternManualStatus').textContent='저장된 비교창 · 저장 풀기 후 닫을 수 있습니다.';return;}
  if(patternEntrySession)closePatternEntry();
  $('patternCompare').hidden=true;patternComparison=null;
  document.body.style.overflow=patternCompareBodyOverflow;
@@ -8518,6 +8519,7 @@ function togglePatternForecastLock(){
  const state=patternComparison;if(!state||patternManualBusy)return;
  const view=state.views.current,status=$('patternManualStatus');
  if(state.forecastLock){
+  try{localStorage.removeItem(HANINE_LOCK_KEY);if(localStorage.getItem(HANINE_LOCK_KEY)!==null)throw Error('저장 해제 실패');}catch(e){status.textContent='저장 풀기 실패 · 다시 시도하세요.';return;}
   state.forecastLock=null;view.replayKey=null;view.replaySource=null;
   $('patternCompareDisplayTf').disabled=false;$('patternCompareHistoricalTf').disabled=false;
   status.textContent='저장 풀기 · 실시간 예측 연동';renderPatternComparison();return;
@@ -8526,7 +8528,8 @@ function togglePatternForecastLock(){
  const source=patternDisplayBars(state),index=patternCompareLimit(view),scenario=view.replayScenario;
  if(!scenario?.prices||scenario.prices.length<2){status.textContent='저장할 미래 예측 자료가 없습니다.';return;}
  state.forecastLock={tf:patternDisplayTf(state),time:source[index].t,scenario:JSON.parse(JSON.stringify(scenario)),fib:patternCompareProjectedFibLevels(source.slice(Math.max(0,index-264),index+1),scenario.prices)};
- status.textContent='저장됨 · 미래 가격과 기준 시각 고정';renderPatternComparison();
+ if(!persistLockedComparison(true)){state.forecastLock=null;status.textContent='기기 저장 공간 부족 또는 저장 실패 · 다시 시도하세요.';renderPatternComparison();return;}
+ status.textContent='저장됨 · 앱 재실행 및 업데이트 후 복원';renderPatternComparison();
 }
 function initPatternComparison(){
  initPatternEntry();
@@ -8843,13 +8846,15 @@ async function restoreLastVisibleScreen(){
    // Use ONLY the chart history already restored from IndexedDB. A PWA
    // wake must never launch a multi-year REST history download by itself.
    // If iOS evicted its cache, keep the saved view for manual restoration.
-   const bars=tf==='1m'&&minuteChartArchive?.length?
-    minuteChartArchive:candles[tf];
+   const backup=snap.backupSources||{};
+   const live=tf==='1m'&&minuteChartArchive?.length?minuteChartArchive:candles[tf];
+   const bars=snap.forecastLock?mergeDailyCandles(backup[tf]||[],live||[]):live;
    if(!Array.isArray(bars)||bars.length<230)return;
    let cachedDisplayBars=null;
    if(snap.displayTf&&snap.displayTf!==tf){
     cachedDisplayBars=snap.displayTf==='1m'&&minuteChartArchive?.length?
      minuteChartArchive:candles[snap.displayTf];
+    if(snap.forecastLock)cachedDisplayBars=mergeDailyCandles(backup[snap.displayTf]||[],cachedDisplayBars||[]);
     const c=indicatorPatternConfig(snap.displayTf);
     if(!Array.isArray(cachedDisplayBars)||
        cachedDisplayBars.length<Math.max(...c.ma,c.bb)+c.window+2)return;
@@ -8877,14 +8882,20 @@ async function restoreLastVisibleScreen(){
      $('patternCompareDisplayTf').value=snap.displayTf;
      current.replayKey=null;current.replaySource=null;
     }
-    if(snap.historicalTf&&snap.historicalTf!==tf&&
+    if(snap.forecastLock&&snap.manualReference?.bars?.length){
+     const ref=snap.manualReference;patternComparison.manualReference=ref;
+     const historical=patternComparison.views.historical;historical.displayTf=ref.tf;historical.displayBars=ref.bars;historical.index=ref.index;historical.baseIndex=ref.index;
+     $('patternCompareHistoricalTf').value=ref.tf;$('patternCompareHistoricalTitle').textContent='과거 실제 차트 (직접 비교)';
+     const stamp=patternCompareLocalInputDate(ref.time);$('patternManualDate').value=stamp.slice(0,10);$('patternManualTime').value=stamp.slice(11);
+    }else if(snap.historicalTf&&snap.historicalTf!==tf&&
        Object.hasOwn(SIMILAR_PATTERN_LABELS,snap.historicalTf)){
      // On iPhone reopen, use ONLY existing cache: never run a fresh
      // multi-year download just to recreate the historical sub-pane.
      const matchTime=patternHistoricalMatchTime(patternComparison);
-     const historic=snap.historicalTf==='1m'?
+     const cachedHistoric=snap.historicalTf==='1m'?
       cachedSegmentFor('1m',matchTime)?.bars||
        minuteChartArchive||candles['1m']:candles[snap.historicalTf];
+     const historic=snap.forecastLock?mergeDailyCandles(backup[snap.historicalTf]||[],cachedHistoric||[]):cachedHistoric;
      const historical=patternComparison.views.historical,
       candidate=patternHistoricalAnchorIndex(historic,snap.historicalTf,matchTime);
      const conf=indicatorPatternConfig(snap.historicalTf),
@@ -8925,6 +8936,7 @@ async function restoreLastVisibleScreen(){
      if(row.show&&typeof row.show==='object')
       view.show={...view.show,...row.show};
     }
+    if(snap.forecastLock){patternComparison.forecastLock=snap.forecastLock;$('patternManualStatus').textContent='저장된 비교창 복원 완료';}
     renderPatternComparison();
    }
   }
@@ -8968,6 +8980,7 @@ function initIndicatorPatternSearch(){
   indicatorPatternSearchBusy=true;btn.disabled=true;tfSelect.disabled=true;
   // A new search must never leave a previous rank, scenario or controls
   // visible, including while new historical candles are loading.
+  if(patternComparison?.forecastLock||readPersistentComparison()){indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false;status.textContent='저장된 비교창을 먼저 저장 풀기 해주세요.';return;}
   closePatternComparison();
   resultsEl.replaceChildren();
   status.textContent='이전 검색 결과 초기화 · 새 검색 시작…';
@@ -10773,13 +10786,49 @@ $('oiToggle').addEventListener('click',()=>{const p=$('oiPanel'),show=p.hidden;p
 // v345. Remember the LAST visible screen; no API keys or private positions
 // are stored here. iOS can suspend or discard a PWA while the screen is off.
 const HANINE_LAST_VIEW_KEY='hanine-last-screen-v345';
+const HANINE_LOCK_KEY='hanine-saved-comparison-v1';
+let lastLockScreenWrite=0;
 const HANINE_TABS=new Set(['chart','position','history','liquidation','settings']);
 let restoringLastView=false,lastViewSavedAt=0,restoringViewStarted=false;
+function readPersistentComparison(){
+ try{const x=JSON.parse(localStorage.getItem(HANINE_LOCK_KEY)||'null');return x?.version===1&&x.comparison?.forecastLock?.scenario?.prices?.length>1?x:null;}catch(_){return null;}
+}
 function readLastView(){
  try{
+  const locked=readPersistentComparison();if(locked)return locked;
   const value=JSON.parse(localStorage.getItem(HANINE_LAST_VIEW_KEY)||'null');
   return value&&value.version===1&&HANINE_TABS.has(value.tab)?value:null;
  }catch(_){return null;}
+}
+function persistLockedComparison(force=false){
+ const state=patternComparison;if(!state?.forecastLock||$('patternCompare')?.hidden)return false;
+ if(!force&&Date.now()-lastLockScreenWrite<5000)return true;
+ try{
+  const snap=lastComparisonSnapshot(),ref=state.manualReference;
+  // A compact self-contained backup; retain all ranking windows and the
+  // visible historical window without depending on evictable chart caches.
+  const sources={};
+  const add=(tf,bars,index,before=340,after=0)=>{
+   if(!bars?.length||!Number.isInteger(index)||index<0)return;
+   sources[tf]=mergeDailyCandles(sources[tf]||[],bars.slice(Math.max(0,index-before),index+after+1));
+  };
+  add(state.tf,state.bars,state.bars.length-1,700);
+  for(const m of state.matches)add(state.tf,state.bars,m.index,340,1100);
+  for(const name of ['current','historical']){
+   const view=state.views[name],tf=name==='current'?patternDisplayTf(state):patternHistoricalTf(state),bars=name==='current'?patternDisplayBars(state):patternHistoricalData(state);
+   if(name==='current'||!ref)add(tf,bars,view.index,700,350);
+  }
+  let manual=null;
+  if(ref){
+   const v=state.views.historical,bars=ref.bars;
+   const subset=mergeDailyCandles(bars.slice(Math.max(0,ref.index-700),ref.index+1101),bars.slice(Math.max(0,v.index-700),v.index+351));
+   manual={tf:ref.tf,time:ref.time,bars:subset,replayBars:ref.replayBars,index:patternHistoricalAnchorIndex(subset,ref.tf,ref.time)};
+  }
+  const value={version:1,tab:'chart',mode:'compare',savedAt:Date.now(),comparison:{...snap,forecastLock:state.forecastLock,manualReference:manual,backupSources:sources}};
+  const json=JSON.stringify(value);localStorage.setItem(HANINE_LOCK_KEY,json);
+  if(localStorage.getItem(HANINE_LOCK_KEY)!==json)throw Error('저장 검증 실패');
+  lastLockScreenWrite=Date.now();return true;
+ }catch(e){console.warn('저장 비교창 보관 실패',e);return false;}
 }
 function lastComparisonSnapshot(){
  const state=patternComparison;
@@ -10804,6 +10853,8 @@ function lastComparisonSnapshot(){
 }
 function saveLastVisibleScreen(force=false){
  if(restoringLastView)return;
+ if(patternComparison?.forecastLock&&!$('patternCompare')?.hidden){persistLockedComparison(force);return;}
+ if(readPersistentComparison())return;
  const now=Date.now();
  if(!force&&now-lastViewSavedAt<1600)return;
  const tab=document.querySelector('.nav-btn.active')?.dataset.tab||'chart';
@@ -11308,7 +11359,7 @@ $('myApiClear').onclick=()=>{
    '입력칸만 지웠어요 · 저장된 API 키 없음');
 };
 
-$('sheetLong').onclick=()=>request('LONG');$('sheetShort').onclick=()=>request('SHORT');for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.addEventListener('change',updateOrderType);$('sheetCancel').onclick=()=>{$('entrySheet').style.display='none'};$('retry').onclick=()=>{savePaperState();const url=new URL(window.location.href);url.searchParams.set('app_refresh',String(Date.now()));window.location.replace(url.toString())};$('demo').onclick=startDemo;
+$('sheetLong').onclick=()=>request('LONG');$('sheetShort').onclick=()=>request('SHORT');for(const radio of document.querySelectorAll('input[name="orderType"]'))radio.addEventListener('change',updateOrderType);$('sheetCancel').onclick=()=>{$('entrySheet').style.display='none'};$('retry').onclick=()=>{if(patternComparison?.forecastLock&&!persistLockedComparison(true)){alert('저장된 비교창 보관 실패 · 새로고침 중단');return;}saveLastVisibleScreen(true);savePaperState();const url=new URL(window.location.href);url.searchParams.set('app_refresh',String(Date.now()));window.location.replace(url.toString())};$('demo').onclick=startDemo;
 $('tf').onchange=()=>{viewOffset=0;resetStableChartScale();crosshairIndex=null;futureCrosshairSlot=null;crosshairPrice=null;$('candleTime').textContent='';chartJumpSegment=null;if($('tf').value==='1d')void loadDailyHistory();render();
  requestAnimationFrame(()=>{draw();drawRmi()});
 };$('long').onclick=()=>showOrderSheet('LONG');$('short').onclick=()=>showOrderSheet('SHORT');$('close').onclick=()=>{const p=allPaperPositions().find(x=>x.id===selectedPaperPositionId);if(!p)return;const number=hedgePositions[p.side].findIndex(x=>x.id===p.id)+1;if(confirm('가상 '+(p.side==='LONG'?'롱':'숏')+' #'+number+' 포지션 한 개만 현재가로 청산할까요?'))closePositionById(p.id,'선택 포지션 수동 청산')};$('cancel').onclick=()=>{if(!pendingOrders.length)return;if(!confirm('수동 미체결 주문 '+pendingOrders.length+'건을 모두 취소할까요?'))return;const count=pendingOrders.length;pendingOrders=[];add('가상 지정가 미체결 '+count+'건 모두 취소 · 예약 증거금 반환');savePaperState();render()};$('clear').onclick=()=>{logs=[];renderLogs();savePaperState()};
@@ -11327,7 +11378,7 @@ $('autoMarketMode').addEventListener('change',()=>{
   if(autoPendingLimit)cancelAutoPendingLimit('사용자가 시장 모드 변경');
   savePaperState();render();updatePosition();void pushSyncSettings();
 });
-$('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState()});$('marginPct').addEventListener('change',()=>{calc();savePaperState()});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
+$('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState()});$('marginPct').addEventListener('change',()=>{calc();savePaperState()});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){if(patternComparison?.forecastLock&&!persistLockedComparison(true))return;saveLastVisibleScreen(true);savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
 
 // Local-only RMI alert. A system notification can be shown while the PWA's
 // JavaScript is running; iOS may suspend it when the screen is locked.
