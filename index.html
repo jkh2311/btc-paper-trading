@@ -8259,7 +8259,7 @@ function renderPatternComparison(){
 function closePatternComparison(){
  if($('patternCompare')?.hidden)return;
  if(patternComparison?.forecastLock&&!persistLockedComparison(true)){$('patternManualStatus').textContent='저장 확인 실패 · 다시 시도하세요.';return;}
- if(patternComparison?.manualReference&&!patternComparison.forecastLock)persistLockedComparison(true,true);
+ if(patternComparison&&!patternComparison.forecastLock)persistLockedComparison(true,true);
  if(patternEntrySession)closePatternEntry();
  $('patternCompare').hidden=true;patternComparison=null;
  document.body.style.overflow=patternCompareBodyOverflow;
@@ -8274,7 +8274,7 @@ function setPatternComparisonRank(rank){
  state.views.current.replayKey=null;$('patternManualStatus').textContent='';
  const selected=state.matches[rank-1];
  if(!selected||!state.bars[selected.index])return;
- state.rank=rank;state.match={...selected};
+ state.rank=rank;state.match={...selected};state.applySharedSelection=true;
  updatePatternCompareHistorySnapshot();
  // A newly selected match can have fewer available subsequent candles.
  // Preserve the user's current-chart zoom, but avoid a blank future viewport.
@@ -8321,7 +8321,7 @@ function setPatternComparisonRank(rank){
  $('patternCompareHistoricalTitle').textContent='과거 실제 차트 ('+rank+'위)';
  for(const button of $('patternCompareRanks')?.querySelectorAll('button[data-rank]')||[])
   button.setAttribute('aria-pressed',String(Number(button.dataset.rank)===rank));
- renderPatternComparison();
+ renderPatternComparison();saveLastVisibleScreen(true);draw();
  // This is a deliberate ranking tap; automatically retrieve the newly
  // selected old 1m date if the saved chunk belongs to the previous rank.
  if(requestedHistoricalTf==='1m'&&historicalTf!=='1m')
@@ -8353,7 +8353,7 @@ function openPatternComparison(tf,bars,matches,rank){
     !match||match.index>=currentIndex)return;
  const config=indicatorPatternConfig(tf);
  patternComparison={
-  tf,bars,config,match:{...match},matches:matches.map(x=>({...x})),rank,
+  tf,bars,config,match:{...match},matches:matches.map(x=>({...x})),rank,applySharedSelection:!restoringLastView,
   forecastBars:patternCompareFutureBars,
   views:{
    current:{index:currentIndex,baseIndex:currentIndex,count:config.window,
@@ -8385,7 +8385,7 @@ function openPatternComparison(tf,bars,matches,rank){
  document.body.style.overflow='hidden';
  $('patternCompare').hidden=false;
  const automatic=readAutomaticComparison()?.comparison;
- if(automatic?.manualReference)attachManualReference(patternComparison,automatic.manualReference);
+ if(restoringLastView&&automatic?.manualReference)attachManualReference(patternComparison,automatic.manualReference);
  saveLastVisibleScreen(true);
  requestAnimationFrame(renderPatternComparison);
  $('patternCompareClose')?.focus({preventScroll:true});
@@ -8849,6 +8849,7 @@ async function loadPatternManualReference(tf,time,keepStart=false){
  const useReference=ref=>{
   attachManualReference(state,{...ref,time,startedAt:keepStart?state.manualReference?.startedAt:Date.now(),forecast:keepStart?state.manualReference?.forecast:null});
   status.textContent=(existingLock?'저장 유지 · ':'자동 유지 · 실시간 예측 연동 · ')+patternCompareLocalInputDate(state.manualReference.time).replace('T',' ')+' KST';
+  if(!keepStart)state.applySharedSelection=true;
   renderPatternComparison();saveLastVisibleScreen(true);draw();
  };
  const current=state.manualReference;
@@ -9367,7 +9368,7 @@ async function restoreLastVisibleScreen(reopen=false){
      const cachedHistoric=snap.historicalTf==='1m'?
       cachedSegmentFor('1m',matchTime)?.bars||
        minuteChartArchive||candles['1m']:candles[snap.historicalTf];
-     const historic=snap.forecastLock?mergeDailyCandles(backup[snap.historicalTf]||[],cachedHistoric||[]):cachedHistoric;
+     const historic=snap.backupSources?mergeDailyCandles(backup[snap.historicalTf]||[],cachedHistoric||[]):cachedHistoric;
      const historical=patternComparison.views.historical,
       candidate=patternHistoricalAnchorIndex(historic,snap.historicalTf,matchTime);
      const conf=indicatorPatternConfig(snap.historicalTf),
@@ -9393,7 +9394,7 @@ async function restoreLastVisibleScreen(reopen=false){
       if(!Number.isFinite(time))return fallback;
       return patternCompareNearestIndex(series,time);
      };
-     view.index=toIndex(row.time,view.index);
+     view.index=name==='current'&&row.followLatest?series.length-1:toIndex(row.time,view.index);
      view.baseIndex=toIndex(row.base,view.baseIndex);
      view.inspectIndex=Number.isFinite(row.inspect)?
       toIndex(row.inspect,null):null;
@@ -9441,14 +9442,41 @@ function initIndicatorPatternSearch(){
   if(hint)hint.textContent=config.name+
    ' · 이평 50% / 이격도 30% / 볼밴 15% / RMI 5% · BTC 절대가격 제외 · 유사도 ≠ 승률';
  };
- tfSelect.addEventListener('change',()=>{
-  if(!indicatorPatternSearchBusy){resultsEl.replaceChildren();status.textContent='';}
-  updateHint();
- });
+ tfSelect.addEventListener('change',updateHint);
  $('tf')?.addEventListener('change',()=>{
   if(!indicatorPatternSearchBusy&&!isSecondsChartTf()){tfSelect.value=$('tf').value;updateHint();}
  });
  tfSelect.value=isSecondsChartTf($('tf')?.value)?'1m':$('tf')?.value||'4h';updateHint();
+ const renderResults=(tf,bars,matches)=>{
+  resultsEl.replaceChildren();
+   for(const [index,match] of matches.entries()){
+    const button=document.createElement('button');
+    button.type='button';
+    button.style.cssText='display:block;text-align:left;background:#1c344c;border:1px solid #4e7394;border-radius:7px;padding:8px;color:#e6f3ff;font-size:11px;line-height:1.65';
+    const dt=new Date(match.time+9*3600000).toISOString().replace('T',' ').slice(0,16);
+    const out=match.returns.map(x=>x.bars+'봉 '+(x.percent>=0?'+':'')+
+     x.percent.toFixed(1)+'%').join(' · ');
+    button.textContent=(index+1)+'위 · '+dt+' KST · 유사도 '+
+     match.similarity.toFixed(1)+'점'+
+     (match.similarity<55?' · ⚠ 유사도 부족':'')+
+     '\n이후 실제 변화: '+out;
+    button.style.whiteSpace='pre-line';
+    button.addEventListener('click',()=>{
+     openPatternComparison(tf,bars,matches,index+1);
+    });
+    resultsEl.appendChild(button);
+   }
+ };
+ const restored=readAutomaticComparison()?.comparison||readPersistentComparison()?.comparison;
+ if(restored?.matches?.length&&SIMILAR_PATTERN_LABELS[restored.tf]){
+  tfSelect.value=restored.tf;
+  seenByTf.set(restored.tf,restored.seen||restored.matches.map(m=>m.at));
+  status.textContent='이전 유사차트 검색 결과 · 순위를 누르면 다시 표시';
+  const bars=restored.backupSources?.[restored.tf]||[];
+  const matches=restored.matches.map(m=>({...m,index:patternCompareNearestIndex(bars,m.at)}));
+  if(bars.length&&matches.every(m=>bars[m.index]?.t===m.at))renderResults(restored.tf,bars,matches);
+  updateHint();
+ }
  const search=async(research=false)=>{
   if(indicatorPatternSearchBusy)return;
   if(demo){status.textContent='실제 과거 시세 조회 모드에서 검색할 수 있어.';return}
@@ -9456,12 +9484,7 @@ function initIndicatorPatternSearch(){
   const excluded=research?(seenByTf.get(tf)||[]):[];
   if(research&&!excluded.length)return;
   indicatorPatternSearchBusy=true;btn.disabled=true;retry.disabled=true;tfSelect.disabled=true;
-  // A new search must never leave a previous rank, scenario or controls
-  // visible, including while new historical candles are loading.
-  if(patternComparison?.forecastLock||readPersistentComparison()){indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false;syncRetry();await restoreLastVisibleScreen(true);return;}
-  closePatternComparison();
-  clearAutomaticComparison();clearSharedPatternSelection();patternManualCache.clear();draw();
-  resultsEl.replaceChildren();
+
   status.textContent=research?'이전 후보 제외 · 새 유사 패턴 검색 중…':'이전 검색 결과 초기화 · 새 검색 시작…';
   try{
    status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 과거 캔들 기록 확인 중…';
@@ -9506,23 +9529,14 @@ function initIndicatorPatternSearch(){
     ') · '+(weak?'⚠ 충분히 닮은 구간을 찾지 못함 (최고 '+best.toFixed(1)+
     '점) · 아래는 상대적으로 가까운 후보일 뿐이야':
     '유사 TOP '+matches.length+' · 누르면 비교 차트 표시')+(research?' · 최신 완료봉 기준 재평가 · 이전 '+excluded.length+'개 후보 제외':'');
-   for(const [index,match] of matches.entries()){
-    const button=document.createElement('button');
-    button.type='button';
-    button.style.cssText='display:block;text-align:left;background:#1c344c;border:1px solid #4e7394;border-radius:7px;padding:8px;color:#e6f3ff;font-size:11px;line-height:1.65';
-    const dt=new Date(match.time+9*3600000).toISOString().replace('T',' ').slice(0,16);
-    const out=match.returns.map(x=>x.bars+'봉 '+(x.percent>=0?'+':'')+
-     x.percent.toFixed(1)+'%').join(' · ');
-    button.textContent=(index+1)+'위 · '+dt+' KST · 유사도 '+
-     match.similarity.toFixed(1)+'점'+
-     (match.similarity<55?' · ⚠ 유사도 부족':'')+
-     '\n이후 실제 변화: '+out;
-    button.style.whiteSpace='pre-line';
-    button.addEventListener('click',()=>{
-     openPatternComparison(tf,bars,matches,index+1);
-    });
-    resultsEl.appendChild(button);
+   try{
+    persistPatternSearchResults(tf,bars,matches,seenByTf.get(tf));
+    localStorage.removeItem(HANINE_LOCK_KEY);
+    clearSharedPatternSelection();patternManualCache.clear();
+    renderResults(tf,bars,matches);
    }
+   catch(e){status.textContent+=' · 검색 결과 보관 실패';}
+   draw();
   }catch(e){status.textContent='검색 실패: '+String(e.message||e)}
   finally{indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false;syncRetry()}
  };
@@ -9925,9 +9939,14 @@ function publishSharedPatternSelection(state,bar){
  if(!Number.isFinite(time)||!(bar?.c>0))return;
  const selected=readSharedPatternSelection(),rank=ref?null:state.rank;
  const manualStart=ref?.startedAt||null,market=ref?.market;
- const same=selected?.time===time&&selected.rank===rank&&selected.manualStart===manualStart&&selected.market===market;
+ const same=!state.applySharedSelection&&selected?.time===time&&selected.rank===rank&&selected.manualStart===manualStart&&selected.market===market;
  const saved=state.forecastLock||ref?.forecast;
  const anchor=same?selected.anchor:{time:ref?.startedAt??Date.now(),price:saved?.scenario?.prices?.[0]??bar.c};
+ if(state.applySharedSelection){
+  if(chartJumpSegment)resetStableChartScale();
+  chartJumpSegment=null;viewOffset=0;
+  state.applySharedSelection=false;
+ }
  state.projectionAnchor=anchor;
  if(same&&selected.forecastBars===state.forecastBars&&selected.blend===patternCompareBlendEnabled)return;
  storeSharedPatternSelection({version:1,time,market,rank,manualStart,forecastBars:state.forecastBars,blend:patternCompareBlendEnabled,anchor});
@@ -11429,7 +11448,7 @@ function readAutomaticComparison(){
   try{
    const saved=JSON.parse(localStorage.getItem(HANINE_AUTO_COMPARISON_KEY)||'null');
    const ref=saved?.comparison?.manualReference;
-   automaticComparison=ref?.bars?.length?saved:null;
+   automaticComparison=saved?.comparison?.matches?.length?saved:null;
    if(ref&&!Number.isFinite(ref.startedAt)){
     ref.startedAt=Number.isFinite(saved.savedAt)?saved.savedAt:Date.now();
     try{localStorage.setItem(HANINE_AUTO_COMPARISON_KEY,JSON.stringify(saved));}catch(_){}
@@ -11438,6 +11457,22 @@ function readAutomaticComparison(){
   catch(_){automaticComparison=null;}
  }
  return automaticComparison;
+}
+function storeAutomaticPatternSnapshot(value){
+ const json=JSON.stringify(value);
+ localStorage.setItem(HANINE_AUTO_COMPARISON_KEY,json);
+ if(localStorage.getItem(HANINE_AUTO_COMPARISON_KEY)!==json)throw Error('검색 결과 보관 확인 실패');
+ automaticComparison=value;
+}
+function persistPatternSearchResults(tf,bars,matches,seen){
+ const config=indicatorPatternConfig(tf),tail=bars.slice(-700),windows=[tail];
+ for(const m of matches)windows.push(bars.slice(Math.max(0,m.index-340),m.index+1+PATTERN_COMPARE_MAX_FUTURE));
+ const backup=windows.reduce((a,b)=>mergeDailyCandles(a,b),[]);
+ const rows=matches.map(m=>({...m,at:bars[m.index]?.t}));
+ storeAutomaticPatternSnapshot({version:1,tab:'chart',mode:'compare',savedAt:Date.now(),
+  comparison:{tf,rank:1,forecastBars:patternCompareFutureBars,displayTf:tf,historicalTf:tf,
+   matches:rows,seen,views:{current:{followLatest:true,count:config.window}},
+   backupSources:{[tf]:backup}}});
 }
 function clearAutomaticComparison(){
  automaticComparison=null;
@@ -11460,7 +11495,7 @@ function readLastView(){
  }catch(_){return null;}
 }
 function persistLockedComparison(force=false,automatic=false){
- const state=patternComparison;if(!(automatic?state?.manualReference:state?.forecastLock)||$('patternCompare')?.hidden)return false;
+ const state=patternComparison;if(!(automatic?state?.matches?.length:state?.forecastLock)||$('patternCompare')?.hidden)return false;
  if(!force&&Date.now()-lastLockScreenWrite<5000)return true;
  try{
   const snap=lastComparisonSnapshot(),ref=state.manualReference;
@@ -11485,9 +11520,11 @@ function persistLockedComparison(force=false,automatic=false){
   }
   const value={version:1,tab:'chart',mode:'compare',savedAt:Date.now(),comparison:{...snap,forecastLock:state.forecastLock,manualReference:manual,backupSources:sources}};
   const key=automatic?HANINE_AUTO_COMPARISON_KEY:HANINE_LOCK_KEY;
-  if(automatic)automaticComparison=value;
-  const json=JSON.stringify(value);localStorage.setItem(key,json);
-  if(localStorage.getItem(key)!==json)throw Error('저장 검증 실패');
+  if(automatic)storeAutomaticPatternSnapshot(value);
+  else{
+   const json=JSON.stringify(value);localStorage.setItem(key,json);
+   if(localStorage.getItem(key)!==json)throw Error('저장 검증 실패');
+  }
   lastLockScreenWrite=Date.now();return true;
  }catch(e){console.warn('저장 비교창 보관 실패',e);return false;}
 }
@@ -11500,7 +11537,7 @@ function lastComparisonSnapshot(){
    patternDisplayBars(state):patternHistoricalData(state);
   if(!view||!Array.isArray(bars))continue;
   const timeOf=i=>Number.isInteger(i)?bars[i]?.t:null;
-  views[name]={time:timeOf(view.index),base:timeOf(view.baseIndex),
+  views[name]={time:timeOf(view.index),base:timeOf(view.baseIndex),followLatest:name==='current'&&view.index===bars.length-1,
    inspect:timeOf(view.inspectIndex),count:view.count,
    futureShift:view.futureShift||0,pastReveal:view.pastReveal||0,priceZoom:view.priceZoom,
    pricePan:view.pricePan,inspectPrice:view.inspectPrice,show:view.show};
@@ -11510,7 +11547,7 @@ function lastComparisonSnapshot(){
  })).filter(m=>Number.isFinite(m.at));
  return {tf:state.tf,rank:state.rank,forecastBars:state.forecastBars,
   displayTf:patternDisplayTf(state),historicalTf:patternHistoricalTf(state),
-  matches,views};
+  matches,views,seen:readAutomaticComparison()?.comparison?.seen};
 }
 function saveLastVisibleScreen(force=false){
  if(restoringLastView)return;
@@ -11521,7 +11558,7 @@ function saveLastVisibleScreen(force=false){
  if(!HANINE_TABS.has(tab))return;
  const compare=!$('patternCompare')?.hidden;
  const expanded=!$('expandedChartOverlay')?.hidden;
- if(compare&&patternComparison?.manualReference&&force)persistLockedComparison(true,true);
+ if(compare&&patternComparison&&force)persistLockedComparison(true,true);
  const value={version:1,tab,mode:compare?'compare':expanded?'expanded':'tab',
   savedAt:now,comparison:compare?lastComparisonSnapshot():null};
  try{const locked=readPersistentComparison();if(locked&&!compare){localStorage.setItem(HANINE_LOCK_KEY,JSON.stringify({...locked,mode:value.mode,tab:value.tab}));}localStorage.setItem(HANINE_LAST_VIEW_KEY,JSON.stringify(value));
@@ -12039,7 +12076,7 @@ $('autoMarketMode').addEventListener('change',()=>{
   if(autoPendingLimit)cancelAutoPendingLimit('사용자가 시장 모드 변경');
   savePaperState();render();updatePosition();void pushSyncSettings();
 });
-$('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState()});$('marginPct').addEventListener('change',()=>{calc();savePaperState()});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){if(patternComparison?.forecastLock&&!persistLockedComparison(true))return;saveLastVisibleScreen(true);savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
+$('sizeMode').addEventListener('change',()=>{syncSizeMode();calc();savePaperState()});$('marginPct').addEventListener('change',()=>{calc();savePaperState()});window.addEventListener('resize',()=>{draw();drawRmi();drawOi()});async function checkAppUpdate(){if(document.visibilityState==='hidden')return;try{const url=new URL(window.location.href);url.searchParams.set('update_check',String(Date.now()));const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)return;const html=await response.text();const match=html.match(/<meta name="btc-app-build" content="([^"]+)"/);const current=document.querySelector('meta[name="btc-app-build"]')?.content;if(match&&current&&match[1]!==current){if(patternComparison&&!$('patternCompare')?.hidden)return;saveLastVisibleScreen(true);savePaperState();const next=new URL(window.location.href);next.searchParams.delete('update_check');next.searchParams.set('app_refresh',String(Date.now()));window.location.replace(next.toString())}}catch(e){console.warn('앱 업데이트 확인 실패',e)}}
 
 // Local-only RMI alert. A system notification can be shown while the PWA's
 // JavaScript is running; iOS may suspend it when the screen is locked.
