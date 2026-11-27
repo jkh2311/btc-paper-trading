@@ -1818,7 +1818,7 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
 </style></head><body><header class="app-header"><div class="brand"><b>₿ BTCUSDT</b><small>실시간 · 모의매매</small></div><div class="header-actions"><span class="pill" id="mode">연결 중</span><button id="autoPaperQuickToggle" type="button" aria-pressed="false" aria-label="자동 모의매매 켜기">AUTO OFF</button><button id="retry" class="icon-btn" aria-label="앱 새로고침" title="앱 전체 새로고침">↻</button><button id="settingsTop" class="icon-btn" aria-label="설정" title="설정">⚙</button></div></header>
 <main>
 <section class="tab-page active" id="page-chart">
- <div class="price-panel"><div class="quote-wrap"><div class="price" id="price">-- USDT</div><div id="funding" class="funding" aria-live="polite">펀딩 조회 중</div></div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="1s">1초 · 현물</option><option value="10s">10초 · 현물</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select></div><div id="convergenceBanner" class="convergence-banner" hidden role="status"></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
+ <div class="price-panel"><div class="quote-wrap"><div class="price" id="price">-- USDT</div><div id="funding" class="funding" aria-live="polite">펀딩 조회 중</div></div><div class="tf-tabs"><select id="tf" aria-label="차트 시간봉"><option value="1m">1분</option><option value="1s">1초 · 현물</option><option value="30s">30초 · 현물</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select></div><div id="convergenceBanner" class="convergence-banner" hidden role="status"></div><div id="status" style="display:none" aria-live="polite"></div><button id="demo" style="display:none" tabindex="-1" aria-hidden="true">데모 가격 사용</button></div>
  <div class="daily-volume" onclick="openVolume30()" id="dailyVolumeTrigger" role="button" tabindex="0" aria-label="최근 30일 일별 BTC 거래량 보기" aria-expanded="false" aria-controls="volume30Overlay">
  <div class="daily-volume-half">
   <div class="daily-volume-top"><span>오늘 거래량</span><strong id="dayVol">조회 중…</strong></div>
@@ -2131,7 +2131,7 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
  </div>
 </div>
 <div id="expandedChartOverlay" hidden role="dialog" aria-modal="true" aria-label="BTC 차트 확대 화면">
-  <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><button type="button" id="expandedChartLatest" aria-label="최신 캔들로 이동" title="최신 차트로 이동">최신</button><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="1s">1초 · 현물</option><option value="10s">10초 · 현물</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
+  <div id="expandedChartHeader"><label class="focus-strategy-control" for="expandedRmiStrategy"><select id="expandedRmiStrategy" aria-label="확대 차트 RMI 신호 전략"><option value="range">1. 모의매매</option><option value="bear">2. 하락추세</option><option value="bull">3. 상승추세</option></select></label><button type="button" id="expandedChartLatest" aria-label="최신 캔들로 이동" title="최신 차트로 이동">최신</button><select id="expandedChartTf" class="expanded-tf-select" aria-label="확대 차트 분봉 선택"><option value="1m">1분</option><option value="1s">1초 · 현물</option><option value="30s">30초 · 현물</option><option value="3m">3분</option><option value="5m">5분</option><option value="10m">10분</option><option value="15m">15분</option><option value="30m">30분</option><option value="1h">1시간</option><option value="4h">4시간</option><option value="6h">6시간</option><option value="12h">12시간</option><option value="1d">일봉</option><option value="1w">주봉</option><option value="1M">월봉</option></select><button type="button" id="expandedChartClose" aria-label="확대 차트 닫기">✕ 닫기</button></div>
 </div>
 <div id="signalAlertToast" hidden role="status" aria-live="assertive" style="position:fixed;left:12px;right:12px;top:56px;z-index:9998;padding:13px 16px;border:1px solid #8bc5b6;border-radius:12px;color:white;font-size:15px;font-weight:750;box-shadow:0 9px 30px #0009;text-align:center;pointer-events:none"></div>
 <div id="tradeBar" class="trade-bar"><button id="long" class="buy" disabled>롱 진입</button><button id="short" class="sell" disabled>숏 진입</button>
@@ -2951,7 +2951,7 @@ async function restoreChartHistoryCache(){
  try{
   // Wait for app declarations + base 1000-bar live data; merging in either
   // order preserves live values for overlapping timestamps.
-  const tfList=['1s','10s','1m','3m','5m','10m','15m','30m','1h','4h','6h','12h','1d','1w','1M'];
+  const tfList=['1s','30s','1m','3m','5m','10m','15m','30m','1h','4h','6h','12h','1d','1w','1M'];
   for(const tf of tfList){
    const row=await chartCacheRead(CHART_HISTORY_STORE,tf).catch(()=>null);
    const saved=normalizeChartCacheBars(row?.bars);
@@ -3044,7 +3044,11 @@ function updateIntradayHistoryJump(){
   if(isSpotSecondsTf(tf)){
    button.disabled=chartJumpBusy||demo;
    button.textContent=chartJumpSegment?.tf===tf?'최신 ⟶':spotSecondsLabel(tf)+' 날짜 이동';
-   button.title='최근 1년 바이낸스 현물 '+spotSecondsLabel(tf);
+   button.title=tf==='30s'?'최근 1개월 자동 조회 · 더 오래된 날짜는 직접 불러오기':'최근 1년 바이낸스 현물 1초봉';
+   if(tf==='30s'&&!chartJumpSegment&&spotThirtyHistoryBusy){
+    button.textContent='30초봉 · 과거 로딩 중';
+    button.title=spotThirtyHistoryStatus;
+   }
    return;
   }
   if(full){
@@ -3512,7 +3516,7 @@ async function tick(){if(demo||priceBusy||(wsConnected&&Date.now()-lastTickAt<30
 let pricePaintTimer=null,chartPaintTimer=null,pricePaintQueued=false,chartPaintQueued=false,latestTradeEventAt=0;
 let lastChartPaintAt=0,lastPricePaintAt=0,connectionWatchdog=null;
 // 10m candles from Binance 5m bars; do not change the 1m signal feed.
-const candleDuration={'1s':1000,'10s':10000,'1m':60000,'3m':180000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'6h':21600000,'12h':43200000,'1d':86400000,'1w':604800000,'1M':2592000000};
+const candleDuration={'1s':1000,'30s':30000,'1m':60000,'3m':180000,'5m':300000,'10m':600000,'15m':900000,'30m':1800000,'1h':3600000,'4h':14400000,'6h':21600000,'12h':43200000,'1d':86400000,'1w':604800000,'1M':2592000000};
 function buildTenMinuteCandles(fiveBars,completeOnly=false){
   if(!Array.isArray(fiveBars)||!fiveBars.length)return [];
   const result=[],fiveCount=[],fiveFirst=[],fiveLast=[];
@@ -3639,18 +3643,18 @@ function scheduleLivePaint(){
   }
 }
 
-function isSpotSecondsTf(tf=$('tf').value){return tf==='1s'||tf==='10s';}
-function spotSecondsLabel(tf){return tf==='10s'?'10초봉':'1초봉';}
-function buildSpotTenSecondCandles(rows,now=0){
+function isSpotSecondsTf(tf=$('tf').value){return tf==='1s'||tf==='30s';}
+function spotSecondsLabel(tf){return tf==='30s'?'30초봉':'1초봉';}
+function buildSpotThirtySecondCandles(rows,now=0){
  const bars=[];
  let bucket=null,count=0;
  const flush=()=>{
   if(!bucket)return;
-  const current=now>=bucket.t&&now<bucket.t+10000;
-  if(count&&(count===10||current))bars.push(bucket);
+  const current=now>=bucket.t&&now<bucket.t+30000;
+  if(count&&(count===30||current))bars.push(bucket);
  };
  for(const row of rows){
-  const t=candleOpenTime('10s',row.t);
+  const t=candleOpenTime('30s',row.t);
   if(!bucket||t!==bucket.t){
    flush();
    bucket={...row,t,source:'spot'};
@@ -3665,7 +3669,94 @@ function buildSpotTenSecondCandles(rows,now=0){
  if(count)flush();
  return bars;
 }
-let spotTenSecondBars=[];
+let spotThirtySecondBars=[];
+const SPOT_ARCHIVE_DAY=86400000;
+const SPOT_THIRTY_STEP=30000;
+let spotThirtyHistoryBusy=false,spotThirtyRetryAt=0,spotThirtyHistoryStatus='';
+function spotThirtyMonthStart(now=Date.now()){
+ const d=new Date(now),year=d.getUTCFullYear(),month=d.getUTCMonth();
+ return Date.UTC(year,month-1,Math.min(d.getUTCDate(),new Date(Date.UTC(year,month,0)).getUTCDate()));
+}
+function showSpotThirtyHistoryStatus(){
+ if($('tf').value==='30s'){
+  const status=$('chartTimeJumpStatus');
+  if(status&&!chartJumpBusy&&!chartJumpSegment)status.textContent=spotThirtyHistoryStatus;
+ }
+}
+async function loadSpotThirtyArchiveDay(day){
+ const date=new Date(day).toISOString().slice(0,10),key='spot-30s-'+date;
+ const cached=await chartCacheRead(CHART_HISTORY_STORE,key).catch(()=>null);
+ if(cached?.bars?.length===2880)return cached.bars;
+ const url='https://data.binance.vision/data/spot/daily/klines/BTCUSDT/1s/BTCUSDT-1s-'+date+'.zip';
+ const response=await fetch(url,{signal:AbortSignal.timeout(25000)});
+ if(response.status===404)return null;
+ if(!response.ok)throw Error('일별 데이터 HTTP '+response.status);
+ const zip=await response.arrayBuffer(),view=new DataView(zip);
+ // Binance daily archives contain one deflated CSV entry.
+ if(view.byteLength<30||view.getUint32(0,true)!==0x04034b50||
+    view.getUint16(8,true)!==8||(view.getUint16(6,true)&9))throw Error('거래소 일별 압축 형식 오류');
+ const offset=30+view.getUint16(26,true)+view.getUint16(28,true),size=view.getUint32(18,true);
+ if(!size||offset+size>view.byteLength)throw Error('거래소 일별 압축 데이터 부족');
+ const payload=new Blob([zip.slice(offset,offset+size)]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+ const csv=await new Response(payload).text();
+ const rows=[];
+ for(const line of csv.split('\n')){
+  if(!line)continue;
+  const [stamp,o,h,l,c,v]=line.split(',',6),time=Number(stamp);
+  rows.push({t:time>1e14?time/1000:time,o:+o,h:+h,l:+l,c:+c,v:+v});
+ }
+ const bars=buildSpotThirtySecondCandles(normalizeChartCacheBars(rows));
+ if(bars.length!==2880||bars[0].t!==day||bars.at(-1).t!==day+SPOT_ARCHIVE_DAY-SPOT_THIRTY_STEP)
+  throw Error('일별 30초봉이 연속되지 않습니다');
+ void chartCacheWrite(CHART_HISTORY_STORE,{tf:key,bars}).catch(()=>{});
+ return bars;
+}
+async function fetchSpotThirtyPage(start,end){
+ const query=new URLSearchParams({symbol:'BTCUSDT',interval:'1s',limit:'990',startTime:String(start),endTime:String(end)});
+ const response=await fetch('https://data-api.binance.vision/api/v3/klines?'+query,{cache:'no-store',signal:AbortSignal.timeout(12000)});
+ if([418,429].includes(response.status))
+  spotSecondRetryAt=Date.now()+Math.max(1,Number(response.headers.get('Retry-After'))||60)*1000;
+ if(!response.ok)throw Error('현물 조회 HTTP '+response.status);
+ const raw=await response.json();
+ const bars=buildSpotThirtySecondCandles(normalizeChartCacheBars(raw.map(v=>({t:+v[0],o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:+v[5]}))));
+ if(bars.length!==(end-start+1)/SPOT_THIRTY_STEP||bars[0]?.t!==start)
+  throw Error('현물 1초봉 일부가 아직 조회되지 않습니다');
+ return bars;
+}
+async function loadSpotThirtyMonth(){
+ if(spotThirtyHistoryBusy||demo||document.hidden||$('tf').value!=='30s'||chartJumpSegment||
+    !spotThirtySecondBars.length||Date.now()<Math.max(spotThirtyRetryAt,spotSecondRetryAt))return;
+ const minimum=spotThirtyMonthStart();
+ if(spotThirtySecondBars[0].t<=minimum)return;
+ spotThirtyHistoryBusy=true;
+ try{
+  while(spotThirtySecondBars[0].t>minimum&&!demo&&!document.hidden&&$('tf').value==='30s'&&!chartJumpSegment){
+   const edge=spotThirtySecondBars[0].t,day=Math.floor((edge-1)/SPOT_ARCHIVE_DAY)*SPOT_ARCHIVE_DAY;
+   const today=Math.floor(Date.now()/SPOT_ARCHIVE_DAY)*SPOT_ARCHIVE_DAY;
+   spotThirtyHistoryStatus='최근 1개월 불러오는 중 · '+new Date(edge+9*3600000).toISOString().slice(0,16).replace('T',' ')+' KST부터 표시';
+   showSpotThirtyHistoryStatus();
+   const archive=day<today?await loadSpotThirtyArchiveDay(day):null;
+   let bars;
+   if(archive)bars=archive.filter(b=>b.t<edge);
+   else{
+    const pages=[];
+    for(let end=edge;end>day&&pages.length<4;){
+     const start=Math.max(day,end-990000);
+     pages.unshift(fetchSpotThirtyPage(start,end-1));end=start;
+    }
+    bars=(await Promise.all(pages)).flat();
+   }
+   if(spotThirtySecondBars[0]?.t!==edge)continue;
+   if(!bars.length||bars.at(-1).t+SPOT_THIRTY_STEP!==edge)throw Error('이전 30초봉과 연결되지 않습니다');
+   spotThirtySecondBars=bars.concat(spotThirtySecondBars);
+   if($('tf').value==='30s'&&!chartJumpSegment){draw();drawRmi();}
+  }
+  if(spotThirtySecondBars[0].t<=minimum)spotThirtyHistoryStatus='최근 1개월 30초봉 조회 완료';
+ }catch(e){
+  spotThirtyRetryAt=Date.now()+10000;
+  spotThirtyHistoryStatus='30초봉 추가 조회 재시도 중 · '+String(e.message||e);
+ }finally{spotThirtyHistoryBusy=false;showSpotThirtyHistoryStatus();}
+}
 let spotSecondBars=[],spotSecondBusy=false,spotSecondRetryAt=0,spotSecondStatus='현물 1초봉 조회 중…';
 function spotSecondCutoff(now=Date.now()){
  const date=new Date(now);
@@ -3692,7 +3783,16 @@ async function refreshSpotSecondChart(){
   if(!next.length)return;
   const contiguous=last&&next[0].t<=last+1000;
   spotSecondBars=mergeDailyCandles(contiguous?spotSecondBars:[],next).slice(-5000);
-  spotTenSecondBars=buildSpotTenSecondCandles(spotSecondBars,Date.now());
+  const recent=buildSpotThirtySecondCandles(spotSecondBars,Date.now());
+  if(recent.length){
+   const start=recent[0].t,prior=spotThirtySecondBars.at(-1)?.t;
+   if(!prior||start>prior+SPOT_THIRTY_STEP)spotThirtySecondBars=recent;
+   else{
+    const keep=spotThirtySecondBars.findLastIndex(bar=>bar.t<start)+1;
+    spotThirtySecondBars.splice(keep,spotThirtySecondBars.length-keep,...recent);
+   }
+  }
+  if($('tf').value==='30s')void loadSpotThirtyMonth();
   if(!contiguous)resetStableChartScale();
  }catch(e){
   spotSecondStatus='현물 초봉 조회 실패 · '+String(e.message||e);
@@ -6245,13 +6345,13 @@ async function extendJumpHistory(direction,segment){
  if(jumpExtendBusy||chartJumpSegment!==segment)return;
  jumpExtendBusy=true;jumpExtendRetryAt=Date.now();
  const tf=segment.tf,step=candleDuration[tf]||60000;
- const source=tf==='10s'?'1s':tf==='10m'?'5m':tf,sourceStep=candleDuration[source]||step;
+ const source=tf==='30s'?'1s':tf==='10m'?'5m':tf,sourceStep=candleDuration[source]||step;
  const first=segment.bars[0].t,last=segment.bars.at(-1).t;
  const minTime=isSpotSecondsTf(tf)?spotSecondCutoff():tf==='1d'?Date.UTC(2017,7,17):
    historyCutoff(tf);
  const nowLast=candleOpenTime(tf,Date.now());
  const start=direction==='before'?Math.max(minTime,first-450*step):last+step;
- const finish=tf==='10s'?(direction==='before'?first-sourceStep:Math.min(nowLast-sourceStep,last+450*step+step-sourceStep)):
+ const finish=tf==='30s'?(direction==='before'?first-sourceStep:Math.min(nowLast-sourceStep,last+450*step+step-sourceStep)):
   direction==='before'?first-step:Math.min(nowLast,last+450*step);
  if(finish<start){jumpExtendBusy=false;return}
  const status=$('chartTimeJumpStatus');
@@ -6275,7 +6375,7 @@ async function extendJumpHistory(direction,segment){
     .filter(v=>Number.isFinite(v.t)&&v.c>0));
    cursor=end+sourceStep;
   }
-  const extra=tf==='10s'?buildSpotTenSecondCandles(fetched):tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
+  const extra=tf==='30s'?buildSpotThirtySecondCandles(fetched):tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
   if(chartJumpSegment!==segment||$('tf').value!==tf)return;
   const original=segment.bars;
   // No fabricated candles between disconnected history windows.
@@ -6300,7 +6400,7 @@ async function extendJumpHistory(direction,segment){
 function chartViewBars(){
  const tf=$('tf').value;
  return chartJumpSegment?.tf===tf?chartJumpSegment.bars:
-  tf==='10s'?spotTenSecondBars:tf==='1s'?spotSecondBars:
+  tf==='30s'?spotThirtySecondBars:tf==='1s'?spotSecondBars:
   tf==='1m'&&minuteChartArchive?.length?minuteChartArchive:candles[tf];
 }
 function dateJumpKstMillis(dateText,timeText){
@@ -6369,10 +6469,10 @@ async function jumpChartToUtc(requestedTime){
     if(status)status.textContent='주봉·월봉 날짜 이동 완료 · 2017년 이후 현물·선물 기록';
     return;
    }
-   const source=tf==='10s'?'1s':tf==='10m'?'5m':tf;
+   const source=tf==='30s'?'1s':tf==='10m'?'5m':tf;
    const sourceDuration=candleDuration[source];
-   const from=Math.max(minimum,target-duration*(tf==='10s'?250:360));
-   const until=tf==='10s'?Math.min(candleOpenTime(tf,Date.now())-sourceDuration,target+duration*100-sourceDuration):Math.min(Date.now(),target+duration*260);
+   const from=Math.max(minimum,target-duration*(tf==='30s'?180:360));
+   const until=tf==='30s'?Math.min(candleOpenTime(tf,Date.now())-sourceDuration,target+duration*90-sourceDuration):Math.min(Date.now(),target+duration*260);
    const fetched=[];
    // Split any daily window crossing 2019-09-09. Before that day the
    // source is BTCUSDT spot; from launch onward it is USD-M futures.
@@ -6393,7 +6493,7 @@ async function jumpChartToUtc(requestedTime){
        .filter(v=>Number.isFinite(v.t)&&v.c>0));
      cursor=end+sourceDuration;
    }
-   const bars=tf==='10s'?buildSpotTenSecondCandles(fetched):tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
+   const bars=tf==='30s'?buildSpotThirtySecondCandles(fetched):tf==='10m'?buildTenMinuteCandles(fetched,true):fetched;
    if(bars.length<22||!bars.some(v=>Math.abs(v.t-target)<duration*2))
      throw Error('해당 시간대의 거래소 캔들을 찾지 못했어');
    if($('tf').value!==tf)return;
