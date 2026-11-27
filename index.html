@@ -7606,10 +7606,10 @@ function patternCompareSetIndex(which,index){
   const baseFuture=Math.max(32,Math.min(160,Math.ceil(view.count*.9)));
   const maxReveal=Math.max(0,Math.min(baseFuture,
    anchor-(warmup+view.count)));
-  const capped=Math.max(anchor-maxReveal,
+  const capped=Math.max(firstAllowed-maxReveal,
    Math.min(anchor+PATTERN_COMPARE_MAX_FUTURE,i));
-  view.index=anchor;
-  view.pastReveal=Math.min(maxReveal,Math.max(0,anchor-capped));
+  view.index=Math.max(firstAllowed,Math.min(anchor,capped+maxReveal));
+  view.pastReveal=Math.min(maxReveal,Math.max(0,view.index-capped));
   view.futureShift=Math.max(0,capped-anchor);
  }
  renderPatternComparison();
@@ -7808,13 +7808,14 @@ function renderPatternComparison(){
   let replay=null;
   if(which==='current'){
    const sourceIndex=state.bars.length-1;
+   const browsePast=index<source.length-1;
    const replayKey=[index,displayTf,state.match.index,state.manualReference?.time,state.manualReference?.tf,state.manualReference?.startedAt,state.forecastBars,
     patternCompareBlendEnabled?'blend50':'original',
     state.bars.length,state.bars.at(-1)?.t,state.bars.at(-1)?.c,
     source.length,source.at(-1)?.t,source.at(-1)?.c].join('|');
    if(view.replayKey!==replayKey||view.replaySource!==source){
     const manual=state.manualReference?patternManualForecast(state,source,source.length-1,displayTf):null;
-    const originalReplay=state.manualReference?patternLockedReplay(manual,bar.t,displayTf):displayTf===state.tf?
+    const originalReplay=browsePast?null:state.manualReference?patternLockedReplay(manual,bar.t,displayTf):displayTf===state.tf?
      patternReplaySeries(state.bars,index,state.match.index,
       state.forecastBars,state.tf,false):
      patternProjectToTimeframe(state.bars,sourceIndex,state.match.index,
@@ -7826,7 +7827,7 @@ function renderPatternComparison(){
      originalReplay;
     view.replayKey=replayKey;view.replaySource=source;
    }
-   if(state.forecastLock){view.replayScenario=patternLockedReplay(state.forecastLock,bar.t,displayTf);view.replayKey=null;}
+   if(state.forecastLock){view.replayScenario=browsePast?null:patternLockedReplay(state.forecastLock,bar.t,displayTf);view.replayKey=null;}
    replay=view.replayScenario;
   }else{
    view.replayScenario=null;view.replayKey=null;view.replaySource=null;
@@ -7834,7 +7835,7 @@ function renderPatternComparison(){
   view.forecastBars=which==='current'&&(state.manualReference||state.forecastLock||displayTf!==state.tf)?
    (replay?.available||0):state.forecastBars;
   view.historical=which==='historical';
-  view.futureEnabled=which==='current';
+  view.futureEnabled=which==='current'&&index===source.length-1;
   paintPatternCompareCanvas(canvasId,source,displayTf,index,config,
    view.inspectIndex,view.show,view);
   const fmt=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',
@@ -8677,7 +8678,7 @@ function initPatternComparison(){
       Math.abs(y-plotted)>15)return null;
    return selected;
   };
-  const inspectAtX=(screenX)=>{
+  const inspectAtX=(screenX,redraw=true)=>{
    const view=patternCompareView(which),state=patternComparison;
    if(!view||!state)return;
    const rect=canvas.getBoundingClientRect();
@@ -8697,7 +8698,7 @@ function initPatternComparison(){
     const source=which==='current'?patternDisplayBars(state):patternHistoricalData(state);
     view.inspectIndex=Math.max(0,Math.min(source.length-1,index));
    }
-   renderPatternComparison();
+   if(redraw)renderPatternComparison();
   };
   // A held finger in the right-hand price scale pins a horizontal
   // inspection line. This uses the rendered/zoomed price scale.
@@ -8750,7 +8751,7 @@ function initPatternComparison(){
       holdingCrosshair=true;
       if(dragMode==='price')inspectAtPriceY(lastY);
       else{
-       inspectAtX(lastX);
+       inspectAtX(lastX,which!=='current');
        if(which==='current')inspectAtPriceY(lastY);
       }
      },380);
@@ -8779,7 +8780,7 @@ function initPatternComparison(){
     lastX=e.clientX;lastY=e.clientY;
     if(dragMode==='price')inspectAtPriceY(e.clientY);
     else{
-     inspectAtX(e.clientX);
+     inspectAtX(e.clientX,which!=='current');
      if(which==='current')inspectAtPriceY(e.clientY);
     }
     return;
@@ -8787,10 +8788,11 @@ function initPatternComparison(){
    if(pointers.size===2){tapMoved=true;
     const [a,b]=[...pointers.values()];
     const dist=Math.hypot(a.x-b.x,a.y-b.y);
-    if(lastDistance>0&&Math.abs(dist-lastDistance)>=12){
+    if(lastDistance>0&&dist>0&&Math.abs(dist-lastDistance)>=3){
      const view=patternCompareView(which);
+     const viewCountBefore=view.count;
      patternCompareSetCount(which,view.count*lastDistance/dist);
-     lastDistance=dist;
+     if(patternCompareView(which).count!==viewCountBefore)lastDistance=dist;
     }
    }else if(pointers.size===1){
     const view=patternCompareView(which);
@@ -8840,8 +8842,10 @@ function initPatternComparison(){
    // clear the pinned guide. Long press of the tag was handled above.
    if(e.type==='pointerup'&&!tapMoved&&!holdingCrosshair&&
       pointers.size===1&&patternComparison&&
-      (dragMode==='time'||dragMode==='price'))
-    clearComparisonGuides();
+      (dragMode==='time'||dragMode==='price')){
+    if(which==='current'&&dragMode==='price'&&priceLabelHold===null)inspectAtPriceY(e.clientY);
+    else clearComparisonGuides();
+   }
    priceLabelHold=null;
    pointers.delete(e.pointerId);
    holdingCrosshair=false;
@@ -10036,15 +10040,15 @@ function initReservationLineHold(){
     const fresh=hit(p.x,p.y).filter(v=>p.orders.some(w=>w.id===v.id));
     if(fresh.length)window.btcOpenReservationPriceEditor?.(fresh.map(v=>v.id));
    },600);
-   stop(e);
+   if(id==='chart')stop(e);
   },{capture:true,passive:false});
   document.addEventListener('pointermove',e=>{
    if(!pending||pending.id!==e.pointerId)return;
    if(Math.hypot(e.clientX-pending.x,e.clientY-pending.y)>10)clear();
-   stop(e);
+   if(id==='chart')stop(e);
   },{capture:true,passive:false});
   for(const type of ['pointerup','pointercancel'])document.addEventListener(type,e=>{
-   if(pending?.id!==e.pointerId)return;clear();suppressUntil=Date.now()+500;stop(e);
+   if(pending?.id!==e.pointerId)return;clear();suppressUntil=Date.now()+500;if(id==='chart')stop(e);
   },{capture:true,passive:false});
   for(const type of ['touchstart','touchmove','touchend','mousedown','mouseup','click','contextmenu'])document.addEventListener(type,e=>{
    if(e.target===canvas&&(pending||Date.now()<suppressUntil))stop(e);
