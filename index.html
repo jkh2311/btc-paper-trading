@@ -7515,7 +7515,7 @@ async function loadPatternHistoricalMinuteWindow(matchTime){
 }
 // Explicit lower-pane timeframe selection; no similarity re-search or orders.
 async function choosePatternHistoricalDisplay(tf){
- if(patternComparison?.manualReference){await loadPatternManualReference(tf,patternComparison.manualReference.time);return;}
+ if(patternComparison?.manualReference){await loadPatternManualReference(tf,patternComparison.manualReference.time,true);return;}
  const state=patternComparison,selector=$('patternCompareHistoricalTf'),
   status=$('patternCompareHistoricalStatus');
  if(!state||!Object.hasOwn(SIMILAR_PATTERN_LABELS,tf))return;
@@ -7808,7 +7808,7 @@ function renderPatternComparison(){
   let replay=null;
   if(which==='current'){
    const sourceIndex=state.bars.length-1;
-   const replayKey=[index,displayTf,state.match.index,state.manualReference?.time,state.manualReference?.tf,state.forecastBars,
+   const replayKey=[index,displayTf,state.match.index,state.manualReference?.time,state.manualReference?.tf,state.manualReference?.startedAt,state.forecastBars,
     patternCompareBlendEnabled?'blend50':'original',
     state.bars.length,state.bars.at(-1)?.t,state.bars.at(-1)?.c,
     source.length,source.at(-1)?.t,source.at(-1)?.c].join('|');
@@ -8412,14 +8412,14 @@ function syncPatternForecastControls(state){
 }
 function attachManualReference(state,ref){
  const {tf,time,bars,index}=ref,config=indicatorPatternConfig(tf);
- state.manualReference=ref;
+ state.manualReference=Number.isFinite(ref.startedAt)?ref:{...ref,startedAt:Date.now()};
  Object.assign(state.views.historical,{displayTf:tf,displayBars:bars,index:Math.min(bars.length-1,index+Math.floor(config.window/2)),baseIndex:index,count:config.window,inspectIndex:null,inspectPrice:null,priceZoom:1,pricePan:0,futureShift:0});
  state.views.current.replayKey=null;state.views.current.replaySource=null;
  $('patternCompareHistoricalTf').value=tf;$('patternCompareHistoricalTitle').textContent='과거 실제 차트 (직접 비교)';
  const stamp=patternCompareLocalInputDate(time);$('patternManualDate').value=stamp.slice(0,10);$('patternManualTime').value=stamp.slice(11);
  $('patternManualStatus').textContent='자동 유지 · 실시간 예측 연동';
 }
-async function loadPatternManualReference(tf,time){
+async function loadPatternManualReference(tf,time,keepStart=false){
  const state=patternComparison,status=$('patternManualStatus');
  if(!state||patternManualBusy)return;
  const existingLock=state.forecastLock;
@@ -8429,7 +8429,7 @@ async function loadPatternManualReference(tf,time){
  if(nextCandleTime(tf,anchor,2)>Date.now()){status.textContent='이후 완료 캔들이 있는 과거 시점을 선택하세요.';return;}
  const key=tf+':'+anchor;
  const useReference=ref=>{
-  attachManualReference(state,{...ref,time});
+  attachManualReference(state,{...ref,time,startedAt:keepStart?state.manualReference?.startedAt:Date.now()});
   status.textContent=(existingLock?'저장 유지 · ':'자동 유지 · 실시간 예측 연동 · ')+patternCompareLocalInputDate(state.manualReference.time).replace('T',' ')+' KST';
   renderPatternComparison();saveLastVisibleScreen(true);draw();
  };
@@ -8519,6 +8519,16 @@ function patternManualReplay(state,source,index,tf){
  // Reuse the existing timeframe conversion with an isolated historical
  // series plus an independent current anchor. Do not alter ranked data.
  const history=(ref.replayBars||ref.bars.slice(ref.index)).slice(0,1+Math.min(PATTERN_COMPARE_MAX_FUTURE,state.forecastBars));
+ // Advance the analogue by elapsed live candle time, keeping the original
+ // historical selection intact. Already elapsed steps cannot restart.
+ if(Number.isFinite(ref.startedAt)){
+  const liveStart=candleOpenTime(ref.tf,ref.startedAt);
+  const liveTime=source[index].t;
+  let elapsed=0;
+  while(elapsed+1<history.length&&nextCandleTime(ref.tf,liveStart,elapsed+1)<=liveTime)elapsed++;
+  history.splice(0,elapsed);
+ }
+ if(history.length<2)return null;
  const current={...source[index],t:candleOpenTime(ref.tf,source[index].t)};
  // Keep the live anchor before the independent historical sequence, so it cannot become a historical successor.
  const combined=[current,...history];
@@ -10927,7 +10937,15 @@ const HANINE_AUTO_COMPARISON_KEY='hanine-auto-comparison-v1';
 var automaticComparison;
 function readAutomaticComparison(){
  if(automaticComparison===undefined){
-  try{const saved=JSON.parse(localStorage.getItem(HANINE_AUTO_COMPARISON_KEY)||'null');automaticComparison=saved?.comparison?.manualReference?.bars?.length?saved:null;}
+  try{
+   const saved=JSON.parse(localStorage.getItem(HANINE_AUTO_COMPARISON_KEY)||'null');
+   const ref=saved?.comparison?.manualReference;
+   automaticComparison=ref?.bars?.length?saved:null;
+   if(ref&&!Number.isFinite(ref.startedAt)){
+    ref.startedAt=Number.isFinite(saved.savedAt)?saved.savedAt:Date.now();
+    try{localStorage.setItem(HANINE_AUTO_COMPARISON_KEY,JSON.stringify(saved));}catch(_){}
+   }
+  }
   catch(_){automaticComparison=null;}
  }
  return automaticComparison;
@@ -10974,7 +10992,7 @@ function persistLockedComparison(force=false,automatic=false){
   if(ref){
    const v=state.views.historical,bars=ref.bars;
    const subset=mergeDailyCandles(bars.slice(Math.max(0,ref.index-700),ref.index+1101),bars.slice(Math.max(0,v.index-700),v.index+351));
-   manual={tf:ref.tf,time:ref.time,bars:subset,replayBars:ref.replayBars,index:patternHistoricalAnchorIndex(subset,ref.tf,ref.time)};
+   manual={tf:ref.tf,time:ref.time,startedAt:ref.startedAt,bars:subset,replayBars:ref.replayBars,index:patternHistoricalAnchorIndex(subset,ref.tf,ref.time)};
   }
   const value={version:1,tab:'chart',mode:'compare',savedAt:Date.now(),comparison:{...snap,forecastLock:state.forecastLock,manualReference:manual,backupSources:sources}};
   const key=automatic?HANINE_AUTO_COMPARISON_KEY:HANINE_LOCK_KEY;
