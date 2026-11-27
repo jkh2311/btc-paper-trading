@@ -7467,6 +7467,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
   ctx.textAlign='center';
   if(boundary<left+pw)ctx.fillText(
     priceView?.historical?'선택일 이후 · 실제':
+     scenario?.nativeDisplay&&scenario.locked?SIMILAR_PATTERN_LABELS[tf]+' 실제 캔들 기반 · 고정':
      scenario?.locked?'저장된 미래 예측 · 고정':scenario?.blend50?'5:5 과거+현재지표 · 시나리오':
      '과거 유사 흐름 · 시나리오',
     Math.max(left+40,Math.min(left+pw-40,(boundary+left+pw)/2)),pt+15);
@@ -8005,7 +8006,7 @@ async function choosePatternCurrentDisplay(tf){
  const view=state.views.current,selector=$('patternCompareDisplayTf');
  const requestId=state.displayRequestId=(state.displayRequestId||0)+1;
  if(selector)selector.disabled=true;
- if(status)status.textContent=SIMILAR_PATTERN_LABELS[state.tf]+' 원본 예측 → '+SIMILAR_PATTERN_LABELS[tf]+' 변환 중…';
+ if(status)status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 현재 차트 불러오는 중…';
  try{
   let bars=tf===state.tf?state.bars:tf==='1m'&&minuteChartArchive?.length?
    minuteChartArchive:candles[tf]||[];
@@ -8025,14 +8026,9 @@ async function choosePatternCurrentDisplay(tf){
   view.inspectIndex=null;view.inspectFutureOffset=null;view.inspectPrice=null;
   view.replayKey=null;view.replaySource=null;
   renderPatternComparison();
-  const replay=view.replayScenario;
-  if(status)status.textContent=tf===state.tf?
-   '원본 '+SIMILAR_PATTERN_LABELS[tf]+' 예측 그대로 표시':
-   '원본 '+SIMILAR_PATTERN_LABELS[state.tf]+' → '+SIMILAR_PATTERN_LABELS[tf]+
-    ' · 이후 '+(replay?.available||0)+'봉'+
-    (replay?.interpolated?' · 중간 경로는 선형 보간':' · 원본 흐름을 시간대로 집계')+
-    (replay?.truncated?' · 표시 최대 1000봉까지':'')+
-    (!(replay?.available>0)?' · 예측 기간이 짧아 완성 구간 없음':'');
+  if(status&&view.replayScenario?.available>0)
+   status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 실제 과거 캔들 기준 · '+view.replayScenario.available+'봉';
+  saveLastVisibleScreen(true);
  }catch(e){
   if(requestId===state.displayRequestId&&patternComparison===state){
    if(status)status.textContent='시간봉 전환 실패: '+String(e?.message||e);
@@ -8107,6 +8103,77 @@ function refreshPatternComparisonCandles(){
   if(Number.isFinite(saved.inspect))view.inspectIndex=patternCompareNearestIndex(merged,saved.inspect);
  }
 }
+function nativePatternReference(state,tf){
+ const time=patternHistoricalMatchTime(state);
+ if(!Number.isFinite(time))return null;
+ const market=state.manualReference?.market||patternManualMarket(tf,time);
+ const anchor=candleOpenTime(tf,time);
+ const key=[market,tf,anchor,state.forecastBars].join('|');
+ const cache=state.nativeReferences||(state.nativeReferences=new Map());
+ const ref=state.manualReference;
+ const local=ref?.tf===tf?(ref.replayBars||ref.bars.slice(ref.index)):
+  !ref&&state.tf===tf?state.bars.slice(state.match.index,state.match.index+state.forecastBars+1):null;
+ if(local?.[0]?.t===anchor&&local[1]?.t===nextCandleTime(tf,anchor,1))return {key,bars:local};
+ let record=cache.get(key);
+ if(record?.bars)return record;
+ if(record?.pending||record?.retryAt>Date.now()||patternManualRetry>Date.now())return null;
+ const status=$('patternCompareDisplayTfStatus');
+ status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 실제 과거 캔들로 예측 준비 중…';
+ record={key,pending:true};cache.set(key,record);
+ void (async()=>{
+  try{
+   const native=tf==='10m'?'5m':tf;
+   const end=Math.min(nextCandleTime(tf,anchor,state.forecastBars+1)-1,candleOpenTime(tf,Date.now())-1);
+   let rows=[];
+   for(let cursor=anchor;cursor<=end;){
+    const part=await fetchPatternManualCandles(market,native,cursor,end);
+    if(!part.length)break;
+    rows=rows.concat(part);
+    const next=nextCandleTime(native,part.at(-1).t,1);
+    if(next<=cursor||part.length<1000)break;
+    cursor=next;
+   }
+   const bars=tf==='10m'?buildTenMinuteCandles(rows,true):rows;
+   if(bars[0]?.t!==anchor||bars[1]?.t!==nextCandleTime(tf,anchor,1))
+    throw Error('기준 시각 이후 실제 캔들이 부족합니다');
+   record.bars=bars;
+  }catch(e){record.retryAt=Date.now()+15000;record.error=String(e.message||e);}
+  finally{
+   record.pending=false;
+   if(patternComparison===state&&patternDisplayTf(state)===tf&&patternHistoricalMatchTime(state)===time){
+    state.views.current.replayKey=null;
+    status.textContent=record.error?'예측 조회 실패 · '+record.error:SIMILAR_PATTERN_LABELS[tf]+' 실제 과거 캔들 기준 예측';
+    if(record.bars){renderPatternComparison();saveLastVisibleScreen(true);draw();}
+   }
+  }
+ })();
+ return null;
+}
+function nativePatternForecast(state,source,index,tf,reference){
+ if(!reference||!source[index])return null;
+ const ref=state.manualReference;
+ const original=state.forecastLock||ref?.forecast;
+ const fixed=!!(ref||state.forecastLock);
+ const anchorTime=fixed?candleOpenTime(tf,original?.time??source[index].t):source[index].t;
+ const anchoredIndex=patternHistoricalAnchorIndex(source,tf,anchorTime);
+ const anchorPrice=fixed?(original?.scenario?.prices?.[0]??source[index].c):source[index].c;
+ const settings=[reference.key,anchorTime,anchorPrice,patternCompareBlendEnabled,ref?.startedAt].join('|');
+ const fixedCache=state.nativeForecasts||(state.nativeForecasts=new Map());
+ if(fixed&&fixedCache.has(settings))return fixedCache.get(settings);
+ const warm=anchoredIndex>=0?source.slice(Math.max(0,anchoredIndex-264),anchoredIndex+1):[{t:anchorTime,c:anchorPrice}];
+ warm[warm.length-1]={...warm.at(-1),t:anchorTime,c:anchorPrice};
+ const combined=warm.concat(reference.bars);
+ let scenario=patternReplaySeries(combined,warm.length-1,warm.length,state.forecastBars,tf);
+ if((scenario?.available||0)<1)return null;
+ if(patternCompareBlendEnabled)scenario=patternCompareFiftyFiftyScenario(warm,warm.length-1,tf,scenario);
+ if(!fixed)return scenario;
+ const fib=patternCompareProjectedFibLevels(warm,scenario.prices);
+ const forecast={tf,time:anchorTime,scenario,fib,automatic:true};
+ if(fixedCache.size>=16)fixedCache.delete(fixedCache.keys().next().value);
+ fixedCache.set(settings,forecast);
+ if(ref&&!ref.forecast)ref.forecast=forecast;
+ return forecast;
+}
 function renderPatternComparison(){
  const state=patternComparison;if(!state||$('patternCompare')?.hidden)return;
  refreshPatternCurrentTarget();
@@ -8126,27 +8193,24 @@ function renderPatternComparison(){
   if(!bar)continue;
   let replay=null;
   if(which==='current'){
-   const sourceIndex=state.bars.length-1;
    const browsePast=index<source.length-1;
-   const replayKey=[index,displayTf,state.match.index,state.manualReference?.time,state.manualReference?.tf,state.manualReference?.startedAt,state.forecastBars,
-    patternCompareBlendEnabled?'blend50':'original',
-    state.bars.length,state.bars.at(-1)?.t,state.bars.at(-1)?.c,
-    source.length,source.at(-1)?.t,source.at(-1)?.c].join('|');
+   const unlocked=state.forecastLock?.tf!==displayTf;
+   const reference=!browsePast&&unlocked?nativePatternReference(state,displayTf):null;
+   const replayKey=[index,displayTf,reference?.key,state.rank,state.manualReference?.time,state.manualReference?.startedAt,
+    state.forecastLock?.time,state.forecastBars,patternCompareBlendEnabled,bar.t,bar.c].join('|');
    if(view.replayKey!==replayKey||view.replaySource!==source){
-    const manual=state.manualReference?patternManualForecast(state,source,source.length-1,displayTf):null;
-    const originalReplay=browsePast?null:state.manualReference?patternLockedReplay(manual,bar.t,displayTf):displayTf===state.tf?
-     patternReplaySeries(state.bars,index,state.match.index,
-      state.forecastBars,state.tf,false):
-     patternProjectToTimeframe(state.bars,sourceIndex,state.match.index,
-      state.tf,source,index,displayTf,state.forecastBars);
-    // OFF is a byte-for-byte-equivalent original scenario object.
-    // ON modifies only the independent comparison canvas visualization.
-    view.replayScenario=patternCompareBlendEnabled&&!state.manualReference?
-     patternCompareFiftyFiftyScenario(source,index,displayTf,originalReplay):
-     originalReplay;
+    let scenario=null;
+    if(!browsePast){
+     if(!unlocked)scenario=patternLockedReplay(state.forecastLock,bar.t,displayTf);
+     else if(reference){
+      const native=nativePatternForecast(state,source,index,displayTf,reference);
+      scenario=state.manualReference||state.forecastLock?patternLockedReplay(native,bar.t,displayTf):native;
+      if(scenario)scenario={...scenario,nativeDisplay:true};
+     }
+    }
+    view.replayScenario=scenario;
     view.replayKey=replayKey;view.replaySource=source;
    }
-   if(state.forecastLock){view.replayScenario=browsePast?null:patternLockedReplay(state.forecastLock,bar.t,displayTf);view.replayKey=null;}
    replay=view.replayScenario;
   }else{
    view.replayScenario=null;view.replayKey=null;view.replaySource=null;
@@ -8190,8 +8254,9 @@ function closePatternComparison(){
 // The current chart's zoom, scroll, crosshair and live-candle updates remain.
 function setPatternComparisonRank(rank){
  const state=patternComparison;
- if(!state||state.forecastLock||state.manualReference||!Number.isInteger(rank)||rank<1||rank>state.matches.length)return;
- state.manualReference=null;state.views.current.replayKey=null;$('patternManualStatus').textContent='';
+ if(!state||state.forecastLock||!Number.isInteger(rank)||rank<1||rank>state.matches.length)return;
+ if(state.manualReference){clearAutomaticComparison();state.manualReference=null;}
+ state.views.current.replayKey=null;$('patternManualStatus').textContent='';
  const selected=state.matches[rank-1];
  if(!selected||!state.bars[selected.index])return;
  state.rank=rank;state.match={...selected};
@@ -8729,7 +8794,7 @@ function syncPatternForecastControls(state){
   if(locked)$(id).disabled=true;
   else if(!patternManualBusy&&['patternManualDate','patternManualTime','patternManualLoad','patternForecastBars','patternCompareBlendToggle'].includes(id))$(id).disabled=false;
  }
- for(const b of $('patternCompareRanks').querySelectorAll('button')){b.disabled=locked||!!state.manualReference;b.setAttribute('aria-pressed',String(!state.manualReference&&Number(b.dataset.rank)===state.rank));}
+ for(const b of $('patternCompareRanks').querySelectorAll('button')){b.disabled=locked;b.setAttribute('aria-pressed',String(!state.manualReference&&Number(b.dataset.rank)===state.rank));}
 }
 const MANUAL_SPOT_START=Date.UTC(2017,7,17);
 function patternManualMarket(tf,time){
