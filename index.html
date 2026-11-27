@@ -1936,7 +1936,7 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
  <div id="candleTime" class="muted candle-info"></div>
  <div class="chart-tools"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="latest">최신 차트</button><button id="expandChartBtn" type="button" aria-label="차트 크게 보기">⛶ 확대</button></div>
  <div id="range" style="display:none"></div><div id="chartHint" style="display:none"></div><p id="selected" style="display:none"></p>
- <div id="entrySheet" class="card" style="display:none"><b id="sheetPrice">실제 BTCUSDT 주문</b><div class="order-types"><label><input type="radio" name="orderType" value="limit" checked> 지정가</label><label><input type="radio" name="orderType" value="market"> 시장가</label></div><label id="limitLabel" for="limitPrice">지정가 (USDT)</label><input id="limitPrice" type="number" min="0.01" step="0.1" inputmode="decimal" placeholder="원하는 진입 가격"><p id="orderHelp" class="muted" style="font-size:11px">지정가 주문은 바이낸스에 실제 전송됩니다.</p><div class="row"><button class="buy" id="sheetLong">롱 진입</button><button class="sell" id="sheetShort">숏 진입</button><button id="sheetCancel">닫기</button></div></div>
+ <div id="entrySheet" class="card" style="display:none"><b id="sheetPrice">실제 BTCUSDT 주문</b><div class="order-types"><label><input type="radio" name="orderType" value="limit" checked> 지정가</label><label><input type="radio" name="orderType" value="market"> 시장가</label><label id="entryPostOnlyLabel"><input type="checkbox" id="entryPostOnly" checked> Post Only</label></div><label id="limitLabel" for="limitPrice">지정가 (USDT)</label><input id="limitPrice" type="number" min="0.01" step="0.1" inputmode="decimal" placeholder="원하는 진입 가격"><p id="orderHelp" class="muted" style="font-size:11px">지정가 주문은 바이낸스에 실제 전송됩니다.</p><div class="row"><button class="buy" id="sheetLong">롱 진입</button><button class="sell" id="sheetShort">숏 진입</button><button id="sheetCancel">닫기</button></div></div>
  <div class="account-strip"><div><small id="balanceSummaryLabel">실제 사용 가능 잔고</small><strong id="balanceSummary">—</strong></div><div><small id="pnlSummaryLabel">미실현 손익 (원화 추정)</small><strong id="pnlSummary">—</strong></div></div>
 </section>
 <section class="tab-page" id="page-position">
@@ -8258,7 +8258,7 @@ function renderPatternEntry(){
  if(!valid)
   $('patternEntryPreview').textContent=form.percent?'증거금 ROI · 설정 레버리지 적용 · 익절/손절 각각 0.1~100% 입력 후 롱 또는 숏 선택':'익절·손절가격 입력 후 롱 또는 숏 선택.\n롱: 손절 < 진입 < 익절 / 숏: 익절 < 진입 < 손절';
  if(!form.prices)return;
- if(valid)$('patternEntryPreview').textContent=(form.current?'실전 · 현재가 지정가 (GTC) · 즉시 체결 가능, 미체결 가능':'실전 · 직접 지정가 (Post Only GTX)')+'\n각 단계의 기존 바이낸스 주문창에서 별도 확인 후 제출합니다.';
+ if(valid)$('patternEntryPreview').textContent=(form.current?'실전 · 현재가 지정가 · 최종 진입창에서 Post Only 선택':'실전 · 직접 지정가 (Post Only GTX)')+'\n각 단계의 기존 바이낸스 주문창에서 별도 확인 후 제출합니다.';
  for(let i=0;i<form.prices.length;i++){
   const row=document.createElement('div');
   row.className='patternEntryStageRow';
@@ -12311,7 +12311,7 @@ setInterval(()=>{
 },5000);
 timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),p=Math.max(1000,v.c*(1+(Math.random()-.5)*.001));a.push({t:Date.now(),o:v.c,h:Math.max(p,v.c),l:Math.min(p,v.c),c:p,v:Math.round(30+Math.random()*200)});a.shift()}last=candles['1m'].at(-1).c;process();render()}else refresh()},45000);
 
-</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=manual-post-only"></script><script src="./market-stats-stream.js?v=343"></script><script src="./protection-read-backoff.js?v=342"></script><script src="./live-manual-protection.js?v=switch-tp-replacement"></script><script src="./live-chart-levels.js?v=read-backoff-v342"></script><script src="./orphan-protection-cleanup.js?v=orphan-backoff-v342"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
+</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=entry-post-only-toggle"></script><script src="./market-stats-stream.js?v=343"></script><script src="./protection-read-backoff.js?v=342"></script><script src="./live-manual-protection.js?v=switch-tp-replacement"></script><script src="./live-chart-levels.js?v=read-backoff-v342"></script><script src="./orphan-protection-cleanup.js?v=orphan-backoff-v342"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
 <script>
 /* v200: Opt-in foreground-only live switch. Standalone single TP trigger or
  * manual price. No 3-part TP integration. Never auto-arm after reload.

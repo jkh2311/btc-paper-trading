@@ -241,6 +241,16 @@ function restoreChartLimitSheet(){
  if(typeof quoteReset!=='undefined'&&quoteReset)quoteReset.style.display='';
  if(typeof limitInput!=='undefined'&&limitInput)limitInput.readOnly=false;
 }
+const entryPostOnly=$('entryPostOnly');
+function syncEntryPostOnly(){
+ const limit=limitOrderSelected();
+ $('entryPostOnlyLabel').style.display=limit?'':'none';
+ entryPostOnly.disabled=!limit;
+ $('orderHelp').textContent=!limit?'실전 시장가 · 체결가 변동 가능':
+  entryPostOnly.checked?'Post Only · 메이커 전용 · 즉시 체결될 가격이면 거절':
+   '일반 지정가 · 즉시 체결되면 테이커 수수료 적용 가능';
+}
+entryPostOnly.addEventListener('change',syncEntryPostOnly);
 document.addEventListener('btc:chart-price-limit-entry',e=>{
  const data=e.detail;
  if(!data||data.symbol!=='BTCUSDT'||!['LONG','SHORT'].includes(data.side)||
@@ -251,7 +261,7 @@ document.addEventListener('btc:chart-price-limit-entry',e=>{
  if(chartLimitPriceMode){
   chartCurrentLimitMode=data.currentLimit===true;
   if(chartCurrentLimitMode){
-   $('orderHelp').textContent='실전 현재가 지정가 · Post Only · 호가 대기 후 체결 가능 · 최종 진입 버튼을 눌러야 전송됩니다.';
+   syncEntryPostOnly();
    if(limitInput)limitInput.readOnly=true;
    sheetPriceEdited=true; // Prevent REST quote fallback; WebSocket only in this mode.
    displayLiveQuote();
@@ -418,9 +428,7 @@ function showSheet(side,chartPrice=null){
  $('sheetLong').style.display=side==='LONG'?'':'none';
  $('sheetShort').style.display=side==='SHORT'?'':'none';
  $('sheetPrice').textContent='BTCUSDT 실제 '+(side==='LONG'?'롱':'숏')+' 주문';
- $('orderHelp').textContent=chartSelected?
-   '실전 예약 지정가 · Post Only(즉시 체결 방지) · 수량은 설정값으로 계산 · 아래 실제 진입 버튼을 누르면 바이낸스에 전송됩니다.':
-   '실전 주문 · Post Only / 시장가';
+ syncEntryPostOnly();
  sh.dataset.realSide=side;
  sheetQuoteGeneration++;sheetPriceEdited=chartSelected;sheetQuoteLastAt=0;
  if(limitInput)limitInput.value=chartSelected?chartPrice.toFixed(1):'';
@@ -440,6 +448,7 @@ quoteReset.onclick=()=>{
 for(const radio of document.querySelectorAll('input[name="orderType"]')){
  radio.addEventListener('change',()=>{
   if(!isSheetOpen())return;
+  syncEntryPostOnly();
   if(chartLimitPriceMode){document.querySelector('input[name="orderType"][value="limit"]').checked=true;return;}
   displayLiveQuote();
   if(!limitOrderSelected())return;
@@ -460,6 +469,7 @@ async function enter(side){
  await run(async()=>{
   if(!account||Date.now()-account.at>30000)throw Error('실제 잔고 조회 후 주문하세요.');
   const currentFollow=chartCurrentLimitMode,entryGeneration=sheetQuoteGeneration;
+  const postOnly=entryPostOnly.checked;
   if(currentFollow&&freshChartCurrentLimit(liveQuote,.1,1,Date.now())===null)throw Error('실시간 현재가 연결 확인 필요 · 주문 미전송');
   const dual=await mode(),f=await filters();
   const type=document.querySelector('input[name="orderType"]:checked')?.value==='market'?'MARKET':'LIMIT';
@@ -509,11 +519,16 @@ async function enter(side){
   if(used>=count)throw Error('실계좌 보유/미체결 기준 '+count+'단계 한도에 도달했습니다. 증거금이 남아도 단계 한도를 넘겨 주문하지 않습니다.');
   if(currentFollow){
    if(!chartCurrentLimitMode||entryGeneration!==sheetQuoteGeneration||!isSheetOpen())throw Error('주문 확인창 변경 · 주문 미전송');
-   const book=await publicJson('/fapi/v1/ticker/bookTicker?symbol='+symbol);
-   const bid=Number(book?.bidPrice),ask=Number(book?.askPrice);
-   if(book.symbol!==symbol||!(bid>0&&ask>=bid))throw Error('실시간 바이낸스 호가 조회 실패 · 주문 미전송');
+   if(postOnly){
+    const book=await publicJson('/fapi/v1/ticker/bookTicker?symbol='+symbol);
+    const bid=Number(book?.bidPrice),ask=Number(book?.askPrice);
+    if(book.symbol!==symbol||!(bid>0&&ask>=bid))throw Error('실시간 바이낸스 호가 조회 실패 · 주문 미전송');
+    price=side==='LONG'?bid:ask;
+   }else{
+    price=freshChartCurrentLimit(liveQuote,currentTick,currentDigits,Date.now());
+    if(price===null)throw Error('실시간 현재가 연결 확인 필요 · 주문 미전송');
+   }
    if(!chartCurrentLimitMode||entryGeneration!==sheetQuoteGeneration||!isSheetOpen())throw Error('주문 확인창 변경 · 주문 미전송');
-   price=side==='LONG'?bid:ask;
    limitInput.value=price.toFixed(currentDigits);
    quoteState.textContent='최신 지정가 확정 · 주문 조건 검사 중';
   }
@@ -534,7 +549,7 @@ async function enter(side){
   if(type==='LIMIT'){
    const p=currentFollow?price.toFixed(currentDigits):roundDown(price,f.price.tickSize);
    if(!(Number(p)>0))throw Error('지정가 호가 단위 오류');
-   order.price=p;order.timeInForce='GTX';
+   order.price=p;order.timeInForce=postOnly?'GTX':'GTC';
   }
   let protection=null;
   if(plan){
@@ -566,6 +581,7 @@ async function enter(side){
     (allocation?' · 증거금 '+(used+1)+'/'+count+'단계 · 전체 허용 '+fmt(allocation.target)+' USDT':'')+
     (order.price?' @ '+order.price+' USDT':''));
   // Leverage was explicitly applied and verified in Settings. Do not change it during entry.
+  if(type==='LIMIT'&&postOnly!==entryPostOnly.checked)throw Error('Post Only 선택이 변경됐어요. 확인 후 다시 눌러 주세요.');
   lastOrderIssue=true;lastRequest=order.newClientOrderId;
   let response;
   try{response=await signed('POST','/fapi/v1/order',order);}
