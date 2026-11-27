@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-chart-switch-v372"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-chart-switch-v373"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -7336,7 +7336,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  const ctx=canvas.getContext('2d');if(!ctx)return;
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#080f19';ctx.fillRect(0,0,width,height);
  // The old-view gesture exchanges empty forecast slots for real historical bars.
- const pastReveal=priceView?.futureEnabled?Math.max(0,Math.floor(priceView?.pastReveal||0)):0;
+ const pastReveal=priceView?.futureEnabled||priceView?.manualViewport?Math.max(0,Math.floor(priceView?.pastReveal||0)):0;
  const row=patternCompareRows(bars,tf,index,pastReveal?
   {...config,window:config.window+pastReveal}:config);
  if(!row){ctx.fillStyle='#e8efff';ctx.fillText('차트 데이터 부족',12,22);return}
@@ -7354,7 +7354,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  const futureSlots=futureEnabled?Math.max(0,baseFutureSlots-pastReveal):0;
  // Keep a stable bar width: pastward movement reveals real older bars
  // while consuming the forecast window. The actual last candle stays visible.
- const slots=n+futureSlots;
+ const slots=priceView?.manualViewport?.slots??(n+futureSlots);
  const X=i=>left+(i+.5-futureShift)*pw/slots;
  const currentLive=futureEnabled?patternCompareLiveCandle(bars,tf):null;
  // Past matches use ONLY candles available at that historical timestamp.
@@ -7412,11 +7412,11 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  for(const e of [...realEntries,...realReservations]){low=Math.min(low,e.price);high=Math.max(high,e.price);}
  if(switchGuide&&Number.isFinite(switchGuide.price)&&(priceView?.priceZoom||1)===1&&Math.abs(priceView?.pricePan||0)<1e-9){low=Math.min(low,switchGuide.price);high=Math.max(high,switchGuide.price);}
  const pad=(high-low)*.06;low-=pad;high+=pad;
- const baselineRange=high-low;
+ const baselineRange=priceView?.manualViewport?.range??(high-low);
  if(priceView){priceView.priceBaselineRange=baselineRange;priceView.pricePlotHeight=pb-pt;}
  const zoom=Math.max(.12,Math.min(20,Number(priceView?.priceZoom)||1));
  const pan=Number.isFinite(priceView?.pricePan)?priceView.pricePan:0;
- const mid=(high+low)/2+pan*baselineRange,half=baselineRange/(2*zoom);
+ const mid=(priceView?.manualViewport?.center??((high+low)/2))+pan*baselineRange,half=baselineRange/(2*zoom);
  low=mid-half;high=mid+half;
  const Y=v=>pt+(high-v)/(high-low)*(pb-pt);
  if(priceView)priceView.priceAxisRange={low,high,top:pt,bottom:pb,width,height};
@@ -7932,7 +7932,31 @@ function patternCompareSetIndex(which,index){
   view.pastReveal=Math.min(maxReveal,Math.max(0,view.index-capped));
   view.futureShift=Math.max(0,capped-anchor);
  }
+ if(which==='current'&&view.manualViewport){
+  const pin=view.manualViewport;
+  pin.time=source[view.index].t;
+  pin.shift=view.futureShift-view.pastReveal;
+  pin.slots=view.count+(view.index===source.length-1?Math.max(32,Math.min(160,Math.ceil(view.count*.9))):0);
+ }
  renderPatternComparison();
+}
+function pinPatternCurrentView(view){
+ const bars=patternDisplayBars(patternComparison),bar=bars[view.index];
+ if(!bar||!view.priceAxisRange)return;
+ const future=view.index===bars.length-1?Math.max(32,Math.min(160,Math.ceil(view.count*.9))):0;
+ const range=view.priceBaselineRange;
+ view.manualViewport={time:bar.t,shift:(view.futureShift||0)-(view.pastReveal||0),
+  slots:view.count+future,range,center:(view.priceAxisRange.high+view.priceAxisRange.low)/2-(view.pricePan||0)*range};
+}
+function restorePatternCurrentWindow(view,bars){
+ const pin=view.manualViewport;
+ const anchor=patternCompareNearestIndex(bars,pin.time);
+ const first=anchor-view.count+1+pin.shift;
+ const end=Math.min(bars.length-1,first+pin.slots-1);
+ view.index=Math.max(0,end);
+ const shift=first-(view.index-view.count+1);
+ view.futureShift=Math.max(0,shift);
+ view.pastReveal=Math.max(0,-shift);
 }
 function patternCompareSetCount(which,count){
  const view=patternCompareView(which);if(!view)return;
@@ -7944,9 +7968,11 @@ function patternCompareSetCount(which,count){
    config.rmiLength+config.rmiMomentum)+2;
  const maxCount=Math.max(10,Math.min(300,source.length-minWarmup,
   view.index-minWarmup+1));
+ if(which==='current')view.manualViewport=null;
  view.count=Math.max(10,Math.min(maxCount,Math.round(count)));
  patternCompareSetIndex(which,view.index+(view.futureShift||0)-
   (view.pastReveal||0));
+ if(which==='current')pinPatternCurrentView(view);
 }
 function patternCompareLocalInputDate(t){
  const d=new Date(t+9*3600000);
@@ -8018,6 +8044,7 @@ async function choosePatternCurrentDisplay(tf){
   if(requestId!==state.displayRequestId||patternComparison!==state)return;
   if(!Array.isArray(bars)||bars.length<config.window+2)
    throw Error('해당 봉의 실제 캔들 데이터가 부족해');
+  view.manualViewport=null;
   view.displayTf=tf;
   view.displayBars=tf===state.tf?null:bars;
   view.index=bars.length-1;view.baseIndex=view.index;
@@ -8201,6 +8228,7 @@ function renderPatternComparison(){
   const source=which==='current'?patternDisplayBars(state):patternHistoricalData(state);
   if(which==='historical')view.historicalMatchTime=patternHistoricalMatchTime(state);
   if(!source?.length)continue;
+  if(which==='current'&&view.manualViewport)restorePatternCurrentWindow(view,source);
   const index=patternCompareLimit(view),bar=source[index];
   if(!bar)continue;
   let replay=null;
@@ -8279,6 +8307,7 @@ function setPatternComparisonRank(rank){
  // A newly selected match can have fewer available subsequent candles.
  // Preserve the user's current-chart zoom, but avoid a blank future viewport.
  const current=state.views.current;
+ current.manualViewport=null;
  current.futureShift=Math.min(current.futureShift||0,PATTERN_COMPARE_MAX_FUTURE);
  // Standardize the two views to the same original comparison horizon
  // whenever a new historical rank is selected. User can zoom afterwards.
@@ -9101,7 +9130,7 @@ function initPatternComparison(){
    const fraction=Math.max(0,Math.min(.999999,
     (screenX-rect.left-6)/Math.max(1,rect.width-76)));
    const totalFuture=view.futureEnabled?Math.max(32,Math.min(160,Math.ceil(view.count*.9))):0;
-   const extra=view.futureEnabled?Math.max(0,view.pastReveal||0):0;
+   const extra=view.futureEnabled||view.manualViewport?Math.max(0,view.pastReveal||0):0;
    const drawnCount=view.count+extra;
    const futureSlots=Math.max(0,totalFuture-extra);
    const index=view.index-drawnCount+1+
@@ -9137,7 +9166,7 @@ function initPatternComparison(){
   const extra=view?.futureEnabled?
    Math.max(32,Math.min(160,Math.ceil((view.count||60)*.9))):0;
   return Math.max(.5,(canvas.clientWidth-76)/
-   Math.max(10,(view?.count||60)+extra));
+   Math.max(10,view?.manualViewport?.slots??((view?.count||60)+extra)));
  };
   canvas.addEventListener('pointerdown',e=>{
    if(!patternComparison)return;
@@ -9220,6 +9249,7 @@ function initPatternComparison(){
      if(Math.abs(dy)>=.8){
       tapMoved=true;clearHold();
       const factor=Math.exp(-dy/Math.max(150,canvas.clientHeight)*2.3);
+      if(which==='current'&&!view.manualViewport)pinPatternCurrentView(view);
       view.priceZoom=Math.max(.12,Math.min(20,(view.priceZoom||1)*factor));
       lastY=e.clientY;renderPatternComparison();
      }
@@ -9274,6 +9304,7 @@ function initPatternComparison(){
    const view=patternCompareView(which);if(!view)return;
    const rect=canvas.getBoundingClientRect();
    if(which==='historical'&&patternComparison.manualReference){view.priceZoom=1;view.pricePan=0;renderPatternComparison();return;}
+   if(which==='current')view.manualViewport=null;
    if(e.clientX-rect.left>=rect.width-71){view.priceZoom=1;view.pricePan=0;}
    else {view.count=which==='current'?
      indicatorPatternConfig(patternDisplayTf(patternComparison)).window:
@@ -9289,6 +9320,7 @@ function initPatternComparison(){
    e.preventDefault();
    const view=patternCompareView(which);
    if(e.offsetX>=canvas.clientWidth-71){
+    if(which==='current'&&!view.manualViewport)pinPatternCurrentView(view);
     view.priceZoom=Math.max(.12,Math.min(20,(view.priceZoom||1)*
      (e.deltaY<0?1.1:.9)));
     renderPatternComparison();
