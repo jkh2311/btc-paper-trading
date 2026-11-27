@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-pattern-real-candle-replace-v370"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="btc-app-build" content="btc-app-build-20261127-switch-guide-v371"><link rel="manifest" href="./manifest.webmanifest?v=229"><link rel="apple-touch-icon" sizes="180x180" href="./hanine-app-icon.jpg?v=229"><meta name="apple-mobile-web-app-title" content="한이네프로그램"><meta name="application-name" content="한이네프로그램"><meta name="theme-color" content="#09111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>한이네프로그램</title><style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#e7edf8;font:15px -apple-system,BlinkMacSystemFont,sans-serif}header{position:sticky;top:0;background:#0d1a2e;padding:14px 16px;border-bottom:1px solid #30415d;z-index:2}h2{font-size:18px;margin:0 0 12px}main{max-width:720px;margin:auto;padding:14px}.card{background:#14233b;border:1px solid #314665;border-radius:18px;padding:16px;margin-bottom:14px}.muted{color:#9db1cb;font-size:13px}.price{font-size:29px;font-weight:750;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.tf{text-align:center;background:#0d1b30;border-radius:10px;padding:10px 2px;font-size:12px}.up{color:#4dd4a4}.down{color:#ff7d92}.flat{color:#aab8cd}button,select,input{font:inherit;border-radius:10px;padding:12px;background:#263d5c;color:white;border:1px solid #4b6383}button{cursor:pointer}button:disabled{opacity:.4}.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}label{display:block;font-size:13px;color:#b6c6dc;margin:10px 0 5px}input{width:100%}canvas{display:block;width:100%;height:410px;background:#0b1728;border-radius:12px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}#chart{overscroll-behavior:contain}.buy{background:#126456}.sell{background:#803b50}.pill{background:#253e60;border-radius:40px;padding:5px 10px;font-size:12px}.warn{color:#ffcf88}small{font-size:12px}#log{max-height:230px;overflow:auto}#log div{padding:8px 0;border-bottom:1px solid #30415d}
 /* iPhone-first compact trading layout */
 body{background:#09111f;font-size:14px}header.app-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;gap:8px;z-index:6}.brand{display:flex;flex-direction:column;gap:3px}.brand b{font-size:16px}.brand small{font-size:10px;color:#9db1cb}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .pill{font-size:10px;padding:5px 7px}.icon-btn{width:34px;height:34px;padding:0;font-size:22px;border-radius:10px}main{padding:8px 10px 180px;max-width:720px}.tab-page{display:none}.tab-page.active{display:block}.price-panel{padding:8px 5px 12px}.price{font-size:clamp(26px,7vw,36px);margin:2px 0 0;letter-spacing:-.8px}.tf-tabs{margin-bottom:9px}.tf-tabs select{width:100%;padding:9px 12px;background:#182941;border:1px solid #304867}.chart-panel{background:#0b1728;border:1px solid #26384e;border-radius:13px;overflow:hidden}.chart-legend,.indicator-label{font-size:11px;color:#9db1cb;padding:7px 10px 2px}.indicator-label{border-top:1px solid #26384e}#combinedChart{position:relative;overflow:hidden}
@@ -7087,7 +7087,9 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
  if(!(high>low)){low=visible.at(-1).c*.97;high=visible.at(-1).c*1.03}
  const realEntries=futureEnabled&&window.btcChartLevelVisible?.('entry')!==false?patternRealEntries:[];
  const realReservations=futureEnabled?realReservationChartLevels():[];
+ const switchGuide=futureEnabled&&window.btcChartLevelVisible?.('switch')!==false?window.btcLiveSwitchLevel?.():null;
  for(const e of [...realEntries,...realReservations]){low=Math.min(low,e.price);high=Math.max(high,e.price);}
+ if(switchGuide&&Number.isFinite(switchGuide.price)&&(priceView?.priceZoom||1)===1&&Math.abs(priceView?.pricePan||0)<1e-9){low=Math.min(low,switchGuide.price);high=Math.max(high,switchGuide.price);}
  const pad=(high-low)*.06;low-=pad;high+=pad;
  const baselineRange=high-low;
  if(priceView){priceView.priceBaselineRange=baselineRange;priceView.pricePlotHeight=pb-pt;}
@@ -7307,6 +7309,7 @@ function paintPatternCompareCanvas(id,bars,tf,index,config,inspectIndex=null,vis
   ctx.restore();
  }
  drawRealReservationChartLines(ctx,Y,pt,pb,left,left+pw,realReservations);
+ if(switchGuide)window.btcDrawLiveSwitchGuide?.(ctx,{y:Y,top:pt,priceBottom:pb,plotW:left+pw,left});
  // Real filled position entry lines only, never historical comparison or pending orders.
  for(const e of realEntries){
   const y=Y(e.price);if(y<pt||y>pb)continue;
@@ -9492,6 +9495,8 @@ const levels=[...liveLevels,...paperLevels,...(chartJumpSegment?[]:realReservati
 // merely to keep that off-screen trading level in the fitted price range.
 const sharedLock=!chartJumpSegment?sharedSavedForecast():null,sharedPoints=sharedForecastPoints(sharedLock,a,$('tf').value,left,plotW/count,plotW);
 if(sharedPoints.length&&verticalZoom===1&&Math.abs(verticalPan)<1e-9){const prices=sharedPoints.map(p=>sharedLock.scenario.prices[p.k]).filter(Number.isFinite);if(prices.length){base.lo=Math.min(base.lo,...prices);base.hi=Math.max(base.hi,...prices);}}
+const activeSwitchGuide=!chartJumpSegment&&!viewOffset&&window.btcChartLevelVisible?.('switch')!==false?window.btcLiveSwitchLevel?.():null;
+if(activeSwitchGuide&&Number.isFinite(activeSwitchGuide.price)&&verticalZoom===1&&Math.abs(verticalPan)<1e-9){base.lo=Math.min(base.lo,activeSwitchGuide.price);base.hi=Math.max(base.hi,activeSwitchGuide.price);const pad=Math.max(2,(base.hi-base.lo)*.04);base.lo-=pad;base.hi+=pad;}
 const rangeSpan=Math.max(1,base.hi-base.lo);
 const levelsNearHistory=!viewOffset||levels.every(price=>
   price>=base.lo-rangeSpan*.45&&price<=base.hi+rangeSpan*.45);
@@ -12236,15 +12241,16 @@ window.btcDrawLiveSwitchGuide=(ctx,scale)=>{
  if(!p||typeof scale?.y!=='function')return;
  const y=scale.y(p.price);
  if(y<scale.top||y>scale.priceBottom)return;
- const ink='#ffd166',label='스위칭 적용구간';
+ const ink='#ffd166',label='스위칭 적용구간 '+fmt(p.price);
+ const left=Number(scale.left)||0;
  ctx.save();
- ctx.beginPath();ctx.rect(0,scale.top,scale.plotW,scale.priceBottom-scale.top);ctx.clip();
+ ctx.beginPath();ctx.rect(left,scale.top,scale.plotW-left,scale.priceBottom-scale.top);ctx.clip();
  ctx.strokeStyle=ink;ctx.lineWidth=2;ctx.setLineDash([8,5]);
- ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(scale.plotW,y+.5);ctx.stroke();ctx.setLineDash([]);
+ ctx.beginPath();ctx.moveTo(left,y+.5);ctx.lineTo(scale.plotW,y+.5);ctx.stroke();ctx.setLineDash([]);
  ctx.font='bold 11px -apple-system,sans-serif';
  const textWidth=ctx.measureText(label).width;
  const width=Math.min(scale.plotW-8,Math.ceil(textWidth)+14);
- const x=6,ty=Math.max(scale.top+2,Math.min(scale.priceBottom-21,y-23));
+ const x=left+6,ty=Math.max(scale.top+2,Math.min(scale.priceBottom-21,y-23));
  ctx.fillStyle='rgba(37,32,17,.94)';ctx.fillRect(x,ty,width,20);
  ctx.strokeStyle=ink;ctx.lineWidth=1;ctx.strokeRect(x+.5,ty+.5,width-1,19);
  ctx.fillStyle=ink;ctx.fillText(label,x+6,ty+14,width-12);
@@ -12853,7 +12859,11 @@ $('btcSwitchArm').addEventListener('click',async()=>{
    balancePct:useBalance?pct:null,type:mode,executionMode,price:target,tpId,
    targets:{tp:targets.tp,sl:targets.sl},
    created:Date.now(),message:''});
+  chartIndicators.levelSwitch=true;
+  document.querySelectorAll('[data-chart-indicator="levelSwitch"]').forEach(el=>{el.checked=true;});
+  try{localStorage.setItem(chartIndicatorStorageKey,JSON.stringify(chartIndicators))}catch(_){}
   renderState();
+  if(patternComparison&&!$('patternCompare')?.hidden)renderPatternComparison();
   hideSwitchDialog();
  }catch(e){$('btcSwitchStatus').textContent='⚠ 설정 실패: '+e.message}
  finally{busy=false;$('btcSwitchArm').disabled=false}
