@@ -1998,7 +1998,7 @@ body.pattern-compare-real-order #entrySheet{z-index:100200!important;position:fi
   <button id="btcSwitchDismiss" type="button">닫기</button>
  </div>
  <div id="btcSwitchStatus" role="status" aria-live="polite">조건 없음</div>
- <p class="btc-switch-info">스위칭 적용 전과 감시 중에는 바이낸스 기존 익절·손절 주문을 변경하지 않습니다. 스위칭 취소는 감시만 해제하고 원래 익절 주문을 그대로 유지합니다. 전환 주문이 시작된 이후에는 자동 복원이 불가능할 수 있습니다.</p>
+ <p class="btc-switch-info">스위칭을 적용하면 기존 익절 주문을 취소하고 앱의 스위칭 가격 감시로 대체합니다. 기존 손절은 감시 중 유지합니다. 스위칭을 취소하면 원래 포지션을 확인한 뒤 기존 익절을 복원합니다.</p>
  <p class="btc-switch-warning">스위칭 조건은 직접 취소할 때까지 저장됩니다. 화면 잠금·백그라운드에서는 실행되지 않으며 앱으로 돌아오면 실계좌 재조회 후 감시를 재개합니다. 거래소에 상주하는 주문은 아니며 비활성 중 가격 도달은 실행을 보장하지 않습니다. 실계좌 주문 확인 실패 시 실행하지 않고 결과 불확실 시 자동 재시도하지 않습니다.</p>
 </div>
 <div id="realAccountUpdated" class="real-updated">실제 계좌 정보 미조회 · 자동 실시간 갱신 아님</div>
@@ -12117,7 +12117,7 @@ setInterval(()=>{
 },5000);
 timer=setInterval(()=>{if(demo){for(let tf of tfs){let a=candles[tf],v=a.at(-1),p=Math.max(1000,v.c*(1+(Math.random()-.5)*.001));a.push({t:Date.now(),o:v.c,h:Math.max(p,v.c),l:Math.min(p,v.c),c:p,v:Math.round(30+Math.random()*200)});a.shift()}last=candles['1m'].at(-1).c;process();render()}else refresh()},45000);
 
-</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=chart-switch-v372"></script><script src="./market-stats-stream.js?v=343"></script><script src="./protection-read-backoff.js?v=342"></script><script src="./live-manual-protection.js?v=protection-backoff-v342"></script><script src="./live-chart-levels.js?v=read-backoff-v342"></script><script src="./orphan-protection-cleanup.js?v=orphan-backoff-v342"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
+</script><script src="./real-position-hedge.js?v=stop-dedup-v322"></script><script src="./live-position-mode-sync.js?v=mode-210"></script><script src="./live-real-history.js?v=real-213"></script><script src="./live-trading-controls.js?v=controls-221"></script><script src="./live-manual-orders.js?v=chart-switch-v372"></script><script src="./market-stats-stream.js?v=343"></script><script src="./protection-read-backoff.js?v=342"></script><script src="./live-manual-protection.js?v=switch-tp-replacement"></script><script src="./live-chart-levels.js?v=read-backoff-v342"></script><script src="./orphan-protection-cleanup.js?v=orphan-backoff-v342"></script><script src="./cme-gaps.js?v=231"></script><script src="./ai-position-tp.js?v=tp-176"></script><script src="./ai-three-tp-orders.js?v=three-tp-177"></script>
 <script>
 /* v200: Opt-in foreground-only live switch. Standalone single TP trigger or
  * manual price. No 3-part TP integration. Never auto-arm after reload.
@@ -12181,6 +12181,8 @@ window.btcDisarmSwitchForManualClose=(side)=>{
   return {ok:false,reason:'스위칭 감시가 현재 주문 조건을 확인 중입니다. 잠시 후 다시 누르세요.'};
  if(!['ARMED','PAUSED'].includes(p.state))
   return {ok:false,reason:'스위칭 상태를 확인할 수 없습니다. 기존 주문 확인이 필요합니다.'};
+ if(p.replacedTp)
+  return {ok:false,reason:'스위칭 설정에서 취소를 눌러 기존 익절을 확인한 뒤 수동 청산해 주세요.'};
  if(side&&p.side!==side)
   return {ok:false,reason:'스위칭 감시 포지션과 청산 방향이 다릅니다. 확인이 필요합니다.'};
  try{
@@ -12323,6 +12325,42 @@ async function algos(){
  if(!rows)throw Error('조건부 주문 조회 실패');
  return rows.filter(o=>o.symbol===SYM);
 }
+function switchProtectionOrders(items,position){
+ const exit=position.side==='LONG'?'SELL':'BUY';
+ const found=items.filter(o=>o.positionSide===position.positionSide&&o.side===exit&&
+  Number(o.triggerPrice)>0&&/^\d+$/.test(String(o.algoId))&&
+  ((['STOP_MARKET','TAKE_PROFIT_MARKET'].includes(o.orderType||o.type)&&
+    (o.closePosition===true||o.closePosition==='true'))||
+   (['STOP','TAKE_PROFIT'].includes(o.orderType||o.type)&&Number(o.quantity)>0&&
+    (position.positionSide!=='BOTH'||o.reduceOnly===true||o.reduceOnly==='true'))));
+ if(found.length!==items.length)throw Error('다른 조건부 주문이 있어 충돌 방지를 위해 중단해요');
+ const tp=found.filter(o=>['TAKE_PROFIT','TAKE_PROFIT_MARKET'].includes(o.orderType||o.type));
+ if(tp.length>1||found.length-tp.length>1)throw Error('손절·익절 보호주문이 중복되어 중단해요');
+ return {tp:tp[0],orders:found};
+}
+window.btcSwitchReplacesTp=side=>{
+ const p=plans()[accountId()];
+ return p?.side===side&&!!p.replacedTp&&['ARMED','PAUSED','REVIEW','EXECUTING','CLOSE_PENDING'].includes(p.state);
+};
+function tpRestoreFields(order){
+ const type=order.orderType||order.type;
+ const fields={algoType:'CONDITIONAL',symbol:SYM,type,side:order.side,positionSide:order.positionSide,
+  triggerPrice:String(order.triggerPrice),workingType:order.workingType||'CONTRACT_PRICE'};
+ if(order.priceProtect===true||order.priceProtect==='true')fields.priceProtect='true';
+ if(type==='TAKE_PROFIT_MARKET')return {...fields,closePosition:'true'};
+ if(!(Number(order.price)>0)||order.timeInForce!=='GTC')
+  throw Error('원래 익절 지정가 주문의 복원 정보를 확인할 수 없어요');
+ return {...fields,price:String(order.price),quantity:String(order.quantity),timeInForce:'GTC',
+  ...(order.positionSide==='BOTH'?{reduceOnly:'true'}:{})};
+}
+async function verifySwitchPosition(plan){
+ const r=await risk(),pos=findPosition(r,plan);
+ if(!pos||r.dual!==(plan.positionSide!=='BOTH')||
+    r.rows.some(x=>x!==pos&&Math.abs(Number(x.positionAmt))>1e-8)||
+    Math.abs(Math.abs(Number(pos.positionAmt))-plan.oldQty)>1e-8||
+    Math.abs(Number(pos.entryPrice)-plan.entry)>Math.max(.2,plan.entry*.0001))
+  throw Error('원래 포지션이 변경되었습니다. 거래소 주문을 직접 확인하세요.');
+}
 function allowedAlgos(items,position){
  const exit=position.side==='LONG'?'SELL':'BUY';
  const found=items.filter(o=>o.positionSide===position.positionSide&&o.side===exit&&
@@ -12335,11 +12373,10 @@ function allowedAlgos(items,position){
  return found;
 }
 async function singleTp(p){
- const r=await algos(),found=allowedAlgos(r,p);
- const tp=found.filter(x=>(x.orderType||x.type)==='TAKE_PROFIT_MARKET');
- if(tp.length!==1||!(Number(tp[0].triggerPrice)>0))
-  throw Error('바이낸스의 기존 단일 전량 익절라인 1개를 찾지 못했어요');
- return tp[0];
+ const {tp}=switchProtectionOrders(await algos(),p);
+ if(!tp)
+  throw Error('바이낸스의 기존 단일 익절라인 1개를 찾지 못했어요');
+ return tp;
 }
 async function qtyFilter(){
  const x=await fetch(BASE+'/fapi/v1/exchangeInfo?symbol='+SYM,
@@ -12404,13 +12441,13 @@ async function afterCloseSize(pct,lot,limitPrice=0){
 async function fillTpPrice(){
  if(!selected)return;
  $('btcSwitchPrice').readOnly=true;
- $('btcSwitchInfo').textContent='실제 바이낸스 단일 전량 익절 주문 가격을 확인 중…';
+ $('btcSwitchInfo').textContent='실제 바이낸스 단일 익절 주문 가격을 확인 중…';
  try{
   const p=selected;
   const order=await singleTp(p);
   if(selected!==p||$('btcSwitchType').value!=='tp')return;
   $('btcSwitchPrice').value=String(order.triggerPrice);
-  $('btcSwitchInfo').textContent='기존 단일 전량 익절 '+fmt(order.triggerPrice)+' USDT · 3분할 익절은 사용하지 않음';
+  $('btcSwitchInfo').textContent='기존 단일 익절 '+fmt(order.triggerPrice)+' USDT · 3분할 익절은 사용하지 않음';
  }catch(e){$('btcSwitchPrice').value='';$('btcSwitchInfo').textContent='⚠ '+e.message}
 }
 function switchProtectionPrices(entry){
@@ -12805,16 +12842,32 @@ quickSubmit.addEventListener('click',async()=>{
 
 $('btcSwitchType').addEventListener('change',setMode);
 $('btcSwitchDismiss').addEventListener('click',hideSwitchDialog);
-$('btcSwitchStop').addEventListener('click',()=>{
- if(busy||['EXECUTING','REVIEW','CLOSE_PENDING','OPEN_PENDING'].includes(armed?.state)){
+$('btcSwitchStop').addEventListener('click',async()=>{
+ if(busy||checking||['EXECUTING','CLOSE_PENDING','OPEN_PENDING'].includes(armed?.state)||
+    (armed?.state==='REVIEW'&&!armed.tpChangePending)){
   $('btcSwitchStatus').textContent='실전 주문 처리/확인 중에는 취소할 수 없습니다. 바이낸스에서 상태를 확인해 주세요.';return;
  }
+ busy=true;
  try{
-  // Prior to execution no TP/SL was modified, so cancelling ONLY the
-  // foreground watcher leaves the existing Binance TP/SL orders unchanged.
+  const plan=armed;
+  if(plan?.replacedTp){
+   await verifySwitchPosition(plan);
+   const original=plan.replacedTp;
+   const fields={...original.fields,clientAlgoId:plan.id+'tp'};
+   const matches=o=>String(o.algoId)===original.id||o.clientAlgoId===fields.clientAlgoId;
+   const {tp}=switchProtectionOrders(await algos(),plan);
+   if(tp&&!matches(tp))throw Error('다른 익절 주문이 이미 있습니다. 바이낸스에서 확인해 주세요.');
+   if(!tp){
+    store({...plan,state:'REVIEW',tpChangePending:true,message:'원래 익절 복원 확인 중'});
+    try{await signed('POST','/fapi/v1/algoOrder',fields)}
+    catch(e){if(!(await algos()).some(matches))throw e;}
+    if(!(await algos()).some(matches))throw Error('원래 익절 복원 상태를 확인할 수 없어요');
+   }
+  }
   store(null);renderState();
-  $('btcSwitchStatus').textContent='✅ 스위칭 취소 완료 · 기존 거래소 익절/손절 주문 유지 (감시만 해제)';
- }catch(e){$('btcSwitchStatus').textContent=e.message}
+  $('btcSwitchStatus').textContent=plan?.replacedTp?'✅ 스위칭 취소 완료 · 기존 익절 확인':'✅ 스위칭 감시 취소 완료';
+ }catch(e){$('btcSwitchStatus').textContent='⚠ 스위칭 취소 실패: '+e.message}
+ finally{busy=false}
 });
 $('btcSwitchArm').addEventListener('click',async()=>{
  if(busy)return;busy=true;$('btcSwitchArm').disabled=true;
@@ -12853,18 +12906,16 @@ $('btcSwitchArm').addEventListener('click',async()=>{
   if(r.rows.some(x=>x!==live&&Math.abs(Number(x.positionAmt))>1e-8))
    throw Error('다른 BTCUSDT 포지션이 있어 자동 전환을 중단합니다');
   const n=await normals();if(n.length)throw Error('기존 일반 미체결 주문이 있습니다. 주문을 정리한 뒤 설정하세요');
-  const a=await algos();allowedAlgos(a,p);
-  let tpId=null;
-  if(mode==='tp'){
-   const tp=a.filter(x=>(x.orderType||x.type)==='TAKE_PROFIT_MARKET'&&
-    x.positionSide===p.positionSide&&x.side===(p.side==='LONG'?'SELL':'BUY'));
-   if(tp.length!==1||Math.abs(Number(tp[0].triggerPrice)-target)>Math.max(.02,target*.000001))
-    throw Error('기존 단일 익절라인이 바뀌었습니다. 다시 선택해 주세요');
-   tpId=String(tp[0].algoId);
-  }
+  if(armed?.replacedTp&&['ARMED','PAUSED'].includes(armed.state))
+   throw Error('기존 스위칭을 취소한 뒤 다시 적용하세요');
+  const {tp}=switchProtectionOrders(await algos(),p);
+  if(mode==='tp'&&(!tp||Math.abs(Number(tp.triggerPrice)-target)>Math.max(.02,target*.000001)))
+   throw Error('기존 단일 익절라인이 바뀌었습니다. 다시 선택해 주세요');
+  const replacedTp=tp?{id:String(tp.algoId),fields:tpRestoreFields(tp)}:null;
   const inverse=p.side==='SHORT'?'LONG':'SHORT';
   if(!confirm('BTCUSDT 실전 스위칭을 적용할까요?\n\n'+p.side+' → '+inverse+
    '\n스위칭 조건: '+(mode==='tp'?'기존 단일 익절라인 ':'직접 지정 가격 ')+fmt(target)+' USDT'+
+    (replacedTp?'\n적용 즉시 기존 익절 취소 · 손절 유지':'')+
    '\n기존 보유: '+fmt(q)+' BTC 전량 청산\n신규 '+inverse+': '+
    (useBalance?'청산 후 확정수익 포함 잔고 '+pct+'% 기준 재계산':fmt(newQty)+' BTC')+
    ' '+(executionMode==='LIMIT'?'지정가':'시장가')+' 진입\n'+
@@ -12872,12 +12923,25 @@ $('btcSwitchArm').addEventListener('click',async()=>{
    '⚠ 실제 '+(executionMode==='LIMIT'?'지정가':'시장가')+
    ' 주문이 제출됩니다. 지정가는 미체결·부분체결 가능하며 기존 보호주문은 취소됩니다. 새 포지션 체결 후 TP/SL 보호주문을 거래소에 등록·확인합니다. 등록 실패 시 직접 확인이 필요합니다.'+
    '\n스위칭 조건은 직접 취소할 때까지 저장됩니다. 앱이 비활성일 때는 실행되지 않으며 복귀 후 감시를 재개합니다. 체결·가격은 보장되지 않습니다.'))return;
-  store({id:'btcsr'+Date.now().toString(36),state:'ARMED',side:p.side,
+  const plan={id:'btcsr'+Date.now().toString(36),state:'ARMED',side:p.side,
    positionSide:p.positionSide,entry:p.entry,oldQty:q,
    newQty:useBalance?q:Number(exactQty(newQty,lot)),qtyMode:useBalance?'balance':'quantity',
-   balancePct:useBalance?pct:null,type:mode,executionMode,price:target,tpId,
+   balancePct:useBalance?pct:null,type:mode,executionMode,price:target,replacedTp,
    targets:{tp:targets.tp,sl:targets.sl},
-   created:Date.now(),message:''});
+   created:Date.now(),message:''};
+  if(replacedTp){
+   await verifySwitchPosition(plan);
+   const current=switchProtectionOrders(await algos(),plan).tp;
+   if(String(current?.algoId)!==replacedTp.id||(await normals()).length)
+    throw Error('확인 중 주문이 변경되었습니다. 다시 설정해 주세요');
+   store({...plan,state:'REVIEW',tpChangePending:true,message:'기존 익절 취소 확인 중'});
+   try{await signed('DELETE','/fapi/v1/algoOrder',{symbol:SYM,algoId:replacedTp.id})}
+   catch(e){if((await algos()).some(o=>String(o.algoId)===replacedTp.id))throw e;}
+   await verifySwitchPosition(plan);
+   if(switchProtectionOrders(await algos(),plan).tp)
+    throw Error('기존 익절 취소 상태를 확인할 수 없어요');
+  }
+  store(plan);
   chartIndicators.levelSwitch=true;
   document.querySelectorAll('[data-chart-indicator="levelSwitch"]').forEach(el=>{el.checked=true;});
   try{localStorage.setItem(chartIndicatorStorageKey,JSON.stringify(chartIndicators))}catch(_){}
@@ -12915,8 +12979,11 @@ async function preflight(p){
   throw Error('원래 포지션 수량 또는 진입가 변경');
  const [n,a,lot]=await Promise.all([normals(),algos(),qtyFilter()]);
  if(n.length)throw Error('일반 미체결 주문이 있어 자동 전환 중단');
- const protection=allowedAlgos(a,p);
- if(p.type==='tp'){
+ const scheduled=['tp','price'].includes(p.type);
+ const protection=scheduled?switchProtectionOrders(a,p).orders:allowedAlgos(a,p);
+ if(p.replacedTp&&protection.some(x=>['TAKE_PROFIT','TAKE_PROFIT_MARKET'].includes(x.orderType||x.type)))
+  throw Error('감시 중 다른 익절 주문이 등록되었습니다. 거래소에서 확인해 주세요.');
+ if(p.type==='tp'&&!p.replacedTp){
   const target=protection.find(x=>String(x.algoId)===p.tpId&&
    (x.orderType||x.type)==='TAKE_PROFIT_MARKET');
   if(!target||Math.abs(Number(target.triggerPrice)-p.price)>Math.max(.02,p.price*.000001))
@@ -13116,8 +13183,7 @@ async function execute(plan){
   // An invalid tick/LOT_SIZE must never create a protection gap.
   const limitRules=plan.executionMode==='LIMIT'?await limitSwitchRules(Number(plan.price)):null;
   const limitCloseQty=limitRules?exactQty(Number(prep.old),limitRules.lot):null;
-  // Only the single full-position STOP / TP market algorithms can be
-  // cancelled. All other orders are rejected above, fail closed.
+  // Cancel only the original position protection accepted by preflight.
   for(const a of prep.protection){
    await signed('DELETE','/fapi/v1/algoOrder',{symbol:SYM,algoId:String(a.algoId)});
   }

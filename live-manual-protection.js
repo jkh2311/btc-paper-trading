@@ -149,6 +149,7 @@ async function protect(side,p,info){
  // original full-size TP. Keep/recreate STOP_MARKET throughout the plan.
  // Never create a competing full-size TP while split order state exists.
  for(const type of (split?['STOP']:['STOP','TAKE_PROFIT'])){
+  if(type==='TAKE_PROFIT'&&window.btcSwitchReplacesTp?.(side))continue;
   if(active.some(o=>category(o.orderType||o.type)===type))continue;
   const clientAlgoId='btcp'+(type==='STOP'?'s':'t')+side[0]+Date.now().toString(36);
   const trigger=prices[type==='STOP'?'STOP_MARKET':'TAKE_PROFIT_MARKET'];
@@ -177,7 +178,7 @@ async function protect(side,p,info){
  }
 
  if(!active.some(o=>category(o.orderType||o.type)==='STOP')||
-    (!split&&!active.some(o=>category(o.orderType||o.type)==='TAKE_PROFIT')))
+    (!split&&!window.btcSwitchReplacesTp?.(side)&&!active.some(o=>category(o.orderType||o.type)==='TAKE_PROFIT')))
   throw Error('손절·익절 활성 상태 확인 실패');
  const hasLegacy=active.some(o=>['STOP_MARKET','TAKE_PROFIT_MARKET'].includes(o.orderType||o.type));
  note.textContent=split?
