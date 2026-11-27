@@ -9469,17 +9469,19 @@ function sharedAutomaticForecast(bars,tf){
  const ref=readAutomaticComparison()?.comparison.manualReference;
  const anchor=bars.at(-1);
  if(!ref||!anchor||viewOffset>0)return null;
- const horizon=patternCompareFutureBars;
+ const horizon=patternCompareFutureBars,fibEnabled=chartIndicators.fib;
  const cache=automaticForecastCache;
- if(cache?.ref===ref&&cache.bars===bars&&cache.tf===tf&&cache.time===anchor.t&&cache.price===anchor.c&&cache.horizon===horizon)return cache.value;
+ if(cache?.ref===ref&&cache.bars===bars&&cache.tf===tf&&cache.time===anchor.t&&cache.price===anchor.c&&cache.horizon===horizon&&cache.fibEnabled===fibEnabled)return cache.value;
  const state={manualReference:ref,forecastBars:horizon};
  let forecastTf=tf,scenario=patternManualReplay(state,bars,bars.length-1,tf);
  if((scenario?.prices?.length||0)<2&&ref.tf!==tf){
   forecastTf=ref.tf;
   scenario=patternManualReplay(state,[anchor],0,forecastTf);
  }
- const value=scenario?.prices?.length>1?{tf:forecastTf,time:anchor.t,scenario,automatic:true}:null;
- automaticForecastCache={ref,bars,tf,time:anchor.t,price:anchor.c,horizon,value};
+ const fib=fibEnabled&&scenario?.prices?.length>1?
+  patternCompareProjectedFibLevels(bars.slice(-265),scenario.prices):null;
+ const value=scenario?.prices?.length>1?{tf:forecastTf,time:anchor.t,scenario,fib,automatic:true}:null;
+ automaticForecastCache={ref,bars,tf,time:anchor.t,price:anchor.c,horizon,fibEnabled,value};
  return value;
 }
 function sharedForecastPoints(lock,a,tf,left,bw,plotW){
@@ -9502,7 +9504,12 @@ function paintSharedSavedForecast(ctx,lock,points,y,top,bottom,plotW,bw){
  if(!lock||!points.length)return;
  const z=lock.scenario;ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,bottom-top);ctx.clip();
  const line=(values,color,width)=>{ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash([5,4]);ctx.beginPath();let started=false;for(const p of points){const v=values?.[p.k];if(!Number.isFinite(v)){started=false;continue;}if(started)ctx.lineTo(p.x,y(v));else{ctx.moveTo(p.x,y(v));started=true;}}ctx.stroke();};
- if(chartIndicators.fib&&lock.fib){for(let j=0;j<7;j++)line(lock.fib.map(v=>v?.[j]),['#bfc8db','#3399ff','#0000ff','#00ff00','#008000','#ff0000','#bfc8db'][j],1);}
+ if(chartIndicators.fib&&lock.fib){
+  const first=points[0],last=points.at(-1);
+  const step=points.length>1?points[1].x-first.x:bw;
+  const x=k=>points[k-first.k]?.x??first.x+(k-first.k)*step;
+  drawPatternCompareProjectedFib(ctx,lock.fib,x,y,first.k,last.k,0,plotW,top,bottom,step);
+ }
  for(const m of z.ma||[])if(chartIndicators['ma'+m.period])line(m.values,m.color,1.4);
  if(chartIndicators.bb)for(const key of ['upper','mid','lower'])line((z.bb||[]).map(v=>v?.[key]),'#63b6a8',1.2);
  line(z.prices,'#ffd780',2.1);ctx.setLineDash([]);ctx.font='bold 11px sans-serif';ctx.fillStyle='#ffe0a0';ctx.fillText(lock.automatic?'과거 차트 기반 예측':'저장된 유사 예측',Math.max(4,Math.min(plotW-100,points[0].x)),top+12);ctx.restore();
@@ -9545,7 +9552,15 @@ const levels=[...liveLevels,...paperLevels,...(chartJumpSegment?[]:realReservati
 // be tens of thousands of dollars away. Do not compress historical candles
 // merely to keep that off-screen trading level in the fitted price range.
 const sharedLock=!chartJumpSegment?(sharedSavedForecast()||sharedAutomaticForecast(a,$('tf').value)):null,sharedPoints=sharedForecastPoints(sharedLock,a,$('tf').value,left,plotW/count,plotW);
-if(sharedPoints.length&&verticalZoom===1&&Math.abs(verticalPan)<1e-9){const prices=sharedPoints.map(p=>sharedLock.scenario.prices[p.k]).filter(Number.isFinite);if(prices.length){base.lo=Math.min(base.lo,...prices);base.hi=Math.max(base.hi,...prices);}}
+if(sharedPoints.length&&verticalZoom===1&&Math.abs(verticalPan)<1e-9){
+ for(const {k} of sharedPoints){
+  const row=chartIndicators.fib?sharedLock.fib?.[k]:null;
+  for(const price of [sharedLock.scenario.prices[k],row?.[0],row?.[6]]){
+   if(!Number.isFinite(price))continue;
+   base.lo=Math.min(base.lo,price);base.hi=Math.max(base.hi,price);
+  }
+ }
+}
 const activeSwitchGuide=!chartJumpSegment&&!viewOffset&&window.btcChartLevelVisible?.('switch')!==false?window.btcLiveSwitchLevel?.():null;
 if(activeSwitchGuide&&Number.isFinite(activeSwitchGuide.price)&&verticalZoom===1&&Math.abs(verticalPan)<1e-9){base.lo=Math.min(base.lo,activeSwitchGuide.price);base.hi=Math.max(base.hi,activeSwitchGuide.price);const pad=Math.max(2,(base.hi-base.lo)*.04);base.lo-=pad;base.hi+=pad;}
 const rangeSpan=Math.max(1,base.hi-base.lo);
