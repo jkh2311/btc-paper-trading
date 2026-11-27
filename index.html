@@ -4072,7 +4072,7 @@ for(const event of ['pointerup','pointercancel','lostpointercapture'])
 // The RMI/disparity separator is a full-width, fixed boundary.
 // Individual right-hand numeric axes zoom their own series independently.
 function visibleFutureSlots(count){
- if(readAutomaticComparison())return Math.min(patternCompareFutureBars,Math.max(4,Math.floor(count*.32)));
+ if(readSharedPatternSelection())return Math.min(patternCompareFutureBars,Math.max(4,Math.floor(count*.32)));
  // When a forecast is enabled, leave enough future slots to SHOW the entire
  // requested projection, with at least 40 actual candles at the left.
  // No synthetic candles are added to the trading/market data arrays.
@@ -8106,7 +8106,7 @@ function refreshPatternComparisonCandles(){
 function nativePatternReference(state,tf){
  const time=patternHistoricalMatchTime(state);
  if(!Number.isFinite(time))return null;
- const market=state.manualReference?.market||patternManualMarket(tf,time);
+ const market=tf==='1s'?'spot':tf==='30s'?'futures':state.manualReference?.market||patternManualMarket(tf,time);
  const anchor=candleOpenTime(tf,time);
  const key=[market,tf,anchor,state.forecastBars].join('|');
  const cache=state.nativeReferences||(state.nativeReferences=new Map());
@@ -8117,15 +8117,24 @@ function nativePatternReference(state,tf){
  let record=cache.get(key);
  if(record?.bars)return record;
  if(record?.pending||record?.retryAt>Date.now()||patternManualRetry>Date.now())return null;
- const status=$('patternCompareDisplayTfStatus');
- status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 실제 과거 캔들로 예측 준비 중…';
+ const status=state.onNativeReferenceReady?null:$('patternCompareDisplayTfStatus');
+ if(status)status.textContent=SIMILAR_PATTERN_LABELS[tf]+' 실제 과거 캔들로 예측 준비 중…';
  record={key,pending:true};cache.set(key,record);
  void (async()=>{
   try{
    const native=tf==='10m'?'5m':tf;
    const end=Math.min(nextCandleTime(tf,anchor,state.forecastBars+1)-1,candleOpenTime(tf,Date.now())-1);
    let rows=[];
-   for(let cursor=anchor;cursor<=end;){
+   if(tf==='30s'){
+    if(anchor<FUTURES_DAILY_START)throw Error('해당 날짜의 선물 30초봉이 없습니다');
+    const midnight=t=>Math.floor(t/FUTURES_ARCHIVE_DAY)*FUTURES_ARCHIVE_DAY;
+    for(let day=midnight(anchor);day<=end;day+=FUTURES_ARCHIVE_DAY){
+     const start=Math.max(anchor,day),finish=Math.min(end,day+FUTURES_ARCHIVE_DAY-1);
+     const archive=day<midnight(Date.now())?await loadFuturesThirtyArchiveDay(day):null;
+     const part=archive?.filter(b=>b.t>=start&&b.t<=finish)||await fetchFuturesThirtyRange(start,finish);
+     rows=rows.concat(part);
+    }
+   }else for(let cursor=anchor;cursor<=end;){
     const part=await fetchPatternManualCandles(market,native,cursor,end);
     if(!part.length)break;
     rows=rows.concat(part);
@@ -8140,7 +8149,8 @@ function nativePatternReference(state,tf){
   }catch(e){record.retryAt=Date.now()+15000;record.error=String(e.message||e);}
   finally{
    record.pending=false;
-   if(patternComparison===state&&patternDisplayTf(state)===tf&&patternHistoricalMatchTime(state)===time){
+   state.onNativeReferenceReady?.();
+   if(status&&patternComparison===state&&patternDisplayTf(state)===tf&&patternHistoricalMatchTime(state)===time){
     state.views.current.replayKey=null;
     status.textContent=record.error?'예측 조회 실패 · '+record.error:SIMILAR_PATTERN_LABELS[tf]+' 실제 과거 캔들 기준 예측';
     if(record.bars){renderPatternComparison();saveLastVisibleScreen(true);draw();}
@@ -8153,11 +8163,13 @@ function nativePatternForecast(state,source,index,tf,reference){
  if(!reference||!source[index])return null;
  const ref=state.manualReference;
  const original=state.forecastLock||ref?.forecast;
- const fixed=!!(ref||state.forecastLock);
- const anchorTime=fixed?candleOpenTime(tf,original?.time??source[index].t):source[index].t;
+ const baseline=state.projectionAnchor;
+ const blend=state.forecastBlend??patternCompareBlendEnabled;
+ const fixed=!!(ref||state.forecastLock||baseline);
+ const anchorTime=fixed?candleOpenTime(tf,baseline?.time??original?.time??source[index].t):source[index].t;
  const anchoredIndex=patternHistoricalAnchorIndex(source,tf,anchorTime);
- const anchorPrice=fixed?(original?.scenario?.prices?.[0]??source[index].c):source[index].c;
- const settings=[reference.key,anchorTime,anchorPrice,patternCompareBlendEnabled,ref?.startedAt].join('|');
+ const anchorPrice=fixed?(baseline?.price??original?.scenario?.prices?.[0]??source[index].c):source[index].c;
+ const settings=[reference.key,anchorTime,anchorPrice,blend,ref?.startedAt].join('|');
  const fixedCache=state.nativeForecasts||(state.nativeForecasts=new Map());
  if(fixed&&fixedCache.has(settings))return fixedCache.get(settings);
  const warm=anchoredIndex>=0?source.slice(Math.max(0,anchoredIndex-264),anchoredIndex+1):[{t:anchorTime,c:anchorPrice}];
@@ -8165,7 +8177,7 @@ function nativePatternForecast(state,source,index,tf,reference){
  const combined=warm.concat(reference.bars);
  let scenario=patternReplaySeries(combined,warm.length-1,warm.length,state.forecastBars,tf);
  if((scenario?.available||0)<1)return null;
- if(patternCompareBlendEnabled)scenario=patternCompareFiftyFiftyScenario(warm,warm.length-1,tf,scenario);
+ if(blend)scenario=patternCompareFiftyFiftyScenario(warm,warm.length-1,tf,scenario);
  if(!fixed)return scenario;
  const fib=patternCompareProjectedFibLevels(warm,scenario.prices);
  const forecast={tf,time:anchorTime,scenario,fib,automatic:true};
@@ -8193,19 +8205,22 @@ function renderPatternComparison(){
   if(!bar)continue;
   let replay=null;
   if(which==='current'){
+   if(!restoringLastView)publishSharedPatternSelection(state,source.at(-1));
    const browsePast=index<source.length-1;
    const unlocked=state.forecastLock?.tf!==displayTf;
    const reference=!browsePast&&unlocked?nativePatternReference(state,displayTf):null;
    const replayKey=[index,displayTf,reference?.key,state.rank,state.manualReference?.time,state.manualReference?.startedAt,
-    state.forecastLock?.time,state.forecastBars,patternCompareBlendEnabled,bar.t,bar.c].join('|');
+    state.forecastLock?.time,state.projectionAnchor?.time,state.forecastBars,patternCompareBlendEnabled,bar.t,bar.c].join('|');
    if(view.replayKey!==replayKey||view.replaySource!==source){
     let scenario=null;
     if(!browsePast){
      if(!unlocked)scenario=patternLockedReplay(state.forecastLock,bar.t,displayTf);
      else if(reference){
       const native=nativePatternForecast(state,source,index,displayTf,reference);
-      scenario=state.manualReference||state.forecastLock?patternLockedReplay(native,bar.t,displayTf):native;
+      scenario=state.projectionAnchor||state.manualReference||state.forecastLock?patternLockedReplay(native,bar.t,displayTf):native;
       if(scenario)scenario={...scenario,nativeDisplay:true};
+      if(native?.scenario&&state.projectionAnchor)
+       rememberSharedPatternForecast(state,displayTf,native);
      }
     }
     view.replayScenario=scenario;
@@ -8215,7 +8230,7 @@ function renderPatternComparison(){
   }else{
    view.replayScenario=null;view.replayKey=null;view.replaySource=null;
   }
-  view.forecastBars=which==='current'&&(state.manualReference||state.forecastLock||displayTf!==state.tf)?
+  view.forecastBars=which==='current'&&(state.projectionAnchor||state.manualReference||state.forecastLock||displayTf!==state.tf)?
    (replay?.available||0):state.forecastBars;
   view.historical=which==='historical';
   view.futureEnabled=which==='current'&&index===source.length-1;
@@ -8233,7 +8248,7 @@ function renderPatternComparison(){
    (which==='historical'?
     ' · '+state.rank+'위 검색 결과 · 실제 과거 전체 차트 · 유사도 '+
      state.match.similarity.toFixed(1)+'점':
-    ' · '+state.rank+'위 원본 유사 흐름을 '+SIMILAR_PATTERN_LABELS[displayTf]+'에 변환')+
+    ' · '+SIMILAR_PATTERN_LABELS[displayTf]+' 실제 과거 캔들 기준 예측')+
    (replay?' · 이후 자료 '+replay.available+'봉'+
     (replay.interpolated?' (중간값 보간)':''):'')+
    (inspected?' · 선택 종가 '+inspected.c.toLocaleString('en-US',{maximumFractionDigits:2}):'');
@@ -9445,7 +9460,7 @@ function initIndicatorPatternSearch(){
   // visible, including while new historical candles are loading.
   if(patternComparison?.forecastLock||readPersistentComparison()){indicatorPatternSearchBusy=false;btn.disabled=false;tfSelect.disabled=false;syncRetry();await restoreLastVisibleScreen(true);return;}
   closePatternComparison();
-  clearAutomaticComparison();patternManualCache.clear();draw();
+  clearAutomaticComparison();clearSharedPatternSelection();patternManualCache.clear();draw();
   resultsEl.replaceChildren();
   status.textContent=research?'이전 후보 제외 · 새 유사 패턴 검색 중…':'이전 검색 결과 초기화 · 새 검색 시작…';
   try{
@@ -9874,19 +9889,87 @@ function paintChartWeekendRegions(ctx,regions,top,bottom,plotW,layer){
  }
  ctx.restore();
 }
-// Shared visual-only forecast on the normal and expanded chart canvas.
-// Use the original saved time knots, including when the chart timeframe changes.
-let sharedLockRaw=null,sharedLockValue=null;
-function sharedSavedForecast(){
- try{const raw=localStorage.getItem(HANINE_LOCK_KEY);if(raw!==sharedLockRaw){sharedLockRaw=raw;sharedLockValue=raw?JSON.parse(raw)?.comparison?.forecastLock:null;}return sharedLockValue;}catch(_){return null;}
+// Keep the same selection and anchor across comparison, main and expanded charts.
+const SHARED_PATTERN_SELECTION_KEY='hanine-shared-pattern-selection-v1';
+var sharedPatternSelection,sharedPatternRuntime,sharedSavedRaw,sharedSavedSnapshot;
+function readSharedPatternSelection(){
+ if(sharedPatternSelection!==undefined)return sharedPatternSelection;
+ try{
+  const selected=JSON.parse(localStorage.getItem(SHARED_PATTERN_SELECTION_KEY)||'null');
+  if(selected?.version===1&&Number.isFinite(selected.time)&&selected.anchor?.price>0){
+   sharedPatternSelection=selected;return selected;
+  }
+  const saved=readPersistentComparison()||readAutomaticComparison(),snap=saved?.comparison;
+  const ref=snap?.manualReference,lock=snap?.forecastLock||ref?.forecast;
+  const time=ref?.time??snap?.matches?.[snap.rank-1]?.at;
+  if(Number.isFinite(time)&&lock?.scenario?.prices?.[0]>0){
+   const selected={version:1,time,market:ref?.market,rank:ref?null:snap.rank,
+    manualStart:ref?.startedAt||null,forecastBars:snap.forecastBars||patternCompareFutureBars,
+    blend:patternCompareBlendEnabled,anchor:{time:ref?.startedAt||lock.time,price:lock.scenario.prices[0]}};
+   storeSharedPatternSelection(selected);return selected;
+  }
+  sharedPatternSelection=null;
+ }catch(_){return null;}
+ return sharedPatternSelection;
 }
-function sharedAutomaticForecast(bars,tf){
- const saved=readAutomaticComparison(),ref=saved?.comparison.manualReference;
- if(!ref||!bars.length||viewOffset>0)return null;
- if(ref.forecast)return ref.forecast;
- const forecast=patternManualForecast({manualReference:ref,forecastBars:patternCompareFutureBars},bars,bars.length-1,tf);
- if(forecast)try{localStorage.setItem(HANINE_AUTO_COMPARISON_KEY,JSON.stringify(saved));}catch(_){}
- return forecast;
+function storeSharedPatternSelection(selected){
+ sharedPatternSelection=selected;sharedPatternRuntime=null;
+ try{
+  if(selected)localStorage.setItem(SHARED_PATTERN_SELECTION_KEY,JSON.stringify(selected));
+  else localStorage.removeItem(SHARED_PATTERN_SELECTION_KEY);
+ }catch(_){}
+}
+function clearSharedPatternSelection(){storeSharedPatternSelection(null);}
+function publishSharedPatternSelection(state,bar){
+ const time=patternHistoricalMatchTime(state),ref=state.manualReference;
+ if(!Number.isFinite(time)||!(bar?.c>0))return;
+ const selected=readSharedPatternSelection(),rank=ref?null:state.rank;
+ const manualStart=ref?.startedAt||null,market=ref?.market;
+ const same=selected?.time===time&&selected.rank===rank&&selected.manualStart===manualStart&&selected.market===market;
+ const saved=state.forecastLock||ref?.forecast;
+ const anchor=same?selected.anchor:{time:ref?.startedAt??Date.now(),price:saved?.scenario?.prices?.[0]??bar.c};
+ state.projectionAnchor=anchor;
+ if(same&&selected.forecastBars===state.forecastBars&&selected.blend===patternCompareBlendEnabled)return;
+ storeSharedPatternSelection({version:1,time,market,rank,manualStart,forecastBars:state.forecastBars,blend:patternCompareBlendEnabled,anchor});
+}
+function sharedPatternState(selected){
+ if(!sharedPatternRuntime){
+  const view={};
+  sharedPatternRuntime={manualReference:{time:selected.time,market:selected.market},forecastBars:selected.forecastBars,
+   projectionAnchor:selected.anchor,forecastBlend:selected.blend,views:{current:view},byTf:new Map(),
+   onNativeReferenceReady:()=>requestAnimationFrame(draw)};
+ }
+ return sharedPatternRuntime;
+}
+function rememberSharedPatternForecast(state,tf,forecast){
+ const selected=readSharedPatternSelection();
+ if(selected?.anchor!==state.projectionAnchor)return;
+ sharedPatternState(selected).byTf.set(tf,{...forecast,rank:selected.rank});
+}
+function sharedLockedComparison(){
+ try{
+  const raw=localStorage.getItem(HANINE_LOCK_KEY);
+  if(raw!==sharedSavedRaw){
+   sharedSavedRaw=raw;sharedSavedSnapshot=raw?JSON.parse(raw)?.comparison:null;
+  }
+  return sharedSavedSnapshot;
+ }catch(_){return null;}
+}
+function sharedSelectedForecast(bars,tf){
+ const selected=readSharedPatternSelection();
+ if(!selected||!bars.length||viewOffset>0)return null;
+ const saved=sharedLockedComparison(),lock=saved?.forecastLock;
+ if(lock?.tf===tf&&(saved.manualReference?.time??saved.matches?.[saved.rank-1]?.at)===selected.time)
+  return {...lock,rank:selected.rank};
+ const state=sharedPatternState(selected);
+ const previous=state.byTf.get(tf);
+ if(previous)return previous;
+ const reference=nativePatternReference(state,tf);
+ const forecast=nativePatternForecast(state,bars,bars.length-1,tf,reference);
+ if(!forecast)return null;
+ const labeled={...forecast,rank:selected.rank};
+ state.byTf.set(tf,labeled);
+ return labeled;
 }
 function sharedForecastPoints(lock,a,tf,left,bw,plotW){
  if(!lock?.scenario?.prices?.length||!a?.length)return [];
@@ -9904,9 +9987,10 @@ function sharedForecastPoints(lock,a,tf,left,bw,plotW){
  }
  return points;
 }
-function paintSharedSavedForecast(ctx,lock,points,y,top,bottom,plotW,bw){
+function paintSharedSavedForecast(ctx,lock,points,y,top,bottom,plotW,bw,futureEdge){
  if(!lock||!points.length)return;
- const z=lock.scenario;ctx.save();ctx.beginPath();ctx.rect(0,top,plotW,bottom-top);ctx.clip();
+ const z=lock.scenario,edge=Math.max(0,Math.min(plotW,futureEdge));
+ ctx.save();ctx.beginPath();ctx.rect(edge,top,plotW-edge,bottom-top);ctx.clip();
  const line=(values,color,width)=>{ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash([5,4]);ctx.beginPath();let started=false;for(const p of points){const v=values?.[p.k];if(!Number.isFinite(v)){started=false;continue;}if(started)ctx.lineTo(p.x,y(v));else{ctx.moveTo(p.x,y(v));started=true;}}ctx.stroke();};
  if(chartIndicators.fib&&lock.fib){
   const first=points[0],last=points.at(-1);
@@ -9916,7 +10000,7 @@ function paintSharedSavedForecast(ctx,lock,points,y,top,bottom,plotW,bw){
  }
  for(const m of z.ma||[])if(chartIndicators['ma'+m.period])line(m.values,m.color,1.4);
  if(chartIndicators.bb)for(const key of ['upper','mid','lower'])line((z.bb||[]).map(v=>v?.[key]),'#63b6a8',1.2);
- line(z.prices,'#ffd780',2.1);ctx.setLineDash([]);ctx.font='bold 11px sans-serif';ctx.fillStyle='#ffe0a0';ctx.fillText(lock.automatic?'과거 차트 기반 예측':'저장된 유사 예측',Math.max(4,Math.min(plotW-100,points[0].x)),top+12);ctx.restore();
+ line(z.prices,'#ffd780',2.1);ctx.setLineDash([]);ctx.font='bold 11px sans-serif';ctx.fillStyle='#ffe0a0';ctx.fillText((lock.rank?lock.rank+'위 유사 예측':'과거 차트 기반 예측')+' · '+(SIMILAR_PATTERN_LABELS[lock.tf]||spotSecondsLabel(lock.tf)),Math.max(edge+4,Math.min(plotW-100,points[0].x)),top+12);ctx.restore();
 }
 function draw(){updateDailyHistoryJump();updateIntradayHistoryJump();if($('tf').value==='10m')syncTenMinuteCandles();let a=chartViewBars(),cv=$('chart'),w=Math.max(260,cv.getBoundingClientRect().width),h=Math.max(65,cv.getBoundingClientRect().height||410),dpr=devicePixelRatio||1;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);let ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);if(!a||a.length<($('tf').value==='30s'?1:22)){ctx.fillStyle='#aab8cd';ctx.fillText($('tf').value==='30s'?futuresThirtyStatus:isSpotSecondsTf()?spotSecondStatus:'캔들 데이터 대기 중',18,28);return}viewCount=Math.max(20,Math.min((chartIndicators.maForecast||chartIndicators.bbForecast)?600:400,viewCount));let {start,end,count,left,slots}=visibleWindow(a),data=a.slice(start,end);if(!data.length)return;
 if(chartJumpSegment?.bars===a)scheduleJumpExtension(a,left,count);let right=72,plotW=w-right-8,top=18,priceBottom=Math.max(42,h-Math.max(31,h*(document.body.classList.contains('chart-focus-mode')?focusVolumeFraction:normalVolumeFraction))),volTop=priceBottom+18,volBottom=h-8;let bb=data.map((v,i)=>{let k=start+i;if(k<19)return null;let v20=a.slice(k-19,k+1).map(x=>x.c),m=v20.reduce((x,y)=>x+y,0)/20,sd=Math.sqrt(v20.reduce((x,y)=>x+(y-m)**2,0)/20);return {mid:m,upper:m+2*sd,lower:m-2*sd}});const anchor=stableChartPriceRange(a,$('tf').value),base={lo:anchor.lo,hi:anchor.hi};
@@ -9955,7 +10039,8 @@ const levels=[...liveLevels,...paperLevels,...(chartJumpSegment?[]:realReservati
 // While viewing far-back history, an unrelated current open position can
 // be tens of thousands of dollars away. Do not compress historical candles
 // merely to keep that off-screen trading level in the fitted price range.
-const sharedLock=!isSecondsChartTf()&&!chartJumpSegment?(sharedSavedForecast()||sharedAutomaticForecast(a,$('tf').value)):null,sharedPoints=sharedForecastPoints(sharedLock,a,$('tf').value,left,plotW/count,plotW);
+const selectedForecast=!chartJumpSegment&&!viewOffset&&readSharedPatternSelection();
+const sharedLock=selectedForecast?sharedSelectedForecast(a,$('tf').value):null,sharedPoints=sharedForecastPoints(sharedLock,a,$('tf').value,left,plotW/count,plotW);
 if(sharedPoints.length&&verticalZoom===1&&Math.abs(verticalPan)<1e-9){
  for(const {k} of sharedPoints){
   const row=chartIndicators.fib?sharedLock.fib?.[k]:null;
@@ -10016,18 +10101,18 @@ paintChartWeekendRegions(ctx,weekendRegions,top,priceBottom,plotW,'background');
   });
   if(started)ctx.stroke();
 }
-if(!sharedLock&&chartIndicators.maForecast){
+if(!selectedForecast&&chartIndicators.maForecast){
  // Translucent white price wave goes below the colored moving averages.
  drawProjectedPricePattern(ctx,a,left,count,plotW,top,priceBottom,y,bw);
  drawProjectedMovingAverages(ctx,a,left,count,plotW,top,priceBottom,y,bw);
 }
 // The projected bands use the same hypothetical future closes and horizon.
 // Paint after the white scenario and ahead of historical Bollinger curves.
-if(!sharedLock&&chartIndicators.bbForecast)drawProjectedBollingerBands(ctx,a,left,count,plotW,top,priceBottom,y,bw);
+if(!selectedForecast&&chartIndicators.bbForecast)drawProjectedBollingerBands(ctx,a,left,count,plotW,top,priceBottom,y,bw);
 // Auto-Fibonacci shares the same hypothetical future close series and is
 // visible in both normal and expanded charts (the same canvas draw path).
-if(!sharedLock&&chartIndicators.fib)drawProjectedAutoFib(ctx,a,left,count,plotW,top,priceBottom,y,bw);
-paintSharedSavedForecast(ctx,sharedLock,sharedPoints,y,top,priceBottom,plotW,bw);
+if(!selectedForecast&&chartIndicators.fib)drawProjectedAutoFib(ctx,a,left,count,plotW,top,priceBottom,y,bw);
+paintSharedSavedForecast(ctx,sharedLock,sharedPoints,y,top,priceBottom,plotW,bw,(a.length-left)*bw);
 if(chartIndicators.bb)for(let [key,color] of [['upper','#63b6a8'],['lower','#63b6a8'],['mid','#63b6a8']]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=key==='mid'?1.8:2.1;let started=false;bb.forEach((v,i)=>{if(!v)return;let x=(start+i-left+.5)*bw;if(!started){ctx.moveTo(x,y(v[key]));started=true}else ctx.lineTo(x,y(v[key]))});ctx.stroke()}ctx.restore();
 // Visual-only daily contraction analogues; never used by positions, orders or signals.
 if(!chartJumpSegment)window.btcDailyConvergenceForecast?.render(ctx,{
